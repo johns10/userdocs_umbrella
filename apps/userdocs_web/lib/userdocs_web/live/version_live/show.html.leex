@@ -1,0 +1,22 @@
+<h1>Show Version</h1>
+
+<%= if @live_action in [:edit] do %>
+  <%= live_modal @socket, UserDocsWeb.VersionLive.FormComponent,
+    id: @version.id,
+    title: @page_title,
+    action: @live_action,
+    version: @version,
+    return_to: Routes.version_show_path(@socket, :show, @version) %>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @version.name %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.version_show_path(@socket, :edit, @version), class: "button" %></span>
+<span><%= live_redirect "Back", to: Routes.version_index_path(@socket, :index) %></span>

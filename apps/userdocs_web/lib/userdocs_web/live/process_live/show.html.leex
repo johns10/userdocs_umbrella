@@ -1,0 +1,22 @@
+<h1>Show Process</h1>
+
+<%= if @live_action in [:edit] do %>
+  <%= live_modal @socket, UserDocsWeb.ProcessesLive.FormComponent,
+    id: @process.id,
+    title: @page_title,
+    action: @live_action,
+    process: @process,
+    return_to: Routes.processes_show_path(@socket, :show, @process) %>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @process.name %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.processes_show_path(@socket, :edit, @process), class: "button" %></span>
+<span><%= live_redirect "Back", to: Routes.processes_index_path(@socket, :index) %></span>

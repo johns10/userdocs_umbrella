@@ -1,0 +1,36 @@
+<h1>Listing Steps</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket, UserDocsWeb.StepLive.FormComponent,
+    id: @step.id || :new,
+    title: @page_title,
+    action: @live_action,
+    step: @step,
+    return_to: Routes.step_index_path(@socket, :index) %>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Order</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="steps">
+    <%= for step <- @steps do %>
+      <tr id="step-<%= step.id %>">
+        <td><%= step.process_id %></td>
+        <td><%= step.order %></td>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.step_show_path(@socket, :show, step) %></span>
+          <span><%= live_patch "Edit", to: Routes.step_index_path(@socket, :edit, step) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: step.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Step", to: Routes.step_index_path(@socket, :new) %></span>

@@ -1,0 +1,18 @@
+<h2><%= @title %></h2>
+
+<%= f = form_for @changeset, "#",
+  id: "step-form",
+  phx_target: @myself,
+  phx_change: "validate",
+  phx_submit: "save" %>
+
+  <%= label f, :process_id %>
+  <%= select f, :process_id, DomainHelpers.build_select_list(Automation.list_processes) %>
+  <%= error_tag f, :process_id %>
+
+  <%= label f, :order %>
+  <%= number_input f, :order %>
+  <%= error_tag f, :order %>
+
+  <%= submit "Save", phx_disable_with: "Saving..." %>
+</form>

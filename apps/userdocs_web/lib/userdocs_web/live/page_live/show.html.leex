@@ -1,0 +1,22 @@
+<h1>Show Page</h1>
+
+<%= if @live_action in [:edit] do %>
+  <%= live_modal @socket, UserDocsWeb.PageLive.FormComponent,
+    id: @page.id,
+    title: @page_title,
+    action: @live_action,
+    page: @page,
+    return_to: Routes.page_show_path(@socket, :show, @page) %>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Url:</strong>
+    <%= @page.url %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.page_show_path(@socket, :edit, @page), class: "button" %></span>
+<span><%= live_redirect "Back", to: Routes.page_index_path(@socket, :index) %></span>

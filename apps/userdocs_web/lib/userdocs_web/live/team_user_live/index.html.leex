@@ -1,0 +1,35 @@
+<h1>Listing Team users</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket, UserDocsWeb.TeamUserLive.FormComponent,
+    id: @team_user.id || :new,
+    title: @page_title,
+    action: @live_action,
+    team_user: @team_user,
+    return_to: Routes.team_user_index_path(@socket, :index) %>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="team_users">
+    <%= for team_user <- @team_users do %>
+      <tr id="team_user-<%= team_user.id %>">
+        <td><%= team_user.user_id %></td>
+        <td><%= team_user.team_id %></td>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.team_user_show_path(@socket, :show, team_user) %></span>
+          <span><%= live_patch "Edit", to: Routes.team_user_index_path(@socket, :edit, team_user) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: team_user.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Team user", to: Routes.team_user_index_path(@socket, :new) %></span>

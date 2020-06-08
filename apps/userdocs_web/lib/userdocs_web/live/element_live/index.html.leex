@@ -1,0 +1,39 @@
+<h1>Listing Elements</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket, UserDocsWeb.ElementLive.FormComponent,
+    id: @element.id || :new,
+    title: @page_title,
+    action: @live_action,
+    element: @element,
+    return_to: Routes.element_index_path(@socket, :index) %>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Strategy</th>
+      <th>Selector</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="elements">
+    <%= for element <- @elements do %>
+      <tr id="element-<%= element.id %>">
+        <td><%= element.name %></td>
+        <td><%= element.strategy %></td>
+        <td><%= element.selector %></td>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.element_show_path(@socket, :show, element) %></span>
+          <span><%= live_patch "Edit", to: Routes.element_index_path(@socket, :edit, element) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: element.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Element", to: Routes.element_index_path(@socket, :new) %></span>

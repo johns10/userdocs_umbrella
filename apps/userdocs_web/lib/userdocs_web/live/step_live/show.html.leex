@@ -1,0 +1,22 @@
+<h1>Show Step</h1>
+
+<%= if @live_action in [:edit] do %>
+  <%= live_modal @socket, UserDocsWeb.StepLive.FormComponent,
+    id: @step.id,
+    title: @page_title,
+    action: @live_action,
+    step: @step,
+    return_to: Routes.step_show_path(@socket, :show, @step) %>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Order:</strong>
+    <%= @step.order %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.step_show_path(@socket, :edit, @step), class: "button" %></span>
+<span><%= live_redirect "Back", to: Routes.step_index_path(@socket, :index) %></span>

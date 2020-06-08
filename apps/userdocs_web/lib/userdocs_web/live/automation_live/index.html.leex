@@ -1,0 +1,14 @@
+<h1><%= @version.name %></h1>
+
+<%= UserDocsWeb.AutomationLive.Index.body(@version) %>
+
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket, UserDocsWeb.ProjectLive.FormComponent,
+    id: @project.id || :new,
+    title: @page_title,
+    action: @live_action,
+    project: @project,
+    return_to: Routes.project_index_path(@socket, :index) %>
+<% end %>
+
+<span><%= live_patch "New Project", to: Routes.project_index_path(@socket, :new) %></span>

@@ -1,0 +1,18 @@
+<h2><%= @title %></h2>
+
+<%= f = form_for @changeset, "#",
+  id: "page-form",
+  phx_target: @myself,
+  phx_change: "validate",
+  phx_submit: "save" %>
+
+  <%= # label f, :version_id %>
+  <%= # select f, :version_id, DomainHelpers.build_select_list(Projects.list_versions) %>
+  <%= # error_tag f, :version_id %>
+
+  <%= label f, :url %>
+  <%= text_input f, :url %>
+  <%= error_tag f, :url %>
+
+  <%= submit "Save", phx_disable_with: "Saving..." %>
+</form>

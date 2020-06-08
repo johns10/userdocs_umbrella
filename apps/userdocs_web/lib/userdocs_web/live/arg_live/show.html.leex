@@ -1,0 +1,27 @@
+<h1>Show Arg</h1>
+
+<%= if @live_action in [:edit] do %>
+  <%= live_modal @socket, UserDocsWeb.ArgLive.FormComponent,
+    id: @arg.id,
+    title: @page_title,
+    action: @live_action,
+    arg: @arg,
+    return_to: Routes.arg_show_path(@socket, :show, @arg) %>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Key:</strong>
+    <%= @arg.key %>
+  </li>
+
+  <li>
+    <strong>Value:</strong>
+    <%= @arg.value %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.arg_show_path(@socket, :edit, @arg), class: "button" %></span>
+<span><%= live_redirect "Back", to: Routes.arg_index_path(@socket, :index) %></span>

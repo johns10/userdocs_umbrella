@@ -1,0 +1,37 @@
+<h1>Listing Step types</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket, UserDocsWeb.StepTypeLive.FormComponent,
+    id: @step_type.id || :new,
+    title: @page_title,
+    action: @live_action,
+    step_type: @step_type,
+    return_to: Routes.step_type_index_path(@socket, :index) %>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Args</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="step_types">
+    <%= for step_type <- @step_types do %>
+      <tr id="step_type-<%= step_type.id %>">
+        <td><%= step_type.name %></td>
+        <td><%= step_type.args %></td>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.step_type_show_path(@socket, :show, step_type) %></span>
+          <span><%= live_patch "Edit", to: Routes.step_type_index_path(@socket, :edit, step_type) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: step_type.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Step type", to: Routes.step_type_index_path(@socket, :new) %></span>
