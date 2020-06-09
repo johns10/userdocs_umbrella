@@ -9,7 +9,7 @@
   <%= label f, :users %>
   <%= multiple_select(f, :users, 
     Enum.map(Users.list_users(), &({&1.email, &1.id})),
-    selected: Enum.map(@team.users, &(&1.id))) %>
+    selected: Enum.map(@changeset.data.users, &(&1.id))) %>
   <%= error_tag f, :users %>
 
   <%= label f, :name %>

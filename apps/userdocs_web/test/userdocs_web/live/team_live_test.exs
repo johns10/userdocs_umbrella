@@ -5,13 +5,18 @@ defmodule UserDocsWeb.TeamLiveTest do
 
   alias UserDocs.Users
 
-  @user_attrs %{
+  @create_user_attrs %{
     email: "user@domain.com", 
     password: "password", 
     password_confirmation: "password"
   }
+  @update_user_attrs %{
+    email: "user@domain.com", 
+    password: "password"
+  }
 
-  @initial_attrs %{name: "initial name", users: [@user_attrs]}
+  
+  @initial_attrs %{name: "initial name", users: []}
   @create_attrs %{name: "some name", users: []}
   @update_attrs %{name: "some updated name", users: []}
   @invalid_attrs %{name: nil, users: []}
@@ -23,7 +28,7 @@ defmodule UserDocsWeb.TeamLiveTest do
   end
   
   defp fixture(:user) do
-    {:ok, user} = Users.create_user(@user_attrs)
+    {:ok, user} = Users.create_user(@create_user_attrs)
     user
   end
 

@@ -246,8 +246,6 @@ defmodule UserDocs.Users do
 
   """
   def create_team(attrs \\ %{}) do
-    IO.puts("Creating Team")
-    IO.inspect(attrs)
     %Team{}
     |> Team.changeset(attrs)
     |> Repo.insert()
@@ -265,14 +263,22 @@ defmodule UserDocs.Users do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_team(%Team{} = team, attrs) do
+  #TODO this could be more elegant, probably
+  def update_team(%Team{} = team, attrs = %{"users" => users}) do
     users = 
       User
       |> where([user], user.id in ^attrs["users"])
       |> Repo.all()
 
+      attrs = Map.put(attrs, "users", users)
+
     team
-    |> Team.changeset(attrs, users)
+    |> Team.changeset(attrs)
+    |> Repo.update()
+  end
+  def update_team(%Team{} = team, attrs) do
+    team
+    |> Team.changeset(attrs)
     |> Repo.update()
   end
 

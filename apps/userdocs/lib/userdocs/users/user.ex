@@ -6,7 +6,11 @@ defmodule UserDocs.Users.User do
   schema "users" do
     pow_user_fields()
 
-    many_to_many :teams, Team, join_through: Users.TeamUser, on_replace: :delete
+    many_to_many :teams, 
+      Team, 
+      join_through: Users.TeamUser, 
+      on_replace: :delete
+      
     timestamps()
   end
 end

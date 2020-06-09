@@ -6,9 +6,9 @@ defmodule UserDocs.UsersTest do
   describe "teams" do
     alias UserDocs.Users.Team
 
-    @valid_attrs %{name: "some name"}
-    @update_attrs %{name: "some updated name"}
-    @invalid_attrs %{name: nil}
+    @valid_attrs %{name: "some name", users: []}
+    @update_attrs %{name: "some updated name", users: []}
+    @invalid_attrs %{name: nil, users: []}
 
     def team_fixture(attrs \\ %{}) do
       {:ok, team} =

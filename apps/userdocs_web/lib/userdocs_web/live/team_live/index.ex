@@ -19,7 +19,6 @@ defmodule UserDocsWeb.TeamLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    IO.puts("Editing team")
     socket
     |> assign(:page_title, "Edit Team")
     |> assign(:users, list_users())
@@ -27,9 +26,13 @@ defmodule UserDocsWeb.TeamLive.Index do
   end
 
   defp apply_action(socket, :new, _params) do
+    team = 
+      %Team{}
+      |> Map.put(:users, [])
+
     socket
     |> assign(:page_title, "New Team")
-    |> assign(:team, %Team{})
+    |> assign(:team, team)
   end
 
   defp apply_action(socket, :index, _params) do
