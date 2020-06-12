@@ -2,7 +2,6 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocs.Users
-  alias UserDocsWeb.DomainHelpers
 
   @impl true
   def update(%{team: team} = assigns, socket) do

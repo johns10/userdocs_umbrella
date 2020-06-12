@@ -19,10 +19,10 @@ defmodule UserDocs.Automation.Process do
       join_through: Automation.VersionProcess, 
       on_replace: :delete
 
-      many_to_many :pages, 
-        Web.Page, 
-        join_through: Automation.PageProcess, 
-        on_replace: :delete
+    many_to_many :pages, 
+      Web.Page, 
+      join_through: Automation.PageProcess, 
+      on_replace: :delete
 
     timestamps()
   end
@@ -34,7 +34,6 @@ defmodule UserDocs.Automation.Process do
     |> put_assoc(:versions, parse_versions(attrs))
     |> put_assoc(:pages, parse_pages(attrs))
     |> validate_required([:name])
-    |> IO.inspect()
   end
 
   defp parse_versions(%{"versions" => versions}), do: versions

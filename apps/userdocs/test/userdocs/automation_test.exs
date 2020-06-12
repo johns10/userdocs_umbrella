@@ -246,9 +246,9 @@ defmodule UserDocs.AutomationTest do
   describe "processes" do
     alias UserDocs.Automation.Process
 
-    @valid_attrs %{name: "some name"}
-    @update_attrs %{name: "some updated name"}
-    @invalid_attrs %{name: nil}
+    @valid_attrs %{name: "some name", pages: [], versions: []}
+    @update_attrs %{name: "some updated name", pages: [], versions: []}
+    @invalid_attrs %{name: nil, pages: [], versions: []}
 
     def process_fixture(attrs \\ %{}) do
       {:ok, process} =
@@ -287,6 +287,7 @@ defmodule UserDocs.AutomationTest do
     test "update_process/2 with invalid data returns error changeset" do
       process = process_fixture()
       assert {:error, %Ecto.Changeset{}} = Automation.update_process(process, @invalid_attrs)
+      IO.inspect(Automation.get_process!(process.id))
       assert process == Automation.get_process!(process.id)
     end
 

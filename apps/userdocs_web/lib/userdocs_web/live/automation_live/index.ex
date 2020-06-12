@@ -23,7 +23,6 @@ defmodule UserDocsWeb.AutomationLive.Index do
 
   def body(version) do
     project_options = DomainHelpers.build_select_list(Projects.list_projects())
-    IO.inspect(project_options)
     [
       "test"
     ]
@@ -53,11 +52,6 @@ defmodule UserDocsWeb.AutomationLive.Index do
     {:ok, _} = Projects.delete_project(project)
 
     {:noreply, assign(socket, :projects, list_projects())}
-  end
-
-  def handle_event("test", _value, socket) do
-    IO.puts("Test event")
-    {:noreply, socket}
   end
 
   defp list_projects do

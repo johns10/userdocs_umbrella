@@ -13,12 +13,23 @@ defmodule UserDocsWeb.GroupComponent do
 
     def body(assigns) do
       IO.puts("Rendering Group Component")
-      IO.inspect(assigns)
-      [
-        for (object <- assigns.objects) do
-          object.name
+      IO.inspect(assigns.opts)
+      objects = assigns.opts[:objects]
+      title = assigns.opts[:title]
+      content_tag(:div, [class: "box"]) do
+        content_tag(:div, [class: "media-content"]) do
+          [
+            content_tag(:strong, []) do
+              title
+            end,
+            content_tag(:p, []) do
+              for (object <- objects) do
+                object.name
+              end
+            end
+          ]
         end
-      ]
+      end
     end
   
     @impl true

@@ -4,7 +4,6 @@ defmodule UserDocsWeb.ProcessesLive.FormComponent do
   alias UserDocs.Web
   alias UserDocs.Automation
   alias UserDocs.Projects
-  alias UserDocsWeb.DomainHelpers
 
   @impl true
   def update(%{process: process} = assigns, socket) do
@@ -18,8 +17,6 @@ defmodule UserDocsWeb.ProcessesLive.FormComponent do
 
   @impl true
   def handle_event("validate", %{"process" => process_params}, socket) do
-    IO.puts("Validating process")
-    IO.inspect(process_params)
     changeset =
       socket.assigns.process
       |> Automation.change_process(process_params)

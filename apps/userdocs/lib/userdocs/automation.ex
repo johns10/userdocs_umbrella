@@ -473,8 +473,6 @@ defmodule UserDocs.Automation do
 
   """
   def update_process(%Process{} = process, attrs) do
-    IO.puts("Updating Process")
-    IO.inspect(attrs)
     attrs = 
       attrs
       |> fetch_process_versions
@@ -492,7 +490,7 @@ defmodule UserDocs.Automation do
 
     Map.put(attrs, "versions", versions)
   end
-  def fetch_process_versions(attrs), do: Map.put(attrs, "versions", [])
+  def fetch_process_versions(attrs), do: attrs
 
   def fetch_process_pages(attrs = %{"pages" => pages}) do
     pages = 
@@ -502,7 +500,7 @@ defmodule UserDocs.Automation do
 
     Map.put(attrs, "pages", pages)
   end
-  def fetch_process_pages(attrs), do: Map.put(attrs, "pages", [])
+  def fetch_process_pages(attrs), do: attrs
 
   @doc """
   Deletes a process.
@@ -530,7 +528,6 @@ defmodule UserDocs.Automation do
 
   """
   def change_process(%Process{} = process, attrs \\ %{}) do
-    IO.puts("Changing Process")
     Process.changeset(process, attrs)
   end
 
