@@ -15,6 +15,17 @@
     <strong>Name:</strong>
     <%= @version.name %>
   </li>
+  <li>
+    <%= 
+    IO.inspect(@version)
+    live_group(@socket, UserDocsWeb.ProcessLive.FormComponent,
+      [
+        objects: @version.processes,
+        form: UserDocsWeb.ProcessLive.FormComponent,
+        return_to: Routes.project_index_path(@socket, :index)
+      ]
+    ) %>
+  </li>
 
 </ul>
 

@@ -16,6 +16,7 @@ defmodule UserDocs.Automation do
       left_join: step in assoc(processes, :steps),
       preload: [
         :pages,
+        :processes,
         pages: {pages, processes: {processes, :steps}}
       ]
 
@@ -417,7 +418,8 @@ defmodule UserDocs.Automation do
 
   """
   def list_processes do
-    Repo.all(Process)
+    Repo.all from Process,
+      preload: [:versions, :pages]
   end
 
   @doc """
@@ -434,7 +436,11 @@ defmodule UserDocs.Automation do
       ** (Ecto.NoResultsError)
 
   """
-  def get_process!(id), do: Repo.get!(Process, id)
+  def get_process!(id) do
+    Repo.one from process in Process,
+      where: process.id == ^id,
+      preload: [:versions, :pages]
+  end
 
   @doc """
   Creates a process.
@@ -467,10 +473,36 @@ defmodule UserDocs.Automation do
 
   """
   def update_process(%Process{} = process, attrs) do
+    IO.puts("Updating Process")
+    IO.inspect(attrs)
+    attrs = 
+      attrs
+      |> fetch_process_versions
+      |> fetch_process_pages
+
     process
     |> Process.changeset(attrs)
     |> Repo.update()
   end
+  def fetch_process_versions(attrs = %{"versions" => versions}) do
+    versions = 
+      UserDocs.Projects.Version
+      |> where([version], version.id in ^attrs["versions"])
+      |> Repo.all()
+
+    Map.put(attrs, "versions", versions)
+  end
+  def fetch_process_versions(attrs), do: Map.put(attrs, "versions", [])
+
+  def fetch_process_pages(attrs = %{"pages" => pages}) do
+    pages = 
+      UserDocs.Web.Page
+      |> where([page], page.id in ^attrs["pages"])
+      |> Repo.all()
+
+    Map.put(attrs, "pages", pages)
+  end
+  def fetch_process_pages(attrs), do: Map.put(attrs, "pages", [])
 
   @doc """
   Deletes a process.
@@ -498,6 +530,19 @@ defmodule UserDocs.Automation do
 
   """
   def change_process(%Process{} = process, attrs \\ %{}) do
+    IO.puts("Changing Process")
     Process.changeset(process, attrs)
   end
+
+  alias UserDocs.Automation.VersionProcess
+
+  @doc """
+  Returns the list of version_process.
+
+  ## Examples
+
+      iex> list_version_process()
+      [%VersionProcess{}, ...]
+
+  """
 end

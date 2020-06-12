@@ -3,6 +3,8 @@ defmodule UserDocsWeb.AutomationLive.Index do
   use UserdocsWeb.LiveViewPowHelper
 
   alias UserDocsWeb.Layout
+  alias UserDocsWeb.DomainHelpers
+  alias UserDocsWeb.SocketHelpers
   alias UserDocs.Automation
   alias UserDocs.Projects
   alias UserDocs.Projects.Project
@@ -10,6 +12,7 @@ defmodule UserDocsWeb.AutomationLive.Index do
   @impl true
   def mount(_params, session, socket) do
     socket = maybe_assign_current_user(socket, session)
+    socket = assign(socket, SocketHelpers.automation_ui_socket())
     {:ok, assign(socket, :version, Automation.details(1))}
   end
 
@@ -19,37 +22,10 @@ defmodule UserDocsWeb.AutomationLive.Index do
   end
 
   def body(version) do
+    project_options = DomainHelpers.build_select_list(Projects.list_projects())
+    IO.inspect(project_options)
     [
-      Layout.content_group("Processes",
-        for(process <- version.processes) do
-          Layout.content_item(process.name)
-        end
-      ),
-      Layout.content_group("Pages",
-        for(page <- version.pages) do
-          [
-            Layout.content_item(
-              [
-                page.url,
-                Layout.content_group("Processes",
-                  for(process <- page.processes) do
-                    Layout.content_item(
-                      [
-                        process.name,
-                        Layout.content_group("Steps",
-                          for(step <- process.steps) do
-                            Layout.content_item(step.order)
-                          end
-                        )
-                      ]
-                    )
-                  end
-                )
-              ]
-            )
-          ]
-        end
-      )
+      "test"
     ]
   end
 
@@ -77,6 +53,11 @@ defmodule UserDocsWeb.AutomationLive.Index do
     {:ok, _} = Projects.delete_project(project)
 
     {:noreply, assign(socket, :projects, list_projects())}
+  end
+
+  def handle_event("test", _value, socket) do
+    IO.puts("Test event")
+    {:noreply, socket}
   end
 
   defp list_projects do

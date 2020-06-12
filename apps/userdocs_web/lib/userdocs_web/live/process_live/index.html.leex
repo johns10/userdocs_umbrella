@@ -12,6 +12,8 @@
 <table>
   <thead>
     <tr>
+      <th>Versions</th>
+      <th>Pages</th>
       <th>Name</th>
 
       <th></th>
@@ -20,6 +22,8 @@
   <tbody id="processes">
     <%= for process <- @processes do %>
       <tr id="process-<%= process.id %>">
+        <td><%= for (version <- process.versions), do: version.name %></td>
+        <td><%= for (page <- process.pages), do: page.name %></td>
         <td><%= process.name %></td>
 
         <td>

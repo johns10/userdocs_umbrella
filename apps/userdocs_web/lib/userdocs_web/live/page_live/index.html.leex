@@ -12,6 +12,7 @@
 <table>
   <thead>
     <tr>
+      <th>Name</th>
       <th>Url</th>
 
       <th></th>
@@ -20,6 +21,7 @@
   <tbody id="pages">
     <%= for page <- @pages do %>
       <tr id="page-<%= page.id %>">
+        <td><%= page.name %></td>
         <td><%= page.url %></td>
 
         <td>
