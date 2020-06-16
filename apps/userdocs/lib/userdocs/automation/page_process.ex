@@ -5,8 +5,8 @@ defmodule UserDocs.Automation.PageProcess do
   @primary_key false
 
   schema "page_processes" do
-    field :page_id, :id
-    field :process_id, :id
+    field :page_id, :integer
+    field :process_id, :integer
 
     timestamps()
   end

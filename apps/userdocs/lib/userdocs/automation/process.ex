@@ -28,7 +28,7 @@ defmodule UserDocs.Automation.Process do
   end
 
   @doc false
-  def changeset(process, attrs) do
+  def changeset(process, attrs) do  
     process
     |> cast(attrs, [:name])
     |> put_assoc(:versions, parse_versions(attrs))

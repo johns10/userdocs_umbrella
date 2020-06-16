@@ -5,8 +5,8 @@ defmodule UserDocs.Automation.VersionProcess do
   @primary_key false
   
   schema "version_processes" do
-    field :version_id, :id
-    field :process_id, :id
+    field :version_id, :integer
+    field :process_id, :integer
 
     timestamps()
   end

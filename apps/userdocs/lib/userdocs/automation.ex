@@ -419,7 +419,7 @@ defmodule UserDocs.Automation do
   """
   def list_processes do
     Repo.all from Process,
-      preload: [:versions, :pages]
+      preload: [:pages, :versions]
   end
 
   @doc """
@@ -437,7 +437,7 @@ defmodule UserDocs.Automation do
 
   """
   def get_process!(id) do
-    Repo.one from process in Process,
+    Repo.one! from process in Process,
       where: process.id == ^id,
       preload: [:versions, :pages]
   end
