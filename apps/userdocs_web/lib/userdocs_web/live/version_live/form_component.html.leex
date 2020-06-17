@@ -7,13 +7,13 @@
   phx_submit: "save" %>
 
   <%= label f, :project_id %>
-  <%= select f, :project_id, DomainHelpers.build_select_list(Projects.list_projects) %>
+  <%= select f, :project_id, DomainHelpers.select_list(Projects.list_projects) %>
   <%= error_tag f, :project_id %>
 
   <%= label f, :name %>
   <%= text_input f, :name %>
   <%= error_tag f, :name %>
-  
+
 
   <%= submit "Save", phx_disable_with: "Saving..." %>
 </form>

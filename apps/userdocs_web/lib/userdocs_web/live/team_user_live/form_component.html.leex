@@ -7,11 +7,11 @@
   phx_submit: "save" %>
 
   <%= label f, :user_id %>
-  <%= select f, :user_id, DomainHelpers.build_select_list(Users.list_users(), :email) %>
+  <%= select f, :user_id, DomainHelpers.select_list(Users.list_users(), :email) %>
   <%= error_tag f, :user_id %>
 
   <%= label f, :team_id %>
-  <%= select f, :team_id, DomainHelpers.build_select_list(Users.list_teams()) %>
+  <%= select f, :team_id, DomainHelpers.select_list(Users.list_teams()) %>
   <%= error_tag f, :team_id %>
 
   <%= submit "Save", phx_disable_with: "Saving..." %>

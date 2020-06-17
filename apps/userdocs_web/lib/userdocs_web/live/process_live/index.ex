@@ -15,6 +15,7 @@ defmodule UserDocsWeb.ProcessesLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
+    IO.puts("Editing a process")
     socket
     |> assign(:page_title, "Edit Process")
     |> assign(:process, Automation.get_process!(id))

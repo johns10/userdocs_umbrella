@@ -22,7 +22,7 @@ defmodule UserDocsWeb.AutomationLive.Index do
   end
 
   def body(version) do
-    project_options = DomainHelpers.build_select_list(Projects.list_projects())
+    project_options = DomainHelpers.select_list(Projects.list_projects())
     [
       "test"
     ]

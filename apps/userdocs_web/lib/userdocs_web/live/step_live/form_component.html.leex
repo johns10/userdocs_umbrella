@@ -7,7 +7,7 @@
   phx_submit: "save" %>
 
   <%= label f, :process_id %>
-  <%= select f, :process_id, DomainHelpers.build_select_list(Automation.list_processes) %>
+  <%= select f, :process_id, DomainHelpers.select_list(Automation.list_processes) %>
   <%= error_tag f, :process_id %>
 
   <%= label f, :order %>

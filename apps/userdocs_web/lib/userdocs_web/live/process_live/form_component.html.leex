@@ -7,17 +7,17 @@
   phx_submit: "save" %>
 
   <%= label f, :versions %>
-  <%= multiple_select(f, :versions, 
-    Enum.map(Projects.list_versions(), &({&1.name, &1.id})),
-    selected: Enum.map(@changeset.data.versions, &(&1.id))) %>
+  <%= multiple_select(f, :versions,
+    DomainHelpers.select_list(@available_versions),
+    selected: DomainHelpers.selected(@changeset.data.versions)) %>
   <%= error_tag f, :versions %>
 
   <%= label f, :pages %>
-  <%= multiple_select(f, :pages, 
-    Enum.map(Web.list_pages(), &({&1.name, &1.id})),
-    selected: Enum.map(@changeset.data.pages, &(&1.id))) %>
+  <%= multiple_select(f, :pages,
+    DomainHelpers.select_list(@available_pages),
+    selected: DomainHelpers.selected(@changeset.data.pages)) %>
   <%= error_tag f, :pages %>
-  
+
   <%= label f, :name %>
   <%= text_input f, :name %>
   <%= error_tag f, :name %>

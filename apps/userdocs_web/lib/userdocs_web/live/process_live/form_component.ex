@@ -1,9 +1,10 @@
 defmodule UserDocsWeb.ProcessesLive.FormComponent do
   use UserDocsWeb, :live_component
 
+  alias UserDocs.Projects
   alias UserDocs.Web
   alias UserDocs.Automation
-  alias UserDocs.Projects
+  alias UserDocsWeb.DomainHelpers
 
   @impl true
   def update(%{process: process} = assigns, socket) do
@@ -12,6 +13,8 @@ defmodule UserDocsWeb.ProcessesLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:available_versions, available_versions())
+     |> assign(:available_pages, available_pages())
      |> assign(:changeset, changeset)}
   end
 
@@ -53,5 +56,13 @@ defmodule UserDocsWeb.ProcessesLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
+  end
+
+  defp available_versions do
+    Projects.list_versions()
+  end
+
+  defp available_pages do
+    Web.list_pages()
   end
 end
