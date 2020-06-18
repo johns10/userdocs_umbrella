@@ -2,12 +2,13 @@ defmodule UserDocsWeb.Layout do
   use Phoenix.HTML
 
   @doc """
-  
+
   """
+  #Not used
   def content_group(group_label, contents) do
     [
-      content_tag(:h3, []) do 
-        group_label 
+      content_tag(:h3, []) do
+        group_label
       end,
       content_tag(:dl, []) do
         contents
@@ -15,12 +16,14 @@ defmodule UserDocsWeb.Layout do
     ]
   end
 
+  #Not used
   def content_item(contents) do
     content_tag(:dt, []) do
       contents
     end
   end
 
+  #Unused, can ber removed shortly
   def picker(contents, options) do
     content_tag(:div, [class: "dropdown is-active"]) do
       [
@@ -31,12 +34,12 @@ defmodule UserDocsWeb.Layout do
             aria_controls: "dropdown-menu"
           ]) do
             [
-              content_tag(:span, []) do 
+              content_tag(:span, []) do
                 "Dropdown Button"
               end,
               content_tag(:span, [class: "icon is-small"]) do
                 content_tag(:i, [
-                  class: "fa fa-angle-down", 
+                  class: "fa fa-angle-down",
                   aria_hiddn: "true"
                 ]) do
                   ""
@@ -70,4 +73,3 @@ defmodule UserDocsWeb.Layout do
     end
   end
 end
-  

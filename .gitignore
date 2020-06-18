@@ -21,3 +21,6 @@ erl_crash.dump
 
 # ignore the mnesia files
 /Mnesia.nonode@nohost/
+*.LOG
+*.DCD
+*.DAT

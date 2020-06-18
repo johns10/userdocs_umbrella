@@ -2,8 +2,6 @@ defmodule UserDocsWeb.AutomationLive.Index do
   use UserDocsWeb, :live_view
   use UserdocsWeb.LiveViewPowHelper
 
-  alias UserDocsWeb.Layout
-  alias UserDocsWeb.DomainHelpers
   alias UserDocsWeb.SocketHelpers
   alias UserDocs.Automation
   alias UserDocs.Projects
@@ -19,13 +17,6 @@ defmodule UserDocsWeb.AutomationLive.Index do
   @impl true
   def handle_params(params, _url, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
-  end
-
-  def body(version) do
-    project_options = DomainHelpers.select_list(Projects.list_projects())
-    [
-      "test"
-    ]
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do

@@ -16,13 +16,16 @@
     <%= @version.name %>
   </li>
   <li>
-    <%= 
-    live_group(@socket, UserDocsWeb.ProcessLive.FormComponent,
+    <%=
+    live_group(@socket,
+      UserDocsWeb.ProcessLive.ShowComponent,
+      UserDocsWeb.ProcessLive.FormComponent,
       [
         title: "Processes",
         objects: @version.processes,
-        form: UserDocsWeb.ProcessLive.FormComponent,
-        return_to: Routes.project_index_path(@socket, :index)
+        return_to: Routes.processes_index_path(@socket, :index),
+        id: "version-" <> Integer.to_string(@version.id) <> "-processes-content-group",
+        parent: @version
       ]
     ) %>
   </li>
