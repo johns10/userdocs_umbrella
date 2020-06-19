@@ -7,15 +7,21 @@
   phx_submit: "save" %>
 
   <%= label f, :versions %>
-  <%= multiple_select(f, :versions,
-    DomainHelpers.select_list(@available_versions),
-    selected: DomainHelpers.selected(@changeset.data.versions)) %>
+  <%=
+    #IO.puts("Form")
+    #IO.inspect(f)
+    select_list = DomainHelpers.select_list(@available_versions)
+    selected = DomainHelpers.selected(@changeset.data.versions)
+    #IO.inspect(select_list)
+    #IO.inspect(selected)
+    multiple_select(f, :versions, select_list, selected: selected) %>
   <%= error_tag f, :versions %>
 
   <%= label f, :pages %>
   <%= multiple_select(f, :pages,
     DomainHelpers.select_list(@available_pages),
-    selected: DomainHelpers.selected(@changeset.data.pages)) %>
+    selected: DomainHelpers.selected(@changeset.data.pages))
+  %>
   <%= error_tag f, :pages %>
 
   <%= label f, :name %>

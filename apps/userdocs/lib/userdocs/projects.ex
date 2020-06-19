@@ -114,7 +114,8 @@ defmodule UserDocs.Projects do
 
   """
   def list_versions do
-    Repo.all(Version)
+    Repo.all from Version,
+      preload: [:processes]
   end
 
   @doc """
@@ -131,7 +132,11 @@ defmodule UserDocs.Projects do
       ** (Ecto.NoResultsError)
 
   """
-  def get_version!(id), do: Repo.get!(Version, id)
+  def get_version!(id) do
+    Repo.one! from version in Version,
+      where: version.id == ^id,
+      preload: [:processes]
+  end
 
   @doc """
   Creates a version.
@@ -146,9 +151,21 @@ defmodule UserDocs.Projects do
 
   """
   def create_version(attrs \\ %{}) do
-    %Version{}
-    |> Version.changeset(attrs)
-    |> Repo.insert()
+    {status, version} =
+      %Version{}
+      |> Version.changeset(attrs)
+      |> Repo.insert()
+
+    version =
+      case status do
+        :ok ->
+          version
+          |> Repo.preload([:processes])
+
+        _ -> version
+      end
+
+    {status, version}
   end
 
   @doc """

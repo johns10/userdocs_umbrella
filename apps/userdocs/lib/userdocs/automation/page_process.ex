@@ -1,7 +1,7 @@
 defmodule UserDocs.Automation.PageProcess do
   use Ecto.Schema
   import Ecto.Changeset
-  
+
   @primary_key false
 
   schema "page_processes" do
@@ -14,7 +14,7 @@ defmodule UserDocs.Automation.PageProcess do
   @doc false
   def changeset(page_process, attrs) do
     page_process
-    |> cast(attrs, [])
-    |> validate_required([])
+    |> cast(attrs, [:page_id, :process_id])
+    |> validate_required([:page_id, :process_id])
   end
 end

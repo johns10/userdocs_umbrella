@@ -455,9 +455,21 @@ defmodule UserDocs.Automation do
 
   """
   def create_process(attrs \\ %{}) do
-    %Process{}
-    |> Process.changeset(attrs)
-    |> Repo.insert()
+    {status, process} =
+      %Process{}
+      |> Process.changeset(attrs)
+      |> Repo.insert()
+
+    process =
+      case status do
+        :ok ->
+          process
+          |> Repo.preload([:pages, :versions])
+
+        _ -> process
+      end
+
+    {status, process}
   end
 
   @doc """
@@ -473,34 +485,23 @@ defmodule UserDocs.Automation do
 
   """
   def update_process(%Process{} = process, attrs) do
-    attrs = 
-      attrs
-      |> fetch_process_versions
-      |> fetch_process_pages
+    {status, process} =
+      process
+      |> Process.changeset(attrs)
+      |> Repo.update()
 
-    process
-    |> Process.changeset(attrs)
-    |> Repo.update()
+
+    process =
+      case status do
+        :ok ->
+          process
+          |> Repo.preload([:pages, :versions])
+
+        _ -> process
+      end
+
+    {status, process}
   end
-  def fetch_process_versions(attrs = %{"versions" => versions}) do
-    versions = 
-      UserDocs.Projects.Version
-      |> where([version], version.id in ^attrs["versions"])
-      |> Repo.all()
-
-    Map.put(attrs, "versions", versions)
-  end
-  def fetch_process_versions(attrs), do: attrs
-
-  def fetch_process_pages(attrs = %{"pages" => pages}) do
-    pages = 
-      UserDocs.Web.Page
-      |> where([page], page.id in ^attrs["pages"])
-      |> Repo.all()
-
-    Map.put(attrs, "pages", pages)
-  end
-  def fetch_process_pages(attrs), do: attrs
 
   @doc """
   Deletes a process.
@@ -533,13 +534,17 @@ defmodule UserDocs.Automation do
 
   alias UserDocs.Automation.VersionProcess
 
-  @doc """
-  Returns the list of version_process.
+  def create_version_process(attrs \\ %{}) do
+    %VersionProcess{}
+    |> VersionProcess.changeset(attrs)
+    |> Repo.insert()
+  end
 
-  ## Examples
+  alias UserDocs.Automation.PageProcess
 
-      iex> list_version_process()
-      [%VersionProcess{}, ...]
-
-  """
+  def create_page_process(attrs \\ %{}) do
+    %PageProcess{}
+    |> PageProcess.changeset(attrs)
+    |> Repo.insert()
+  end
 end

@@ -12,9 +12,9 @@ defmodule UserDocs.Projects.Version do
     belongs_to :project, Project
     has_many :pages, Web.Page
 
-    many_to_many :processes, 
-      Automation.Process, 
-      join_through: Automation.VersionProcess, 
+    many_to_many :processes,
+      Automation.Process,
+      join_through: Automation.VersionProcess,
       on_replace: :delete
 
     timestamps()

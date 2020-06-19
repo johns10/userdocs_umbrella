@@ -287,7 +287,6 @@ defmodule UserDocs.AutomationTest do
     test "update_process/2 with invalid data returns error changeset" do
       process = process_fixture()
       assert {:error, %Ecto.Changeset{}} = Automation.update_process(process, @invalid_attrs)
-      IO.inspect(Automation.get_process!(process.id))
       assert process == Automation.get_process!(process.id)
     end
 

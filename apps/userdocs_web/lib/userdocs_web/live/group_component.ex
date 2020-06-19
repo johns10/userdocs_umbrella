@@ -30,6 +30,7 @@ defmodule UserDocsWeb.GroupComponent do
               <%= live_footer @socket, UserDocsWeb.ProcessesLive.FormComponent,
                 id: "version-" <> Integer.to_string(@opts[:parent].id) <> "-processes-new",
                 title: "New Process",
+                action: @footer_action,
                 process: %UserDocs.Automation.Process{},
                 return_to: Routes.automation_index_path(@socket, :index) %>
             </footer>

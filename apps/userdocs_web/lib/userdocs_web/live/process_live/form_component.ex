@@ -47,7 +47,17 @@ defmodule UserDocsWeb.ProcessesLive.FormComponent do
 
   defp save_process(socket, :new, process_params) do
     case Automation.create_process(process_params) do
-      {:ok, _process} ->
+      {:ok, process} ->
+        IO.puts("Saving Process")
+
+        check_nil(process_params["pages"])
+        |> Enum.map(fn(page_id) -> %{process_id: process.id, page_id: String.to_integer(page_id)} end)
+        |> Enum.each(fn(p) -> Automation.create_page_process(p) end)
+
+        check_nil(process_params["versions"])
+        |> Enum.map(fn(version_id) -> %{process_id: process.id, version_id: String.to_integer(version_id)} end)
+        |> Enum.each(fn(v) -> Automation.create_version_process(v) end)
+
         {:noreply,
          socket
          |> put_flash(:info, "Process created successfully")
@@ -65,4 +75,6 @@ defmodule UserDocsWeb.ProcessesLive.FormComponent do
   defp available_pages do
     Web.list_pages()
   end
+
+  defp check_nil(items), do: items || []
 end

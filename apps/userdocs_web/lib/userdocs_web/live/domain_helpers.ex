@@ -11,10 +11,12 @@ defmodule UserDocsWeb.DomainHelpers do
       |> List.insert_at(0, {"None", None})
     end
 
-    def selected([items]) do
+    def selected(items = [ _ | _]) do
       items
       |> Enum.map(fn(x) -> (x.id) end)
     end
-    def selected(_), do: []
+    def selected(items) do
+      []
+    end
 
   end
