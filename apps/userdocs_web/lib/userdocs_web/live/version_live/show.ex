@@ -2,6 +2,8 @@ defmodule UserDocsWeb.VersionLive.Show do
   use UserDocsWeb, :live_view
 
   alias UserDocs.Projects
+  alias UserDocs.Automation
+  alias UserDocs.Web
 
   @impl true
   def mount(_params, _session, socket) do

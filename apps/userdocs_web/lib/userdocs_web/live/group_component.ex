@@ -27,10 +27,14 @@ defmodule UserDocsWeb.GroupComponent do
           <footer class="card-footer <%= is_hidden?(assigns) %>">
             <%= if @footer_action in [:new] do %>
               <%= live_footer @socket, @form,
-                id: "version-" <> Integer.to_string(@opts[:parent].id) <> "-processes-new",
+                id: "version-"
+                  <> Integer.to_string(@opts[:parent].id)
+                  <> "-"
+                  <> @opts[:type]
+                  <> "form",
                 title: "New Process",
                 action: @footer_action,
-                process: %UserDocs.Automation.Process{} %>
+                empty_changeset: @opts[:empty_changeset] %>
             </footer>
           <% else %>
             <a phx-click="new" phx-target="<%= @myself %>" class="card-footer-item">New</a>
@@ -61,6 +65,7 @@ defmodule UserDocsWeb.GroupComponent do
 
     @impl true
     def handle_event("new", _, socket) do
+      IO.puts("New Event")
       socket = assign(socket, :footer_action, :new)
       {:noreply, socket}
     end

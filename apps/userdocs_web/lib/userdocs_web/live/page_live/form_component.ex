@@ -1,8 +1,17 @@
 defmodule UserDocsWeb.PageLive.FormComponent do
   use UserDocsWeb, :live_component
   alias UserDocs.Web
+  alias UserDocsWeb.LiveHelpers
 
   @impl true
+  def update(%{empty_changeset: page} = assigns, socket) do
+    assigns =
+      assigns
+      |> Map.put(:page, page)
+      |> Map.delete(:empty_changeset)
+
+    update(assigns, socket)
+  end
   def update(%{page: page} = assigns, socket) do
     changeset = Web.change_page(page)
 
@@ -32,7 +41,7 @@ defmodule UserDocsWeb.PageLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Page updated successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+         |> LiveHelpers.maybe_push_redirect()}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
@@ -45,7 +54,7 @@ defmodule UserDocsWeb.PageLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Page created successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+         |> LiveHelpers.maybe_push_redirect()}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}

@@ -8,8 +8,18 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
   alias UserDocsWeb.LiveHelpers
 
   @impl true
+  def update(%{empty_changeset: process} = assigns, socket) do
+    assigns =
+      assigns
+      |> Map.put(:process, process)
+      |> Map.delete(:empty_changeset)
+
+    update(assigns, socket)
+  end
   def update(%{process: process} = assigns, socket) do
     changeset = Automation.change_process(process)
+
+    IO.inspect(assigns)
 
     {:ok,
      socket

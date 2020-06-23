@@ -22,10 +22,12 @@
       UserDocsWeb.ProcessLive.FormComponent,
       [
         title: "Processes",
+        type: "page",
         objects: @version.processes,
         return_to: Routes.process_index_path(@socket, :index),
         id: "version-" <> Integer.to_string(@version.id) <> "-processes",
-        parent: @version
+        parent: @version,
+        empty_changeset: %Automation.Process{}
       ]
     ) %>
   </li>
@@ -35,10 +37,12 @@
       UserDocsWeb.PageLive.FormComponent,
       [
         title: "Pages",
+        type: "page",
         objects: @version.pages,
         return_to: Routes.page_index_path(@socket, :index),
         id: "version-" <> Integer.to_string(@version.id) <> "-pages",
-        parent: @version
+        parent: @version,
+        empty_changeset: %Web.Page{}
       ]
     ) %>
   </li>
