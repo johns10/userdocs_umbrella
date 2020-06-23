@@ -2,11 +2,14 @@ defmodule UserDocs.Automation.VersionProcess do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias UserDocs.Automation.Process
+  alias UserDocs.Projects.Version
+
   @primary_key false
 
   schema "version_processes" do
-    field :version_id, :integer
-    field :process_id, :integer
+    belongs_to :process, Process
+    belongs_to :version, Version
 
     timestamps()
   end

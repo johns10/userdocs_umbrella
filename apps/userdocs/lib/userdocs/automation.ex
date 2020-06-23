@@ -9,7 +9,7 @@ defmodule UserDocs.Automation do
   alias UserDocs.Projects
 
   def details(version_id) do
-    version = Repo.one from version in Projects.Version,
+    Repo.one from version in Projects.Version,
       where: version.id == ^version_id,
       left_join: pages in assoc(version, :pages),
       left_join: processes in assoc(pages, :processes),
@@ -19,7 +19,6 @@ defmodule UserDocs.Automation do
         :processes,
         pages: {pages, processes: {processes, :steps}}
       ]
-
   end
 
   alias UserDocs.Automation.StepType
@@ -462,12 +461,11 @@ defmodule UserDocs.Automation do
 
     process =
       case status do
-        :ok ->
-          process
-          |> Repo.preload([:pages, :versions])
-
+        :ok -> process
         _ -> process
       end
+
+    UserDocsWeb.Endpoint.broadcast("process", "create", process)
 
     {status, process}
   end
@@ -490,7 +488,6 @@ defmodule UserDocs.Automation do
       |> Process.changeset(attrs)
       |> Repo.update()
 
-
     process =
       case status do
         :ok ->
@@ -499,6 +496,8 @@ defmodule UserDocs.Automation do
 
         _ -> process
       end
+
+    UserDocsWeb.Endpoint.broadcast("process", "update", process)
 
     {status, process}
   end
@@ -535,9 +534,25 @@ defmodule UserDocs.Automation do
   alias UserDocs.Automation.VersionProcess
 
   def create_version_process(attrs \\ %{}) do
-    %VersionProcess{}
-    |> VersionProcess.changeset(attrs)
-    |> Repo.insert()
+
+
+    {status, version_process} =
+      %VersionProcess{}
+      |> VersionProcess.changeset(attrs)
+      |> Repo.insert()
+
+      version_process =
+        case status do
+          :ok ->
+            version_process
+            |> Repo.preload([:version, :process])
+
+          _ -> version_process
+        end
+
+    UserDocsWeb.Endpoint.broadcast("version_process", "create", version_process)
+
+    {status, version_process}
   end
 
   alias UserDocs.Automation.PageProcess

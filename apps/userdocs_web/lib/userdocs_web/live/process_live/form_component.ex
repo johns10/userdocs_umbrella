@@ -1,10 +1,11 @@
-defmodule UserDocsWeb.ProcessesLive.FormComponent do
+defmodule UserDocsWeb.ProcessLive.FormComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocs.Projects
   alias UserDocs.Web
   alias UserDocs.Automation
   alias UserDocsWeb.DomainHelpers
+  alias UserDocsWeb.LiveHelpers
 
   @impl true
   def update(%{process: process} = assigns, socket) do
@@ -38,7 +39,7 @@ defmodule UserDocsWeb.ProcessesLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Process updated successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+         |> LiveHelpers.maybe_push_redirect()}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
@@ -48,8 +49,6 @@ defmodule UserDocsWeb.ProcessesLive.FormComponent do
   defp save_process(socket, :new, process_params) do
     case Automation.create_process(process_params) do
       {:ok, process} ->
-        IO.puts("Saving Process")
-
         check_nil(process_params["pages"])
         |> Enum.map(fn(page_id) -> %{process_id: process.id, page_id: String.to_integer(page_id)} end)
         |> Enum.each(fn(p) -> Automation.create_page_process(p) end)
@@ -61,7 +60,7 @@ defmodule UserDocsWeb.ProcessesLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Process created successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+         |> LiveHelpers.maybe_push_redirect()}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}

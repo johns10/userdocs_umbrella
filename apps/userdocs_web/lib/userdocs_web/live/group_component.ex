@@ -18,34 +18,37 @@ defmodule UserDocsWeb.GroupComponent do
           <div class="card-content <%= is_hidden?(assigns) %>">
             <div class="content">
               <%= for(object <- @opts[:objects]) do %>
-                <%= live_show(@socket, UserDocsWeb.ProcessesLive.ShowComponent,
+                <%= live_show(@socket, @show,
                   "process-" <> Integer.to_string(object.id),
-                  object: object,
-                  return_to: Routes.processes_index_path(@socket, :index))%>
+                  object: object)%>
               <% end %>
             </div>
           </div>
           <footer class="card-footer <%= is_hidden?(assigns) %>">
             <%= if @footer_action in [:new] do %>
-              <%= live_footer @socket, UserDocsWeb.ProcessesLive.FormComponent,
+              <%= live_footer @socket, @form,
                 id: "version-" <> Integer.to_string(@opts[:parent].id) <> "-processes-new",
                 title: "New Process",
                 action: @footer_action,
-                process: %UserDocs.Automation.Process{},
-                return_to: Routes.automation_index_path(@socket, :index) %>
+                process: %UserDocs.Automation.Process{} %>
             </footer>
           <% else %>
             <a phx-click="new" phx-target="<%= @myself %>" class="card-footer-item">New</a>
           <% end %>
         </div>
       """
-
     end
 
     @impl true
     def mount(socket) do
       socket = assign(socket, :expanded, false)
       socket = assign(socket, :footer_action, false)
+      {:ok, socket}
+    end
+
+    @impl true
+    def update(assigns, socket) do
+      socket = assign(socket, assigns)
       {:ok, socket}
     end
 
@@ -58,7 +61,6 @@ defmodule UserDocsWeb.GroupComponent do
 
     @impl true
     def handle_event("new", _, socket) do
-      IO.puts("Got a new event")
       socket = assign(socket, :footer_action, :new)
       {:noreply, socket}
     end

@@ -6,9 +6,19 @@ defmodule UserDocsWeb.AutomationLive.Index do
   alias UserDocs.Automation
   alias UserDocs.Projects
   alias UserDocs.Projects.Project
+  alias UserDocsWeb.Endpoint
+
+
+  # TODO: Must implement either updating the state tree/components
+  def handle_info(_message = %{topic: _topic, event: _event, payload: _payload}, socket) do
+    socket = assign(socket, :version, Automation.details(1))
+    {:noreply, socket}
+  end
 
   @impl true
   def mount(_params, session, socket) do
+    Endpoint.subscribe("process")
+    Endpoint.subscribe("version_process")
     socket = maybe_assign_current_user(socket, session)
     socket = assign(socket, SocketHelpers.automation_ui_socket())
     {:ok, assign(socket, :version, Automation.details(1))}

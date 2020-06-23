@@ -7,7 +7,6 @@ defmodule UserDocs.Automation.Process do
   alias UserDocs.Projects
   alias UserDocs.Automation
   alias UserDocs.Web
-  alias UserDocs.Pro
 
   schema "processes" do
     field :name, :string

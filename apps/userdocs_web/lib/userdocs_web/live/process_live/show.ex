@@ -1,4 +1,4 @@
-defmodule UserDocsWeb.ProcessesLive.Show do
+defmodule UserDocsWeb.ProcessLive.Show do
   use UserDocsWeb, :live_view
 
   alias UserDocs.Automation

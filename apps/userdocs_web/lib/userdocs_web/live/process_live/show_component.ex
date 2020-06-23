@@ -1,4 +1,4 @@
-defmodule UserDocsWeb.ProcessesLive.ShowComponent do
+defmodule UserDocsWeb.ProcessLive.ShowComponent do
   use UserDocsWeb, :live_component
 
   @impl true

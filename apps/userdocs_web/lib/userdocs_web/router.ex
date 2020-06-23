@@ -25,7 +25,7 @@ defmodule UserDocsWeb.Router do
 
     live "/", PageLive, :index
     live "/automation", AutomationLive.Index, :index
-    
+
     live "/content", ContentLive.Index, :index
     live "/content/new", ContentLive.Index, :new
     live "/content/:id/edit", ContentLive.Index, :edit
@@ -96,11 +96,11 @@ defmodule UserDocsWeb.Router do
     live "/args/:id/edit", ArgLive.Index, :edit
     live "/args/:id", ArgLive.Show, :show
     live "/args/:id/show/edit", ArgLive.Show, :edit
-    live "/processes", ProcessesLive.Index, :index
-    live "/processes/new", ProcessesLive.Index, :new
-    live "/processes/:id/edit", ProcessesLive.Index, :edit
-    live "/processes/:id", ProcessesLive.Show, :show
-    live "/processes/:id/show/edit", ProcessesLive.Show, :edit
+    live "/processes", ProcessLive.Index, :index
+    live "/processes/new", ProcessLive.Index, :new
+    live "/processes/:id/edit", ProcessLive.Index, :edit
+    live "/processes/:id", ProcessLive.Show, :show
+    live "/processes/:id/show/edit", ProcessLive.Show, :edit
 
   end
 

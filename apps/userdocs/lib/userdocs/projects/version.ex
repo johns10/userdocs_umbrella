@@ -2,15 +2,15 @@ defmodule UserDocs.Projects.Version do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias UserDocs.Web
+  alias UserDocs.Web.Page
   alias UserDocs.Automation
-  alias UserDocs.Projects
+  alias UserDocs.Projects.Project
 
   schema "versions" do
     field :name, :string
 
     belongs_to :project, Project
-    has_many :pages, Web.Page
+    has_many :pages, Page
 
     many_to_many :processes,
       Automation.Process,

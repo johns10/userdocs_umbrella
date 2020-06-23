@@ -1,12 +1,12 @@
 <h1>Listing Processes</h1>
 
 <%= if @live_action in [:new, :edit] do %>
-  <%= live_modal @socket, UserDocsWeb.ProcessesLive.FormComponent,
+  <%= live_modal @socket, UserDocsWeb.ProcessLive.FormComponent,
     id: @process.id || :new,
     title: @page_title,
     action: @live_action,
     process: @process,
-    return_to: Routes.processes_index_path(@socket, :index) %>
+    return_to: Routes.process_index_path(@socket, :index) %>
 <% end %>
 
 <table>
@@ -27,8 +27,8 @@
         <td><%= process.name %></td>
 
         <td>
-          <span><%= live_redirect "Show", to: Routes.processes_show_path(@socket, :show, process) %></span>
-          <span><%= live_patch "Edit", to: Routes.processes_index_path(@socket, :edit, process) %></span>
+          <span><%= live_redirect "Show", to: Routes.process_show_path(@socket, :show, process) %></span>
+          <span><%= live_patch "Edit", to: Routes.process_index_path(@socket, :edit, process) %></span>
           <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: process.id, data: [confirm: "Are you sure?"] %></span>
         </td>
       </tr>
@@ -36,4 +36,4 @@
   </tbody>
 </table>
 
-<span><%= live_patch "New Process", to: Routes.processes_index_path(@socket, :new) %></span>
+<span><%= live_patch "New Process", to: Routes.process_index_path(@socket, :new) %></span>

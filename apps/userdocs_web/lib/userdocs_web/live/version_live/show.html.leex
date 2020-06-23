@@ -23,8 +23,21 @@
       [
         title: "Processes",
         objects: @version.processes,
-        return_to: Routes.processes_index_path(@socket, :index),
-        id: "version-" <> Integer.to_string(@version.id) <> "-processes-content-group",
+        return_to: Routes.process_index_path(@socket, :index),
+        id: "version-" <> Integer.to_string(@version.id) <> "-processes",
+        parent: @version
+      ]
+    ) %>
+  </li>
+  <li>
+    <%= live_group(@socket,
+      UserDocsWeb.PageLive.ShowComponent,
+      UserDocsWeb.PageLive.FormComponent,
+      [
+        title: "Pages",
+        objects: @version.pages,
+        return_to: Routes.page_index_path(@socket, :index),
+        id: "version-" <> Integer.to_string(@version.id) <> "-pages",
         parent: @version
       ]
     ) %>

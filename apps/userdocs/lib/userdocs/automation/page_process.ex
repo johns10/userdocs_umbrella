@@ -2,11 +2,14 @@ defmodule UserDocs.Automation.PageProcess do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias UserDocs.Automation.Process
+  alias UserDocs.Web.Page
+
   @primary_key false
 
   schema "page_processes" do
-    field :page_id, :integer
-    field :process_id, :integer
+    belongs_to :process, Process
+    belongs_to :page, Page
 
     timestamps()
   end

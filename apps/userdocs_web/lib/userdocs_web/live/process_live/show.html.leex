@@ -1,12 +1,12 @@
 <h1>Show Process</h1>
 
 <%= if @live_action in [:edit] do %>
-  <%= live_modal @socket, UserDocsWeb.ProcessesLive.FormComponent,
+  <%= live_modal @socket, UserDocsWeb.ProcessLive.FormComponent,
     id: @process.id,
     title: @page_title,
     action: @live_action,
     process: @process,
-    return_to: Routes.processes_show_path(@socket, :show, @process) %>
+    return_to: Routes.process_show_path(@socket, :show, @process) %>
 <% end %>
 
 <ul>
@@ -18,5 +18,5 @@
 
 </ul>
 
-<span><%= live_patch "Edit", to: Routes.processes_show_path(@socket, :edit, @process), class: "button" %></span>
-<span><%= live_redirect "Back", to: Routes.processes_index_path(@socket, :index) %></span>
+<span><%= live_patch "Edit", to: Routes.process_show_path(@socket, :edit, @process), class: "button" %></span>
+<span><%= live_redirect "Back", to: Routes.process_index_path(@socket, :index) %></span>
