@@ -1,18 +1,39 @@
-<h2><%= @title %></h2>
+<h4><%= @title %></h2>
 
 <%= f = form_for @changeset, "#",
   id: "page-form",
   phx_target: @myself,
   phx_change: "validate",
-  phx_submit: "save" %>
+  phx_submit: "save",
+  class: "form-horizontal" %>
 
-  <%= label f, :name %>
-  <%= text_input f, :name %>
-  <%= error_tag f, :name %>
+  <div class="field">
+    <%= label f, :version_id, class: :label %>
+    <div class="control">
+      <div class="select">
+        <%= select f, :version_id,
+          DomainHelpers.select_list(@available_versions),
+          selected: DomainHelpers.selected(@changeset.data.versions) %>
+      </div>
+    </div>
+    <%= error_tag f, :versions %>
+  </div>
 
-  <%= label f, :url %>
-  <%= text_input f, :url %>
-  <%= error_tag f, :url %>
+  <div class="field">
+    <%= label f, :name %>
+    <div class="control">
+      <%= text_input f, :name, class: "input", type: "text" %>
+    </div>
+    <%= error_tag f, :name %>
+  </div>
 
-  <%= submit "Save", phx_disable_with: "Saving..." %>
+  <div class="field">
+    <%= label f, :url %>
+    <div class="control">
+      <%= text_input f, :url, class: "input", type: "text" %>
+    </div>
+    <%= error_tag f, :url %>
+  </div>
+
+  <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
 </form>

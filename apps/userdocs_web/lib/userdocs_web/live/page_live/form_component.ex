@@ -1,7 +1,18 @@
 defmodule UserDocsWeb.PageLive.FormComponent do
   use UserDocsWeb, :live_component
   alias UserDocs.Web
+  alias UserDocs.Projects
   alias UserDocsWeb.LiveHelpers
+  alias UserDocsWeb.DomainHelpers
+
+  @impl true
+  def mount(socket) do
+    socket =
+      socket
+      |> assign(:action, None)
+      |> assign(:title, None)
+    {:ok, socket}
+  end
 
   @impl true
   def update(%{empty_changeset: page} = assigns, socket) do
@@ -18,6 +29,9 @@ defmodule UserDocsWeb.PageLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:title, assigns.opts[:title])
+     |> assign(:action, assigns.opts[:action])
+     |> assign(:available_versions, available_versions())
      |> assign(:changeset, changeset)}
   end
 
@@ -59,5 +73,9 @@ defmodule UserDocsWeb.PageLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
+  end
+
+  defp available_versions do
+    Projects.list_versions()
   end
 end

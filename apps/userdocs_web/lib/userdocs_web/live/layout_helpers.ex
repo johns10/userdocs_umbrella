@@ -24,7 +24,7 @@ defmodule UserDocsWeb.Layout do
   end
 
   #Unused, can ber removed shortly
-  def picker(contents, options) do
+  def picker(_contents, options) do
     content_tag(:div, [class: "dropdown is-active"]) do
       [
         content_tag(:div, [class: "dropdown-trigger"]) do

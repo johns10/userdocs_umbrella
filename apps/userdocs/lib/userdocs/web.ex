@@ -5,6 +5,7 @@ defmodule UserDocs.Web do
 
   import Ecto.Query, warn: false
   alias UserDocs.Repo
+  alias UserDocsWeb.Endpoint
 
   alias UserDocs.Web.Page
 
@@ -50,9 +51,20 @@ defmodule UserDocs.Web do
 
   """
   def create_page(attrs \\ %{}) do
-    %Page{}
-    |> Page.changeset(attrs)
-    |> Repo.insert()
+    {status, page} =
+      %Page{}
+      |> Page.changeset(attrs)
+      |> Repo.insert()
+
+    page =
+      case status do
+        :ok -> page
+        _ -> page
+      end
+
+    Endpoint.broadcast("page", "create", page)
+
+    {status, page}
   end
 
   @doc """
@@ -68,9 +80,20 @@ defmodule UserDocs.Web do
 
   """
   def update_page(%Page{} = page, attrs) do
-    page
-    |> Page.changeset(attrs)
-    |> Repo.update()
+    {status, page} =
+      page
+      |> Page.changeset(attrs)
+      |> Repo.update()
+
+      page =
+        case status do
+          :ok -> page
+          _ -> page
+        end
+
+    Endpoint.broadcast("page", "update", page)
+
+    {status, page}
   end
 
   @doc """

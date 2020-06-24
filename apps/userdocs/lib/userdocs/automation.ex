@@ -5,6 +5,7 @@ defmodule UserDocs.Automation do
 
   import Ecto.Query, warn: false
   alias UserDocs.Repo
+  alias UserDocsWeb.Endpoint
 
   alias UserDocs.Projects
 
@@ -465,7 +466,7 @@ defmodule UserDocs.Automation do
         _ -> process
       end
 
-    UserDocsWeb.Endpoint.broadcast("process", "create", process)
+    Endpoint.broadcast("process", "create", process)
 
     {status, process}
   end
@@ -497,7 +498,7 @@ defmodule UserDocs.Automation do
         _ -> process
       end
 
-    UserDocsWeb.Endpoint.broadcast("process", "update", process)
+    Endpoint.broadcast("process", "update", process)
 
     {status, process}
   end
@@ -550,7 +551,7 @@ defmodule UserDocs.Automation do
           _ -> version_process
         end
 
-    UserDocsWeb.Endpoint.broadcast("version_process", "create", version_process)
+    Endpoint.broadcast("version_process", "create", version_process)
 
     {status, version_process}
   end

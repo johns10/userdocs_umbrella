@@ -18,6 +18,7 @@ defmodule UserDocsWeb.AutomationLive.Index do
   @impl true
   def mount(_params, session, socket) do
     Endpoint.subscribe("process")
+    Endpoint.subscribe("page")
     Endpoint.subscribe("version_process")
     socket = maybe_assign_current_user(socket, session)
     socket = assign(socket, SocketHelpers.automation_ui_socket())

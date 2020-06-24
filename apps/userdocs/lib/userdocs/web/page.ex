@@ -3,16 +3,15 @@ defmodule UserDocs.Web.Page do
   import Ecto.Changeset
 
   alias UserDocs.Automation
-  alias UserDocs.Projects
 
   schema "pages" do
     field :name, :string
     field :url, :string
-    
-    many_to_many :processes, 
-      Automation.Process, 
+
+    many_to_many :processes,
+      Automation.Process,
       join_through: Automation.PageProcess
-    
+
     belongs_to :version, UserDocs.Projects.Version
 
     timestamps()

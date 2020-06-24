@@ -20,7 +20,7 @@ defmodule UserDocs.Users do
   def list_users do
     Repo.all(User)
   end
-  
+
   @doc """
   Gets a single user.
 
@@ -116,7 +116,7 @@ defmodule UserDocs.Users do
   def list_team_users do
     Repo.all(TeamUser)
   end
-  
+
   @doc """
   Gets a single team_user.
 
@@ -210,7 +210,7 @@ defmodule UserDocs.Users do
 
   """
   def list_teams do
-    Repo.all from team in Team, 
+    Repo.all from team in Team,
       preload: [:users]
   end
 
@@ -230,6 +230,7 @@ defmodule UserDocs.Users do
   """
   def get_team!(id) do
     Repo.one from team in Team,
+      where: team.id == ^id,
       preload: [:users]
   end
 
@@ -264,8 +265,8 @@ defmodule UserDocs.Users do
 
   """
   #TODO this could be more elegant, probably
-  def update_team(%Team{} = team, attrs = %{"users" => users}) do
-    users = 
+  def update_team(%Team{} = team, attrs = %{"users" => _users}) do
+    users =
       User
       |> where([user], user.id in ^attrs["users"])
       |> Repo.all()
