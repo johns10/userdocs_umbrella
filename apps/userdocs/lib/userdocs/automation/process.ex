@@ -16,12 +16,14 @@ defmodule UserDocs.Automation.Process do
     many_to_many :versions,
       Projects.Version,
       join_through: Automation.VersionProcess,
-      on_replace: :delete
+      on_replace: :delete,
+      on_delete: :delete_all
 
     many_to_many :pages,
       Web.Page,
       join_through: Automation.PageProcess,
-      on_replace: :delete
+      on_replace: :delete,
+      on_delete: :delete_all
 
     timestamps()
   end

@@ -12,7 +12,9 @@
 <table>
   <thead>
     <tr>
+      <th>Process ID</th>
       <th>Order</th>
+      <th>Name</th>
 
       <th></th>
     </tr>
@@ -22,6 +24,7 @@
       <tr id="step-<%= step.id %>">
         <td><%= step.process_id %></td>
         <td><%= step.order %></td>
+        <td><%= step.name %></td>
 
         <td>
           <span><%= live_redirect "Show", to: Routes.step_show_path(@socket, :show, step) %></span>

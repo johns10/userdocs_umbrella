@@ -14,5 +14,9 @@
   <%= number_input f, :order %>
   <%= error_tag f, :order %>
 
+  <%= label f, :name %>
+  <%= text_input f, :name %>
+  <%= error_tag f, :name %>
+
   <%= submit "Save", phx_disable_with: "Saving..." %>
 </form>

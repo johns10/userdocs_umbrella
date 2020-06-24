@@ -35,21 +35,31 @@ defmodule UserDocsWeb.LiveHelpers do
   end
 
   def live_show(socket, component, id, opts) do
-    modal_opts = [id: id, component: component, opts: opts]
+    object = Keyword.fetch!(opts, :object)
+    modal_opts = [
+      id: id,
+      component: component,
+      object: object,
+      opts: opts
+    ]
     live_component(socket, UserDocsWeb.ShowComponent, modal_opts)
   end
 
   @spec live_footer(Phoenix.LiveView.Socket.t(), any, any) :: Phoenix.LiveView.Component.t()
   def live_footer(socket, component, opts) do
     id = Keyword.fetch!(opts, :id)
+    title = Keyword.fetch!(opts, :title)
+    hidden = Keyword.fetch!(opts, :hidden)
     empty_changeset = Keyword.fetch!(opts, :empty_changeset)
     footer_opts = [
       id: id,
+      title: title,
+      hidden: hidden,
       component: component,
       opts: opts,
       empty_changeset: empty_changeset
     ]
-    live_component(socket, component, footer_opts)
+    live_component(socket, UserDocsWeb.FooterComponent, footer_opts)
   end
 
   def maybe_push_redirect(socket = %{assigns: %{return_to: return_to}}), do: LiveView.push_redirect(socket, to: return_to)

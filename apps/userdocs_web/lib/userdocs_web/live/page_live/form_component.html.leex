@@ -13,7 +13,7 @@
       <div class="select">
         <%= select f, :version_id,
           DomainHelpers.select_list(@available_versions),
-          selected: DomainHelpers.selected(@changeset.data.versions) %>
+          selected: DomainHelpers.selected(@changeset.data.version_id) %>
       </div>
     </div>
     <%= error_tag f, :versions %>

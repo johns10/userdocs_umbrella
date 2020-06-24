@@ -4,14 +4,23 @@ defmodule UserDocsWeb.ShowComponent do
   @impl true
   def render(assigns) do
     ~L"""
-    <div>
-    <%= live_component @socket, @component, @opts %>
-    </div>
+      <%= @component.render(assigns) %>
     """
   end
 
   @impl true
-  def handle_event("close", _, socket) do
-    {:noreply, push_patch(socket, to: socket.assigns.return_to)}
+  def mount(socket) do
+    socket =
+      socket
+      |> assign(:expanded, false)
+      |> assign(:action, :show)
+
+    {:ok, socket}
+  end
+
+  @impl true
+  def handle_event("expand", _, socket) do
+    socket = assign(socket, :expanded, not socket.assigns.expanded)
+    {:noreply, socket}
   end
 end

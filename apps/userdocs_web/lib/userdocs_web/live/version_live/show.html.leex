@@ -16,13 +16,12 @@
     <%= @version.name %>
   </li>
   <li>
-    <%=
-    live_group(@socket,
+    <%= live_group(@socket,
       UserDocsWeb.ProcessLive.ShowComponent,
       UserDocsWeb.ProcessLive.FormComponent,
       [
         title: "Processes",
-        type: "page",
+        type: "process",
         objects: @version.processes,
         return_to: Routes.process_index_path(@socket, :index),
         id: "version-" <> Integer.to_string(@version.id) <> "-processes",

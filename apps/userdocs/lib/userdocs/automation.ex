@@ -14,11 +14,12 @@ defmodule UserDocs.Automation do
       where: version.id == ^version_id,
       left_join: pages in assoc(version, :pages),
       left_join: processes in assoc(pages, :processes),
-      left_join: step in assoc(processes, :steps),
+      left_join: steps in assoc(processes, :steps),
       preload: [
         :pages,
         :processes,
-        pages: {pages, processes: {processes, :steps}}
+        pages: {pages, processes: {processes, :steps}},
+        processes: :steps
       ]
   end
 

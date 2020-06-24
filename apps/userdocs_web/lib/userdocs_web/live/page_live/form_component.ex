@@ -9,8 +9,8 @@ defmodule UserDocsWeb.PageLive.FormComponent do
   def mount(socket) do
     socket =
       socket
-      |> assign(:action, None)
-      |> assign(:title, None)
+      #|> assign(:action, None)
+      # |> assign(:title, None)
     {:ok, socket}
   end
 
@@ -29,8 +29,8 @@ defmodule UserDocsWeb.PageLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:title, assigns.opts[:title])
-     |> assign(:action, assigns.opts[:action])
+     #|> assign(:title, assigns.opts[:title])
+     #|> assign(:action, assigns.opts[:action])
      |> assign(:available_versions, available_versions())
      |> assign(:changeset, changeset)}
   end

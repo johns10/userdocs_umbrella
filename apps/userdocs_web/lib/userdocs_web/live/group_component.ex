@@ -19,33 +19,17 @@ defmodule UserDocsWeb.GroupComponent do
             <div class="content">
               <%= for(object <- @opts[:objects]) do %>
                 <%= live_show(@socket, @show,
-                  "process-" <> Integer.to_string(object.id),
-                  object: object)%>
-              <% end %>
-            </div>
-            <div class="content">
-              <%= if @footer_action in [:new] do %>
-                <%= live_footer @socket, @form,
-                  id: "version-"
-                    <> Integer.to_string(@opts[:parent].id)
-                    <> "-"
-                    <> @opts[:type]
-                    <> "-form",
-                  title: "New Process",
-                  action: @footer_action,
-                  empty_changeset: @opts[:empty_changeset],
-                  parent: @myself,
-                  parent_component: @myself %>
+                  @opts[:type] <> "-" <> Integer.to_string(object.id) <> "-show",
+                  object: object) %>
               <% end %>
             </div>
           </div>
-          <footer class="card-footer <%= is_hidden?(assigns) %>">
-            <%= if @footer_action not in [:new] do %>
-              <a phx-click="new" phx-target="<%= @myself %>" class="card-footer-item">New</a>
-            <% else %>
-            <a phx-click="cancel" phx-target="<%= @myself %>" class="card-footer-item">Cancel</a>
-            <% end %>
-          </footer>
+          <%= live_footer(@socket, UserDocsWeb.ProcessLive.FormComponent,
+            title: "New Process",
+            hidden: is_hidden?(assigns),
+            id: @opts[:type] <> "-form-new",
+            empty_changeset: %UserDocs.Automation.Process{}
+          ) %>
         </div>
       """
     end
@@ -69,18 +53,6 @@ defmodule UserDocsWeb.GroupComponent do
       {:noreply, socket}
     end
 
-    @impl true
-    def handle_event("new", _, socket) do
-      socket = assign(socket, :footer_action, :new)
-      {:noreply, socket}
-    end
-
-    @impl true
-    def handle_event("cancel", _, socket) do
-      socket = assign(socket, :footer_action, :show)
-      {:noreply, socket}
-    end
-
-    def is_hidden?(%{expanded: false}), do: " is-hidden"
+    def is_hidden?(%{expanded: false}), do: "is-hidden"
     def is_hidden?(%{expanded: true}), do: ""
   end

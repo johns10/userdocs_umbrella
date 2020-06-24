@@ -11,7 +11,10 @@
     <%= label f, :versions, class: :label %>
     <div class="control">
       <div class="select">
-        <%= select f, :versions,
+        <%=
+          IO.puts("Process form")
+          IO.inspect(assigns)
+          select f, :versions,
           DomainHelpers.select_list(@available_versions),
           selected: DomainHelpers.selected(@changeset.data.versions) %>
       </div>

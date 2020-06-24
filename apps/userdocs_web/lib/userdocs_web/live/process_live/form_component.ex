@@ -9,11 +9,6 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
 
   @impl true
   def mount(socket) do
-    socket =
-      socket
-      |> assign(:action, None)
-      |> assign(:title, None)
-      |> assign(:parent_component, None)
     {:ok, socket}
   end
 
@@ -28,14 +23,10 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
   end
   def update(%{process: process} = assigns, socket) do
     changeset = Automation.change_process(process)
-    IO.inspect(assigns)
 
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:title, assigns.opts[:title])
-     |> assign(:action, assigns.opts[:action])
-     |> assign(:parent_component, assigns.opts[:parent_component])
      |> assign(:available_versions, available_versions())
      |> assign(:available_pages, available_pages())
      |> assign(:changeset, changeset)}
@@ -57,7 +48,14 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
 
   defp save_process(socket, :edit, process_params) do
     case Automation.update_process(socket.assigns.process, process_params) do
-      {:ok, _process} ->
+      {:ok, process} ->
+
+        {:ok, _version_process } =
+          maybe_add_version_process(process.id, process_params["versions"])
+
+        {:ok, _page_process } =
+          maybe_add_page_process(process.id, process_params["pages"])
+
         {:noreply,
          socket
          |> put_flash(:info, "Process updated successfully")
@@ -72,7 +70,7 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
     case Automation.create_process(process_params) do
       {:ok, process} ->
         #Left to crib from later
-        """
+        _unused_code_block = """
         check_nil(process_params["pages"])
         |> Enum.map(fn(page_id) -> %{process_id: process.id, page_id: String.to_integer(page_id)} end)
         |> Enum.each(fn(p) -> Automation.create_page_process(p) end)
