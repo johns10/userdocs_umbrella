@@ -8,27 +8,12 @@
   class: "form-horizontal" %>
 
   <div class="field">
-    <%= label f, :versions, class: :label %>
-    <div class="control">
-      <div class="select">
-        <%=
-          IO.puts("Process form")
-          IO.inspect(assigns)
-          select f, :versions,
-          DomainHelpers.select_list(@available_versions),
-          selected: DomainHelpers.selected(@changeset.data.versions) %>
-      </div>
-    </div>
-    <%= error_tag f, :versions %>
-  </div>
-
-  <div class="field">
     <%= label f, :pages, class: :label %>
     <div class="control">
       <div class="select">
         <%= select f, :pages,
           DomainHelpers.select_list(@available_pages),
-          selected: DomainHelpers.selected(@changeset.data.pages) %>
+          selected: @parent.id %>
       </div>
     </div>
     <%= error_tag f, :pages %>

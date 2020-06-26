@@ -13,7 +13,22 @@
 
   <li>
     <strong>Url:</strong>
-    <%= @page.url %>
+    <%= @page.url %> asdfsdf
+  </li>
+  <li>
+    <%= live_group(@socket,
+      UserDocsWeb.Process.ShowComponent,
+      UserDocsWeb.Process.FormComponent,
+      [
+        title: "Processes",
+        type: :process,
+        struct: %Automation.Process{},
+        objects: @page.processes,
+        return_to: Routes.process_index_path(@socket, :index),
+        id: "page-" <> Integer.to_string(@page.id) <> "-processes",
+        parent: @page
+      ]
+    ) %>
   </li>
 
 </ul>

@@ -11,7 +11,7 @@ defmodule UserDocsWeb.StepsLive.ShowComponent do
         <p class="card-header-title">
           <%= @object.name %>
         </p>
-        <a href="#" class="card-header-icon" aria-label="more options">
+        <a class="card-header-icon" aria-label="more options">
           <span class="icon" phx-click="expand" phx-target="<%= @myself %>">
             <i class="fa fa-angle-down" aria-hidden="true"></i>
           </span>

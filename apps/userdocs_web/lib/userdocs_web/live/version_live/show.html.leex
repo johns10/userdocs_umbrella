@@ -9,44 +9,22 @@
     return_to: Routes.version_show_path(@socket, :show, @version) %>
 <% end %>
 
-<ul>
-
-  <li>
-    <strong>Name:</strong>
-    <%= @version.name %>
-  </li>
-  <li>
-    <%= live_group(@socket,
-      UserDocsWeb.ProcessLive.ShowComponent,
-      UserDocsWeb.ProcessLive.FormComponent,
-      [
-        title: "Processes",
-        type: "process",
-        objects: @version.processes,
-        return_to: Routes.process_index_path(@socket, :index),
-        id: "version-" <> Integer.to_string(@version.id) <> "-processes",
-        parent: @version,
-        empty_changeset: %Automation.Process{}
-      ]
-    ) %>
-  </li>
-  <li>
-    <%= live_group(@socket,
-      UserDocsWeb.PageLive.ShowComponent,
-      UserDocsWeb.PageLive.FormComponent,
-      [
-        title: "Pages",
-        type: "page",
-        objects: @version.pages,
-        return_to: Routes.page_index_path(@socket, :index),
-        id: "version-" <> Integer.to_string(@version.id) <> "-pages",
-        parent: @version,
-        empty_changeset: %Web.Page{}
-      ]
-    ) %>
-  </li>
-
-</ul>
+<strong>Name:</strong>
+<%= @version.name %>
+<%= live_group(@socket,
+  UserDocsWeb.PageLive.ShowComponent,
+  UserDocsWeb.PageLive.FormComponent,
+  [
+    title: "Pages",
+    type: :page,
+    parent_type: :version,
+    struct: %Web.Page{},
+    objects: @version.pages,
+    return_to: Routes.page_index_path(@socket, :index),
+    id: "version-" <> Integer.to_string(@version.id) <> "-pages",
+    parent: @version
+  ]
+) %>
 
 <span><%= live_patch "Edit", to: Routes.version_show_path(@socket, :edit, @version), class: "button" %></span>
 <span><%= live_redirect "Back", to: Routes.version_index_path(@socket, :index) %></span>

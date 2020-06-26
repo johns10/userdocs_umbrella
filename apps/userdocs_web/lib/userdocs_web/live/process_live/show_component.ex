@@ -12,7 +12,7 @@ defmodule UserDocsWeb.ProcessLive.ShowComponent do
         <p class="card-header-title">
           <%= @object.name %>
         </p>
-        <a href="#" class="card-header-icon" aria-label="more options">
+        <a class="card-header-icon" aria-label="more options">
           <span class="icon" phx-click="expand" phx-target="<%= @myself %>">
             <i class="fa fa-angle-down" aria-hidden="true"></i>
           </span>
@@ -20,13 +20,13 @@ defmodule UserDocsWeb.ProcessLive.ShowComponent do
       </header>
       <div class="card-content <%= Layout.is_hidden?(assigns) %>">
         <div class="content">
-          <ul>
-            <%= for(step <- @object.steps) do %>
-              <%= live_show(@socket, StepsLive.ShowComponent,
-                "step-" <> Integer.to_string(step.id) <> "-show",
-                object: step) %>
-            <%= end %>
-          </ul>
+          <%= for(step <- @object.steps) do %>
+            <%= live_show(@socket, StepsLive.ShowComponent,
+              id: "step-"
+                <> Integer.to_string(step.id)
+                <> "-show",
+              object: step) %>
+          <%= end %>
         </div>
       </div>
     </div>

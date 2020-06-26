@@ -2,6 +2,7 @@ defmodule UserDocsWeb.PageLive.Show do
   use UserDocsWeb, :live_view
 
   alias UserDocs.Web
+  alias UserDocs.Automation
 
   @impl true
   def mount(_params, _session, socket) do

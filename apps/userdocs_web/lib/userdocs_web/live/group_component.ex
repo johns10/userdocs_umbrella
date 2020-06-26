@@ -4,31 +4,43 @@ defmodule UserDocsWeb.GroupComponent do
     @impl true
     def render(assigns) do
       ~L"""
-        <div class="card">
+        <div class="card" id="<%= @id %>">
           <header class="card-header">
             <p class="card-header-title">
-              <%= @opts[:title] %>
+              <%= @title %>
             </p>
-            <a href="#" class="card-header-icon" aria-label="more options">
-              <span class="icon" phx-click="expand" phx-target="<%= @myself %>">
+            <a
+              class="card-header-icon"
+              phx-click="expand"
+              phx-target="<%= @myself %>"
+              aria-label="more options">
+              <span class="icon" >
                 <i class="fa fa-angle-down" aria-hidden="true"></i>
               </span>
             </a>
           </header>
           <div class="card-content <%= is_hidden?(assigns) %>">
             <div class="content">
-              <%= for(object <- @opts[:objects]) do %>
+              <%= for(object <- @objects) do %>
                 <%= live_show(@socket, @show,
-                  @opts[:type] <> "-" <> Integer.to_string(object.id) <> "-show",
+                  id: Atom.to_string(@type) <> "-"
+                    <> Integer.to_string(object.id)
+                    <> "-show",
                   object: object) %>
               <% end %>
             </div>
           </div>
-          <%= live_footer(@socket, UserDocsWeb.ProcessLive.FormComponent,
+          <%= live_footer(@socket, @form,
+            type: @type,
+            struct: @struct,
+            parent: @parent,
+            parent_type: @parent_type,
+            id: Atom.to_string(@parent_type) <> "-"
+              <> Integer.to_string(@parent.id) <> "-"
+              <> Atom.to_string(@type)
+              <> "-form-new",
             title: "New Process",
-            hidden: is_hidden?(assigns),
-            id: @opts[:type] <> "-form-new",
-            empty_changeset: %UserDocs.Automation.Process{}
+            hidden: is_hidden?(assigns)
           ) %>
         </div>
       """
@@ -49,6 +61,8 @@ defmodule UserDocsWeb.GroupComponent do
 
     @impl true
     def handle_event("expand", _, socket) do
+      IO.puts("Expanding")
+      IO.inspect(socket.assigns.myself)
       socket = assign(socket, :expanded, not socket.assigns.expanded)
       {:noreply, socket}
     end

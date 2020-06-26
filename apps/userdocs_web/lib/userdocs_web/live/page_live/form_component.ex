@@ -6,31 +6,14 @@ defmodule UserDocsWeb.PageLive.FormComponent do
   alias UserDocsWeb.DomainHelpers
 
   @impl true
-  def mount(socket) do
-    socket =
-      socket
-      #|> assign(:action, None)
-      # |> assign(:title, None)
-    {:ok, socket}
-  end
-
-  @impl true
-  def update(%{empty_changeset: page} = assigns, socket) do
-    assigns =
-      assigns
-      |> Map.put(:page, page)
-      |> Map.delete(:empty_changeset)
-
-    update(assigns, socket)
-  end
   def update(%{page: page} = assigns, socket) do
+    IO.puts("updating Page form")
+    IO.inspect(assigns)
     changeset = Web.change_page(page)
 
     {:ok,
      socket
      |> assign(assigns)
-     #|> assign(:title, assigns.opts[:title])
-     #|> assign(:action, assigns.opts[:action])
      |> assign(:available_versions, available_versions())
      |> assign(:changeset, changeset)}
   end
