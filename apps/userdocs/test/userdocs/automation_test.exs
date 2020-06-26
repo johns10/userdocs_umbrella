@@ -182,67 +182,6 @@ defmodule UserDocs.AutomationTest do
     end
   end
 
-  describe "args" do
-    alias UserDocs.Automation.Arg
-
-    @valid_attrs %{key: "some key", value: "some value"}
-    @update_attrs %{key: "some updated key", value: "some updated value"}
-    @invalid_attrs %{key: nil, value: nil}
-
-    def arg_fixture(attrs \\ %{}) do
-      {:ok, arg} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Automation.create_arg()
-
-      arg
-    end
-
-    test "list_args/0 returns all args" do
-      arg = arg_fixture()
-      assert Automation.list_args() == [arg]
-    end
-
-    test "get_arg!/1 returns the arg with given id" do
-      arg = arg_fixture()
-      assert Automation.get_arg!(arg.id) == arg
-    end
-
-    test "create_arg/1 with valid data creates a arg" do
-      assert {:ok, %Arg{} = arg} = Automation.create_arg(@valid_attrs)
-      assert arg.key == "some key"
-      assert arg.value == "some value"
-    end
-
-    test "create_arg/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Automation.create_arg(@invalid_attrs)
-    end
-
-    test "update_arg/2 with valid data updates the arg" do
-      arg = arg_fixture()
-      assert {:ok, %Arg{} = arg} = Automation.update_arg(arg, @update_attrs)
-      assert arg.key == "some updated key"
-      assert arg.value == "some updated value"
-    end
-
-    test "update_arg/2 with invalid data returns error changeset" do
-      arg = arg_fixture()
-      assert {:error, %Ecto.Changeset{}} = Automation.update_arg(arg, @invalid_attrs)
-      assert arg == Automation.get_arg!(arg.id)
-    end
-
-    test "delete_arg/1 deletes the arg" do
-      arg = arg_fixture()
-      assert {:ok, %Arg{}} = Automation.delete_arg(arg)
-      assert_raise Ecto.NoResultsError, fn -> Automation.get_arg!(arg.id) end
-    end
-
-    test "change_arg/1 returns a arg changeset" do
-      arg = arg_fixture()
-      assert %Ecto.Changeset{} = Automation.change_arg(arg)
-    end
-  end
-
   describe "processes" do
     alias UserDocs.Automation.Process
 

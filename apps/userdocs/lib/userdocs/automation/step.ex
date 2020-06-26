@@ -2,15 +2,20 @@ defmodule UserDocs.Automation.Step do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias UserDocs.Web.Element
+  alias UserDocs.Automation.StepType
+  alias UserDocs.Web.Annotation
   alias UserDocs.Automation.Process
 
   schema "steps" do
     field :order, :integer
     field :name, :string
-    field :element_id, :id
-    field :annotation_id, :id
-    field :step_type_id, :id
+    field :url, :string
+    field :text, :string
 
+    belongs_to :element, Element
+    belongs_to :annotation, Annotation
+    belongs_to :step_type, StepType
     belongs_to :process, Process
 
     timestamps()

@@ -3,6 +3,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   alias UserDocsWeb.DomainHelpers
 
   alias UserDocs.Automation
+  alias UserDocs.Web
 
   @impl true
   def update(%{step: step} = assigns, socket) do
@@ -11,6 +12,9 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:available_processes, available_processes())
+     |> assign(:available_elements, available_elements(step))
+     |> assign(:step_types, step_types())
      |> assign(:changeset, changeset)}
   end
 
@@ -52,5 +56,31 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
+  end
+
+  defp available_processes do
+    Automation.list_processes()
+  end
+
+  defp available_elements(step) do
+    IO.puts("Getting available elements")
+    process = Automation.get_process!(
+      step.process_id,
+      %{pages: true, versions: true}
+    )
+    versions_or_pages_elements(process.versions, process.pages)
+  end
+
+  defp versions_or_pages_elements([ version | _ ], []) do
+    IO.puts("Getting version elements")
+    Web.list_elements(%{}, %{version_id: version.id})
+  end
+  defp versions_or_pages_elements([], [ page | _ ]) do
+    IO.puts("Getting page elements")
+    Web.list_elements(%{}, %{page_id: page.id})
+  end
+
+  defp step_types do
+    Automation.list_step_types()
   end
 end

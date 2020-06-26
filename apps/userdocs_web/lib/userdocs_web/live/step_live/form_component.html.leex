@@ -7,16 +7,32 @@
   phx_submit: "save" %>
 
   <%= label f, :process_id %>
-  <%= select f, :process_id, DomainHelpers.select_list(Automation.list_processes) %>
+  <%= select f, :process_id, DomainHelpers.select_list(@available_processes) %>
   <%= error_tag f, :process_id %>
+
+  <%= label f, :name %>
+  <%= text_input f, :name %>
+  <%= error_tag f, :name %>
+
+  <%= label f, :step_type_id %>
+  <%= select f, :step_type_id, DomainHelpers.select_list(@step_types) %>
+  <%= error_tag f, :step_type_id %>
+
+  <%= label f, :element_id %>
+  <%= select f, :element_id, DomainHelpers.select_list(@available_elements) %>
+  <%= error_tag f, :element_id %>
 
   <%= label f, :order %>
   <%= number_input f, :order %>
   <%= error_tag f, :order %>
 
-  <%= label f, :name %>
-  <%= text_input f, :name %>
-  <%= error_tag f, :name %>
+  <%= label f, :url %>
+  <%= text_input f, :url %>
+  <%= error_tag f, :url %>
+
+  <%= label f, :text %>
+  <%= text_input f, :text %>
+  <%= error_tag f, :text %>
 
   <%= submit "Save", phx_disable_with: "Saving..." %>
 </form>

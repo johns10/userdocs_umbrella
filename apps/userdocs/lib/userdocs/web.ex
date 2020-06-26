@@ -232,9 +232,28 @@ defmodule UserDocs.Web do
       [%Element{}, ...]
 
   """
-  def list_elements do
-    Repo.all(Element)
+  def list_elements(_params \\ %{}, filters \\ %{}) do
+    base_elements_query()
+    |> maybe_filter_by_version(filters[:version_id])
+    |> maybe_filter_by_page(filters[:page_id])
+    |> Repo.all()
   end
+
+  defp maybe_filter_by_version(query, nil), do: query
+  defp maybe_filter_by_version(query, version_id) do
+    from(element in query,
+      where: element.version_id == ^version_id
+    )
+  end
+
+  defp maybe_filter_by_page(query, nil), do: query
+  defp maybe_filter_by_page(query, page_id) do
+    from(element in query,
+      where: element.page_id == ^page_id
+    )
+  end
+
+  defp base_elements_query(), do: from(elements in Element)
 
   @doc """
   Gets a single element.
@@ -251,6 +270,7 @@ defmodule UserDocs.Web do
 
   """
   def get_element!(id), do: Repo.get!(Element, id)
+
 
   @doc """
   Creates a element.

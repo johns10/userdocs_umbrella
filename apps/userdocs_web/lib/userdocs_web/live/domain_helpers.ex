@@ -15,7 +15,7 @@ defmodule UserDocsWeb.DomainHelpers do
       items
       |> Enum.map(fn(x) -> (x.id) end)
     end
-    def selected(items) do
+    def selected(_items) do
       []
     end
 

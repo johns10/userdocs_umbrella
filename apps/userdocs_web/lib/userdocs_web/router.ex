@@ -91,11 +91,6 @@ defmodule UserDocsWeb.Router do
     live "/jobs/:id/edit", JobLive.Index, :edit
     live "/jobs/:id", JobLive.Show, :show
     live "/jobs/:id/show/edit", JobLive.Show, :edit
-    live "/args", ArgLive.Index, :index
-    live "/args/new", ArgLive.Index, :new
-    live "/args/:id/edit", ArgLive.Index, :edit
-    live "/args/:id", ArgLive.Show, :show
-    live "/args/:id/show/edit", ArgLive.Show, :edit
     live "/processes", ProcessLive.Index, :index
     live "/processes/new", ProcessLive.Index, :new
     live "/processes/:id/edit", ProcessLive.Index, :edit

@@ -130,8 +130,9 @@ defmodule UserDocs.Automation do
       [%Step{}, ...]
 
   """
-  def list_steps do
-    Repo.all(Step)
+  def list_steps() do
+    Repo.all from Step,
+      preload: [:process]
   end
 
   @doc """
@@ -311,102 +312,6 @@ defmodule UserDocs.Automation do
     Job.changeset(job, attrs)
   end
 
-  alias UserDocs.Automation.Arg
-
-  @doc """
-  Returns the list of args.
-
-  ## Examples
-
-      iex> list_args()
-      [%Arg{}, ...]
-
-  """
-  def list_args do
-    Repo.all(Arg)
-  end
-
-  @doc """
-  Gets a single arg.
-
-  Raises `Ecto.NoResultsError` if the Arg does not exist.
-
-  ## Examples
-
-      iex> get_arg!(123)
-      %Arg{}
-
-      iex> get_arg!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_arg!(id), do: Repo.get!(Arg, id)
-
-  @doc """
-  Creates a arg.
-
-  ## Examples
-
-      iex> create_arg(%{field: value})
-      {:ok, %Arg{}}
-
-      iex> create_arg(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_arg(attrs \\ %{}) do
-    %Arg{}
-    |> Arg.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a arg.
-
-  ## Examples
-
-      iex> update_arg(arg, %{field: new_value})
-      {:ok, %Arg{}}
-
-      iex> update_arg(arg, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_arg(%Arg{} = arg, attrs) do
-    arg
-    |> Arg.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a arg.
-
-  ## Examples
-
-      iex> delete_arg(arg)
-      {:ok, %Arg{}}
-
-      iex> delete_arg(arg)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_arg(%Arg{} = arg) do
-    Repo.delete(arg)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking arg changes.
-
-  ## Examples
-
-      iex> change_arg(arg)
-      %Ecto.Changeset{data: %Arg{}}
-
-  """
-  def change_arg(%Arg{} = arg, attrs \\ %{}) do
-    Arg.changeset(arg, attrs)
-  end
-
   alias UserDocs.Automation.Process
 
   @doc """
@@ -437,11 +342,23 @@ defmodule UserDocs.Automation do
       ** (Ecto.NoResultsError)
 
   """
-  def get_process!(id) do
-    Repo.one! from process in Process,
-      where: process.id == ^id,
-      preload: [:versions, :pages]
+  def get_process!(id, params \\ %{}) do
+    base_process_query(id)
+    |> maybe_preload_pages(params[:pages])
+    |> maybe_preload_versions(params[:versions])
+    |> Repo.one!()
   end
+
+  defp base_process_query(id) do
+    from(process in Process, where: process.id == ^id)
+  end
+
+  defp maybe_preload_pages(query, nil), do: query
+  defp maybe_preload_pages(query, _), do: from(processes in query, preload: [:pages])
+
+  defp maybe_preload_versions(query, nil), do: query
+  defp maybe_preload_versions(query, _), do: from(processes in query, preload: [:versions])
+
 
   @doc """
   Creates a process.
@@ -543,16 +460,10 @@ defmodule UserDocs.Automation do
       |> VersionProcess.changeset(attrs)
       |> Repo.insert()
 
-      version_process =
-        case status do
-          :ok ->
-            version_process
-            |> Repo.preload([:version, :process])
-
-          _ -> version_process
-        end
-
-    Endpoint.broadcast("version_process", "create", version_process)
+      case status do
+        :ok -> Endpoint.broadcast("version_process", "create", version_process)
+        _ -> version_process
+      end
 
     {status, version_process}
   end
