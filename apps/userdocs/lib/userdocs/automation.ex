@@ -17,9 +17,7 @@ defmodule UserDocs.Automation do
       left_join: steps in assoc(processes, :steps),
       preload: [
         :pages,
-        :processes,
-        pages: {pages, processes: {processes, :steps}},
-        processes: :steps
+        pages: {pages, processes: {processes, :steps}}
       ]
   end
 
@@ -325,7 +323,7 @@ defmodule UserDocs.Automation do
   """
   def list_processes do
     Repo.all from Process,
-      preload: [:pages, :versions]
+      preload: []
   end
 
   @doc """
@@ -378,12 +376,6 @@ defmodule UserDocs.Automation do
       |> Process.changeset(attrs)
       |> Repo.insert()
 
-    process =
-      case status do
-        :ok -> process
-        _ -> process
-      end
-
     Endpoint.broadcast("process", "create", process)
 
     {status, process}
@@ -402,19 +394,15 @@ defmodule UserDocs.Automation do
 
   """
   def update_process(%Process{} = process, attrs) do
+    IO.puts("Updating Process")
+    IO.inspect(attrs)
     {status, process} =
       process
       |> Process.changeset(attrs)
       |> Repo.update()
 
-    process =
-      case status do
-        :ok ->
-          process
-          |> Repo.preload([:pages, :versions])
 
-        _ -> process
-      end
+    IO.inspect(process)
 
     Endpoint.broadcast("process", "update", process)
 
@@ -448,31 +436,5 @@ defmodule UserDocs.Automation do
   """
   def change_process(%Process{} = process, attrs \\ %{}) do
     Process.changeset(process, attrs)
-  end
-
-  alias UserDocs.Automation.VersionProcess
-
-  def create_version_process(attrs \\ %{}) do
-
-
-    {status, version_process} =
-      %VersionProcess{}
-      |> VersionProcess.changeset(attrs)
-      |> Repo.insert()
-
-      case status do
-        :ok -> Endpoint.broadcast("version_process", "create", version_process)
-        _ -> version_process
-      end
-
-    {status, version_process}
-  end
-
-  alias UserDocs.Automation.PageProcess
-
-  def create_page_process(attrs \\ %{}) do
-    %PageProcess{}
-    |> PageProcess.changeset(attrs)
-    |> Repo.insert()
   end
 end

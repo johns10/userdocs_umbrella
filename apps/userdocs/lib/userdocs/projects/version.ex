@@ -3,19 +3,14 @@ defmodule UserDocs.Projects.Version do
   import Ecto.Changeset
 
   alias UserDocs.Web.Page
-  alias UserDocs.Automation
   alias UserDocs.Projects.Project
 
   schema "versions" do
     field :name, :string
 
     belongs_to :project, Project
-    has_many :pages, Page
 
-    many_to_many :processes,
-      Automation.Process,
-      join_through: Automation.VersionProcess,
-      on_replace: :delete
+    has_many :pages, Page
 
     timestamps()
   end

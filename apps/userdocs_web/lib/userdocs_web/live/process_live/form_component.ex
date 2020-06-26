@@ -1,7 +1,6 @@
 defmodule UserDocsWeb.ProcessLive.FormComponent do
   use UserDocsWeb, :live_component
 
-  alias UserDocs.Projects
   alias UserDocs.Web
   alias UserDocs.Automation
   alias UserDocsWeb.DomainHelpers
@@ -19,7 +18,6 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:available_versions, available_versions())
      |> assign(:available_pages, available_pages())
      |> assign(:changeset, changeset)}
   end
@@ -40,14 +38,7 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
 
   defp save_process(socket, :edit, process_params) do
     case Automation.update_process(socket.assigns.process, process_params) do
-      {:ok, process} ->
-
-        {:ok, _version_process } =
-          maybe_add_version_process(process.id, process_params["versions"])
-
-        {:ok, _page_process } =
-          maybe_add_page_process(process.id, process_params["pages"])
-
+      {:ok, _process} ->
         {:noreply,
          socket
          |> put_flash(:info, "Process updated successfully")
@@ -60,19 +51,7 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
 
   defp save_process(socket, :new, process_params) do
     case Automation.create_process(process_params) do
-      {:ok, process} ->
-        #Left to crib from later
-        _unused_code_block = """
-        check_nil(process_params["pages"])
-        |> Enum.map(fn(page_id) -> %{process_id: process.id, page_id: String.to_integer(page_id)} end)
-        |> Enum.each(fn(p) -> Automation.create_page_process(p) end)
-        """
-        {:ok, _version_process } =
-          maybe_add_version_process(process.id, process_params["versions"])
-
-        {:ok, _page_process } =
-          maybe_add_page_process(process.id, process_params["pages"])
-
+      {:ok, _process} ->
         {:noreply,
          socket
          |> put_flash(:info, "Process created successfully")
@@ -83,23 +62,16 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
     end
   end
 
-  defp available_versions do
-    Projects.list_versions()
+  def maybe_parent_id(assigns) do
+    try do
+      assigns.parent.id
+    rescue
+      ArgumentError -> assigns.changeset.data.page_id
+      KeyError -> assigns.changeset.data.page_id
+    end
   end
 
   defp available_pages do
     Web.list_pages()
-  end
-
-  defp maybe_add_page_process(_, "Elixir.None"), do: { :ok, None }
-  defp maybe_add_page_process(process_id, page_id) do
-    %{ process_id: process_id, page_id: String.to_integer(page_id) }
-    |> Automation.create_page_process
-  end
-
-  defp maybe_add_version_process(_, "Elixir.None"), do: { :ok, None }
-  defp maybe_add_version_process(process_id, version_id) do
-    %{ process_id: process_id, version_id: String.to_integer(version_id) }
-    |> Automation.create_version_process()
   end
 end

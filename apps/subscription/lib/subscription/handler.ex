@@ -1,15 +1,15 @@
 defmodule Subscription.Handler do
 
-  def apply( type, "create" = command, object, state ) do
-    { state, data } = StateHandlers.create(state, type, object)
+  def apply( type, "create", object, state ) do
+    { state, _data } = StateHandlers.create(state, type, object)
     state
   end
-  def apply( type, "update" = command, object, state ) do
-    { state, data } = StateHandlers.update(state, type, object)
+  def apply( type, "update", object, state ) do
+    { state, _data } = StateHandlers.update(state, type, object)
     state
   end
-  def apply( type, "delete" = command, id, object, state ) do
-    { state, data } = StateHandlers.delete(state, type, id)
+  def apply( type, "delete", id, _object, state ) do
+    { state, _data } = StateHandlers.delete(state, type, id)
     state
   end
 

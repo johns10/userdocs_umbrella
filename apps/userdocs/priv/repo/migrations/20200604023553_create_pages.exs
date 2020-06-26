@@ -6,7 +6,6 @@ defmodule UserDocs.Repo.Migrations.CreatePages do
       add :name, :string
       add :url, :string
       add :version_id, references(:versions, on_delete: :nothing)
-
       timestamps()
     end
 

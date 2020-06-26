@@ -8,12 +8,12 @@
   class: "form-horizontal" %>
 
   <div class="field">
-    <%= label f, :pages, class: :label %>
+    <%= label f, :page_id, class: :label %>
     <div class="control">
       <div class="select">
-        <%= select f, :pages,
+        <%= select f, :page_id,
           DomainHelpers.select_list(@available_pages),
-          selected: @parent.id %>
+          selected: maybe_parent_id(assigns) %>
       </div>
     </div>
     <%= error_tag f, :pages %>

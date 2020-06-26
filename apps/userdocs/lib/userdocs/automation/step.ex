@@ -13,10 +13,10 @@ defmodule UserDocs.Automation.Step do
     field :url, :string
     field :text, :string
 
+    belongs_to :process, Process
     belongs_to :element, Element
     belongs_to :annotation, Annotation
     belongs_to :step_type, StepType
-    belongs_to :process, Process
 
     timestamps()
   end
