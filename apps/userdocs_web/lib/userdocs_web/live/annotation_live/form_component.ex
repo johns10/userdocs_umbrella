@@ -2,6 +2,8 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocs.Web
+  alias UserDocsWeb.DomainHelpers
+  alias UserDocsWeb.LiveHelpers
 
   @impl true
   def update(%{annotation: annotation} = assigns, socket) do
@@ -10,6 +12,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:available_pages, available_pages())
      |> assign(:changeset, changeset)}
   end
 
@@ -33,7 +36,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Annotation updated successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+         |> LiveHelpers.maybe_push_redirect()}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
@@ -46,10 +49,14 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Annotation created successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+         |> LiveHelpers.maybe_push_redirect()}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
+  end
+
+  defp available_pages do
+    Web.list_pages()
   end
 end

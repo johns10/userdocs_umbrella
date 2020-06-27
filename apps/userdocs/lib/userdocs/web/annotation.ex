@@ -24,7 +24,8 @@ defmodule UserDocs.Web.Annotation do
   @doc false
   def changeset(annotation, attrs) do
     annotation
-    |> cast(attrs, [:name, :label, :description])
+    |> cast(attrs, [:name, :label, :description, :page_id,
+      :annotation_type_id, :element_id, :content_id])
     |> foreign_key_constraint(:page_id)
     |> foreign_key_constraint(:annotation_type_id)
     |> foreign_key_constraint(:elment_id)

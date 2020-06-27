@@ -18,6 +18,7 @@ defmodule UserDocs.Automation do
       preload: [
         :pages,
         pages: :elements,
+        pages: :annotations,
         pages: {pages, processes: {processes, :steps}}
       ]
   end

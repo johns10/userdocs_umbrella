@@ -5,6 +5,7 @@ defmodule UserDocs.Web.Page do
   alias UserDocs.Projects.Version
   alias UserDocs.Automation.Process
   alias UserDocs.Web.Element
+  alias UserDocs.Web.Annotation
 
   schema "pages" do
     field :name, :string
@@ -14,6 +15,7 @@ defmodule UserDocs.Web.Page do
 
     has_many :processes, Process
     has_many :elements, Element
+    has_many :annotations, Annotation
 
     timestamps()
   end

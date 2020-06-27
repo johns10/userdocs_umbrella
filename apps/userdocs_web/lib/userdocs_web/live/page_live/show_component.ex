@@ -6,6 +6,7 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
 
   alias UserDocsWeb.ProcessLive
   alias UserDocsWeb.ElementLive
+  alias UserDocsWeb.AnnotationLive
   alias UserDocsWeb.Layout
 
   @impl true
@@ -56,6 +57,22 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
             id: "page-"
               <> Integer.to_string(@object.id)
               <> "-elements",
+            parent: @object
+          ]
+        ) %>
+        <%= live_group(@socket,
+          AnnotationLive.ShowComponent,
+          AnnotationLive.FormComponent,
+          [
+            title: "Annotations",
+            type: :annotation,
+            parent_type: :page,
+            struct: %Web.Annotation{},
+            objects: @object.annotations,
+            return_to: Routes.annotation_index_path(@socket, :index),
+            id: "page-"
+              <> Integer.to_string(@object.id)
+              <> "-annotation",
             parent: @object
           ]
         ) %>
