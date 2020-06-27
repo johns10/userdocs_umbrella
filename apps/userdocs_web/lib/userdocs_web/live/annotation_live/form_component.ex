@@ -2,6 +2,8 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocs.Web
+  alias UserDocs.Documents
+
   alias UserDocsWeb.DomainHelpers
   alias UserDocsWeb.LiveHelpers
 
@@ -13,6 +15,8 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
      socket
      |> assign(assigns)
      |> assign(:available_pages, available_pages())
+     |> assign(:available_content, available_content())
+     |> assign(:available_elements, available_elements())
      |> assign(:changeset, changeset)}
   end
 
@@ -44,6 +48,8 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
   end
 
   defp save_annotation(socket, :new, annotation_params) do
+    IO.puts("Saving new Annotation")
+    IO.inspect(annotation_params)
     case Web.create_annotation(annotation_params) do
       {:ok, _annotation} ->
         {:noreply,
@@ -52,11 +58,21 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
          |> LiveHelpers.maybe_push_redirect()}
 
       {:error, %Ecto.Changeset{} = changeset} ->
+        IO.puts("Saving new Annotation Failed")
+        IO.inspect(changeset)
         {:noreply, assign(socket, changeset: changeset)}
     end
   end
 
   defp available_pages do
     Web.list_pages()
+  end
+
+  defp available_elements() do
+    Web.list_elements()
+  end
+
+  defp available_content() do
+    Documents.list_content()
   end
 end

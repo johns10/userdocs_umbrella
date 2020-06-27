@@ -4,11 +4,11 @@ defmodule UserDocsWeb.DomainHelpers do
 
     """
     def select_list(items, field \\ :name)
-    def select_list([], _), do: [{"None", None}]
+    def select_list([], _), do: [{"None", ""}]
     def select_list(items, field) do
       items
       |> Enum.map(&{Map.get(&1, field), &1.id})
-      |> List.insert_at(0, {"None", None})
+      |> List.insert_at(0, {"None", ""})
     end
 
     def selected(items = [ _ | _]) do

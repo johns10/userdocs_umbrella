@@ -391,6 +391,8 @@ defmodule UserDocs.Web do
 
   """
   def create_annotation(attrs \\ %{}) do
+    IO.puts("Creating Annotation")
+    IO.inspect(attrs)
     %Annotation{}
     |> Annotation.changeset(attrs)
     |> Repo.insert()

@@ -26,10 +26,6 @@ defmodule UserDocs.Web.Annotation do
     annotation
     |> cast(attrs, [:name, :label, :description, :page_id,
       :annotation_type_id, :element_id, :content_id])
-    |> foreign_key_constraint(:page_id)
-    |> foreign_key_constraint(:annotation_type_id)
-    |> foreign_key_constraint(:elment_id)
-    |> foreign_key_constraint(:content_id)
     |> validate_required([:name, :label, :description])
   end
 end

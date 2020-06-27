@@ -18,6 +18,30 @@
     <%= error_tag f, :pages %>
   </div>
 
+  <div class="field">
+    <%= label f, :content_id, class: :label %>
+    <div class="control">
+      <div class="select">
+        <%= select f, :content_id,
+          DomainHelpers.select_list(@available_content),
+          selected: @changeset.data.content_id %>
+      </div>
+    </div>
+    <%= error_tag f, :pages %>
+  </div>
+
+  <div class="field">
+    <%= label f, :element_id, class: :label %>
+    <div class="control">
+      <div class="select">
+        <%= select f, :element_id,
+          DomainHelpers.select_list(@available_elements),
+          selected: @changeset.data.element_id %>
+      </div>
+    </div>
+    <%= error_tag f, :pages %>
+  </div>
+
   <%= label f, :name %>
   <%= text_input f, :name %>
   <%= error_tag f, :name %>
