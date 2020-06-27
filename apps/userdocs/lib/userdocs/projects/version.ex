@@ -18,7 +18,8 @@ defmodule UserDocs.Projects.Version do
   @doc false
   def changeset(version, attrs) do
     version
-    |> cast(attrs, [:name, :project_id])
+    |> cast(attrs, [:name])
+    |> foreign_key_constraint(:project_id)
     |> validate_required([:name])
   end
 end

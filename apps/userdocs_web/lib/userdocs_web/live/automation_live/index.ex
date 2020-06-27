@@ -17,7 +17,6 @@ defmodule UserDocsWeb.AutomationLive.Index do
 
   @impl true
   def mount(_params, session, socket) do
-    # IO.inspect(Automation.details(1))
     Endpoint.subscribe("process")
     Endpoint.subscribe("page")
     Endpoint.subscribe("version_process")

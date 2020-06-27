@@ -2,14 +2,21 @@ defmodule UserDocs.Web.Annotation do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias UserDocs.Web.AnnotationType
+  alias UserDocs.Web.Element
+  alias UserDocs.Web.Page
+  alias UserDocs.Documents.Content
+
   schema "annotations" do
     field :description, :string
     field :label, :string
     field :name, :string
-    field :annotation_type_id, :id
-    field :page_id, :id
-    field :element_id, :id
-    field :content_id, :id
+
+    belongs_to :page, Page
+
+    belongs_to :annotation_type, AnnotationType
+    belongs_to :element, Element
+    belongs_to :content, Content
 
     timestamps()
   end
@@ -18,6 +25,10 @@ defmodule UserDocs.Web.Annotation do
   def changeset(annotation, attrs) do
     annotation
     |> cast(attrs, [:name, :label, :description])
+    |> foreign_key_constraint(:page_id)
+    |> foreign_key_constraint(:annotation_type_id)
+    |> foreign_key_constraint(:elment_id)
+    |> foreign_key_constraint(:content_id)
     |> validate_required([:name, :label, :description])
   end
 end

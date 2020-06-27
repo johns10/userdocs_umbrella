@@ -1,14 +1,14 @@
 defmodule UserDocsWeb.PageLive.FormComponent do
   use UserDocsWeb, :live_component
+
   alias UserDocs.Web
   alias UserDocs.Projects
+
   alias UserDocsWeb.LiveHelpers
   alias UserDocsWeb.DomainHelpers
 
   @impl true
   def update(%{page: page} = assigns, socket) do
-    IO.puts("updating Page form")
-    IO.inspect(assigns)
     changeset = Web.change_page(page)
 
     {:ok,

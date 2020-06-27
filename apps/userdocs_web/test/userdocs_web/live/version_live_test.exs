@@ -49,16 +49,21 @@ defmodule UserDocsWeb.VersionLiveTest do
     test "saves new version", %{conn: conn} do
       {:ok, index_live, _html} = live(conn, Routes.version_index_path(conn, :index))
 
-      assert index_live |> element("a", "New Version") |> render_click() =~
-               "New Version"
+      assert index_live
+      |> element("a", "New Version")
+      |> render_click() =~ "New Version"
 
       assert_patch(index_live, Routes.version_index_path(conn, :new))
 
       assert index_live
-             |> form("#version-form", version: @invalid_attrs)
-             |> render_change() =~ "can&apos;t be blank"
+      |> form("#version-form", version: @invalid_attrs)
+      |> render_change() =~ "can&apos;t be blank"
 
-      version_attrs = Map.put(@create_attrs, :project_id, first_project_id())
+      version_attrs = Map.put(
+        @create_attrs,
+        :project_id,
+        first_project_id()
+      )
 
       {:ok, _, html} =
         index_live
@@ -79,10 +84,14 @@ defmodule UserDocsWeb.VersionLiveTest do
       assert_patch(index_live, Routes.version_index_path(conn, :edit, version))
 
       assert index_live
-             |> form("#version-form", version: @invalid_attrs)
-             |> render_change() =~ "can&apos;t be blank"
+      |> form("#version-form", version: @invalid_attrs)
+      |> render_change() =~ "can&apos;t be blank"
 
-      update_attrs = Map.put(@update_attrs, :project_id, first_project_id())
+      update_attrs = Map.put(
+        @update_attrs,
+        :project_id,
+        first_project_id()
+      )
 
       {:ok, _, html} =
         index_live
@@ -115,7 +124,9 @@ defmodule UserDocsWeb.VersionLiveTest do
     test "updates version within modal", %{conn: conn, version: version} do
       {:ok, show_live, _html} = live(conn, Routes.version_show_path(conn, :show, version))
 
-      assert show_live |> element("a", "Edit") |> render_click() =~
+      assert show_live
+      |> element("a", "Edit")
+      |> render_click() =~
                "Edit Version"
 
       assert_patch(show_live, Routes.version_show_path(conn, :edit, version))

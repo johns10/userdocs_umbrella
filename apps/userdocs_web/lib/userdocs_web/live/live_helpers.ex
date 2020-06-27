@@ -70,6 +70,8 @@ defmodule UserDocsWeb.LiveHelpers do
     live_component(socket, UserDocsWeb.ShowComponent, modal_opts)
   end
 
-  def maybe_push_redirect(socket = %{assigns: %{return_to: return_to}}), do: LiveView.push_redirect(socket, to: return_to)
+  def maybe_push_redirect(socket = %{assigns: %{return_to: return_to}}) do
+    LiveView.push_redirect(socket, to: return_to)
+  end
   def maybe_push_redirect(socket), do: socket
 end

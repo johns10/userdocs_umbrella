@@ -1,8 +1,11 @@
 defmodule UserDocsWeb.VersionLive.FormComponent do
   use UserDocsWeb, :live_component
-  alias UserDocsWeb.DomainHelpers
+
   alias UserDocs.Projects
-  
+
+  alias UserDocsWeb.DomainHelpers
+  alias UserDocsWeb.LiveHelpers
+
   @impl true
   def update(%{version: version} = assigns, socket) do
     changeset = Projects.change_version(version)
@@ -33,7 +36,7 @@ defmodule UserDocsWeb.VersionLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Version updated successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+         |> LiveHelpers.maybe_push_redirect()}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
@@ -46,7 +49,7 @@ defmodule UserDocsWeb.VersionLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Version created successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+         |> LiveHelpers.maybe_push_redirect()}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}

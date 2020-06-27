@@ -128,10 +128,19 @@ defmodule UserDocs.Automation do
       [%Step{}, ...]
 
   """
-  def list_steps() do
-    Repo.all from Step,
-      preload: [:process]
+  def list_steps(params \\ %{}, _filters \\ %{}) do
+    base_steps_query()
+    |> maybe_preload_processes(params[:processes])
+    |> Repo.all()
   end
+
+  defp base_steps_query(), do: from(steps in Step)
+
+  defp maybe_preload_processes(query, nil), do: query
+  defp maybe_preload_processes(query, _) do
+    from(steps in query, preload: [:processes])
+  end
+
 
   @doc """
   Gets a single step.
@@ -394,15 +403,10 @@ defmodule UserDocs.Automation do
 
   """
   def update_process(%Process{} = process, attrs) do
-    IO.puts("Updating Process")
-    IO.inspect(attrs)
     {status, process} =
       process
       |> Process.changeset(attrs)
       |> Repo.update()
-
-
-    IO.inspect(process)
 
     Endpoint.broadcast("process", "update", process)
 

@@ -6,33 +6,94 @@
   phx_change: "validate",
   phx_submit: "save" %>
 
-  <%= label f, :process_id %>
-  <%= select f, :process_id, DomainHelpers.select_list(@available_processes) %>
-  <%= error_tag f, :process_id %>
+  <div class="field">
+    <%= label f, :process_id, class: :label %>
+    <div class="control">
+      <div class="select">
+        <%= select f, :process_id,
+          DomainHelpers.select_list(@available_processes),
+          selected: DomainHelpers.maybe_parent_id(assigns, :process_id) %>
+      </div>
+    </div>
+    <%= error_tag f, :process_id %>
+  </div>
 
-  <%= label f, :name %>
-  <%= text_input f, :name %>
-  <%= error_tag f, :name %>
 
-  <%= label f, :step_type_id %>
-  <%= select f, :step_type_id, DomainHelpers.select_list(@step_types) %>
-  <%= error_tag f, :step_type_id %>
+  <div class="field">
+    <%= label f, :order %>
+    <div class="control">
+      <%= number_input f, :order, class: "input", type: "text" %>
+    </div>
+    <%= error_tag f, :order %>
+  </div>
 
-  <%= label f, :element_id %>
-  <%= select f, :element_id, DomainHelpers.select_list(@available_elements) %>
-  <%= error_tag f, :element_id %>
+  <div class="field">
+    <%= label f, :name %>
+    <div class="control">
+      <%= text_input f, :name, class: "input", type: "text" %>
+    </div>
+    <%= error_tag f, :name %>
+  </div>
 
-  <%= label f, :order %>
-  <%= number_input f, :order %>
-  <%= error_tag f, :order %>
+  <div class="field">
+    <%= label f, :step_type_id, class: :label %>
+    <div class="control">
+      <div class="select">
+        <%= select f, :step_type_id,
+          DomainHelpers.select_list(@step_types),
+          selected: @changeset.data.step_type_id %>
+      </div>
+    </div>
+    <%= error_tag f, :step_type_id %>
+  </div>
 
-  <%= label f, :url %>
-  <%= text_input f, :url %>
-  <%= error_tag f, :url %>
+  <%= if("element_id" in @enabled_fields) do %>
+    <div class="field">
+      <%= label f, :element_id, class: :label %>
+      <div class="control">
+        <div class="select">
+          <%= select f, :element_id,
+            DomainHelpers.select_list(@available_elements),
+            selected: @changeset.data.element_id %>
+        </div>
+      </div>
+      <%= error_tag f, :element_id %>
+    </div>
+  <% end %>
 
-  <%= label f, :text %>
-  <%= text_input f, :text %>
-  <%= error_tag f, :text %>
+  <%= if("annotation_id" in @enabled_fields) do %>
+    <div class="field">
+      <%= label f, :annotation_id, class: :label %>
+      <div class="control">
+        <div class="select">
+          <%= select f, :annotation_id,
+            DomainHelpers.select_list(@available_annotations),
+            selected: @changeset.data.annotation_id %>
+        </div>
+      </div>
+      <%= error_tag f, :element_id %>
+    </div>
+  <% end %>
+
+  <%= if("url" in @enabled_fields) do %>
+    <div class="field">
+      <%= label f, :url %>
+      <div class="control">
+        <%= text_input f, :url, class: "input", type: "text" %>
+      </div>
+      <%= error_tag f, :url %>
+    </div>
+  <% end %>
+
+  <%= if("text" in @enabled_fields) do %>
+    <div class="field">
+      <%= label f, :text %>
+      <div class="control">
+        <%= text_input f, :text, class: "input", type: "text" %>
+      </div>
+      <%= error_tag f, :text %>
+    </div>
+  <% end %>
 
   <%= submit "Save", phx_disable_with: "Saving..." %>
 </form>

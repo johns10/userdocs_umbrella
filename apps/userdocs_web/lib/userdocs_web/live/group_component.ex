@@ -1,6 +1,8 @@
 defmodule UserDocsWeb.GroupComponent do
     use UserDocsWeb, :live_component
 
+    alias UserDocsWeb.Layout
+
     @impl true
     def render(assigns) do
       ~L"""
@@ -19,7 +21,7 @@ defmodule UserDocsWeb.GroupComponent do
               </span>
             </a>
           </header>
-          <div class="card-content <%= is_hidden?(assigns) %>">
+          <div class="card-content <%= Layout.is_hidden?(assigns) %>">
             <div class="content">
               <%= for(object <- @objects) do %>
                 <%= live_show(@socket, @show,
@@ -39,8 +41,8 @@ defmodule UserDocsWeb.GroupComponent do
               <> Integer.to_string(@parent.id) <> "-"
               <> Atom.to_string(@type)
               <> "-form-new",
-            title: "New Process",
-            hidden: is_hidden?(assigns)
+            title: @title,
+            hidden: Layout.is_hidden?(assigns)
           ) %>
         </div>
       """
@@ -61,12 +63,7 @@ defmodule UserDocsWeb.GroupComponent do
 
     @impl true
     def handle_event("expand", _, socket) do
-      IO.puts("Expanding")
-      IO.inspect(socket.assigns.myself)
       socket = assign(socket, :expanded, not socket.assigns.expanded)
       {:noreply, socket}
     end
-
-    def is_hidden?(%{expanded: false}), do: "is-hidden"
-    def is_hidden?(%{expanded: true}), do: ""
   end

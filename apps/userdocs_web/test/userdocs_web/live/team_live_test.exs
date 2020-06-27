@@ -6,16 +6,12 @@ defmodule UserDocsWeb.TeamLiveTest do
   alias UserDocs.Users
 
   @create_user_attrs %{
-    email: "user@domain.com", 
-    password: "password", 
+    email: "user@domain.com",
+    password: "password",
     password_confirmation: "password"
   }
-  @update_user_attrs %{
-    email: "user@domain.com", 
-    password: "password"
-  }
 
-  
+
   @initial_attrs %{name: "initial name", users: []}
   @create_attrs %{name: "some name", users: []}
   @update_attrs %{name: "some updated name", users: []}
@@ -26,7 +22,7 @@ defmodule UserDocsWeb.TeamLiveTest do
     |> Enum.at(0)
     |> Map.get(:id)
   end
-  
+
   defp fixture(:user) do
     {:ok, user} = Users.create_user(@create_user_attrs)
     user
@@ -60,8 +56,8 @@ defmodule UserDocsWeb.TeamLiveTest do
     test "saves new team", %{conn: conn} do
       {:ok, index_live, _html} = live(conn, Routes.team_index_path(conn, :index))
 
-      assert index_live 
-      |> element("a", "New Team") 
+      assert index_live
+      |> element("a", "New Team")
       |> render_click() =~ "New Team"
 
       assert_patch(index_live, Routes.team_index_path(conn, :new))
@@ -122,9 +118,9 @@ defmodule UserDocsWeb.TeamLiveTest do
     # TODO : Figure out why this requires team[users][]
     test "updates team within modal", %{conn: conn, team: team} do
       {:ok, show_live, _html} = live(conn, Routes.team_show_path(conn, :show, team))
-      
-      assert show_live 
-      |> element("a", "Edit") 
+
+      assert show_live
+      |> element("a", "Edit")
       |> render_click() =~
         "Edit Team"
 
@@ -132,7 +128,7 @@ defmodule UserDocsWeb.TeamLiveTest do
 
       assert show_live
       |> form("#team-form", team: @invalid_attrs)
-      |> render_change() =~ 
+      |> render_change() =~
         "can&apos;t be blank"
 
       team_attrs = Map.put(@update_attrs, :users, [first_user_id()])

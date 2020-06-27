@@ -4,14 +4,32 @@ defmodule UserDocsWeb.PageLiveTest do
   import Phoenix.LiveViewTest
 
   alias UserDocs.Web
+  alias UserDocs.Projects
 
-  @create_attrs %{url: "some url"}
-  @update_attrs %{url: "some updated url"}
-  @invalid_attrs %{url: nil}
+  @version_attrs %{name: "some name"}
 
+  @create_attrs %{name: "some name", url: "some url"}
+  @update_attrs %{name: "some updated name", url: "some updated url"}
+  @invalid_attrs %{name: nil, url: nil}
+
+  defp first_version_id() do
+    Projects.list_versions()
+    |> Enum.at(0)
+    |> Map.get(:id)
+  end
+
+  defp fixture(:version) do
+    {:ok, version} = Projects.create_version(@version_attrs)
+    version
+  end
   defp fixture(:page) do
     {:ok, page} = Web.create_page(@create_attrs)
     page
+  end
+
+  defp create_version(_) do
+    version = fixture(:version)
+    %{version: version}
   end
 
   defp create_page(_) do
@@ -20,7 +38,7 @@ defmodule UserDocsWeb.PageLiveTest do
   end
 
   describe "Index" do
-    setup [:create_page]
+    setup [:create_version, :create_page]
 
     test "lists all pages", %{conn: conn, page: page} do
       {:ok, _index_live, html} = live(conn, Routes.page_index_path(conn, :index))
@@ -32,19 +50,25 @@ defmodule UserDocsWeb.PageLiveTest do
     test "saves new page", %{conn: conn} do
       {:ok, index_live, _html} = live(conn, Routes.page_index_path(conn, :index))
 
-      assert index_live 
-      |> element("a", "New Page") 
+      assert index_live
+      |> element("a", "New Page")
       |> render_click() =~ "New Page"
 
       assert_patch(index_live, Routes.page_index_path(conn, :new))
 
       assert index_live
-             |> form("#page-form", page: @invalid_attrs)
-             |> render_change() =~ "can&apos;t be blank"
+      |> form("#page-form", page: @invalid_attrs)
+      |> render_change() =~ "can&apos;t be blank"
+
+      page_attrs = Map.put(
+        @create_attrs,
+        :version_id,
+        first_version_id()
+      )
 
       {:ok, _, html} =
         index_live
-        |> form("#page-form", page: @create_attrs)
+        |> form("#page-form", page: page_attrs)
         |> render_submit()
         |> follow_redirect(conn, Routes.page_index_path(conn, :index))
 
@@ -61,12 +85,18 @@ defmodule UserDocsWeb.PageLiveTest do
       assert_patch(index_live, Routes.page_index_path(conn, :edit, page))
 
       assert index_live
-             |> form("#page-form", page: @invalid_attrs)
-             |> render_change() =~ "can&apos;t be blank"
+      |> form("#page-form", page: @invalid_attrs)
+      |> render_change() =~ "can&apos;t be blank"
+
+      update_attrs = Map.put(
+        @update_attrs,
+        :version_id,
+        first_version_id()
+      )
 
       {:ok, _, html} =
         index_live
-        |> form("#page-form", page: @update_attrs)
+        |> form("#page-form", page: update_attrs)
         |> render_submit()
         |> follow_redirect(conn, Routes.page_index_path(conn, :index))
 
@@ -83,7 +113,7 @@ defmodule UserDocsWeb.PageLiveTest do
   end
 
   describe "Show" do
-    setup [:create_page]
+    setup [:create_version, :create_page]
 
     test "displays page", %{conn: conn, page: page} do
       {:ok, _show_live, html} = live(conn, Routes.page_show_path(conn, :show, page))
@@ -95,18 +125,25 @@ defmodule UserDocsWeb.PageLiveTest do
     test "updates page within modal", %{conn: conn, page: page} do
       {:ok, show_live, _html} = live(conn, Routes.page_show_path(conn, :show, page))
 
-      assert show_live |> element("a", "Edit") |> render_click() =~
-               "Edit Page"
+      assert show_live
+      |> element("a", "Edit")
+      |> render_click() =~ "Edit Page"
 
       assert_patch(show_live, Routes.page_show_path(conn, :edit, page))
 
       assert show_live
-             |> form("#page-form", page: @invalid_attrs)
-             |> render_change() =~ "can&apos;t be blank"
+      |> form("#page-form", page: @invalid_attrs)
+      |> render_change() =~ "can&apos;t be blank"
+
+      update_attrs = Map.put(
+        @update_attrs,
+        :version_id,
+        first_version_id()
+      )
 
       {:ok, _, html} =
         show_live
-        |> form("#page-form", page: @update_attrs)
+        |> form("#page-form", page: update_attrs)
         |> render_submit()
         |> follow_redirect(conn, Routes.page_show_path(conn, :show, page))
 

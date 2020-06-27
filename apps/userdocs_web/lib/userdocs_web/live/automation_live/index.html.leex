@@ -1,3 +1,6 @@
 <h1><%= @version.name %></h1>
 
-<%= UserDocsWeb.VersionLive.Show.render(assigns) %>
+<%= live_component(@socket, UserDocsWeb.VersionLive.ShowComponent,
+[
+  version: @version
+]) %>

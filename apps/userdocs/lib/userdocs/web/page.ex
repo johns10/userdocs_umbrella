@@ -20,6 +20,7 @@ defmodule UserDocs.Web.Page do
   def changeset(page, attrs) do
     page
     |> cast(attrs, [:name, :url, :version_id])
+    |> foreign_key_constraint(:version_id)
     |> validate_required([:url])
   end
 end

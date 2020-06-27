@@ -1,4 +1,4 @@
-defmodule UserDocsWeb.StepsLive.ShowComponent do
+defmodule UserDocsWeb.StepLive.ShowComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocsWeb.Layout

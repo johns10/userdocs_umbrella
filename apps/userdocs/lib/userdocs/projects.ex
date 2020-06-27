@@ -114,8 +114,7 @@ defmodule UserDocs.Projects do
 
   """
   def list_versions do
-    Repo.all from Version,
-      preload: [:processes]
+    Repo.all from Version
   end
 
   @doc """
@@ -134,8 +133,7 @@ defmodule UserDocs.Projects do
   """
   def get_version!(id) do
     Repo.one! from version in Version,
-      where: version.id == ^id,
-      preload: [:processes]
+      where: version.id == ^id
   end
 
   @doc """
@@ -151,21 +149,9 @@ defmodule UserDocs.Projects do
 
   """
   def create_version(attrs \\ %{}) do
-    {status, version} =
-      %Version{}
-      |> Version.changeset(attrs)
-      |> Repo.insert()
-
-    version =
-      case status do
-        :ok ->
-          version
-          |> Repo.preload([:processes])
-
-        _ -> version
-      end
-
-    {status, version}
+    %Version{}
+    |> Version.changeset(attrs)
+    |> Repo.insert()
   end
 
   @doc """

@@ -36,7 +36,6 @@ defmodule UserDocsWeb.FooterComponent do
 
   @impl true
   def handle_event("new", _, socket) do
-    IO.puts("New Event")
     socket = assign(socket, :action, :new)
     {:noreply, socket}
   end

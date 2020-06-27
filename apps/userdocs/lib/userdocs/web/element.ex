@@ -4,8 +4,8 @@ defmodule UserDocs.Web.Element do
 
   schema "elements" do
     field :name, :string
-    field :selector, :string
     field :strategy, :string
+    field :selector, :string
     field :page_id, :id
 
     timestamps()

@@ -6,8 +6,8 @@ defmodule UserDocs.WebTest do
   describe "pages" do
     alias UserDocs.Web.Page
 
-    @valid_attrs %{url: "some url"}
-    @update_attrs %{url: "some updated url"}
+    @valid_attrs %{url: "some url", version_id: ""}
+    @update_attrs %{url: "some updated url", version_id: ""}
     @invalid_attrs %{url: nil}
 
     def page_fixture(attrs \\ %{}) do

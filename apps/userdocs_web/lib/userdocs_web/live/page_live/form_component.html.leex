@@ -13,7 +13,8 @@
       <div class="select">
         <%= select f, :version_id,
           DomainHelpers.select_list(@available_versions),
-          selected: @parent.id %>
+          selected: DomainHelpers.maybe_parent_id(
+            assigns, :version_id) %>
       </div>
     </div>
     <%= error_tag f, :versions %>

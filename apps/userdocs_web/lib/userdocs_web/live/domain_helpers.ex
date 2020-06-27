@@ -15,8 +15,16 @@ defmodule UserDocsWeb.DomainHelpers do
       items
       |> Enum.map(fn(x) -> (x.id) end)
     end
-    def selected(_items) do
-      []
+    def selected(_items), do: []
+
+
+  def maybe_parent_id(assigns, field) do
+    try do
+      assigns.parent.id
+    rescue
+      ArgumentError -> Map.get(assigns.changeset.data, field)
+      KeyError -> Map.get(assigns.changeset.data, field)
     end
+  end
 
   end
