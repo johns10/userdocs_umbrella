@@ -18,9 +18,19 @@ defmodule UserDocs.Web do
       [%Page{}, ...]
 
   """
-  def list_pages do
-    Repo.all(Page)
+  def list_pages(params \\ %{}, _filters \\ %{}) do
+    base_pages_query()
+    |> maybe_preload_elements(params[:elements])
+    |> Repo.all()
+
   end
+
+  defp maybe_preload_elements(query, nil), do: query
+  defp maybe_preload_elements(query, _) do
+    from(pages in query, preload: [:elements])
+  end
+
+  defp base_pages_query(), do: from(pages in Page)
 
   @doc """
   Gets a single page.

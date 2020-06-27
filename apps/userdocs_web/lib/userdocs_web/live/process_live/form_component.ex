@@ -62,16 +62,6 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
     end
   end
 
-  #TODO: Migrate the form and delete this
-  def maybe_parent_id(assigns) do
-    try do
-      assigns.parent.id
-    rescue
-      ArgumentError -> assigns.changeset.data.page_id
-      KeyError -> assigns.changeset.data.page_id
-    end
-  end
-
   defp available_pages do
     Web.list_pages()
   end

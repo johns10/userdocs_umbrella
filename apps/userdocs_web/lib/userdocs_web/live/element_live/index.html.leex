@@ -12,6 +12,7 @@
 <table>
   <thead>
     <tr>
+      <th>Page ID</th>
       <th>Name</th>
       <th>Strategy</th>
       <th>Selector</th>
@@ -22,6 +23,7 @@
   <tbody id="elements">
     <%= for element <- @elements do %>
       <tr id="element-<%= element.id %>">
+        <td><%= element.page_id %></td>
         <td><%= element.name %></td>
         <td><%= element.strategy %></td>
         <td><%= element.selector %></td>

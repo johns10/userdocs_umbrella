@@ -17,6 +17,7 @@ defmodule UserDocs.Automation do
       left_join: steps in assoc(processes, :steps),
       preload: [
         :pages,
+        pages: :elements,
         pages: {pages, processes: {processes, :steps}}
       ]
   end

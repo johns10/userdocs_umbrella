@@ -3,6 +3,9 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
 
   alias UserDocs.Web
 
+  alias UserDocsWeb.LiveHelpers
+  alias UserDocsWeb.DomainHelpers
+
   @impl true
   def update(%{element: element} = assigns, socket) do
     changeset = Web.change_element(element)
@@ -10,6 +13,7 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:available_pages, available_pages())
      |> assign(:changeset, changeset)}
   end
 
@@ -33,7 +37,7 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Element updated successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+         |> LiveHelpers.maybe_push_redirect()}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
@@ -46,10 +50,14 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Element created successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+         |> LiveHelpers.maybe_push_redirect()}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
+  end
+
+  defp available_pages do
+    Web.list_pages()
   end
 end

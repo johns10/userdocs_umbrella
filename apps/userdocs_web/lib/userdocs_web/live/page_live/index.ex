@@ -6,7 +6,10 @@ defmodule UserDocsWeb.PageLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :pages, list_pages())}
+    socket =
+      socket
+      |> assign(:pages, list_pages(%{elements: true}))
+    {:ok, socket}
   end
 
   @impl true
@@ -40,7 +43,7 @@ defmodule UserDocsWeb.PageLive.Index do
     {:noreply, assign(socket, :pages, list_pages())}
   end
 
-  defp list_pages do
-    Web.list_pages()
+  defp list_pages(params \\ %{}) do
+    Web.list_pages(params)
   end
 end

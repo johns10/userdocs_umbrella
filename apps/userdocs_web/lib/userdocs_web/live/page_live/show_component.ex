@@ -2,8 +2,10 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocs.Automation
-  alias UserDocsWeb.ProcessLive.ShowComponent
-  alias UserDocsWeb.ProcessLive.FormComponent
+  alias UserDocs.Web
+
+  alias UserDocsWeb.ProcessLive
+  alias UserDocsWeb.ElementLive
   alias UserDocsWeb.Layout
 
   @impl true
@@ -25,7 +27,9 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
         </a>
       </header>
       <div class="card-content <%= Layout.is_hidden?(assigns) %>">
-        <%= live_group(@socket, ShowComponent, FormComponent,
+        <%= live_group(@socket,
+          ProcessLive.ShowComponent,
+          ProcessLive.FormComponent,
           [
             title: "Processes",
             type: :process,
@@ -36,6 +40,22 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
             id: "page-"
               <> Integer.to_string(@object.id)
               <> "-processes",
+            parent: @object
+          ]
+        ) %>
+        <%= live_group(@socket,
+          ElementLive.ShowComponent,
+          ElementLive.FormComponent,
+          [
+            title: "Elements",
+            type: :element,
+            parent_type: :page,
+            struct: %Web.Element{},
+            objects: @object.elements,
+            return_to: Routes.element_index_path(@socket, :index),
+            id: "page-"
+              <> Integer.to_string(@object.id)
+              <> "-elements",
             parent: @object
           ]
         ) %>

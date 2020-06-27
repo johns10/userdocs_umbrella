@@ -57,7 +57,6 @@ defmodule UserDocsWeb.PageLive.FormComponent do
         {:noreply, assign(socket, changeset: changeset)}
     end
   end
-
   defp available_versions do
     Projects.list_versions()
   end

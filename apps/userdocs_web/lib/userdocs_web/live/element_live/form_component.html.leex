@@ -6,17 +6,41 @@
   phx_change: "validate",
   phx_submit: "save" %>
 
-  <%= label f, :name %>
-  <%= text_input f, :name %>
-  <%= error_tag f, :name %>
+  <div class="field">
+    <%= label f, :page_id, class: :label %>
+    <div class="control">
+      <div class="select">
+        <%= select f, :page_id,
+          DomainHelpers.select_list(@available_pages),
+          selected: DomainHelpers.maybe_parent_id(assigns, :page_id) %>
+      </div>
+    </div>
+    <%= error_tag f, :pages %>
+  </div>
 
-  <%= label f, :strategy %>
-  <%= text_input f, :strategy %>
-  <%= error_tag f, :strategy %>
+  <div class="field">
+    <%= label f, :name %>
+    <div class="control">
+      <%= text_input f, :name, class: "input", type: "text" %>
+    </div>
+    <%= error_tag f, :name %>
+  </div>
 
-  <%= label f, :selector %>
-  <%= text_input f, :selector %>
-  <%= error_tag f, :selector %>
+  <div class="field">
+    <%= label f, :strategy %>
+    <div class="control">
+      <%= text_input f, :strategy, class: "input", type: "text" %>
+    </div>
+    <%= error_tag f, :strategy %>
+  </div>
+
+  <div class="field">
+    <%= label f, :selector %>
+    <div class="control">
+      <%= text_input f, :selector, class: "input", type: "text" %>
+    </div>
+    <%= error_tag f, :selector %>
+  </div>
 
   <%= submit "Save", phx_disable_with: "Saving..." %>
 </form>
