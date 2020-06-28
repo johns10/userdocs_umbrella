@@ -1,10 +1,30 @@
 defmodule UserDocsWeb.ShowComponent do
   use UserDocsWeb, :live_component
 
+  alias UserDocsWeb.Layout
+
   @impl true
   def render(assigns) do
     ~L"""
-      <%= @component.render(assigns) %>
+    <div class="card" id="<%= @id %>">
+      <header class="card-header">
+        <p class="card-header-title">
+          <%= @object.name %>
+        </p>
+        <a
+          class="card-header-icon"
+          phx-click="expand"
+          phx-target="<%= @myself %>"
+          aria-label="more options">
+          <span class="icon" >
+            <i class="fa fa-angle-down" aria-hidden="true"></i>
+          </span>
+        </a>
+      </header>
+      <div class="card-content <%= Layout.is_hidden?(assigns) %>">
+        <%= @component.render(assigns) %>
+      </div>
+    </div>
     """
   end
 
