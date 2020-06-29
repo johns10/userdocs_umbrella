@@ -60,14 +60,19 @@ defmodule UserDocsWeb.LiveHelpers do
     live_component(socket, UserDocsWeb.GroupComponent, opts)
   end
 
-  def live_show(socket, component, opts) do
-    modal_opts = [
+  def live_show(socket, show, form, opts) do
+    type = Keyword.fetch!(opts, :type)
+    object = Keyword.fetch!(opts, :object)
+    show_opts = [
       id: Keyword.fetch!(opts, :id),
-      component: component,
-      object: Keyword.fetch!(opts, :object),
-      opts: opts
+      name: object.name,
+      show: show,
+      form: form,
+      opts: [ {type, object} | opts ]
     ]
-    live_component(socket, UserDocsWeb.ShowComponent, modal_opts)
+    |> Keyword.put(type, object)
+
+    live_component(socket, UserDocsWeb.ShowComponent, show_opts)
   end
 
   def maybe_push_redirect(socket = %{assigns: %{return_to: return_to}}) do

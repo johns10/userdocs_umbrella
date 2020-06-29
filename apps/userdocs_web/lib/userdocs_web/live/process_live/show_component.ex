@@ -3,7 +3,6 @@ defmodule UserDocsWeb.ProcessLive.ShowComponent do
 
   alias UserDocs.Automation
 
-  alias UserDocsWeb.Layout
   alias UserDocsWeb.StepLive.ShowComponent
   alias UserDocsWeb.StepLive.FormComponent
 
@@ -16,12 +15,12 @@ defmodule UserDocsWeb.ProcessLive.ShowComponent do
         type: :step,
         parent_type: :process,
         struct: %Automation.Step{},
-        objects: @object.steps,
+        objects: @process.steps,
         return_to: Routes.step_index_path(@socket, :index),
         id: "process-"
-          <> Integer.to_string(@object.id)
+          <> Integer.to_string(@process.id)
           <> "-steps",
-        parent: @object
+        parent: @process
       ]
     ) %>
     """

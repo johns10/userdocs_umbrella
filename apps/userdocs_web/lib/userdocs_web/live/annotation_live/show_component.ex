@@ -4,8 +4,10 @@ defmodule UserDocsWeb.AnnotationLive.ShowComponent do
   @impl true
   def render(assigns) do
     ~L"""
-    <strong>Name:</strong>
-    <%= @object.name %>
+    <div>
+      <strong>Name:</strong>
+      <%= @annotation.name %>
+    </div>
     """
   end
 end

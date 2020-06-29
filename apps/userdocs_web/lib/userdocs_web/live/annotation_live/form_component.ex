@@ -48,8 +48,6 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
   end
 
   defp save_annotation(socket, :new, annotation_params) do
-    IO.puts("Saving new Annotation")
-    IO.inspect(annotation_params)
     case Web.create_annotation(annotation_params) do
       {:ok, _annotation} ->
         {:noreply,
@@ -58,8 +56,6 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
          |> LiveHelpers.maybe_push_redirect()}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        IO.puts("Saving new Annotation Failed")
-        IO.inspect(changeset)
         {:noreply, assign(socket, changeset: changeset)}
     end
   end

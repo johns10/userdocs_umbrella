@@ -1,5 +1,3 @@
-<h4><%= @title %></h2>
-
 <%= f = form_for @changeset, "#",
   id: "page-form",
   phx_target: @myself,
@@ -7,14 +5,15 @@
   phx_submit: "save",
   class: "form-horizontal" %>
 
+  <h4><%= @title %></h4>
+
   <div class="field">
     <%= label f, :version_id, class: :label %>
     <div class="control">
-      <div class="select">
+      <div class="select" readonly=true>
         <%= select f, :version_id,
           DomainHelpers.select_list(@available_versions),
-          selected: DomainHelpers.maybe_parent_id(
-            assigns, :version_id) %>
+          selected: DomainHelpers.maybe_parent_id(assigns, :version_id)%>
       </div>
     </div>
     <%= error_tag f, :versions %>
@@ -23,7 +22,7 @@
   <div class="field">
     <%= label f, :name %>
     <div class="control">
-      <%= text_input f, :name, class: "input", type: "text" %>
+      <%= text_input f, :name, class: "input", type: "text", readonly: true %>
     </div>
     <%= error_tag f, :name %>
   </div>

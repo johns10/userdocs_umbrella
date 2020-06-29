@@ -9,7 +9,7 @@ defmodule UserDocsWeb.ShowComponent do
     <div class="card" id="<%= @id %>">
       <header class="card-header">
         <p class="card-header-title">
-          <%= @object.name %>
+          <%= @name %>
         </p>
         <a
           class="card-header-icon"
@@ -22,7 +22,9 @@ defmodule UserDocsWeb.ShowComponent do
         </a>
       </header>
       <div class="card-content <%= Layout.is_hidden?(assigns) %>">
-        <%= @component.render(assigns) %>
+        <%= live_component @socket, @form, @opts %>
+        <hr>
+        <%= live_component @socket, @show, @opts %>
       </div>
     </div>
     """

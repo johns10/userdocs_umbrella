@@ -24,11 +24,14 @@ defmodule UserDocsWeb.GroupComponent do
           <div class="card-content <%= Layout.is_hidden?(assigns) %>">
             <div class="content">
               <%= for(object <- @objects) do %>
-                <%= live_show(@socket, @show,
+                <%= live_show(@socket, @show, @form,
                   id: Atom.to_string(@type) <> "-"
                     <> Integer.to_string(object.id)
                     <> "-show",
-                  object: object) %>
+                  title: "Edit " <> Atom.to_string(@type),
+                  type: @type,
+                  object: object,
+                  action: :edit) %>
               <% end %>
             </div>
           </div>

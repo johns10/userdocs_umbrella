@@ -6,7 +6,7 @@ defmodule UserDocsWeb.FooterComponent do
     ~L"""
     <div class="card-content <%= @hidden %>">
       <div class="content">
-        <%=if @action in [:new] do %>
+        <%= if @action in [:new] do %>
           <%= live_component @socket, @component, @opts ++ [{:action, :new}] %>
         <% end %>
       </div>

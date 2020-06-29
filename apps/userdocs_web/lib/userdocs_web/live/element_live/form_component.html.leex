@@ -1,10 +1,10 @@
-<h2><%= @title %></h2>
-
 <%= f = form_for @changeset, "#",
   id: "element-form",
   phx_target: @myself,
   phx_change: "validate",
   phx_submit: "save" %>
+
+  <h2><%= @title %></h2>
 
   <div class="field">
     <%= label f, :page_id, class: :label %>

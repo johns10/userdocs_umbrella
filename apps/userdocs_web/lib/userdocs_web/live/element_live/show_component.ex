@@ -6,8 +6,10 @@ defmodule UserDocsWeb.ElementLive.ShowComponent do
   @impl true
   def render(assigns) do
     ~L"""
-    <strong>Name:</strong>
-    <%= @object.name %>
+    <div>
+      <strong>Name:</strong>
+      <%= @element.name %>
+    </div>
     """
   end
 end
