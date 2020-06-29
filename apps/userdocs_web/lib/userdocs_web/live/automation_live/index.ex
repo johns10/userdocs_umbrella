@@ -11,6 +11,7 @@ defmodule UserDocsWeb.AutomationLive.Index do
 
   # TODO: Must implement either updating the state tree/components
   def handle_info(_message = %{topic: _topic, event: _event, payload: _payload}, socket) do
+    IO.puts("Got a subscription notification")
     socket = assign(socket, :version, Automation.details(1))
     {:noreply, socket}
   end

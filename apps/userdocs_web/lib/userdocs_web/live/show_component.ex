@@ -31,6 +31,16 @@ defmodule UserDocsWeb.ShowComponent do
   end
 
   @impl true
+  def update(assigns, socket) do
+    type = Keyword.get(assigns.opts, :type)
+    object = Keyword.get(assigns.opts, :object)
+    {:ok,
+     socket
+     |> assign(assigns)
+     |> assign(type, object)}
+  end
+
+  @impl true
   def mount(socket) do
     socket =
       socket
