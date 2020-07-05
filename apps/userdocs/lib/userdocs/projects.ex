@@ -131,10 +131,18 @@ defmodule UserDocs.Projects do
       ** (Ecto.NoResultsError)
 
   """
-  def get_version!(id) do
-    Repo.one! from version in Version,
-      where: version.id == ^id
+  def get_version!(id, params \\ %{}, _filters \\ %{}) do
+    base_version_query(id)
+    |> maybe_preload_pages(params[:pages])
+    |> Repo.one!()
   end
+
+  defp base_version_query(id) do
+    from(version in Version, where: version.id == ^id)
+  end
+
+  defp maybe_preload_pages(query, nil), do: query
+  defp maybe_preload_pages(query, _), do: from(version in query, preload: [:pages])
 
   @doc """
   Creates a version.

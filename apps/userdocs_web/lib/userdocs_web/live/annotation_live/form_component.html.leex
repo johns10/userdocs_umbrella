@@ -11,7 +11,7 @@
     <div class="control">
       <div class="select">
         <%= select f, :page_id,
-          DomainHelpers.select_list(@available_pages),
+          DomainHelpers.maybe_select_list(assigns, :available_pages),
           selected: DomainHelpers.maybe_parent_id(assigns, :page_id) %>
       </div>
     </div>
@@ -23,7 +23,7 @@
     <div class="control">
       <div class="select">
         <%= select f, :content_id,
-          DomainHelpers.select_list(@available_content),
+          DomainHelpers.maybe_select_list(assigns, :available_content),
           selected: @changeset.data.content_id %>
       </div>
     </div>
@@ -35,7 +35,7 @@
     <div class="control">
       <div class="select">
         <%= select f, :element_id,
-          DomainHelpers.select_list(@available_elements),
+            DomainHelpers.maybe_select_list(assigns, :available_elements),
           selected: @changeset.data.element_id %>
       </div>
     </div>

@@ -1,14 +1,14 @@
 defmodule UserDocsWeb.FooterComponent do
   use UserDocsWeb, :live_component
 
+  alias UserDocsWeb.Layout
+
   @impl true
   def render(assigns) do
     ~L"""
-    <div class="card-content <%= @hidden %>">
-      <div class="content">
-        <%= if @action in [:new] do %>
-          <%= live_component @socket, @component, @opts ++ [{:action, :new}] %>
-        <% end %>
+    <div class="card-content <%= @hidden %>" id="<%= @id %>">
+      <div class="content <%= Layout.is_hidden?(assigns) %>">
+        <%= live_form @socket, @component, @opts %>
       </div>
     </div>
     <footer class="card-footer <%= @hidden %>">
@@ -30,7 +30,19 @@ defmodule UserDocsWeb.FooterComponent do
   end
 
   @impl true
+  def update(assigns, socket) do
+    socket =
+      socket
+      |> assign(assigns)
+
+    {:ok, socket}
+  end
+
+  @impl true
   def mount(socket) do
+    socket =
+      socket
+      |> assign(:action, :show)
     {:ok, socket}
   end
 

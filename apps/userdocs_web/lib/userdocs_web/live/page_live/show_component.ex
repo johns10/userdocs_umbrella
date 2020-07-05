@@ -25,7 +25,11 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
           id: "page-"
             <> Integer.to_string(@page.id)
             <> "-processes",
-          parent: @page
+          parent: @page,
+          select_lists: @select_lists
+          |> Map.put(:available_elements, @page.elements)
+          |> Map.put(:available_annotations, @page.annotations)
+          |> Map.put(:available_processes, @page.processes)
         ]
       ) %>
       <hr>
@@ -42,7 +46,8 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
           id: "page-"
             <> Integer.to_string(@page.id)
             <> "-elements",
-          parent: @page
+          parent: @page,
+          select_lists: @select_lists
         ]
       ) %>
       <hr>
@@ -59,7 +64,9 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
           id: "page-"
             <> Integer.to_string(@page.id)
             <> "-annotation",
-          parent: @page
+          parent: @page,
+          select_lists: @select_lists
+          |> Map.put(:available_elements, @page.elements)
         ]
       ) %>
     </div>
@@ -68,11 +75,7 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
 
   @impl true
   def handle_event("expand", _, socket) do
-    socket =
-      socket
-      |> assign(:expanded, not socket.assigns.expanded)
-
-    {:noreply, socket}
+    {:noreply, assign(socket, :expanded, not socket.assigns.expanded)}
   end
 
   @impl true

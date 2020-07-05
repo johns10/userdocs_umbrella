@@ -13,7 +13,6 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:available_pages, available_pages())
      |> assign(:changeset, changeset)}
   end
 
@@ -55,9 +54,5 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
-  end
-
-  defp available_pages do
-    Web.list_pages()
   end
 end

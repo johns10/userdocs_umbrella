@@ -18,7 +18,6 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:available_pages, available_pages())
      |> assign(:changeset, changeset)}
   end
 

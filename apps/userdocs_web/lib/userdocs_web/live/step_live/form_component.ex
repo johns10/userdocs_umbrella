@@ -23,10 +23,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:available_processes, available_processes())
-     |> assign(:available_elements, available_elements())
-     |> assign(:available_annotations, available_annotations())
-     |> assign(:step_types, step_types())
      |> assign(:changeset, changeset)}
   end
 
@@ -82,21 +78,5 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
-  end
-
-  defp available_processes do
-    Automation.list_processes()
-  end
-
-  defp available_elements() do
-    Web.list_elements()
-  end
-
-  defp available_annotations() do
-    Web.list_annotations()
-  end
-
-  defp step_types do
-    Automation.list_step_types()
   end
 end

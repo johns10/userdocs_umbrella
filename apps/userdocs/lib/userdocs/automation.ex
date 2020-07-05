@@ -362,9 +362,10 @@ defmodule UserDocs.Automation do
     from(process in Process, where: process.id == ^id)
   end
 
+#TODO Remove
   defp maybe_preload_pages(query, nil), do: query
   defp maybe_preload_pages(query, _), do: from(processes in query, preload: [:pages])
-
+#TODO Remove
   defp maybe_preload_versions(query, nil), do: query
   defp maybe_preload_versions(query, _), do: from(processes in query, preload: [:versions])
 

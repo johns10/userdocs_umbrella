@@ -14,9 +14,6 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:available_pages, available_pages())
-     |> assign(:available_content, available_content())
-     |> assign(:available_elements, available_elements())
      |> assign(:changeset, changeset)}
   end
 
@@ -58,17 +55,5 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
-  end
-
-  defp available_pages do
-    Web.list_pages()
-  end
-
-  defp available_elements() do
-    Web.list_elements()
-  end
-
-  defp available_content() do
-    Documents.list_content()
   end
 end

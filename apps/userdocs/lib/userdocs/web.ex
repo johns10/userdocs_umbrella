@@ -18,9 +18,10 @@ defmodule UserDocs.Web do
       [%Page{}, ...]
 
   """
-  def list_pages(params \\ %{}, _filters \\ %{}) do
+  def list_pages(params \\ %{}, filters \\ %{}) do
     base_pages_query()
     |> maybe_preload_elements(params[:elements])
+    |> maybe_filter_by_version(filters[:version_id])
     |> Repo.all()
 
   end
@@ -28,6 +29,13 @@ defmodule UserDocs.Web do
   defp maybe_preload_elements(query, nil), do: query
   defp maybe_preload_elements(query, _) do
     from(pages in query, preload: [:elements])
+  end
+
+  defp maybe_filter_by_version(query, nil), do: query
+  defp maybe_filter_by_version(query, version_id) do
+    from(page in query,
+      where: page.version_id == ^version_id
+    )
   end
 
   defp base_pages_query(), do: from(pages in Page)
@@ -391,7 +399,6 @@ defmodule UserDocs.Web do
 
   """
   def create_annotation(attrs \\ %{}) do
-    IO.inspect(attrs)
     %Annotation{}
     |> Annotation.changeset(attrs)
     |> Repo.insert()

@@ -11,7 +11,6 @@ defmodule UserDocsWeb.AutomationLive.Index do
 
   # TODO: Must implement either updating the state tree/components
   def handle_info(_message = %{topic: _topic, event: _event, payload: _payload}, socket) do
-    IO.puts("Got a subscription notification")
     socket = assign(socket, :version, Automation.details(1))
     {:noreply, socket}
   end
@@ -21,9 +20,15 @@ defmodule UserDocsWeb.AutomationLive.Index do
     Endpoint.subscribe("process")
     Endpoint.subscribe("page")
     Endpoint.subscribe("version_process")
-    socket = maybe_assign_current_user(socket, session)
-    socket = assign(socket, SocketHelpers.automation_ui_socket())
-    {:ok, assign(socket, :version, Automation.details(1))}
+
+    socket =
+      socket
+      |> maybe_assign_current_user(session)
+      |> assign(SocketHelpers.automation_ui_socket())
+      |> assign(:available_versions, available_versions())
+      |> assign(:version, Automation.details(1))
+
+    {:ok, socket}
   end
 
   @impl true
@@ -59,5 +64,9 @@ defmodule UserDocsWeb.AutomationLive.Index do
 
   defp list_projects do
     Projects.list_projects()
+  end
+
+  defp available_versions do
+    Projects.list_versions()
   end
 end

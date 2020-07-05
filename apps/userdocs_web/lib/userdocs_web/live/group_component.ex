@@ -29,6 +29,7 @@ defmodule UserDocsWeb.GroupComponent do
                     <> Integer.to_string(object.id)
                     <> "-show",
                   title: "Edit " <> Atom.to_string(@type),
+                  select_lists: @select_lists,
                   type: @type,
                   object: object,
                   action: :edit) %>
@@ -43,9 +44,11 @@ defmodule UserDocsWeb.GroupComponent do
             id: Atom.to_string(@parent_type) <> "-"
               <> Integer.to_string(@parent.id) <> "-"
               <> Atom.to_string(@type)
-              <> "-form-new",
-            title: @title,
-            hidden: Layout.is_hidden?(assigns)
+              <> "-footer",
+              title: "New " <> Atom.to_string(@type),
+            hidden: Layout.is_hidden?(assigns),
+            select_lists: @select_lists,
+            action: :new
           ) %>
         </div>
       """

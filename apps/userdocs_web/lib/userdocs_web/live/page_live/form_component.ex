@@ -14,7 +14,6 @@ defmodule UserDocsWeb.PageLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:available_versions, available_versions())
      |> assign(:changeset, changeset)}
   end
 
@@ -56,8 +55,5 @@ defmodule UserDocsWeb.PageLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
-  end
-  defp available_versions do
-    Projects.list_versions()
   end
 end

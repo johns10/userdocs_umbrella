@@ -20,9 +20,25 @@ defmodule UserDocsWeb.ProcessLive.ShowComponent do
         id: "process-"
           <> Integer.to_string(@process.id)
           <> "-steps",
-        parent: @process
+        parent: @process,
+        select_lists: @select_lists
       ]
     ) %>
     """
+  end
+
+  @impl true
+  def handle_event("expand", _, socket) do
+    {:noreply, assign(socket, :expanded, not socket.assigns.expanded)}
+  end
+
+  @impl true
+  def mount(socket) do
+    socket =
+      socket
+      |> assign(:expanded, false)
+      |> assign(:action, :show)
+
+      {:ok, socket}
   end
 end

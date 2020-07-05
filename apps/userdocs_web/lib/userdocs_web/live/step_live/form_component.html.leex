@@ -11,7 +11,7 @@
     <div class="control">
       <div class="select">
         <%= select f, :process_id,
-          DomainHelpers.select_list(@available_processes),
+          DomainHelpers.maybe_select_list(assigns, :available_processes),
           selected: DomainHelpers.maybe_parent_id(assigns, :process_id) %>
       </div>
     </div>
@@ -40,7 +40,7 @@
     <div class="control">
       <div class="select">
         <%= select f, :step_type_id,
-          DomainHelpers.select_list(@step_types),
+          DomainHelpers.maybe_select_list(assigns, :available_step_types),
           selected: @changeset.data.step_type_id %>
       </div>
     </div>
@@ -53,7 +53,7 @@
       <div class="control">
         <div class="select">
           <%= select f, :element_id,
-            DomainHelpers.select_list(@available_elements),
+            DomainHelpers.maybe_select_list(assigns, :available_elements),
             selected: @changeset.data.element_id %>
         </div>
       </div>
@@ -67,7 +67,7 @@
       <div class="control">
         <div class="select">
           <%= select f, :annotation_id,
-            DomainHelpers.select_list(@available_annotations),
+            DomainHelpers.maybe_select_list(assigns, :available_annotations),
             selected: @changeset.data.annotation_id %>
         </div>
       </div>

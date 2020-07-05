@@ -6,17 +6,22 @@
 
   <h2><%= @title %></h2>
 
-  <div class="field">
-    <%= label f, :page_id, class: :label %>
-    <div class="control">
-      <div class="select">
-        <%= select f, :page_id,
-          DomainHelpers.select_list(@available_pages),
-          selected: DomainHelpers.maybe_parent_id(assigns, :page_id) %>
+  <%= if(LiveHelpers.maybe_action(assigns) in [:edit]) do %>
+    <div class="field">
+      <%= label f, :page_id, class: :label %>
+      <div class="control">
+        <div class="select">
+          <%= select f, :page_id,
+            DomainHelpers.maybe_select_list(assigns, :available_pages),
+            value: DomainHelpers.maybe_parent_id(assigns, :page_id)%>
+        </div>
       </div>
+      <%= error_tag f, :pages %>
     </div>
-    <%= error_tag f, :pages %>
-  </div>
+  <% else %>
+    <%= hidden_input f, :page_id,
+      value: DomainHelpers.maybe_parent_id(assigns, :page_id)%>
+  <% end %>
 
   <div class="field">
     <%= label f, :name %>
