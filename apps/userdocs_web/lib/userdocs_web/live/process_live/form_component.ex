@@ -1,7 +1,6 @@
 defmodule UserDocsWeb.ProcessLive.FormComponent do
   use UserDocsWeb, :live_component
 
-  alias UserDocs.Web
   alias UserDocs.Automation
   alias UserDocsWeb.DomainHelpers
   alias UserDocsWeb.LiveHelpers
@@ -59,9 +58,5 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
-  end
-
-  defp available_pages do
-    Web.list_pages()
   end
 end

@@ -1,8 +1,6 @@
 defmodule UserDocsWeb.VersionLive.ShowComponent do
   use UserDocsWeb, :live_component
 
-  alias UserDocs.Web
-  alias UserDocs.Projects
   alias UserDocs.Documents
   alias UserDocs.Automation
 

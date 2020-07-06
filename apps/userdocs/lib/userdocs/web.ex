@@ -257,13 +257,6 @@ defmodule UserDocs.Web do
     |> Repo.all()
   end
 
-  defp maybe_filter_by_version(query, nil), do: query
-  defp maybe_filter_by_version(query, version_id) do
-    from(element in query,
-      where: element.version_id == ^version_id
-    )
-  end
-
   defp maybe_filter_by_page(query, nil), do: query
   defp maybe_filter_by_page(query, page_id) do
     from(element in query,

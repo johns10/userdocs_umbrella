@@ -1,10 +1,10 @@
-<h2><%= @title %></h2>
-
 <%= f = form_for @changeset, "#",
   id: "step-form",
   phx_target: @myself,
   phx_change: "validate",
   phx_submit: "save" %>
+
+  <h4><%= @title %></h4>
 
   <div class="field">
     <%= label f, :process_id, class: :label %>
@@ -17,7 +17,6 @@
     </div>
     <%= error_tag f, :process_id %>
   </div>
-
 
   <div class="field">
     <%= label f, :order %>

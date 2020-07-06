@@ -74,11 +74,6 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
   end
 
   @impl true
-  def handle_event("expand", _, socket) do
-    {:noreply, assign(socket, :expanded, not socket.assigns.expanded)}
-  end
-
-  @impl true
   def mount(socket) do
     socket =
       socket

@@ -45,7 +45,7 @@ defmodule UserDocsWeb.LiveHelpers do
       <> "  form component: " <> Atom.to_string(component) <> "\n"
       <> "  action: " <> Atom.to_string(action) <> "\n"
 
-    Logger.debug(log_string)
+    #Logger.debug(log_string)
 
     footer_opts = [
       id: id,
@@ -77,7 +77,7 @@ defmodule UserDocsWeb.LiveHelpers do
       <> "  show component: " <> Atom.to_string(show_component) <> "\n"
       <> "  form component: " <> Atom.to_string(form_component) <> "\n"
 
-    Logger.debug(log_string)
+    #Logger.debug(log_string)
 
     group_opts = [
       id: id,
@@ -126,7 +126,7 @@ defmodule UserDocsWeb.LiveHelpers do
       <> "  form component: " <> Atom.to_string(form) <> "\n"
       <> "  action: " <> Atom.to_string(action) <> "\n"
 
-    Logger.debug(log_string)
+    # Logger.debug(log_string)
 
     form_opts = [
       id: Keyword.fetch!(opts, :id),

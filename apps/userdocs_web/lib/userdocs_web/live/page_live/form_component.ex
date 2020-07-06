@@ -2,7 +2,6 @@ defmodule UserDocsWeb.PageLive.FormComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocs.Web
-  alias UserDocs.Projects
 
   alias UserDocsWeb.LiveHelpers
   alias UserDocsWeb.DomainHelpers

@@ -25,6 +25,14 @@
   <% end %>
 
   <div class="field">
+    <%= label f, :order %>
+    <div class="control">
+      <%= number_input f, :order, class: "input", type: "text" %>
+    </div>
+    <%= error_tag f, :order %>
+  </div>
+
+  <div class="field">
     <%= label f, :name %>
     <div class="control">
       <%= text_input f, :name, class: "input", type: "text" %>

@@ -69,6 +69,7 @@ defmodule UserDocsWeb.GroupComponent do
 
     @impl true
     def handle_event("expand", _, socket) do
+      IO.puts("Got an expand event")
       socket = assign(socket, :expanded, not socket.assigns.expanded)
       {:noreply, socket}
     end

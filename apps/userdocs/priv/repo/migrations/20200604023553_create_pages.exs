@@ -3,6 +3,7 @@ defmodule UserDocs.Repo.Migrations.CreatePages do
 
   def change do
     create table(:pages) do
+      add :order, :integer
       add :name, :string
       add :url, :string
       add :version_id, references(:versions, on_delete: :nothing)

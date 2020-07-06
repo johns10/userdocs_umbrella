@@ -3,6 +3,7 @@ defmodule UserDocs.Repo.Migrations.CreateProcesses do
 
   def change do
     create table(:processes) do
+      add :order, :integer
       add :name, :string
       add :page_id, references(:pages, on_delete: :nothing)
       timestamps()

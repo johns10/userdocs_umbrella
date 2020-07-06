@@ -5,7 +5,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   alias UserDocsWeb.DomainHelpers
 
   alias UserDocs.Automation
-  alias UserDocs.Web
 
   @impl true
   def mount(socket) do
@@ -43,9 +42,10 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   end
 
   defp enabled_fields("Elixir.None", socket), do: socket
+  defp enabled_fields("", socket), do: socket
   defp enabled_fields(step_type_id, socket) do
     args = Enum.filter(
-        socket.assigns.step_types,
+        socket.assigns.select_lists.available_step_types,
         fn(x) -> x.id == String.to_integer(step_type_id) end
       )
       |> Enum.at(0)

@@ -6,6 +6,7 @@ defmodule UserDocs.Automation.Process do
   alias UserDocs.Web.Page
 
   schema "processes" do
+    field :order, :integer
     field :name, :string
 
     belongs_to :page, Page
@@ -18,7 +19,7 @@ defmodule UserDocs.Automation.Process do
   @doc false
   def changeset(process, attrs) do
     process
-    |> cast(attrs, [:name, :page_id])
+    |> cast(attrs, [:order, :name, :page_id])
     |> foreign_key_constraint(:page_id)
     |> validate_required([:name])
   end

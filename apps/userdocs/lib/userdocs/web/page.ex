@@ -8,6 +8,7 @@ defmodule UserDocs.Web.Page do
   alias UserDocs.Web.Annotation
 
   schema "pages" do
+    field :order, :integer
     field :name, :string
     field :url, :string
 
@@ -23,7 +24,7 @@ defmodule UserDocs.Web.Page do
   @doc false
   def changeset(page, attrs) do
     page
-    |> cast(attrs, [:name, :url, :version_id])
+    |> cast(attrs, [:order, :name, :url, :version_id])
     |> foreign_key_constraint(:version_id)
     |> validate_required([:url])
   end

@@ -2,7 +2,6 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocs.Web
-  alias UserDocs.Documents
 
   alias UserDocsWeb.DomainHelpers
   alias UserDocsWeb.LiveHelpers
