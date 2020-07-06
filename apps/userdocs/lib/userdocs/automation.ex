@@ -12,9 +12,9 @@ defmodule UserDocs.Automation do
   def details(version_id) do
     Repo.one from version in Projects.Version,
       where: version.id == ^version_id,
-      left_join: pages in assoc(version, :pages),
-      left_join: processes in assoc(pages, :processes),
-      left_join: steps in assoc(processes, :steps),
+      left_join: pages in assoc(version, :pages), order_by: pages.order,
+      left_join: processes in assoc(pages, :processes), order_by: processes.order,
+      left_join: steps in assoc(processes, :steps), order_by: steps.order,
       preload: [
         :pages,
         pages: :elements,

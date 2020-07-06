@@ -21,7 +21,7 @@
     </div>
   <% else %>
     <%= hidden_input f, :page_id,
-      selected: DomainHelpers.maybe_parent_id(assigns, :page_id) %>
+      value: DomainHelpers.maybe_parent_id(assigns, :page_id) %>
   <% end %>
 
   <div class="field">

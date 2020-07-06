@@ -119,20 +119,23 @@ defmodule UserDocsWeb.LiveHelpers do
     action = Keyword.fetch!(opts, :action)
     struct = Keyword.fetch!(opts, :struct)
     select_lists = Keyword.fetch!(opts, :select_lists)
+    parent = Keyword.fetch!(opts, :parent)
 
     log_string =
       "Creating live form of type " <> Atom.to_string(type) <> "\n"
       <> "  title: " <> title <> "\n"
       <> "  form component: " <> Atom.to_string(form) <> "\n"
       <> "  action: " <> Atom.to_string(action) <> "\n"
+      <> "  parent id: " <> Integer.to_string(parent.id) <> "\n"
 
-    # Logger.debug(log_string)
+    Logger.debug(log_string)
 
     form_opts = [
       id: Keyword.fetch!(opts, :id),
       title: title,
       action: action,
       select_lists: select_lists,
+      parent: parent,
       opts: opts
     ]
     |> Keyword.put(type, struct)
