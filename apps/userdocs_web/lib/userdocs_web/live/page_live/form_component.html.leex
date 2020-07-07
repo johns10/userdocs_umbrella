@@ -11,7 +11,7 @@
     <div class="field">
       <%= label f, :version_id, class: :label %>
       <div class="control">
-        <div class="select" readonly=false>
+        <div class="select">
           <%= select f, :version_id,
             DomainHelpers.maybe_select_list(assigns, :available_versions),
             value: DomainHelpers.maybe_parent_id(assigns, :version_id)%>
@@ -27,7 +27,7 @@
   <div class="field">
     <%= label f, :order %>
     <div class="control">
-      <%= number_input f, :order, class: "input", type: "text", readonly: @read_only  %>
+      <%= number_input f, :order, class: "input", type: "text", readonly: @read_only %>
     </div>
     <%= error_tag f, :order %>
   </div>

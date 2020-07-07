@@ -13,7 +13,7 @@ defmodule UserDocsWeb.PageLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:read_only, false)
+     |> assign(:read_only, LiveHelpers.read_only?(assigns))
      |> assign(:changeset, changeset)}
   end
 

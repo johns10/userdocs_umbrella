@@ -32,20 +32,24 @@ defmodule UserDocsWeb.GroupComponent do
                   select_lists: @select_lists,
                   type: @type,
                   object: object,
-                  action: :edit) %>
+                  parent: @parent,
+                  action: :edit,
+                  struct: @struct
+                ) %>
               <% end %>
             </div>
           </div>
           <%= live_footer(@socket, @form,
             type: @type,
             struct: @struct,
+            object: %{},
             parent: @parent,
             parent_type: @parent_type,
             id: Atom.to_string(@parent_type) <> "-"
               <> Integer.to_string(@parent.id) <> "-"
               <> Atom.to_string(@type)
               <> "-footer",
-              title: "New " <> Atom.to_string(@type),
+            title: "New " <> Atom.to_string(@type),
             hidden: Layout.is_hidden?(assigns),
             select_lists: @select_lists,
             action: :new

@@ -17,6 +17,7 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:read_only, LiveHelpers.read_only?(assigns))
      |> assign(:changeset, changeset)}
   end
 

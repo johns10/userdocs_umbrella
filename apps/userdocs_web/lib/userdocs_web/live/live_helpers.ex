@@ -99,13 +99,21 @@ defmodule UserDocsWeb.LiveHelpers do
     type = Keyword.fetch!(opts, :type)
     object = Keyword.fetch!(opts, :object)
     select_lists = Keyword.fetch!(opts, :select_lists)
+    title = Keyword.fetch!(opts, :title)
+    struct = Keyword.fetch!(opts, :struct)
+    parent = Keyword.fetch!(opts, :parent)
 
     show_opts = [
       id: Keyword.fetch!(opts, :id),
+      title: title,
       name: object.name,
       show: show,
       form: form,
       select_lists: select_lists,
+      parent: parent,
+      type: type,
+      struct: struct,
+      object: object,
       opts: [ {type, object} | opts ]
     ]
     |> Keyword.put(type, object)
@@ -119,6 +127,7 @@ defmodule UserDocsWeb.LiveHelpers do
     action = Keyword.fetch!(opts, :action)
     struct = Keyword.fetch!(opts, :struct)
     select_lists = Keyword.fetch!(opts, :select_lists)
+    object = Keyword.fetch!(opts, :object)
     parent = Keyword.fetch!(opts, :parent)
 
     log_string =
@@ -128,7 +137,7 @@ defmodule UserDocsWeb.LiveHelpers do
       <> "  action: " <> Atom.to_string(action) <> "\n"
       <> "  parent id: " <> Integer.to_string(parent.id) <> "\n"
 
-    Logger.debug(log_string)
+    # Logger.debug(log_string)
 
     form_opts = [
       id: Keyword.fetch!(opts, :id),
@@ -136,9 +145,10 @@ defmodule UserDocsWeb.LiveHelpers do
       action: action,
       select_lists: select_lists,
       parent: parent,
+      struct: struct,
       opts: opts
     ]
-    |> Keyword.put(type, struct)
+    |> Keyword.put(type, maybe_object(action, object, struct))
 
     live_component(socket, form, form_opts)
   end
@@ -155,4 +165,23 @@ defmodule UserDocsWeb.LiveHelpers do
       _ -> :edit
     end
   end
+
+  def read_only?(assigns) do
+    action =
+      try do
+        Map.get(assigns, :action)
+      rescue
+        _ -> :false
+      end
+
+    if(action in [:new, :edit]) do
+      false
+    else
+      true
+    end
+  end
+
+  def maybe_object(:new, _, struct), do: struct
+  def maybe_object(:edit, object, _), do: object
+  def maybe_object(:show, object, _), do: object
 end

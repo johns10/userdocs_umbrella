@@ -26,7 +26,7 @@
   <div class="field">
     <%= label f, :name %>
     <div class="control">
-      <%= text_input f, :name, class: "input", type: "text" %>
+      <%= text_input f, :name, class: "input", type: "text", readonly: @read_only %>
     </div>
     <%= error_tag f, :name %>
   </div>
@@ -34,7 +34,7 @@
   <div class="field">
     <%= label f, :strategy %>
     <div class="control">
-      <%= text_input f, :strategy, class: "input", type: "text" %>
+      <%= text_input f, :strategy, class: "input", type: "text", readonly: @read_only %>
     </div>
     <%= error_tag f, :strategy %>
   </div>
@@ -42,10 +42,12 @@
   <div class="field">
     <%= label f, :selector %>
     <div class="control">
-      <%= text_input f, :selector, class: "input", type: "text" %>
+      <%= text_input f, :selector, class: "input", type: "text", readonly: @read_only %>
     </div>
     <%= error_tag f, :selector %>
   </div>
 
-  <%= submit "Save", phx_disable_with: "Saving..." %>
+  <%= if(LiveHelpers.maybe_action(assigns) in [:edit, :new]) do %>
+    <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
+  <% end %>
 </form>

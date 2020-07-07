@@ -17,7 +17,7 @@ defmodule UserDocsWeb.ShowComponent do
           phx-target="<%= @myself %>"
           aria-label="more options">
           <span class="icon" >
-            <%= if(@action == :edit) do %>
+            <%= if(@action in [:edit, :new]) do %>
               <i class="fa fa-times-circle" aria-hidden="true"></i>
             <%= else %>
               <i class="fa fa-edit" aria-hidden="true"></i>
@@ -35,7 +35,18 @@ defmodule UserDocsWeb.ShowComponent do
         </a>
       </header>
       <div class="card-content <%= Layout.is_hidden?(assigns) %>">
-        <%= live_component @socket, @form, @opts  %>
+        <%= live_form @socket, @form,
+          type: @type,
+          title: @title,
+          action: @action,
+          struct: @struct,
+          select_lists: @select_lists,
+          parent: @parent,
+          object: @object,
+          id: Atom.to_string(@type) <> "-"
+            <> Integer.to_string(@object.id)
+            <> "-edit-form"
+        %>
         <hr>
         <%= live_component @socket, @show, @opts %>
       </div>
@@ -50,8 +61,7 @@ defmodule UserDocsWeb.ShowComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(type, object)
-     |> assign(:readonly, maybe_readonly(socket.assigns.action))}
+     |> assign(type, object)}
   end
 
   @impl true
@@ -60,7 +70,7 @@ defmodule UserDocsWeb.ShowComponent do
       socket
       |> assign(:expanded, false)
       |> assign(:read_only, false)
-      |> assign(:action, :show)
+      |> assign(:action, :edit)
 
     {:ok, socket}
   end
@@ -82,7 +92,4 @@ defmodule UserDocsWeb.ShowComponent do
     socket = assign(socket, :expanded, not socket.assigns.expanded)
     {:noreply, socket}
   end
-
-  def maybe_readonly(:edit), do: false
-  def maybe_readonly(_), do: true
 end

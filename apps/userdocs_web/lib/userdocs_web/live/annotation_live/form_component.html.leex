@@ -6,17 +6,22 @@
 
   <h2><%= @title %></h2>
 
-  <div class="field">
-    <%= label f, :page_id, class: :label %>
-    <div class="control">
-      <div class="select">
-        <%= select f, :page_id,
-          DomainHelpers.maybe_select_list(assigns, :available_pages),
-          selected: DomainHelpers.maybe_parent_id(assigns, :page_id) %>
+  <%= if(LiveHelpers.maybe_action(assigns) in [:edit]) do %>
+    <div class="field">
+      <%= label f, :page_id, class: :label %>
+      <div class="control">
+        <div class="select">
+          <%= select f, :page_id,
+            DomainHelpers.maybe_select_list(assigns, :available_pages),
+            selected: DomainHelpers.maybe_parent_id(assigns, :page_id) %>
+        </div>
       </div>
+      <%= error_tag f, :pages %>
     </div>
-    <%= error_tag f, :pages %>
-  </div>
+  <% else %>
+    <%= hidden_input f, :version_id,
+      value: DomainHelpers.maybe_parent_id(assigns, :version_id)%>
+  <% end %>
 
   <div class="field">
     <%= label f, :content_id, class: :label %>
@@ -24,7 +29,8 @@
       <div class="select">
         <%= select f, :content_id,
           DomainHelpers.maybe_select_list(assigns, :available_content),
-          selected: @changeset.data.content_id %>
+          selected: @changeset.data.content_id,
+          readonly: @read_only %>
       </div>
     </div>
     <%= error_tag f, :pages %>
@@ -42,17 +48,31 @@
     <%= error_tag f, :pages %>
   </div>
 
-  <%= label f, :name %>
-  <%= text_input f, :name %>
-  <%= error_tag f, :name %>
+  <div class="field">
+    <%= label f, :name %>
+    <div class="control">
+      <%= text_input f, :name, class: "input", type: "text", readonly: @read_only %>
+    </div>
+    <%= error_tag f, :name %>
+  </div>
 
-  <%= label f, :label %>
-  <%= text_input f, :label %>
-  <%= error_tag f, :label %>
+  <div class="field">
+    <%= label f, :label %>
+    <div class="control">
+      <%= text_input f, :label, class: "input", type: "text", readonly: @read_only %>
+    </div>
+    <%= error_tag f, :label %>
+  </div>
 
-  <%= label f, :description %>
-  <%= text_input f, :description %>
-  <%= error_tag f, :description %>
+  <div class="field">
+    <%= label f, :description %>
+    <div class="control">
+      <%= text_input f, :description, class: "input", type: "text", readonly: @read_only %>
+    </div>
+    <%= error_tag f, :description %>
+  </div>
 
-  <%= submit "Save", phx_disable_with: "Saving..." %>
+  <%= if(LiveHelpers.maybe_action(assigns) in [:edit, :new]) do %>
+    <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
+  <% end %>
 </form>
