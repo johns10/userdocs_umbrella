@@ -11,21 +11,20 @@ defmodule UserDocsWeb.ProcessLive.ShowComponent do
   def render(assigns) do
     ~L"""
     <div>
-      <%= live_group(@socket, Header, ShowComponent, FormComponent,
-        [
-          title: "Steps",
+      <%= for(object <- @process.steps) do %>
+        <%= live_show(@socket, Header, ShowComponent, FormComponent,
+          id: "step-"
+            <> Integer.to_string(object.id)
+            <> "-show",
+          title: "Edit step",
+          select_lists: @select_lists,
           type: :step,
-          parent_type: :process,
-          struct: %Automation.Step{},
-          objects: @process.steps,
-          return_to: Routes.step_index_path(@socket, :index),
-          id: "process-"
-            <> Integer.to_string(@process.id)
-            <> "-steps",
+          object: object,
           parent: @process,
-          select_lists: @select_lists
-        ]
-      ) %>
+          action: :edit,
+          struct: %Automation.Step{}
+        ) %>
+      <% end %>
     </div>
     """
   end
