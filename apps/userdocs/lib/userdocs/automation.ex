@@ -13,7 +13,7 @@ defmodule UserDocs.Automation do
     Repo.one from version in Projects.Version,
       where: version.id == ^version_id,
       left_join: pages in assoc(version, :pages), order_by: pages.order,
-      left_join: processes in assoc(pages, :processes), order_by: processes.order,
+      left_join: processes in assoc(version, :processes), order_by: processes.order,
       left_join: annotations in assoc(pages, :annotations), order_by: annotations.name,
       left_join: steps in assoc(processes, :steps), order_by: steps.order,
       left_join: annotation in assoc(steps, :annotation), order_by: annotation.name,
@@ -22,11 +22,11 @@ defmodule UserDocs.Automation do
         pages: :elements,
         pages: :annotations,
         pages: {pages, annotations: {annotations, :annotation_type}},
-        pages: {pages, processes: {processes, :steps}},
-        pages: {pages, processes: {processes, steps: {steps, :step_type}}},
-        pages: {pages, processes: {processes, steps: {steps, :element}}},
-        pages: {pages, processes: {processes, steps: {steps, :annotation}}},
-        pages: {pages, processes: {processes, steps: {steps, annotation: {annotation, :annotation_type}}}}
+        processes: {processes, :steps},
+        processes: {processes, steps: {steps, :step_type}},
+        processes: {processes, steps: {steps, :element}},
+        processes: {processes, steps: {steps, :annotation}},
+        processes: {processes, steps: {steps, annotation: {annotation, :annotation_type}}}
       ]
   end
 
@@ -61,6 +61,10 @@ defmodule UserDocs.Automation do
   """
   def get_step_type!(id), do: Repo.get!(StepType, id)
 
+  @spec create_step_type(
+          :invalid
+          | %{optional(:__struct__) => none, optional(atom | binary) => any}
+        ) :: any
   @doc """
   Creates a step_type.
 

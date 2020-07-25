@@ -3,7 +3,6 @@ defmodule UserDocs.Web.Page do
   import Ecto.Changeset
 
   alias UserDocs.Projects.Version
-  alias UserDocs.Automation.Process
   alias UserDocs.Web.Element
   alias UserDocs.Web.Annotation
 
@@ -14,7 +13,6 @@ defmodule UserDocs.Web.Page do
 
     belongs_to :version, Version
 
-    has_many :processes, Process
     has_many :elements, Element
     has_many :annotations, Annotation
 

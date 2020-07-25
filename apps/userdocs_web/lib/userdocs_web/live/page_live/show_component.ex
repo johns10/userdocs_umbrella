@@ -13,28 +13,6 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
     ~L"""
     <div>
       <%= live_group(@socket,
-        ProcessLive.Header,
-        ProcessLive.ShowComponent,
-        ProcessLive.FormComponent,
-        [
-          title: "Processes",
-          type: :process,
-          parent_type: :page,
-          struct: %Automation.Process{},
-          objects: @page.processes,
-          return_to: Routes.process_index_path(@socket, :index),
-          id: "page-"
-            <> Integer.to_string(@page.id)
-            <> "-processes",
-          parent: @page,
-          select_lists: @select_lists
-          |> Map.put(:available_elements, @page.elements)
-          |> Map.put(:available_annotations, @page.annotations)
-          |> Map.put(:available_processes, @page.processes)
-        ]
-      ) %>
-      <hr>
-      <%= live_group(@socket,
         ElementLive.Header,
         ElementLive.ShowComponent,
         ElementLive.FormComponent,

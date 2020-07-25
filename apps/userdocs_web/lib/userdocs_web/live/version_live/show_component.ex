@@ -7,9 +7,10 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
   alias UserDocs.Web
   alias UserDocs.Web.Page
 
-  alias UserDocsWeb.PageLive.ShowComponent
-  alias UserDocsWeb.PageLive.FormComponent
-  alias UserDocsWeb.PageLive.Header
+  alias UserDocsWeb.PageLive
+  alias UserDocsWeb.ProcessLive
+
+  alias UserDocs.Automation.Process
 
   @impl true
   def render(assigns) do
@@ -20,7 +21,23 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
           <%= @version.name %>
         </p>
       </header>
-      <%= live_group(@socket, Header, ShowComponent, FormComponent,
+      <%= live_group(@socket, ProcessLive.Header, ProcessLive.ShowComponent, ProcessLive.FormComponent,
+        [
+          title: "Processes",
+          type: :process,
+          parent_type: :version,
+          struct: %Process{},
+          objects: @version.processes,
+          return_to: Routes.process_index_path(@socket, :index),
+          id: "version-" <> Integer.to_string(@version.id) <> "-processes",
+          parent: @version,
+          select_lists: %{
+            available_elements: @available_elements,
+            available_step_types: @available_step_types,
+          }
+        ]
+      ) %>
+      <%= live_group(@socket, PageLive.Header, PageLive.ShowComponent, PageLive.FormComponent,
         [
           title: "Pages",
           type: :page,
@@ -51,6 +68,7 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
       |> assign(:available_step_types, step_types())
       |> assign(:available_content, available_content())
       |> assign(:available_annotation_types, annotation_types())
+      |> assign(:available_elements, elements())
 
     {:ok, socket}
   end
@@ -62,6 +80,12 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
       |> assign(:version, None)
 
     {:ok, socket}
+  end
+
+  #TODO: Needs to be fixed badly
+
+  defp elements do
+    Web.list_elements()
   end
 
   defp step_types do

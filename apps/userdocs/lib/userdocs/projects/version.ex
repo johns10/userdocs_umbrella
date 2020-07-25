@@ -3,6 +3,7 @@ defmodule UserDocs.Projects.Version do
   import Ecto.Changeset
 
   alias UserDocs.Web.Page
+  alias UserDocs.Automation.Process
   alias UserDocs.Projects.Project
 
   schema "versions" do
@@ -11,6 +12,7 @@ defmodule UserDocs.Projects.Version do
     belongs_to :project, Project
 
     has_many :pages, Page
+    has_many :processes, Process
 
     timestamps()
   end
