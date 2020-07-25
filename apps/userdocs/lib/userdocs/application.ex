@@ -5,6 +5,8 @@ defmodule UserDocs.Application do
 
   use Application
 
+  def application do [applications: [:image64]] end
+
   def start(_type, _args) do
     children = [
       # Start the Ecto repository

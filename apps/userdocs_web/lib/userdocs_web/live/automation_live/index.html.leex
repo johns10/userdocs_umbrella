@@ -1,5 +1,26 @@
+<span><%= link "Sign in", to: "http://localhost:4000/session/new" %></span>
+<span><%= link "Delete", to: "http://localhost:4000/session", method: :delete %></span>
+
 <%= live_component(@socket, UserDocsWeb.VersionLive.ShowComponent,
 [
   available_versions: @available_versions,
   version: @version
 ]) %>
+
+<%= live_component(@socket, UserDocsWeb.ScreenShotHandler,
+[
+  id: "screenshot-handler-component"
+]) %>
+
+<nav class="navbar is-fixed-bottom" role="navigation" aria-label="main navigation">
+
+  <div class="navbar-brand">
+    <div class="navbar-item">
+      <div class="field is-grouped">
+        <p class="control">
+          <input class="input" type="text" placeholder="Selector" id="selector-transfer-field">
+        </p>
+      </div>
+    </div>
+  </div>
+</nav>

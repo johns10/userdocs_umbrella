@@ -14,12 +14,19 @@ defmodule UserDocs.Automation do
       where: version.id == ^version_id,
       left_join: pages in assoc(version, :pages), order_by: pages.order,
       left_join: processes in assoc(pages, :processes), order_by: processes.order,
+      left_join: annotations in assoc(pages, :annotations), order_by: annotations.name,
       left_join: steps in assoc(processes, :steps), order_by: steps.order,
+      left_join: annotation in assoc(steps, :annotation), order_by: annotation.name,
       preload: [
         :pages,
         pages: :elements,
         pages: :annotations,
-        pages: {pages, processes: {processes, :steps}}
+        pages: {pages, annotations: {annotations, :annotation_type}},
+        pages: {pages, processes: {processes, :steps}},
+        pages: {pages, processes: {processes, steps: {steps, :step_type}}},
+        pages: {pages, processes: {processes, steps: {steps, :element}}},
+        pages: {pages, processes: {processes, steps: {steps, :annotation}}},
+        pages: {pages, processes: {processes, steps: {steps, annotation: {annotation, :annotation_type}}}}
       ]
   end
 
@@ -173,9 +180,14 @@ defmodule UserDocs.Automation do
 
   """
   def create_step(attrs \\ %{}) do
-    %Step{}
-    |> Step.changeset(attrs)
-    |> Repo.insert()
+    {status, step} =
+      %Step{}
+      |> Step.changeset(attrs)
+      |> Repo.insert()
+
+    Endpoint.broadcast("step", "create", step)
+
+    {status, step}
   end
 
   @doc """
@@ -191,9 +203,14 @@ defmodule UserDocs.Automation do
 
   """
   def update_step(%Step{} = step, attrs) do
-    step
-    |> Step.changeset(attrs)
-    |> Repo.update()
+    {status, step} =
+      step
+      |> Step.changeset(attrs)
+      |> Repo.update()
+
+    Endpoint.broadcast("step", "update", step)
+
+    {status, step}
   end
 
   @doc """

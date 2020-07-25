@@ -3,6 +3,7 @@ defmodule UserDocsWeb.ProcessLive.ShowComponent do
 
   alias UserDocs.Automation
 
+  alias UserDocsWeb.StepLive.Header
   alias UserDocsWeb.StepLive.ShowComponent
   alias UserDocsWeb.StepLive.FormComponent
 
@@ -10,7 +11,7 @@ defmodule UserDocsWeb.ProcessLive.ShowComponent do
   def render(assigns) do
     ~L"""
     <div>
-      <%= live_group(@socket, ShowComponent, FormComponent,
+      <%= live_group(@socket, Header, ShowComponent, FormComponent,
         [
           title: "Steps",
           type: :step,

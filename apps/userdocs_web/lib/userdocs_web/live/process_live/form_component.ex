@@ -4,20 +4,19 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
   alias UserDocs.Automation
   alias UserDocsWeb.DomainHelpers
   alias UserDocsWeb.LiveHelpers
-
-  @impl true
-  def mount(socket) do
-    {:ok, socket}
-  end
+  alias UserDocsWeb.Layout
 
   @impl true
   def update(%{process: process} = assigns, socket) do
     changeset = Automation.change_process(process)
+    maybe_parent_id = DomainHelpers.maybe_parent_id(assigns, :page_id)
 
     {:ok,
      socket
      |> assign(assigns)
      |> assign(:read_only, LiveHelpers.read_only?(assigns))
+     |> assign(:maybe_action, LiveHelpers.maybe_action(assigns))
+     |> assign(:maybe_parent_id, maybe_parent_id)
      |> assign(:changeset, changeset)}
   end
 

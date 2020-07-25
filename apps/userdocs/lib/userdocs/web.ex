@@ -296,9 +296,14 @@ defmodule UserDocs.Web do
 
   """
   def create_element(attrs \\ %{}) do
-    %Element{}
-    |> Element.changeset(attrs)
-    |> Repo.insert()
+    {status, element} =
+      %Element{}
+      |> Element.changeset(attrs)
+      |> Repo.insert()
+
+    Endpoint.broadcast("element", "create", element)
+
+    {status, element}
   end
 
   @doc """
@@ -314,9 +319,14 @@ defmodule UserDocs.Web do
 
   """
   def update_element(%Element{} = element, attrs) do
-    element
-    |> Element.changeset(attrs)
-    |> Repo.update()
+    {status, element} =
+      element
+      |> Element.changeset(attrs)
+      |> Repo.update()
+
+    Endpoint.broadcast("element", "update", element)
+
+    {status, element}
   end
 
   @doc """

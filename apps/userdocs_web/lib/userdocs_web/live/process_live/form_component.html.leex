@@ -1,6 +1,6 @@
 <%= f = form_for @changeset, "#",
-  id: "process-form",
-  phx_target: @myself,
+  id: @id,
+  phx_target: @myself.cid,
   phx_change: "validate",
   phx_submit: "save",
   class: "form-horizontal" %>
@@ -14,20 +14,29 @@
         <div class="select">
           <%= select f, :page_id,
             DomainHelpers.maybe_select_list(assigns, :available_pages),
-            selected: DomainHelpers.maybe_parent_id(assigns, :page_id) %>
+            selected: DomainHelpers.maybe_parent_id(assigns, :page_id),
+            id: Layout.form_field_id(@maybe_action, f, :page_id,
+              "page", @maybe_parent_id) %>
         </div>
       </div>
       <%= error_tag f, :pages %>
     </div>
   <% else %>
     <%= hidden_input f, :page_id,
-      value: DomainHelpers.maybe_parent_id(assigns, :page_id) %>
+      value: DomainHelpers.maybe_parent_id(assigns, :page_id),
+      id: Layout.form_field_id(@maybe_action, f, :page_id,
+        "page", @maybe_parent_id) %>
   <% end %>
 
   <div class="field">
     <%= label f, :order %>
     <div class="control">
-      <%= number_input f, :order, class: "input", type: "text", readonly: @read_only %>
+      <%= number_input f, :order,
+        class: "input",
+        type: "text",
+        readonly: @read_only,
+        id: Layout.form_field_id(@maybe_action, f, :order,
+          "page", @maybe_parent_id) %>
     </div>
     <%= error_tag f, :order %>
   </div>
@@ -35,7 +44,12 @@
   <div class="field">
     <%= label f, :name %>
     <div class="control">
-      <%= text_input f, :name, class: "input", type: "text", readonly: @read_only %>
+      <%= text_input f, :name,
+        class: "input",
+        type: "text",
+        readonly: @read_only,
+        id: Layout.form_field_id(@maybe_action, f, :name,
+          "page", @maybe_parent_id) %>
     </div>
     <%= error_tag f, :name %>
   </div>

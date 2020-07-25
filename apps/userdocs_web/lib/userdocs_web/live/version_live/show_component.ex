@@ -4,10 +4,12 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
   alias UserDocs.Documents
   alias UserDocs.Automation
 
+  alias UserDocs.Web
   alias UserDocs.Web.Page
 
   alias UserDocsWeb.PageLive.ShowComponent
   alias UserDocsWeb.PageLive.FormComponent
+  alias UserDocsWeb.PageLive.Header
 
   @impl true
   def render(assigns) do
@@ -18,7 +20,7 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
           <%= @version.name %>
         </p>
       </header>
-      <%= live_group(@socket, ShowComponent, FormComponent,
+      <%= live_group(@socket, Header, ShowComponent, FormComponent,
         [
           title: "Pages",
           type: :page,
@@ -31,7 +33,8 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
           select_lists: %{
             available_versions: @available_versions,
             available_pages: @version.pages,
-            available_step_types: @available_step_types
+            available_step_types: @available_step_types,
+            available_annotation_types: @available_annotation_types
           }
         ]
       ) %>
@@ -47,6 +50,7 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
       |> assign(assigns)
       |> assign(:available_step_types, step_types())
       |> assign(:available_content, available_content())
+      |> assign(:available_annotation_types, annotation_types())
 
     {:ok, socket}
   end
@@ -62,6 +66,10 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
 
   defp step_types do
     Automation.list_step_types()
+  end
+
+  defp annotation_types do
+    Web.list_annotation_types()
   end
 
   defp available_content() do

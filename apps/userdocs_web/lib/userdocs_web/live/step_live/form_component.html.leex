@@ -1,6 +1,6 @@
 <%= f = form_for @changeset, "#",
-  id: "step-form",
-  phx_target: @myself,
+  id: @id,
+  phx_target: @myself.cid,
   phx_change: "validate",
   phx_submit: "save" %>
 
@@ -13,20 +13,29 @@
         <div class="select">
           <%= select f, :process_id,
             DomainHelpers.maybe_select_list(assigns, :available_processes),
-            selected: DomainHelpers.maybe_parent_id(assigns, :process_id) %>
+            selected: DomainHelpers.maybe_parent_id(assigns, :process_id),
+            id: Layout.form_field_id(@maybe_action, f, :process_id,
+              "page", @maybe_parent_id) %>
         </div>
       </div>
       <%= error_tag f, :process_id %>
     </div>
   <% else %>
-    <%= hidden_input f, :version_id,
-      value: DomainHelpers.maybe_parent_id(assigns, :version_id)%>
+    <%= hidden_input f, :process_id,
+      value: DomainHelpers.maybe_parent_id(assigns, :process_id),
+      id: Layout.form_field_id(@maybe_action, f, :process_id,
+        "page", @maybe_parent_id) %>
   <% end %>
 
   <div class="field">
     <%= label f, :order %>
     <div class="control">
-      <%= number_input f, :order, class: "input", type: "text", readonly: @read_only %>
+      <%= number_input f, :order,
+        class: "input",
+        type: "text",
+        readonly: @read_only,
+        id: Layout.form_field_id(@maybe_action, f, :order,
+          "page", @maybe_parent_id) %>
     </div>
     <%= error_tag f, :order %>
   </div>
@@ -34,7 +43,12 @@
   <div class="field">
     <%= label f, :name %>
     <div class="control">
-      <%= text_input f, :name, class: "input", type: "text", readonly: @read_only %>
+      <%= text_input f, :name,
+        class: "input",
+        type: "text",
+        readonly: @read_only,
+        id: Layout.form_field_id(@maybe_action, f, :name,
+          "page", @maybe_parent_id) %>
     </div>
     <%= error_tag f, :name %>
   </div>
@@ -46,7 +60,9 @@
         <%= select f, :step_type_id,
           DomainHelpers.maybe_select_list(assigns, :available_step_types),
           selected: @changeset.data.step_type_id,
-          disabled: @read_only %>
+          disabled: @read_only,
+          id: Layout.form_field_id(@maybe_action, f, :step_type_id,
+            "page", @maybe_parent_id) %>
       </div>
     </div>
     <%= error_tag f, :step_type_id %>
@@ -60,7 +76,9 @@
           <%= select f, :element_id,
             DomainHelpers.maybe_select_list(assigns, :available_elements),
             selected: @changeset.data.element_id,
-            disabled: @read_only %>
+            disabled: @read_only,
+            id: Layout.form_field_id(@maybe_action, f, :element_id,
+              "page", @maybe_parent_id) %>
         </div>
       </div>
       <%= error_tag f, :element_id %>
@@ -75,7 +93,9 @@
           <%= select f, :annotation_id,
             DomainHelpers.maybe_select_list(assigns, :available_annotations),
             selected: @changeset.data.annotation_id,
-            disabled: @read_only %>
+            disabled: @read_only,
+            id: Layout.form_field_id(@maybe_action, f, :annotation_id,
+              "page", @maybe_parent_id) %>
         </div>
       </div>
       <%= error_tag f, :element_id %>
@@ -84,11 +104,30 @@
 
   <%= if("url" in @enabled_fields) do %>
     <div class="field">
-      <%= label f, :url %>
-      <div class="control">
-        <%= text_input f, :url, class: "input", type: "text", readonly: @read_only %>
-      </div>
-      <%= error_tag f, :url %>
+      <%= label f, :url, class: "label" %>
+      <p class="control">
+        <div class="field has-addons">
+          <!--
+          TODO: Get this prefix picker working somehow
+          <p class="control">
+            <span class="select">
+              <select>
+                <option>http://</option>
+                <option>https://</option>
+              </select>
+            </span>
+          </p>-->
+          <p class="control">
+            <%= text_input f, :url,
+              class: "input",
+              type: "text",
+              readonly: @read_only,
+              id: Layout.form_field_id(@maybe_action, f, :url,
+                "page", @maybe_parent_id) %>
+          </p>
+          <%= error_tag f, :url %>
+        </div>
+      </p>
     </div>
   <% end %>
 
@@ -99,6 +138,26 @@
         <%= text_input f, :text, class: "input", type: "text", readonly: @read_only %>
       </div>
       <%= error_tag f, :text %>
+    </div>
+  <% end %>
+
+  <%= if("width" in @enabled_fields) do %>
+    <div class="field">
+      <%= label f, :width %>
+      <div class="control">
+        <%= text_input f, :width, class: "input", type: "text", readonly: @read_only %>
+      </div>
+      <%= error_tag f, :width %>
+    </div>
+  <% end %>
+
+  <%= if("height" in @enabled_fields) do %>
+    <div class="field">
+      <%= label f, :height %>
+      <div class="control">
+        <%= text_input f, :height, class: "input", type: "text", readonly: @read_only %>
+      </div>
+      <%= error_tag f, :height %>
     </div>
   <% end %>
 

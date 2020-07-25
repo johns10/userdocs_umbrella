@@ -20,11 +20,18 @@ defmodule UserDocsWeb.Router do
       error_handler: Pow.Phoenix.PlugErrorHandler
   end
 
+  scope "/" do
+    pipe_through :browser
+
+    pow_routes()
+  end
+
   scope "/", UserDocsWeb do
-    pipe_through [:browser]
+    pipe_through [:browser, :protected]
 
     live "/", PageLive, :index
     live "/automation", AutomationLive.Index, :index
+    live "/index.html", AutomationLive.Index, :index
 
     live "/content", ContentLive.Index, :index
     live "/content/new", ContentLive.Index, :new
@@ -97,6 +104,12 @@ defmodule UserDocsWeb.Router do
     live "/processes/:id", ProcessLive.Show, :show
     live "/processes/:id/show/edit", ProcessLive.Show, :edit
 
+    live "/files", FileLive.Index, :index
+    live "/files/new", FileLive.Index, :new
+    live "/files/:id/edit", FileLive.Index, :edit
+    live "/files/:id", FileLive.Show, :show
+    live "/files/:id/show/edit", FileLive.Show, :edit
+
   end
 
   # Other scopes may use custom stacks.
@@ -115,7 +128,7 @@ defmodule UserDocsWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/" do
-      pipe_through :browser
+      pipe_through [:browser, :protected]
       pow_routes()
       live_dashboard "/dashboard", metrics: UserDocsWeb.Telemetry
     end

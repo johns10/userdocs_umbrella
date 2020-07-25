@@ -1,0 +1,37 @@
+<h1>Show File</h1>
+
+<%= if @live_action in [:edit] do %>
+  <%= live_modal @socket, UserDocsWeb.FileLive.FormComponent,
+    id: @file.id,
+    title: @page_title,
+    action: @live_action,
+    file: @file,
+    return_to: Routes.file_show_path(@socket, :show, @file) %>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Filename:</strong>
+    <%= @file.filename %>
+  </li>
+
+  <li>
+    <strong>Size:</strong>
+    <%= @file.size %>
+  </li>
+
+  <li>
+    <strong>Content type:</strong>
+    <%= @file.content_type %>
+  </li>
+
+  <li>
+    <strong>Hash:</strong>
+    <%= @file.hash %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.file_show_path(@socket, :edit, @file), class: "button" %></span>
+<span><%= live_redirect "Back", to: Routes.file_index_path(@socket, :index) %></span>

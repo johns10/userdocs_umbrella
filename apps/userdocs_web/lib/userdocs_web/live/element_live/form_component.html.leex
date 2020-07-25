@@ -1,6 +1,6 @@
 <%= f = form_for @changeset, "#",
-  id: "element-form",
-  phx_target: @myself,
+  id: @id,
+  phx_target: @myself.cid,
   phx_change: "validate",
   phx_submit: "save" %>
 
@@ -13,20 +13,28 @@
         <div class="select">
           <%= select f, :page_id,
             DomainHelpers.maybe_select_list(assigns, :available_pages),
-            value: DomainHelpers.maybe_parent_id(assigns, :page_id)%>
+            value: DomainHelpers.maybe_parent_id(assigns, :page_id),
+            id: Layout.form_field_id(@maybe_action, f, :page_id,
+              "page", @maybe_parent_id) %>
         </div>
       </div>
       <%= error_tag f, :pages %>
     </div>
   <% else %>
     <%= hidden_input f, :page_id,
-      value: DomainHelpers.maybe_parent_id(assigns, :page_id)%>
+      value: DomainHelpers.maybe_parent_id(assigns, :page_id),
+      id: Layout.form_field_id(@maybe_action, f, :page_id,
+        "page", @maybe_parent_id) %>
   <% end %>
 
   <div class="field">
     <%= label f, :name %>
     <div class="control">
-      <%= text_input f, :name, class: "input", type: "text", readonly: @read_only %>
+      <%= text_input f, :name,
+        class: "input",
+        type: "text",
+        readonly: @read_only,
+        id: Layout.form_field_id(@maybe_action, f, :name, "page", @maybe_parent_id) %>
     </div>
     <%= error_tag f, :name %>
   </div>
@@ -34,17 +42,52 @@
   <div class="field">
     <%= label f, :strategy %>
     <div class="control">
-      <%= text_input f, :strategy, class: "input", type: "text", readonly: @read_only %>
+      <%= text_input f, :strategy,
+        class: "input",
+        type: "text",
+        readonly: @read_only,
+        id: Layout.form_field_id(@maybe_action, f, :strategy,
+          "page", @maybe_parent_id) %>
     </div>
     <%= error_tag f, :strategy %>
   </div>
 
   <div class="field">
-    <%= label f, :selector %>
-    <div class="control">
-      <%= text_input f, :selector, class: "input", type: "text", readonly: @read_only %>
-    </div>
-    <%= error_tag f, :selector %>
+    <%= label f, :selector, class: "label" %>
+    <p class="control">
+      <div class="field has-addons">
+        <p class="control">
+          <%= text_input f, :selector,
+            class: "input",
+            type: "text",
+            readonly: @read_only,
+            id: @selector_field_id,
+            value: LiveHelpers.maybe_value(@copied_selector, @changeset.data.selector) %>
+        </p>
+        <p class="control">
+          <button class="button"
+            target="<%= @selector_field_id %>"
+            phx-hook="CopySelector">
+            <span class="icon" >
+              <i class="fa fa-arrow-left" aria-hidden="true" target="<%= @selector_field_id %>"></i>
+            </span>
+          </span>
+        </p>
+        <!-- TODO validate that @changeset.data.selector works here -->
+        <p class="control">
+          <button class="button"
+            selector="<%= @changeset.data.selector %>"
+            phx-hook="testSelector">
+            <span class="icon" >
+              <i class="fa fa-cloud-upload"
+                aria-hidden="true"
+                selector="<%= @changeset.data.selector %>"></i>
+            </span>
+          </span>
+        </p>
+      </div>
+      <%= error_tag f, :selector %>
+    </p>
   </div>
 
   <%= if(LiveHelpers.maybe_action(assigns) in [:edit, :new]) do %>

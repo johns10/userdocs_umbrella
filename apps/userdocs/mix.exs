@@ -23,7 +23,7 @@ defmodule UserDocs.MixProject do
   def application do
     [
       mod: {UserDocs.Application, []},
-      extra_applications: [:logger, :runtime_tools, :mnesia]
+      extra_applications: [:logger, :runtime_tools, :mnesia, :image64]
     ]
   end
 
@@ -40,7 +40,9 @@ defmodule UserDocs.MixProject do
       {:ecto_sql, "~> 3.4"},
       {:postgrex, ">= 0.0.0"},
       {:jason, "~> 1.0"},
-      {:pow, "~> 1.0.20"}
+      {:pow, "~> 1.0.20"},
+      {:image64, "~> 0.0.1"},
+      {:uuid, "~> 1.1"}
     ]
   end
 

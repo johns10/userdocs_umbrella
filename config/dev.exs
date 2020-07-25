@@ -9,6 +9,8 @@ config :userdocs, UserDocs.Repo,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
+
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
@@ -29,6 +31,10 @@ config :userdocs_web, UserDocsWeb.Endpoint,
       cd: Path.expand("../apps/userdocs_web/assets", __DIR__)
     ]
   ]
+
+
+config :userdocs_web,
+  uploads_directory: "/media"
 
 # ## SSL Support
 #

@@ -13,6 +13,7 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
     ~L"""
     <div>
       <%= live_group(@socket,
+        ProcessLive.Header,
         ProcessLive.ShowComponent,
         ProcessLive.FormComponent,
         [
@@ -34,6 +35,7 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
       ) %>
       <hr>
       <%= live_group(@socket,
+        ElementLive.Header,
         ElementLive.ShowComponent,
         ElementLive.FormComponent,
         [
@@ -52,6 +54,7 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
       ) %>
       <hr>
       <%= live_group(@socket,
+        AnnotationLive.Header,
         AnnotationLive.ShowComponent,
         AnnotationLive.FormComponent,
         [

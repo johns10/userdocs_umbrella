@@ -3,6 +3,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   alias UserDocsWeb.LiveHelpers
   alias UserDocsWeb.DomainHelpers
+  alias UserDocsWeb.Layout
 
   alias UserDocs.Automation
 
@@ -18,41 +19,42 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   @impl true
   def update(%{step: step} = assigns, socket) do
     changeset = Automation.change_step(step)
+    maybe_parent_id = DomainHelpers.maybe_parent_id(assigns, :page_id)
+    enabled_fields =
+      LiveHelpers.enabled_fields(assigns.select_lists.available_step_types,
+        changeset.data.step_type_id)
 
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:enabled_fields, enabled_fields)
      |> assign(:read_only, LiveHelpers.read_only?(assigns))
+     |> assign(:maybe_action, LiveHelpers.maybe_action(assigns))
+     |> assign(:maybe_parent_id, maybe_parent_id)
      |> assign(:changeset, changeset)}
   end
 
   @impl true
   def handle_event("validate", %{"step" => step_params}, socket) do
-    socket = enabled_fields(step_params["step_type_id"], socket)
+    enabled_fields =
+      LiveHelpers.enabled_fields(socket.assigns.select_lists.available_step_types,
+        step_params["step_type_id"])
 
     changeset =
       socket.assigns.step
       |> Automation.change_step(step_params)
       |> Map.put(:action, :validate)
 
-    {:noreply, assign(socket, :changeset, changeset)}
+    socket =
+      socket
+      |> assign(:changeset, changeset)
+      |> assign(:enabled_fields, enabled_fields)
+
+    {:noreply, socket}
   end
 
   def handle_event("save", %{"step" => step_params}, socket) do
     save_step(socket, socket.assigns.action, step_params)
-  end
-
-  defp enabled_fields("Elixir.None", socket), do: socket
-  defp enabled_fields("", socket), do: socket
-  defp enabled_fields(step_type_id, socket) do
-    args = Enum.filter(
-        socket.assigns.select_lists.available_step_types,
-        fn(x) -> x.id == String.to_integer(step_type_id) end
-      )
-      |> Enum.at(0)
-      |> Map.get(:args)
-
-    assign(socket, :enabled_fields, args)
   end
 
   defp save_step(socket, :edit, step_params) do

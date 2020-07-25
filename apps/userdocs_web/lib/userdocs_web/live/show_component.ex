@@ -8,13 +8,11 @@ defmodule UserDocsWeb.ShowComponent do
     ~L"""
     <div class="card" id="<%= @id %>">
       <header class="card-header">
-        <p class="card-header-title">
-          <%= @name %>
-        </p>
+        <%= @header.render(assigns) %>
         <a
-          class="card-header-icon"
+          class="navbar-item"
           phx-click="edit"
-          phx-target="<%= @myself %>"
+          phx-target="<%= @myself.cid %>"
           aria-label="more options">
           <span class="icon" >
             <%= if(@action in [:edit, :new]) do %>
@@ -25,12 +23,12 @@ defmodule UserDocsWeb.ShowComponent do
           </span>
         </a>
         <a
-          class="card-header-icon"
+          class="navbar-item"
           phx-click="expand"
-          phx-target="<%= @myself %>"
+          phx-target="<%= @myself.cid %>"
           aria-label="more options">
           <span class="icon" >
-              <i class="fa fa-angle-down" aria-hidden="true"></i>
+            <i class="fa fa-angle-down" aria-hidden="true"></i>
           </span>
         </a>
       </header>

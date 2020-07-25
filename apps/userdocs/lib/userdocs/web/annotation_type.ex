@@ -3,6 +3,7 @@ defmodule UserDocs.Web.AnnotationType do
   import Ecto.Changeset
 
   schema "annotation_types" do
+    field :args, {:array, :string}
     field :name, :string
 
     timestamps()
@@ -11,7 +12,7 @@ defmodule UserDocs.Web.AnnotationType do
   @doc false
   def changeset(annotation_type, attrs) do
     annotation_type
-    |> cast(attrs, [:name])
+    |> cast(attrs, [:name, :args])
     |> validate_required([:name])
   end
 end

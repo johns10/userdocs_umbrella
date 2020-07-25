@@ -1,26 +1,30 @@
 <%= f = form_for @changeset, "#",
-  id: "annotation-form",
-  phx_target: @myself,
+  id: @id,
+  phx_target: @myself.cid,
   phx_change: "validate",
   phx_submit: "save" %>
 
   <h2><%= @title %></h2>
 
-  <%= if(LiveHelpers.maybe_action(assigns) in [:edit]) do %>
+  <%= if(@maybe_action in [:edit]) do %>
     <div class="field">
       <%= label f, :page_id, class: :label %>
       <div class="control">
         <div class="select">
           <%= select f, :page_id,
             DomainHelpers.maybe_select_list(assigns, :available_pages),
-            selected: DomainHelpers.maybe_parent_id(assigns, :page_id) %>
+            selected: @maybe_parent_id,
+            id: Layout.form_field_id(@maybe_action, f, :page_id,
+              "page", @maybe_parent_id) %>
         </div>
       </div>
       <%= error_tag f, :pages %>
     </div>
   <% else %>
     <%= hidden_input f, :version_id,
-      value: DomainHelpers.maybe_parent_id(assigns, :version_id)%>
+      value: @maybe_parent_id,
+      id: Layout.form_field_id(@maybe_action, f, :page_id,
+        "page", @maybe_parent_id) %>
   <% end %>
 
   <div class="field">
@@ -30,19 +34,9 @@
         <%= select f, :content_id,
           DomainHelpers.maybe_select_list(assigns, :available_content),
           selected: @changeset.data.content_id,
-          readonly: @read_only %>
-      </div>
-    </div>
-    <%= error_tag f, :pages %>
-  </div>
-
-  <div class="field">
-    <%= label f, :element_id, class: :label %>
-    <div class="control">
-      <div class="select">
-        <%= select f, :element_id,
-            DomainHelpers.maybe_select_list(assigns, :available_elements),
-          selected: @changeset.data.element_id %>
+          readonly: @read_only,
+          id: Layout.form_field_id(@maybe_action, f, :content_id,
+            "page", @maybe_parent_id) %>
       </div>
     </div>
     <%= error_tag f, :pages %>
@@ -51,7 +45,12 @@
   <div class="field">
     <%= label f, :name %>
     <div class="control">
-      <%= text_input f, :name, class: "input", type: "text", readonly: @read_only %>
+      <%= text_input f, :name,
+        class: "input",
+        type: "text",
+        id: Layout.form_field_id(@maybe_action, f, :name,
+          "page", @maybe_parent_id),
+        readonly: @read_only %>
     </div>
     <%= error_tag f, :name %>
   </div>
@@ -59,7 +58,12 @@
   <div class="field">
     <%= label f, :label %>
     <div class="control">
-      <%= text_input f, :label, class: "input", type: "text", readonly: @read_only %>
+      <%= text_input f, :label,
+        class: "input",
+        type: "text",
+        id: Layout.form_field_id(@maybe_action, f, :label,
+          "page", @maybe_parent_id),
+        readonly: @read_only %>
     </div>
     <%= error_tag f, :label %>
   </div>
@@ -67,12 +71,101 @@
   <div class="field">
     <%= label f, :description %>
     <div class="control">
-      <%= text_input f, :description, class: "input", type: "text", readonly: @read_only %>
+      <%= text_input f, :description,
+        class: "input",
+        type: "text",
+        id: Layout.form_field_id(@maybe_action, f, :description,
+          "page", @maybe_parent_id),
+        readonly: @read_only %>
     </div>
     <%= error_tag f, :description %>
   </div>
 
-  <%= if(LiveHelpers.maybe_action(assigns) in [:edit, :new]) do %>
+  <div class="field">
+    <%= label f, :annotation_type_id, class: :label %>
+    <div class="control">
+      <div class="select">
+        <%= select f, :annotation_type_id,
+            DomainHelpers.maybe_select_list(assigns, :available_annotation_types),
+            selected: @changeset.data.annotation_type_id,
+            id: Layout.form_field_id(@maybe_action, f, :annotation_type_id,
+              "page", @maybe_parent_id) %>
+      </div>
+    </div>
+    <%= error_tag f, :pages %>
+  </div>
+
+  <%= if(Atom.to_string(field = :x_orientation) in @enabled_fields) do %>
+    <div class="field">
+      <%= label f, field %>
+      <div class="control">
+        <%= text_input f, field, class: "input", type: "text", readonly: @read_only %>
+      </div>
+      <%= error_tag f, field %>
+    </div>
+  <% end %>
+
+  <%= if(Atom.to_string(field = :y_orientation) in @enabled_fields) do %>
+    <div class="field">
+      <%= label f, field %>
+      <div class="control">
+        <%= text_input f, field, class: "input", type: "text", readonly: @read_only %>
+      </div>
+      <%= error_tag f, field %>
+    </div>
+  <% end %>
+
+  <%= if(Atom.to_string(field = :size) in @enabled_fields) do %>
+    <div class="field">
+      <%= label f, field %>
+      <div class="control">
+        <%= number_input f, field, class: "input", type: "text", readonly: @read_only %>
+      </div>
+      <%= error_tag f, field %>
+    </div>
+  <% end %>
+
+  <%= if(Atom.to_string(field = :color) in @enabled_fields) do %>
+    <div class="field">
+      <%= label f, field %>
+      <div class="control">
+        <%= text_input f, field, class: "input", type: "text", readonly: @read_only %>
+      </div>
+      <%= error_tag f, field %>
+    </div>
+  <% end %>
+
+  <%= if(Atom.to_string(field = :thickness) in @enabled_fields) do %>
+    <div class="field">
+      <%= label f, field %>
+      <div class="control">
+        <%= number_input f, field, class: "input", type: "text", readonly: @read_only %>
+      </div>
+      <%= error_tag f, field %>
+    </div>
+  <% end %>
+
+  <%= if(Atom.to_string(field = :x_offset) in @enabled_fields) do %>
+    <div class="field">
+      <%= label f, field %>
+      <div class="control">
+        <%= number_input f, field, class: "input", type: "text", readonly: @read_only %>
+      </div>
+      <%= error_tag f, field %>
+    </div>
+  <% end %>
+
+  <%= if(Atom.to_string(field = :y_offset) in @enabled_fields) do %>
+    <div class="field">
+      <%= label f, field %>
+      <div class="control">
+        <%= number_input f, field, class: "input", type: "text", readonly: @read_only %>
+      </div>
+      <%= error_tag f, field %>
+    </div>
+  <% end %>
+
+  <%= if(@maybe_action in [:edit, :new]) do %>
     <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
   <% end %>
 </form>

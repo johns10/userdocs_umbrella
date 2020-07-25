@@ -5,16 +5,20 @@ defmodule UserDocsWeb.PageLive.FormComponent do
 
   alias UserDocsWeb.LiveHelpers
   alias UserDocsWeb.DomainHelpers
+  alias UserDocsWeb.Layout
 
   @impl true
   def update(%{page: page} = assigns, socket) do
     changeset = Web.change_page(page)
+    maybe_parent_id = DomainHelpers.maybe_parent_id(assigns, :page_id)
 
     {:ok,
      socket
      |> assign(assigns)
      |> assign(:read_only, LiveHelpers.read_only?(assigns))
-     |> assign(:changeset, changeset)}
+     |> assign(:changeset, changeset)
+     |> assign(:maybe_action, LiveHelpers.maybe_action(assigns))
+     |> assign(:maybe_parent_id, maybe_parent_id)}
   end
 
   @impl true

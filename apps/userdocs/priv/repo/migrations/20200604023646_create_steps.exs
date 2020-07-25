@@ -7,6 +7,8 @@ defmodule UserDocs.Repo.Migrations.CreateSteps do
       add :name, :string
       add :url, :string
       add :text, :string
+      add :width, :integer
+      add :height, :integer
 
       add :element_id, references(:elements, on_delete: :nothing)
       add :annotation_id, references(:annotations, on_delete: :nothing)

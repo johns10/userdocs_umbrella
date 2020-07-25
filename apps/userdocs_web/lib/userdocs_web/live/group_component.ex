@@ -14,7 +14,7 @@ defmodule UserDocsWeb.GroupComponent do
             <a
               class="card-header-icon"
               phx-click="expand"
-              phx-target="<%= @myself %>"
+              phx-target="<%= @myself.cid %>"
               aria-label="more options">
               <span class="icon" >
                 <i class="fa fa-angle-down" aria-hidden="true"></i>
@@ -24,7 +24,7 @@ defmodule UserDocsWeb.GroupComponent do
           <div class="card-content <%= Layout.is_hidden?(assigns) %>">
             <div class="content">
               <%= for(object <- @objects) do %>
-                <%= live_show(@socket, @show, @form,
+                <%= live_show(@socket, @header, @show, @form,
                   id: Atom.to_string(@type) <> "-"
                     <> Integer.to_string(object.id)
                     <> "-show",

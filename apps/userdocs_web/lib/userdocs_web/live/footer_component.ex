@@ -15,13 +15,13 @@ defmodule UserDocsWeb.FooterComponent do
       <%= if @action not in [:new] do %>
         <a
           phx-click="new"
-          phx-target="<%= @myself %>"
+          phx-target="<%= @myself.cid %>"
           class="card-footer-item"
         >New</a>
       <% else %>
         <a
           phx-click="cancel"
-          phx-target="<%= @myself %>"
+          phx-target="<%= @myself.cid %>"
           class="card-footer-item"
         >Cancel</a>
       <% end %>

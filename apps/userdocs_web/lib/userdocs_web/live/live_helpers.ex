@@ -58,7 +58,7 @@ defmodule UserDocsWeb.LiveHelpers do
     live_component(socket, UserDocsWeb.FooterComponent, footer_opts)
   end
 
-  def live_group(socket, show_component, form_component, opts) do
+  def live_group(socket, header, show_component, form_component, opts) do
     type = Keyword.fetch!(opts, :type)
     id = Keyword.fetch!(opts, :id)
     parent_type = Keyword.fetch!(opts, :parent_type)
@@ -89,13 +89,14 @@ defmodule UserDocsWeb.LiveHelpers do
       parent: parent,
       show: show_component,
       form: form_component,
+      header: header,
       select_lists: select_lists,
       opts: opts
     ]
     live_component(socket, UserDocsWeb.GroupComponent, group_opts)
   end
 
-  def live_show(socket, show, form, opts) do
+  def live_show(socket, header, show, form, opts) do
     type = Keyword.fetch!(opts, :type)
     object = Keyword.fetch!(opts, :object)
     select_lists = Keyword.fetch!(opts, :select_lists)
@@ -114,6 +115,7 @@ defmodule UserDocsWeb.LiveHelpers do
       type: type,
       struct: struct,
       object: object,
+      header: header,
       opts: [ {type, object} | opts ]
     ]
     |> Keyword.put(type, object)
@@ -181,7 +183,27 @@ defmodule UserDocsWeb.LiveHelpers do
     end
   end
 
+  def maybe_value("Elixir.None", other_value), do: other_value
+  def maybe_value(None, other_value), do: other_value
+  def maybe_value(nil, other_value), do: other_value
+  def maybe_value(value, _) when is_integer(value), do: Integer.to_string(value)
+  def maybe_value(value, _), do: value
+
   def maybe_object(:new, _, struct), do: struct
   def maybe_object(:edit, object, _), do: object
   def maybe_object(:show, object, _), do: object
+
+  def enabled_fields(_, "Elixir.None"), do: []
+  def enabled_fields(_, ""), do: []
+  def enabled_fields(_, nil), do: []
+  def enabled_fields(objects, id) when is_bitstring(id) do
+    enabled_fields(objects, String.to_integer(id))
+  end
+  def enabled_fields(objects, id) when is_integer(id) do
+    IO.puts("Enabled Fields")
+    Enum.filter(objects, fn(x) -> x.id == id end)
+      |> Enum.at(0)
+      |> Map.get(:args)
+      |> IO.inspect()
+  end
 end

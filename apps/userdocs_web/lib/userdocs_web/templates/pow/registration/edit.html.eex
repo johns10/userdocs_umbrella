@@ -26,5 +26,5 @@
   <div>
     <%= submit "Update" %>
   </div>
-<% end %>
 
+<% end %>

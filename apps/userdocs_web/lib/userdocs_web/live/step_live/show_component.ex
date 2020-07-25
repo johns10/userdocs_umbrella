@@ -4,6 +4,7 @@ defmodule UserDocsWeb.StepLive.ShowComponent do
   @impl true
   def render(assigns) do
     ~L"""
+    <p>Not Populated</p>
     """
   end
 end

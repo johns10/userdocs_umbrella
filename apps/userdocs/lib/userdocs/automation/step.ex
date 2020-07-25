@@ -12,6 +12,8 @@ defmodule UserDocs.Automation.Step do
     field :name, :string
     field :url, :string
     field :text, :string
+    field :width, :integer
+    field :height, :integer
 
     belongs_to :process, Process
     belongs_to :element, Element
@@ -24,8 +26,11 @@ defmodule UserDocs.Automation.Step do
   @doc false
   def changeset(step, attrs) do
     step
-    |> cast(attrs, [:order, :name, :process_id])
+    |> cast(attrs, [:order, :name, :process_id, :element_id, :annotation_id, :step_type_id, :url, :text, :width, :height])
     |> foreign_key_constraint(:process_id)
+    |> foreign_key_constraint(:element)
+    |> foreign_key_constraint(:annotation)
+    |> foreign_key_constraint(:step_type)
     |> validate_required([:order])
   end
 end
