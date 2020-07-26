@@ -12,6 +12,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     socket =
       socket
       |> assign(:enabled_fields, [])
+      |> assign(:url_mode, Null)
 
     {:ok, socket}
   end
@@ -81,5 +82,11 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
+  end
+
+  def handle_event("toggle_url_mode", %{"arg" => arg}, socket) do
+    IO.puts("Toggling URL Mode")
+    IO.inspect(arg)
+    {:noreply, assign(socket, :url_mode, String.to_atom(arg))}
   end
 end

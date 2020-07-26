@@ -83,13 +83,9 @@ defmodule UserDocs.Media do
       content_type: meta.image_type
     }
 
-
-    IO.inspect(file_attrs)
-
     %File{}
     |> File.changeset(file_attrs)
     |> Repo.insert()
-    |> IO.inspect()
   end
 
   defp image_meta(meta) do

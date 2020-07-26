@@ -13,9 +13,9 @@
         <div class="select">
           <%= select f, :process_id,
             DomainHelpers.maybe_select_list(assigns, :available_processes),
-            selected: DomainHelpers.maybe_parent_id(assigns, :process_id),
+            value: DomainHelpers.maybe_parent_id(assigns, :process_id),
             id: Layout.form_field_id(@maybe_action, f, :process_id,
-              "page", @maybe_parent_id) %>
+              "process", @maybe_parent_id) %>
         </div>
       </div>
       <%= error_tag f, :process_id %>
@@ -24,7 +24,7 @@
     <%= hidden_input f, :process_id,
       value: DomainHelpers.maybe_parent_id(assigns, :process_id),
       id: Layout.form_field_id(@maybe_action, f, :process_id,
-        "page", @maybe_parent_id) %>
+        "process", @maybe_parent_id) %>
   <% end %>
 
   <div class="field">
@@ -35,7 +35,7 @@
         type: "text",
         readonly: @read_only,
         id: Layout.form_field_id(@maybe_action, f, :order,
-          "page", @maybe_parent_id) %>
+          "process", @maybe_parent_id) %>
     </div>
     <%= error_tag f, :order %>
   </div>
@@ -48,7 +48,7 @@
         type: "text",
         readonly: @read_only,
         id: Layout.form_field_id(@maybe_action, f, :name,
-          "page", @maybe_parent_id) %>
+          "process", @maybe_parent_id) %>
     </div>
     <%= error_tag f, :name %>
   </div>
@@ -62,7 +62,7 @@
           selected: @changeset.data.step_type_id,
           disabled: @read_only,
           id: Layout.form_field_id(@maybe_action, f, :step_type_id,
-            "page", @maybe_parent_id) %>
+            "process", @maybe_parent_id) %>
       </div>
     </div>
     <%= error_tag f, :step_type_id %>
@@ -78,7 +78,7 @@
             selected: @changeset.data.element_id,
             disabled: @read_only,
             id: Layout.form_field_id(@maybe_action, f, :element_id,
-              "page", @maybe_parent_id) %>
+              "process", @maybe_parent_id) %>
         </div>
       </div>
       <%= error_tag f, :element_id %>
@@ -95,11 +95,23 @@
             selected: @changeset.data.annotation_id,
             disabled: @read_only,
             id: Layout.form_field_id(@maybe_action, f, :annotation_id,
-              "page", @maybe_parent_id) %>
+              "process", @maybe_parent_id) %>
         </div>
       </div>
       <%= error_tag f, :element_id %>
     </div>
+  <% end %>
+
+  <%= if @changeset.data.page_reference == "url" || @url_mode == :type do %>
+    <%= hidden_input f, :page_reference,
+      value: "url",
+      id: Layout.form_field_id(@maybe_action, f, :process_id,
+        "process", @maybe_parent_id) %>
+  <% else %>
+    <%= hidden_input f, :page_reference,
+      value: "page",
+      id: Layout.form_field_id(@maybe_action, f, :process_id,
+        "process", @maybe_parent_id) %>
   <% end %>
 
   <%= if("url" in @enabled_fields) do %>
@@ -107,25 +119,49 @@
       <%= label f, :url, class: "label" %>
       <p class="control">
         <div class="field has-addons">
-          <!--
-          TODO: Get this prefix picker working somehow
+          <%= if @changeset.data.page_reference == "url" || @url_mode == :type do %>
+            <div class="control">
+              <a class="button"
+                phx-click= "toggle_url_mode",
+                phx-value-arg= "pick"
+                phx-target= "<%= @myself.cid %>">Pick</a>
+            </div>
+          <% else %>
+            <div class="control">
+              <a class="button"
+                phx-click= "toggle_url_mode",
+                phx-value-arg= "type"
+                phx-target= "<%= @myself.cid %>">Type</a>
+            </div>
+          <% end %>
           <p class="control">
-            <span class="select">
-              <select>
-                <option>http://</option>
-                <option>https://</option>
-              </select>
-            </span>
-          </p>-->
-          <p class="control">
-            <%= text_input f, :url,
-              class: "input",
-              type: "text",
-              readonly: @read_only,
-              id: Layout.form_field_id(@maybe_action, f, :url,
-                "page", @maybe_parent_id) %>
+            <%= if @changeset.data.page_reference == "url" || @url_mode == :type do %>
+              <%= text_input f, :url,
+                class: "input",
+                type: "text",
+                readonly: @read_only,
+                id: Layout.form_field_id(@maybe_action, f, :url,
+                  "process", @maybe_parent_id) %>
+            <% else %>
+              <div class="select">
+                <%= select f, :page_id,
+                  DomainHelpers.maybe_select_list(assigns, :available_pages),
+                  id: Layout.form_field_id(@maybe_action, f, :page_id,
+                    "process", @maybe_parent_id) %>
+              </div>
+            <% end %>
           </p>
           <%= error_tag f, :url %>
+            <!--
+            TODO: Get this prefix picker working somehow
+            <p class="control">
+              <span class="select">
+                <select>
+                  <option>http://</option>
+                  <option>https://</option>
+                </select>
+              </span>
+            </p>-->
         </div>
       </p>
     </div>

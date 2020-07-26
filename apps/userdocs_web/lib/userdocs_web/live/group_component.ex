@@ -34,7 +34,8 @@ defmodule UserDocsWeb.GroupComponent do
                   object: object,
                   parent: @parent,
                   action: :edit,
-                  struct: @struct
+                  struct: @struct,
+                  expanded: @expanded
                 ) %>
               <% end %>
             </div>

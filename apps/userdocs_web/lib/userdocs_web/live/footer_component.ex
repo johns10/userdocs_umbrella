@@ -7,7 +7,7 @@ defmodule UserDocsWeb.FooterComponent do
   def render(assigns) do
     ~L"""
     <div class="card-content <%= @hidden %>" id="<%= @id %>">
-      <div class="content <%= Layout.is_hidden?(assigns) %>">
+      <div class="content <%= Layout.is_hidden?(@expanded, @action) %>">
         <%= live_form @socket, @component, @opts %>
       </div>
     </div>
@@ -43,13 +43,14 @@ defmodule UserDocsWeb.FooterComponent do
     socket =
       socket
       |> assign(:action, :show)
+      |> assign(:expanded, :false)
     {:ok, socket}
   end
 
   @impl true
   def handle_event("new", _, socket) do
-    socket = assign(socket, :action, :new)
-    {:noreply, socket}
+    IO.puts("New event in footer")
+    {:noreply, assign(socket, :action, :new)}
   end
 
   @impl true

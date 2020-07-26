@@ -9,7 +9,9 @@ defmodule UserDocs.Repo.Migrations.CreateSteps do
       add :text, :string
       add :width, :integer
       add :height, :integer
+      add :page_reference, :string
 
+      add :page_id, references(:pages, on_delete: :nothing)
       add :element_id, references(:elements, on_delete: :nothing)
       add :annotation_id, references(:annotations, on_delete: :nothing)
       add :step_type_id, references(:step_types, on_delete: :nothing)
@@ -18,6 +20,7 @@ defmodule UserDocs.Repo.Migrations.CreateSteps do
       timestamps()
     end
 
+    create index(:steps, [:page_id])
     create index(:steps, [:element_id])
     create index(:steps, [:annotation_id])
     create index(:steps, [:step_type_id])

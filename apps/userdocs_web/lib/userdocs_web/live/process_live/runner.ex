@@ -57,7 +57,6 @@ defmodule UserDocsWeb.ProcessLive.Runner do
   end
 
   defp safe_step(step) do
-    IO.inspect(step)
     %{
       type: String.downcase(step.step_type.name) |> String.replace(" ", "_"),
       element_id: "step-" <> Integer.to_string(step.id) <> "-runner",
@@ -106,7 +105,6 @@ defmodule UserDocsWeb.ProcessLive.Runner do
   end
 
   def safe_annotation_type(annotation_type = %UserDocs.Web.AnnotationType{}) do
-    IO.inspect(annotation_type)
     name = try do
       String.downcase(annotation_type.name)
     rescue

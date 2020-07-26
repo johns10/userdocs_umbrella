@@ -7,6 +7,8 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
   alias UserDocs.Web
   alias UserDocs.Web.Page
 
+  alias UserDocs.Projects
+
   alias UserDocsWeb.PageLive
   alias UserDocsWeb.ProcessLive
 
@@ -34,6 +36,8 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
           select_lists: %{
             available_elements: @available_elements,
             available_step_types: @available_step_types,
+            available_pages: @version.pages,
+            available_processes: @version.processes
           }
         ]
       ) %>
@@ -83,6 +87,10 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
   end
 
   #TODO: Needs to be fixed badly
+
+  defp processes do
+    Automation.list_processes()
+  end
 
   defp elements do
     Web.list_elements()

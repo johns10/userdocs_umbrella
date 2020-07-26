@@ -11,6 +11,10 @@ defmodule UserDocsWeb.ProcessLive.ShowComponent do
   def render(assigns) do
     ~L"""
     <div>
+      <div>
+        <%= @expanded %>
+        <%= @action %>
+      </div>
       <%= for(object <- @process.steps) do %>
         <%= live_show(@socket, Header, ShowComponent, FormComponent,
           id: "step-"
@@ -25,12 +29,32 @@ defmodule UserDocsWeb.ProcessLive.ShowComponent do
           struct: %Automation.Step{}
         ) %>
       <% end %>
+      <%= live_footer(@socket, FormComponent,
+        type: :step,
+        struct: %Automation.Step{},
+        object: %{},
+        parent: @process,
+        parent_type: :process,
+        id: "process-"
+          <> Integer.to_string(@process.id) <> "-"
+          <> "step"
+          <> "-footer",
+        title: "New step",
+        hidden: "",
+        select_lists: @select_lists,
+        action: :new
+      ) %>
     </div>
+
     """
   end
 
   @impl true
   def mount(socket) do
+    socket =
+      socket
+      |> assign(:expanded, false)
+      |> assign(:footer_action, false)
     {:ok, socket}
   end
 end

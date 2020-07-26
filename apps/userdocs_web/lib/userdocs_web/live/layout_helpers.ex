@@ -5,6 +5,8 @@ defmodule UserDocsWeb.Layout do
   def is_hidden?(%{expanded: true}), do: ""
   def is_hidden?(%{action: :new}), do: ""
   def is_hidden?(%{action: :show}), do: " is-hidden"
+  def is_hidden?(false, :new), do: ""
+  def is_hidden?(_, _), do: " is-hidden"
 
 
   def form_field_id(action, f, field, parent_type, parent_id) do

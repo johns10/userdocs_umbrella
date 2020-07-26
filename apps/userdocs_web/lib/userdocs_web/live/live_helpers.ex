@@ -131,6 +131,7 @@ defmodule UserDocsWeb.LiveHelpers do
     select_lists = Keyword.fetch!(opts, :select_lists)
     object = Keyword.fetch!(opts, :object)
     parent = Keyword.fetch!(opts, :parent)
+    id = Keyword.fetch!(opts, :id)
 
     log_string =
       "Creating live form of type " <> Atom.to_string(type) <> "\n"
@@ -142,7 +143,7 @@ defmodule UserDocsWeb.LiveHelpers do
     # Logger.debug(log_string)
 
     form_opts = [
-      id: Keyword.fetch!(opts, :id),
+      id: id,
       title: title,
       action: action,
       select_lists: select_lists,
@@ -200,10 +201,8 @@ defmodule UserDocsWeb.LiveHelpers do
     enabled_fields(objects, String.to_integer(id))
   end
   def enabled_fields(objects, id) when is_integer(id) do
-    IO.puts("Enabled Fields")
     Enum.filter(objects, fn(x) -> x.id == id end)
       |> Enum.at(0)
       |> Map.get(:args)
-      |> IO.inspect()
   end
 end
