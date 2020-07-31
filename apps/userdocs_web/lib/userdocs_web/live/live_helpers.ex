@@ -156,6 +156,33 @@ defmodule UserDocsWeb.LiveHelpers do
     live_component(socket, form, form_opts)
   end
 
+  def live_embedded_form(socket, form, opts) do
+    type = Keyword.fetch!(opts, :type)
+    title = Keyword.fetch!(opts, :title)
+    action = Keyword.fetch!(opts, :action)
+    id = Keyword.fetch!(opts, :id)
+    object = Keyword.fetch!(opts, :object)
+    struct = Keyword.fetch!(opts, :struct)
+    parent = Keyword.fetch!(opts, :parent)
+    select_lists = Keyword.fetch!(opts, :select_lists)
+
+    log_string =
+      "Creating embedded form"
+    Logger.debug(log_string)
+
+    form_opts = [
+      type: type,
+      title: title,
+      action: action,
+      id: id,
+      parent: parent,
+      select_lists: select_lists
+    ]
+    |> Keyword.put(type, maybe_object(action, object, struct))
+
+    live_component(socket, form, form_opts)
+  end
+
   def maybe_push_redirect(socket = %{assigns: %{return_to: return_to}}) do
     LiveView.push_redirect(socket, to: return_to)
   end

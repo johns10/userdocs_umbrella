@@ -15,4 +15,11 @@ defmodule UserDocs.Web.AnnotationType do
     |> cast(attrs, [:name, :args])
     |> validate_required([:name])
   end
+
+  @spec safe(%UserDocs.Web.AnnotationType{}, Map) :: %{name: binary}
+  def safe(annotation_type = %UserDocs.Web.AnnotationType{}, _handlers) do
+    %{
+      name: annotation_type.name
+    }
+  end
 end

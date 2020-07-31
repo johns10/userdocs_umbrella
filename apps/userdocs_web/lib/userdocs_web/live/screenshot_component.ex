@@ -17,8 +17,9 @@ defmodule UserDocsWeb.ScreenShotHandler do
 
   @impl true
   def handle_event("create_screenshot", payload, socket) do
-    IO.puts("Got a create screenshot event")
-    Media.encode_hash_create_file(payload)
+    _log_string = "create_screenshot"
+    {status, _result} = Media.encode_hash_create_file(payload)
+    IO.puts(status)
     {:noreply, socket}
   end
 

@@ -10,11 +10,14 @@ defmodule UserDocsWeb.Layout do
 
 
   def form_field_id(action, f, field, parent_type, parent_id) do
+    parent_id = Integer.to_string(parent_id || 0)
+    field = Atom.to_string(field)
+
     parent_type <> "_"
-    <> Integer.to_string(parent_id) <> "_"
+    <> parent_id <> "_"
     <> field_name(f)
     <> id_or_new(action, f) <> "_"
-    <> Atom.to_string(field)
+    <> field
   end
 
   defp field_name(f) do

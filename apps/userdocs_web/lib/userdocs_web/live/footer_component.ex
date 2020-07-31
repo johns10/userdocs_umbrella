@@ -49,7 +49,6 @@ defmodule UserDocsWeb.FooterComponent do
 
   @impl true
   def handle_event("new", _, socket) do
-    IO.puts("New event in footer")
     {:noreply, assign(socket, :action, :new)}
   end
 

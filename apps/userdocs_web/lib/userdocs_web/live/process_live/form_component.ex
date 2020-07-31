@@ -9,7 +9,8 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
   @impl true
   def update(%{process: process} = assigns, socket) do
     changeset = Automation.change_process(process)
-    maybe_parent_id = DomainHelpers.maybe_parent_id(assigns, :page_id)
+    maybe_parent_id = DomainHelpers.maybe_parent_id(
+      assigns, :page_id)
 
     {:ok,
      socket

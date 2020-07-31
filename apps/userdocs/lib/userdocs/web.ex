@@ -252,7 +252,6 @@ defmodule UserDocs.Web do
   """
   def list_elements(_params \\ %{}, filters \\ %{}) do
     base_elements_query()
-    |> maybe_filter_by_version(filters[:version_id])
     |> maybe_filter_by_page(filters[:page_id])
     |> Repo.all()
   end
@@ -420,9 +419,14 @@ defmodule UserDocs.Web do
 
   """
   def update_annotation(%Annotation{} = annotation, attrs) do
-    annotation
-    |> Annotation.changeset(attrs)
-    |> Repo.update()
+    {status, page} =
+      annotation
+      |> Annotation.changeset(attrs)
+      |> Repo.update()
+
+    Endpoint.broadcast("page", "create", page)
+
+    { status, page }
   end
 
   @doc """

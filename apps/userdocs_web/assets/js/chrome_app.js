@@ -16,18 +16,18 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import NProgress from "nprogress"
 import {LiveSocket} from "phoenix_live_view"
-import {handle_job} from "./commands.js"
+import {handle_message} from "./commands.js"
 
 
 chrome.runtime.onMessage.addListener(
-	function(request, sender, sendResponse) {
+	function(message, sender, sendResponse) {
     console.log("Extension received message")
 		console.log(sender.tab ?
 							"from a content script:" + sender.tab.url :
               "from the extension");
-              
-  request.activeAnnotations = []
-  handle_job(request, 'extension')
+            
+  console.log("handling message in the listener")
+  handle_message(message, 'extension')
 });
 
 const updateEvent = new CustomEvent('update', {
@@ -46,19 +46,20 @@ Hooks.fileTransfer = {
 };
 Hooks.jobRunner = {
   mounted() {
-    this.handleEvent("message", (payload) =>
+    this.handleEvent("message", (message) =>
     {
-      var processId =  Number(this.el.attributes["phx-value-process-id"].value)
-      if(processId === payload.id) {
-        chrome.storage.local.get(['activeTabId', 'activeWindowId'], function (result) {
-          console.log("Adding a job to the queue")
-          console.log(result)
-          payload.activeTabId = result.activeTabId
-          payload.activeWindowId = result.activeWindowId
-          handle_job(payload, 'extension')
-          // window.currentJob = new Job(payload, messageHandler)
-          // window.currentJob.apply()
-        })
+      const type = message.type
+      if (type === 'process') {
+        const thisProcessId =  this.el.attributes["phx-value-process-id"].value
+        const messageProcessId = message.payload.process.id
+
+        if(thisProcessId == messageProcessId) {
+          chrome.storage.local.get(['activeTabId', 'activeWindowId'], function (result) {
+            message.payload.activeTabId = result.activeTabId
+            message.payload.activeWindowId = result.activeWindowId
+            handle_message(message, 'extension')
+          })
+        }
       }
     }),
     this.el.addEventListener("message", e => {
@@ -73,32 +74,25 @@ Hooks.jobRunner = {
 };
 Hooks.executeStep = {
   mounted() {
-    this.el.addEventListener("click", e => {
-      console.log("Extension Executing Step");
-      console.log(event.target.nodeName)
-      // TODO: Find a better way to find the right a.  I could easily 
-      // add class navbar-item or something
-      var element = event.target.closest('a');
-      var activeTabId = null;
-      chrome.storage.local.get(['activeTabId'], function (result) {
-        activeTabId = result.activeTabId;
-        var payload = {
-          type: 'command',
-          subType: element.attributes["command"].value.toLowerCase(),
-          target: activeTabId,
-          updateTarget: element.attributes["update-target"].value,
-          id: element.id,
-          args: {
-            url: element.attributes["url"].value,
-            strategy: element.attributes["strategy"].value,
-            selector: element.attributes["selector"].value
-          }
-        };
-        messageHandler.apply(payload);
-      })
+    this.handleEvent("message", (message) =>
+    {
+      const type = message.type
+      if (type === 'step') {
+        const thisStepId =  this.el.attributes["phx-value-step-id"].value
+        const messageStepId = message.payload.process.steps[0].id
+        
+        if(thisStepId == messageStepId) {
+          chrome.storage.local.get(['activeTabId', 'activeWindowId'], function (result) {
+            message.payload.activeTabId = result.activeTabId
+            message.payload.activeWindowId = result.activeWindowId
+            handle_message(message, 'extension')
+          })
+        }
+      }
     }),
     this.el.addEventListener("message", e => {
-      // console.log("Got a step update")
+      console.log("Got a step update")
+      console.log(e.detail)
       var payload = {
         status: e.detail.status,
         error: e.detail.error

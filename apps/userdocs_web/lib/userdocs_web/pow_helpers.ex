@@ -112,10 +112,13 @@ defmodule UserdocsWeb.LiveViewPowHelper do
 
     # Do we have an available session which matches the fingerprint?
     case sessions |> Enum.find(& &1 == session_token) do
-      nil -> Logger.debug("No Matching Session Found")
-      _available_session ->  # We have an available session. Now lets update it's TTL by passing the previously fetched credential
-                            Logger.debug("Matching Session Found. Updating TTL")
-                            CredentialsCache.put(pow_config, session_token, pow_credential)
+      nil ->
+        Logger.debug("No Matching Session Found")
+
+      _available_session ->
+        # We have an available session. Now lets update it's TTL by passing the previously fetched credential
+        Logger.debug("Matching Session Found. Updating TTL")
+        CredentialsCache.put(pow_config, session_token, pow_credential)
     end
   end
 

@@ -53,16 +53,14 @@ defmodule UserDocs.Media do
 
   """
   def create_file(attrs \\ %{}) do
-    IO.puts("Create File")
     %File{}
     |> File.changeset(attrs)
     |> Repo.insert()
   end
 
-  def encode_hash_create_file(attrs) do
-    IO.puts("Encode, Hash, Create File 2")
+  def encode_hash_create_file(%{ "encoded_image" => raw_encoded_image}) do
 
-    [ meta_text | [ encoded_image | _ ] ] = String.split(attrs["encoded_image"], ",")
+    [ meta_text | [ encoded_image | _ ] ] = String.split(raw_encoded_image, ",")
     meta = image_meta(meta_text)
 
     file_name = UUID.uuid4() <> "." <> meta.image_type
@@ -86,6 +84,10 @@ defmodule UserDocs.Media do
     %File{}
     |> File.changeset(file_attrs)
     |> Repo.insert()
+  end
+  def encode_hash_create_file(%{}), do: { :error, "Missing encoded image.  Failed to create file"}
+  def encode_hash_create_file(_) do
+    raise(ArgumentError, message: "Passed an invalid variable to " <> Atom.to_string(__MODULE__))
   end
 
   defp image_meta(meta) do

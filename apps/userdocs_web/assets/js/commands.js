@@ -1,64 +1,109 @@
+function handle_message(message, environment) {
+  const log_string = "Received " + message.type + " message.  "
+  console.log(log_string)
+  if (message.type == 'process') {
+    message.payload.type = 'process'
+    handle_job(message.payload, environment)
+  } else if (message.type == 'step') {
+    message.payload.type = 'step'
+    handle_step(message.payload, environment)
+  }
+}
+
 function handle_job(job, environment) {
-  console.log("handling job " + job.id + " step " + job.current_step_id + " sequence " + job.current_sequence)
-  console.log(job)
-  console.log(job.active_annotations[0])
-  if (job.status === 'not_started') {
-    start_job(job, environment)
+  const status = job.status
+
+  const log_string = "handling job " + job.id + " step " + job.current_step_id + " sequence " + job.current_sequence + " status " + status
+  console.log(log_string)
+
+  if (status === 'not_started') {
+    start_job(job, environment, handle_job)
     updateJobStatus(job)
-  } else if (job.status == 'running') {
-    run_current_step(job, environment)
-  } else if (job.status == 'failed') {
+  } else if (status == 'running') {
+    run_current_step(job, environment, handle_job)
+  } else if (status == 'failed') {
     const step = current_step(job)
     updateStepStatus(step)
     updateJobStatus(job)
-  } else if (job.status == 'complete') {
+  } else if (status == 'complete') {
     const step = current_step(job)
     updateStepStatus(step)
     updateJobStatus(job)
   }
 }
 
-function start_job(job, environment) {
-  console.log("Starting Job")
-  // console.log(job)
-  job.status = 'running'
-  job.current_step_id = job.steps[0].id
-  job.current_sequence = 1
-
-  handle_job(job, environment)
+function handle_step(job, environment) {
+  const status = job.status
+  console.log("Handling Step")
+  console.log(job)
+  if (status === 'not_started') {
+    start_job(job, environment, handle_step)
+  } else if (status == 'running') {
+    run_current_step(job, environment, handle_step)
+  } else if (status == 'failed') {
+    const step = current_step(job)
+    updateStepStatus(step)
+  } else if (status == 'complete') {
+    const step = current_step(job)
+    updateStepStatus(step)
+  }
 }
 
-function run_current_step(job, environment) {
+function start_job(job, environment, proceed) {
+  const steps = job.process.steps
+
+  const log_string = "Starting Job"
+  console.log(log_string)
+
+  job.status = 'running'
+  job.current_step_id = steps[0].id
+  job.current_sequence = 1
+
+  proceed(job, environment)
+}
+
+function run_current_step(job, environment, proceed) {
   var step = current_step(job)
   var apply = current_sequence(job, step)
 
-  apply(job, environment)
+  apply(job, environment, proceed)
 }
 
 function current_step(job) {
-  // console.log("Locating current step")
-  // console.log(job)
-  return job.steps.filter(step => step.id === job.current_step_id)[0]
+  const steps = job.process.steps
+  return steps.filter(step => step.id === job.current_step_id)[0]
 }
 
 function current_step_index(job) {
-  return job.steps.findIndex(step => step.id === job.current_step_id)
+  const steps = job.process.steps
+  return steps.findIndex(step => step.id === job.current_step_id)
 }
 
 function current_sequence(job, step) {
-  // console.log("Locating current sequence")
-  var sequence_id = job.current_sequence
-  return commands()[step.type][sequence_id]
+  const log_string = "Locating current sequence of " + step.step_type.name
+  console.log(step)
+  const step_type_name = step.step_type.name
+  const sequence_id = job.current_sequence
+
+  return commands()[step_type_name][sequence_id]
 }
 
-function success(job, environment) { 
+function success(job, environment, proceed) { 
   console.log("Step Succeeded")
   job.current_sequence = job.current_sequence + 1
-  handle_job(job, environment)
+  proceed(job, environment)
 }
 
 function updateStepStatus(step) {
-  var step_element = document.getElementById(step.element_id)
+  // # TODO: Remove this convention and replace with something I pass in
+  console.log("Updating step status")
+  const step_element_id = "step-" + step.id + "-runner"
+  var step_element = document.getElementById(step_element_id)
+  
+  step.element_id = step_element_id
+
+  console.log(step)
+
   step_element.dispatchEvent(new CustomEvent("message", {
     bubbles: false,
     detail: step
@@ -66,14 +111,20 @@ function updateStepStatus(step) {
 }
 
 function updateJobStatus(job) {
-  var job_element = document.getElementById(job.element_id)
+  // # TODO: Remove this convention and replace with something I pass in
+  console.log("Updating Job Status")
+  const job_element_id = "process-" + job.process.id + "-runner"
+  var job_element = document.getElementById(job_element_id)
+
+  job.element_id = job_element_id
+
   job_element.dispatchEvent(new CustomEvent("message", {
     bubbles: false,
     detail: job
   }))
 }
 
-function failStep(job, error, environment) {
+function failStep(job, error, environment, proceed) {
   console.log("Step Failed")
   console.log(error)
   var step = current_step(job)
@@ -82,22 +133,21 @@ function failStep(job, error, environment) {
 
   if(environment == 'extension') {
     console.log("In Extension")
-    updateStepStatus(step)
-    failJob(job, "Step " + step.id + " failed", environment)
+    failJob(job, "Step " + step.id + " failed", environment, proceed)
   } else if (environment == 'browser') {
     console.log("In Browser")
-    failJob(job, "Step " + step.id + " failed", environment)
+    failJob(job, "Step " + step.id + " failed", environment, proceed)
   }
 
 }
 
-function failJob(job, error, environment) {
+function failJob(job, error, environment, proceed) {
   console.log("Job Failed")
   job.status = "failed"
   job.error = error
 
   if(environment == 'extension') {
-    updateJobStatus(job)
+    proceed(job, environment)
   } else if (environment == 'browser') {
     chrome.runtime.sendMessage(job)
   }
@@ -105,7 +155,7 @@ function failJob(job, error, environment) {
 
 function commands() {
   return {
-    click: {
+    "Click": {
       1: startStep,
       2: sendToBrowser,
       3: waitForElement,
@@ -113,13 +163,13 @@ function commands() {
       5: sendToExtension,
       6: completeStep
     },
-    navigate: {
+    "Navigate": {
       1: startStep,
       2: navigate,
       3: waitForLoad,
       4: completeStep
     },
-    fill_field: {
+    "Fill Field": {
       1: startStep,
       2: sendToBrowser,
       3: waitForElement,
@@ -127,17 +177,17 @@ function commands() {
       5: sendToExtension,
       6: completeStep
     },
-    set_size_explicit: {
+    "Set Size Explicit": {
       1: startStep,
       2: setSize,
       3: completeStep
     },
-    full_screen_screenshot: {
+    "Full Screen Screenshot": {
       1: startStep,
       2: fullScreenShot,
       3: completeStep
     },
-    apply_annotation: {
+    "Apply Annotation": {
       1: startStep,
       2: sendToBrowser,
       3: waitForElement,
@@ -145,7 +195,7 @@ function commands() {
       5: sendToExtension,
       6: completeStep
     },
-    clear_annotations: {
+    "Clear Annotations": {
       1: startStep,
       2: sendToBrowser,
       3: clearAnnotations,
@@ -157,12 +207,12 @@ function commands() {
 
 function annotations() {
   return {
-    outline: outline,
-    badge: badge
+    "Outline": outline,
+    "Badge": badge
   }
 }
 
-function clearAnnotations(job, environment) {
+function clearAnnotations(job, environment, proceed) {
   const step = current_step(job)
 
   try {
@@ -170,28 +220,29 @@ function clearAnnotations(job, environment) {
       document.body.removeChild(window.active_annotations[i]);
     }
     window.active_annotations = []
-    success(job, environment)
+    success(job, environment, proceed)
   } catch(error) {
     step.status = "failed"
     step.error = error
-    failStep(job, error, environment)
+    failStep(job, error, environment, proceed)
   }
 }
 
-function applyAnnotation(job, environment) {
+function applyAnnotation(job, environment, proceed) {
   const step = current_step(job)
+  const name = step.annotation.annotation_type.name
   console.log("applying annotation")
   /*
   console.log(step)
   console.log(step.annotation.annotation_type.name)
   console.log(annotations())
   */
-  var apply = annotations()[step.annotation.annotation_type.name]
+  var apply = annotations()[name]
   try {
-    apply(job, environment)
-    success(job, environment)
+    apply(job, environment, proceed)
+    success(job, environment, proceed)
   } catch(error) {
-    failStep(job, environment)
+    failStep(job, error, environment, proceed)
   }
 }
 
@@ -199,7 +250,7 @@ function blur(job, environment) {
 
 }
 
-function badge(job, environment) {
+function badge(job, environment, proceed) {
   const step = current_step(job)
   const selector = step.element.selector
   const strategy = step.element.strategy
@@ -265,17 +316,18 @@ function badge(job, environment) {
   } catch(error) {
     step.status = "failed"
     step.error = error
-    failStep(job, error, environment)
+    failStep(job, error, environment, proceed)
   }
 }
 
-function outline(job, environment) {
+function outline(job, environment, proceed) {
   const step = current_step(job)
   const selector = step.element.selector
   const strategy = step.element.strategy
-  const element = getElement(strategy, selector)
   const outlineColor = step.annotation.color
   const thickness = step.annotation.thickness + 'px';
+
+  const element = getElement(strategy, selector)
 
   const rect = element.getBoundingClientRect();
   const outline = document.createElement('div');
@@ -294,40 +346,48 @@ function outline(job, environment) {
   } catch(error) {
     step.status = "failed"
     step.error = error
-    failStep(job, error, environment)
+    failStep(job, error, environment, proceed)
   }
 }
 
-function fullScreenShot(job, environment) {
+function fullScreenShot(job, environment, proceed) {
   const activeWindowId = job.activeWindowId
   const step = current_step(job)
 
   console.log("Taking a full screen screenshot")
   try {
     chrome.tabs.captureVisibleTab(activeWindowId, function(result) {
+      console.log("Finished capturing Result")
       console.log(result)
-      step.encoded_image = result
-      document
-        .getElementById("screenshot-handler-component")
-        .dispatchEvent(new CustomEvent("message", {
-          bubbles: false,
-          detail: step
-        }))
-      success(job,environment)
+      if(result) {
+        step.encoded_image = result
+        document
+          .getElementById("screenshot-handler-component")
+          .dispatchEvent(new CustomEvent("message", {
+            bubbles: false,
+            detail: step
+          }))
+        success(job, environment, proceed)
+      } else if(result == undefined) {
+        step.status = "failed"
+        const error = "No Screenshot Returned"
+        step.error = error
+        failStep(job, error, environment, proceed)
+      }
     })
   } catch(error) {
     step.status = "failed"
     step.error = error
-    failStep(job, error, environment)
+    failStep(job, error, environment, proceed)
   }
 }
 
-function setSize(job, environment) {
+function setSize(job, environment, proceed) {
   const activeWindowId = job.activeWindowId
   const step = current_step(job)
   const payload = {
-    width: step.args.width,
-    height: step.args.height
+    width: step.width,
+    height: step.height
   }
 
   console.log("Setting size in " + activeWindowId)
@@ -335,45 +395,44 @@ function setSize(job, environment) {
 
   try {
     chrome.windows.update(activeWindowId, payload)
-    success(job, environment)
+    success(job, environment, proceed)
   } catch(error) {
     step.status = "failed"
     step.error = error
-    failStep(job, error, environment)
+    failStep(job, error, environment, proceed)
   }
 
 }
 
-function navigate(job, environment) {
+function navigate(job, environment, proceed) {
   const activeTabId = job.activeTabId
   const step = current_step(job)
 
   const payload = {
-    url: step.args.url
+    url: step.url
   }
 
-  console.log("Executing a navigate")
-  // console.log(activeTabId)
-  // console.log(payload)
+  const log_string = "Executing a navigate step to " + activeTabId
+  console.log(log_string)
   
   try {
     chrome.tabs.update(activeTabId, payload, function(result) {
       console.log("Triggered Navigation")
-      success(job, environment)
+      success(job, environment, proceed)
     })
   } catch (error) {
     step.status = "failed"
     step.error = error
-    failStep(job, error, environment)
+    failStep(job, error, environment, proceed)
   }
 }
 
-function fillField(job, environment) {
+function fillField(job, environment, proceed) {
   console.log("Filling a field")
   const step = current_step(job)
   const selector = step.element.selector
   const strategy = step.element.strategy
-  const text = step.args.text
+  const text = step.text
   const element = getElement(strategy, selector)
   const event = new Event('input', { bubbles: true })
 
@@ -381,22 +440,22 @@ function fillField(job, environment) {
     console.log("Writing to field")  
     element.value = text
     element.dispatchEvent(event)
-    success(job, environment)
+    success(job, environment, proceed)
   } catch (error) {
     step.status = "failed"
     step.error = error
-    failStep(job, error, environment)
+    failStep(job, error, environment, proceed)
   }
 }
 
-function waitForLoad(job, environment) {
+function waitForLoad(job, environment, proceed) {
   console.log("waiting for load")
   const activeTabId = job.activeTabId
 
   var timeout = setTimeout(function(){ 
     clearInterval(interval)
     console.log("Not found")
-    failStep(job, "Page not Loaded", environment)
+    failStep(job, "Page not Loaded", environment, proceed)
    }, 3000);
 
   var interval = setInterval(function(){
@@ -405,107 +464,130 @@ function waitForLoad(job, environment) {
         clearTimeout(timeout)
         clearInterval(interval)
         console.log("Page Loaded")
-        success(job, environment)
+        success(job, environment, proceed)
       }
     })
   }, 100);
 }
 
 
-function startStep(job, environment) {
-  console.log("Starting a step")
+function startStep(job, environment, proceed) {
   var step = current_step(job)
-  var step_index = current_step_index(job)
-  var step_element = document.getElementById(step.element_id)
+  // TODO: This is a convention.  Find a cleaner way to pass from backend
+  const step_element_id = "step-" + step.id + "-runner"
+  const step_element = document.getElementById(step_element_id)
+  const step_index = current_step_index(job)
+  const steps = job.process.steps
+
+  console.log("Starting a " + step.type + " step")
+
   step.status = "running"
+  step.element_id = step_element_id
 
   try {
     step_element.dispatchEvent(new CustomEvent("message", {
       bubbles: false,
       detail: step
     }))
-    job.steps[step_index] = step
-    success(job, environment)
+    steps[step_index] = step
+    success(job, environment, proceed)
   } catch(error) {
-    failStep(job, error, environment)
+    failStep(job, error, environment, proceed)
   }
 }
 
-function completeStep(job, environment) {
-  console.log("Completing a step")
+function completeStep(job, environment, proceed) {
   var step = current_step(job)
-  console.log(step.element_id)
-  var step_index = current_step_index(job)
-  const step_element = document.getElementById(step.element_id)
-  console.log(step_element)
+  const step_index = current_step_index(job)
+  // TODO: This is a convention.  Find a cleaner way to pass from backend
+  const step_element_id = "step-" + step.id + "-runner"
+  const step_element = document.getElementById(step_element_id)
   const event = new CustomEvent("message", {bubbles: false, detail: step})
+  const steps = job.process.steps
+
+  const log_string = "Completing step " + step_element_id
+  console.log(log_string)
+
   step.status = "complete"
 
   try {
     step_element.dispatchEvent(event)
-    var next_step = job.steps[step_index + 1]
+    var next_step = steps[step_index + 1]
     console.log(next_step)
     if (next_step) {
       // If there's another step, we update and call handle_job
       job.current_step_id = next_step.id
       job.current_sequence = 1
-      handle_job(job, environment)
+      proceed(job, environment)
     } else {
       // If there's not, we're going to complete the job
-      completeJob(job, environment)
+      completeJob(job, environment, proceed)
     }
   } catch(error) {
-    failStep(job, error, environment)
+    failStep(job, error, environment, proceed)
   }
 }
 
-function completeJob(job, environment) {
+function completeJob(job, environment, proceed) {
   job.status = 'complete'
-  handle_job(job, environment)
+  proceed(job, environment)
 }
 
 
-function sendToBrowser(job, environment) {
+function sendToBrowser(job, environment, proceed) {
   console.log("Send to browser")
   if(environment == 'extension') {
     console.log("Sending to browser")
     // console.log(job.activeTabId)
+    const message = {
+      type: job.type,
+      payload: job
+    }
     try {
       job.current_sequence = job.current_sequence + 1
-      chrome.tabs.sendMessage(job.activeTabId, job)
+      chrome.tabs.sendMessage(job.activeTabId, message)
       console.log("Step sent to browser")
     } catch(error) {
-      failStep(job, error, environment)
+      failStep(job, error, environment, proceed)
     }
   } else {
-    success(job, environment)
+    success(job, environment, proceed)
   }
 }
 
-function sendToExtension(job, environment) {
+function sendToExtension(job, environment, proceed) {
   if(environment == 'browser') {
+    console.log("sending to browser")
+    const message = {
+      type: job.type,
+      payload: job
+    }
+
     try {
       job.current_sequence = job.current_sequence + 1
-      chrome.runtime.sendMessage(job)
+      chrome.runtime.sendMessage(message)
       console.log("Sent to Extension") 
     } catch(error) {
-      failStep(job, error, environment)
+      failStep(job, error, environment, proceed)
     } 
   } else {
-    success(job, environment)
+    success(job, environment, proceed)
   }
 }
 
-function waitForElement(job, environment) {
+function waitForElement(job, environment, proceed) {
   var step = current_step(job)
+
   const selector = step.element.selector
   const strategy = step.element.strategy
+
   var element = null
-  // console.log("Waiting for element, strategy: " + strategy + " selector: " + selector)
+  
+  const log_string = console.log("Waiting for element, strategy: " + strategy + " selector: " + selector)
 
   var timeout = setTimeout(function(){ 
     clearInterval(interval)
-    failStep(job, "Element not found", environment)
+    failStep(job, "Element not found", environment, proceed)
    }, 3000);
   var interval = setInterval(function(){
     element = getElement(strategy, selector)
@@ -514,12 +596,12 @@ function waitForElement(job, environment) {
       clearTimeout(timeout)
       clearInterval(interval)
       console.log("found")
-      success(job, environment)
+      success(job, environment, proceed)
     }
   }, 100);
 }
 
-function click(job, environment) {
+function click(job, environment, proceed) {
   const step = current_step(job)
   const selector = step.element.selector
   const strategy = step.element.strategy
@@ -528,11 +610,11 @@ function click(job, environment) {
     console.log("Getting element")
     getElement(strategy, selector)
       .click()
-    success(job, environment)
+    success(job, environment, proceed)
   } catch (error) {
     step.status = "failed"
     step.error = error
-    failStep(job, error, environment)
+    failStep(job, error, environment, proceed)
   }
 }
 
@@ -552,4 +634,4 @@ function getElement(strategy, selector) {
   return element
 }
 
-export {handle_job}
+export {handle_message}

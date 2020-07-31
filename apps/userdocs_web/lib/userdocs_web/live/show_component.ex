@@ -33,6 +33,7 @@ defmodule UserDocsWeb.ShowComponent do
         </a>
       </header>
       <div class="card-content <%= Layout.is_hidden?(assigns) %>">
+        <%= live_component @socket, @show, @opts %>
         <%= live_form @socket, @form,
           type: @type,
           title: @title,
@@ -46,7 +47,6 @@ defmodule UserDocsWeb.ShowComponent do
             <> "-edit-form"
         %>
         <hr>
-        <%= live_component @socket, @show, @opts %>
       </div>
     </div>
     """

@@ -15,4 +15,10 @@ defmodule UserDocs.Automation.StepType do
     |> cast(attrs, [:name, :args])
     |> validate_required([:name, :args])
   end
+
+  def safe(step_type = %UserDocs.Automation.StepType{}, _handlers) do
+    %{
+      name: step_type.name
+    }
+  end
 end

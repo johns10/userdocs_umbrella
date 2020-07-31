@@ -1,4 +1,4 @@
-import {handle_job} from '/commands.js';
+import {handle_message} from '/commands.js';
 
 var PATH = null
 
@@ -10,8 +10,7 @@ export function main () {
     var logSuffix = sender.tab ? "from a content script:" + sender.tab.url : "from the extension"
     console.log("Browser received message " + logSuffix)
     console.log(request)
-    handle_job(request, 'browser')
-    return true
+    handle_message(request, 'browser')
   });
   
   document.onmouseover = function(event) {

@@ -37,7 +37,8 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
             available_elements: @available_elements,
             available_step_types: @available_step_types,
             available_pages: @version.pages,
-            available_processes: @version.processes
+            available_processes: @version.processes,
+            available_annotation_types: @available_annotation_types
           }
         ]
       ) %>

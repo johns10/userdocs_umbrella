@@ -2,17 +2,17 @@ defmodule UserDocsWeb.StepLive.Runner do
   use UserDocsWeb, :live_component
   use Phoenix.HTML
 
+  alias UserDocs.Automation.Runner
+
   @impl true
   def render(assigns) do
     ~L"""
     <a class="navbar-item"
       id="<%= @id %>"
+      phx-click="execute_step"
+      phx-value-step-id="<%= @object.id %>"
       phx-hook="executeStep"
-      command="<%= @step_type_name %>"
-      url="<%= @object.url %>"
-      selector="<%= Map.get(@element, :selector) %>"
-      strategy="<%= Map.get(@element, :strategy) %>"
-      update-target="<%= @myself.cid %>"
+      phx-target="<%= @myself.cid %>"
       status="<%= @status %>"
     >
       <span class="icon">
@@ -25,6 +25,25 @@ defmodule UserDocsWeb.StepLive.Runner do
       </span>
     </a>
     """
+  end
+
+  def handle_event("execute_step", %{"step-id" => step_id}, socket) do
+    _log_string = "Executing step " <> step_id
+    IO.puts(_log_string)
+
+    payload =  %{
+      type: "step",
+      payload: %{
+        process: %{
+          steps: [ Runner.parse(socket.assigns.object) ],
+        },
+        element_id: socket.assigns.id,
+        status: "not_started",
+        active_annotations: []
+      }
+    }
+
+    {:noreply, push_event(socket, "message", payload)}
   end
 
   @impl true

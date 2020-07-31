@@ -20,4 +20,16 @@ defmodule UserDocs.Web.Element do
     |> foreign_key_constraint(:page_id)
     |> validate_required([:name, :strategy, :selector])
   end
+
+  def safe(element = %UserDocs.Web.Element{}, _handlers) do
+    %{
+      id: element.id,
+      page_id: element.page_id,
+
+      name: element.name,
+      strategy: element.strategy,
+      selector: element.selector
+    }
+  end
+  def safe(_ , handlers), do: safe(%UserDocs.Web.Element{}, handlers)
 end

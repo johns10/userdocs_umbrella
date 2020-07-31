@@ -11,6 +11,13 @@ defmodule UserDocsWeb.DomainHelpers do
     select_list(select_list)
   end
 
+  def maybe_select_list(%Ecto.Association.NotLoaded{}) do
+    [{"None", ""}]
+  end
+  def maybe_select_list(list) do
+    select_list(list)
+  end
+
     @doc """
 
     """
@@ -41,7 +48,7 @@ defmodule UserDocsWeb.DomainHelpers do
   if you're editing the record.
   """
   def maybe_parent_id(assigns, field) do
-    try do
+    test = try do
       assigns.parent.id
     rescue
       ArgumentError -> Map.get(assigns.changeset.data, field)
@@ -49,4 +56,36 @@ defmodule UserDocsWeb.DomainHelpers do
     end
   end
 
+  def most_recent_navigated_to_page(assigns, pages) do
+    page_id =
+      case step = recent_navigation_step(assigns) do
+        None -> 0
+        _ -> step.page_id
+      end
+
+    page =
+      pages
+      |> Enum.filter(fn(page) -> page_id == page.id end)
+      |> Enum.at(0)
+
+    case page do
+      %UserDocs.Web.Page{} -> page
+      None -> %UserDocs.Web.Page{}
+      nil -> %UserDocs.Web.Page{}
+    end
   end
+
+  def recent_navigation_step(assigns) do
+    navigation_steps = Enum.filter(
+      assigns.parent.steps,
+      fn step -> step.step_type.name == "Navigate" && step.order < assigns.step.order end
+    )
+
+    try do
+      Enum.max_by(navigation_steps, fn step -> step.order || 0 end)
+    rescue
+      EmptyError -> None
+      _ -> None
+    end
+  end
+end

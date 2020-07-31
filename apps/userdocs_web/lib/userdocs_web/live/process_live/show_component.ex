@@ -14,6 +14,7 @@ defmodule UserDocsWeb.ProcessLive.ShowComponent do
       <div>
         <%= @expanded %>
         <%= @action %>
+        <%= @parent.name %>
       </div>
       <%= for(object <- @process.steps) do %>
         <%= live_show(@socket, Header, ShowComponent, FormComponent,
@@ -45,7 +46,6 @@ defmodule UserDocsWeb.ProcessLive.ShowComponent do
         action: :new
       ) %>
     </div>
-
     """
   end
 
