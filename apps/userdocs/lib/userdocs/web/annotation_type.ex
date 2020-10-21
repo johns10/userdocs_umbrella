@@ -2,6 +2,7 @@ defmodule UserDocs.Web.AnnotationType do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:args, :name]}
   schema "annotation_types" do
     field :args, {:array, :string}
     field :name, :string
@@ -22,4 +23,5 @@ defmodule UserDocs.Web.AnnotationType do
       name: annotation_type.name
     }
   end
+  def safe(nil, _handlers), do: nil
 end

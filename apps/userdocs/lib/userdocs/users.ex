@@ -17,8 +17,21 @@ defmodule UserDocs.Users do
       [%TeamUser{}, ...]
 
   """
-  def list_users do
-    Repo.all(User)
+  def list_users(params \\ %{}, _filters \\ %{}) do
+    base_users_query()
+    |> maybe_filter_by_team(params[:team_id])
+    |> Repo.all()
+  end
+
+  defp base_users_query(), do: from(users in User)
+
+  defp maybe_filter_by_team(query, nil), do: query
+  defp maybe_filter_by_team(query, team_id) do
+    from(user in query,
+    left_join: team_user in TeamUser, on: user.id == team_user.user_id,
+    left_join: team in Team, on: team.id == team_user.team_id,
+    where: team_user.team_id == ^team_id
+  )
   end
 
   @doc """
@@ -113,9 +126,26 @@ defmodule UserDocs.Users do
       [%TeamUser{}, ...]
 
   """
-  def list_team_users do
-    Repo.all(TeamUser)
+  def list_team_users(params \\ %{}, filters \\ %{}) do
+    base_team_users_query()
+    |> maybe_preload_teams(params[:team])
+    |> maybe_filter_by_user(filters[:user_id])
+    |> Repo.all()
   end
+
+  defp maybe_preload_teams(query, nil), do: query
+  defp maybe_preload_teams(query, _) do
+    from(team_users in query, preload: [:team])
+  end
+
+  defp maybe_filter_by_user(query, nil), do: query
+  defp maybe_filter_by_user(query, user_id) do
+    from(team_user in query,
+      where: team_user.user_id == ^user_id
+    )
+  end
+
+  defp base_team_users_query(), do: from(team_users in TeamUser)
 
   @doc """
   Gets a single team_user.
@@ -209,10 +239,30 @@ defmodule UserDocs.Users do
       [%Team{}, ...]
 
   """
-  def list_teams do
-    Repo.all from team in Team,
-      preload: [:users]
+  def list_teams(_params \\ %{}, filters \\ %{}) do
+    base_teams_query()
+    |> maybe_filter_team_by_user(filters[:user_id])
+    |> maybe_filter_by_ids(filters[:ids])
+    |> Repo.all()
   end
+
+  defp maybe_filter_team_by_user(query, nil), do: query
+  defp maybe_filter_team_by_user(query, user_id) do
+    from(team in query,
+    left_join: team_user in TeamUser, on: team.id == team_user.team_id,
+    left_join: user in User, on: user.id == team_user.user_id,
+    where: team_user.user_id == ^user_id
+  )
+  end
+
+  defp maybe_filter_by_ids(query, nil), do: query
+  defp maybe_filter_by_ids(query, ids) do
+    from(item in query,
+    where: item.id in ^ids
+  )
+  end
+
+  defp base_teams_query(), do: from(teams in Team)
 
   @doc """
   Gets a single team.
@@ -232,6 +282,33 @@ defmodule UserDocs.Users do
     Repo.one from team in Team,
       where: team.id == ^id,
       preload: [:users]
+  end
+
+  def get_version_team!(id) do
+    Repo.one from team in Team,
+      left_join: project in UserDocs.Projects.Project, on: project.team_id == team.id,
+      left_join: version in UserDocs.Projects.Version, on: version.project_id == project.id,
+      where: version.id == ^id
+  end
+
+  # TODO: Move this into base query
+  def get_annotation_team!(id) do
+    Repo.one from team in Team,
+      left_join: project in UserDocs.Projects.Project, on: project.team_id == team.id,
+      left_join: version in UserDocs.Projects.Version, on: version.project_id == project.id,
+      left_join: page in UserDocs.Web.Page, on: page.version_id == version.id,
+      left_join: annotation in UserDocs.Web.Annotation, on: annotation.page_id == page.id,
+      where: annotation.id == ^id
+  end
+
+  # TODO: Move this into base query
+  def get_step_team!(id) do
+    Repo.one from team in Team,
+      left_join: project in UserDocs.Projects.Project, on: project.team_id == team.id,
+      left_join: version in UserDocs.Projects.Version, on: version.project_id == project.id,
+      left_join: process in UserDocs.Automation.Process, on: process.version_id == version.id,
+      left_join: step in UserDocs.Automation.Step, on: step.process_id == process.id,
+      where: step.id == ^id
   end
 
   @doc """

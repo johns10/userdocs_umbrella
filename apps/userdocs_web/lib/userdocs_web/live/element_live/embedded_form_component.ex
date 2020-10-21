@@ -38,42 +38,51 @@ defmodule UserDocsWeb.ElementLive.EmbeddedFormComponent do
                   </div>
 
                   <div class="field">
-                    <%= label fp, :strategy, class: "label" %>
-                    <div class="control">
-                      <%= text_input fp, :strategy, class: "input", type: "text", readonly: @read_only,
-                      id: @base_form_id <> "-element-" <> Integer.to_string(@form.data.element.id) <> "-strategy" %>
-                    </div>
-                    <%= error_tag fp, :strategy %>
-                  </div>
-
-                  <div class="field">
                     <%= label fp, :selector, class: "label" %>
                     <p class="control">
                       <div class="field has-addons">
-                        <p class="control">
+                        <div class="control">
+                          <%= select fp, :strategy_id, @strategies_select_options,
+                            class: "input",
+                            type: "text",
+                            readonly: @read_only,
+                            id: strategy_field_id(fp.data.page_id, fp.data.id) %>
+                        </div>
+                        <p class="control is-expanded">
                           <%= text_input fp, :selector, class: "input", type: "text", readonly: @read_only,
-                          id: @base_form_id <> "-element-" <> Integer.to_string(@form.data.element.id) <> "-selector" %>
+                          id: selector_field_id(fp.data.page_id, fp.data.id) %>
                         </p>
-                        <p class="control">
-                          <button class="button"
-                            target="<%= selector_field_id(@form.data.id, fp.data.id) %>"
-                            phx-hook="CopySelector">
+                        <div class="control">
+                          <button
+                            class="button"
+                            type="button"
+                            selector="<%= selector_field_id(fp.data.page_id, fp.data.id) %>"
+                            strategy="<%= strategy_field_id(fp.data.page_id, fp.data.id) %>"
+                            phx-hook="CopySelector"
+                          >
                             <span class="icon" >
-                              <i class="fa fa-arrow-left"
+                              <i
+                                class="fa fa-arrow-left"
                                 aria-hidden="true"
-                                target="<%= selector_field_id(@form.data.id, fp.data.id) %>"></i>
+                              ></i>
                             </span>
                           </span>
-                        </p>
+                        </div>
                         <!-- TODO validate that @changeset.data.selector works here -->
-                        <p class="control">
-                          <button class="button"
-                            selector="<%= fp.data.selector %>"
-                            phx-hook="testSelector">
+                          <p class="control">
+                          <button
+                            type="button"
+                            class="button"
+                            phx-target="<%= @myself.cid %>"
+                            phx-value-element-id="<%= fp.data.id %>"
+                            phx-value-selector="<%= selector_field_id(fp.data.page_id, fp.data.id) %>"
+                            phx-value-strategy="<%= strategy_field_id(fp.data.page_id, fp.data.id) %>"
+                            phx-click="test_selector"
+                          >
                             <span class="icon" >
                               <i class="fa fa-cloud-upload"
                                 aria-hidden="true"
-                                selector="<%= fp.data.selector %>"></i>
+                              ></i>
                             </span>
                           </span>
                         </p>
@@ -104,6 +113,53 @@ defmodule UserDocsWeb.ElementLive.EmbeddedFormComponent do
   def handle_event("expand", _, socket) do
     socket = assign(socket, :expanded, not socket.assigns.expanded)
     {:noreply, socket}
+  end
+
+  def handle_event("test_selector", %{ "element-id" => element_id }, socket) do
+    element_id = String.to_integer(element_id)
+
+    IO.puts("Testing selector")
+
+    element =
+      socket.assigns.elements
+      |> Enum.filter(fn(e) -> e.id == element_id end)
+      |> Enum.at(0)
+
+    payload =  %{
+      type: "step",
+      payload: %{
+        process: %{
+          steps: [
+            %{
+              id: 0,
+              selector: element.selector,
+              strategy: element.strategy,
+              step_type: %{
+                name: "Test Selector"
+              }
+            }
+           ],
+        },
+        element_id: socket.assigns.id,
+        status: "not_started",
+        active_annotations: []
+      }
+    }
+
+    {
+      :noreply,
+      socket
+      |> push_event("test_selector", payload)
+    }
+  end
+
+  defp strategy_field_id(page_id, nil), do: strategy_field_id(page_id, 0)
+  defp strategy_field_id(page_id, element_id) when is_integer(page_id) and is_integer(element_id) do
+    "page-"
+    <> Integer.to_string(page_id)
+    <> "-element-"
+    <> Integer.to_string(element_id)
+    <> "-form-strategy-field"
   end
 
   defp selector_field_id(page_id, nil), do: selector_field_id(page_id, 0)

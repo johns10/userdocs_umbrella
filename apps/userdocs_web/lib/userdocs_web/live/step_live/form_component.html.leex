@@ -12,9 +12,8 @@
       <%= label f, form_field, class: :label %>
       <div class="control">
         <div class="select">
-          <%= select f, form_field,
-            available_processes(assigns),
-            value: maybe_parent_id(assigns),
+          <%= select f, form_field, @processes_select_options,
+            value: @selected_process_id,
             id: form_field_id(assigns, f, form_field) %>
         </div>
       </div>
@@ -41,7 +40,8 @@
   <div class="field">
     <%= label f, form_field = :name %>
     <div class="control">
-      <%= text_input f, form_field, class: "input", type: "text", readonly: @read_only,
+      <%= text_input f, form_field, class: "input", type: "text",
+        readonly: @read_only, value: @auto_gen_name,
         id: form_field_id(assigns, f, form_field) %>
     </div>
     <%= error_tag f, form_field %>
@@ -51,8 +51,7 @@
     <%= label f, form_field = :step_type_id, class: :label %>
     <div class="control">
       <div class="select">
-        <%= select f, form_field,
-          DomainHelpers.maybe_select_list(assigns, :available_step_types),
+        <%= select f, form_field, @step_type_select_options,
           selected: @changeset.data.step_type_id,
           disabled: @read_only,
           id: form_field_id(assigns, f, form_field) %>
@@ -68,66 +67,110 @@
           <div class="label">Page</div>
           <div class="control is-expanded">
             <div class="select is-fullwidth">
-              <%= select f, :page_id, available_pages(assigns),
+              <%= select f, :page_id, @pages_select_options,
+                selected: @selected_page_id,
                 id: Layout.form_field_id(@maybe_action, f, :page_id, "process", @maybe_parent_id) %>
             </div>
           </div>
         </div>
         <%= if("element_id" in @enabled_fields) do %>
-          <div class="field">
+          <fieldset>
             <%= label f, form_field = :element_id, class: "label" %>
-            <div class="control is-expanded">
-              <div class="select is-fullwidth">
-                <%= select f, form_field, @available_elements,
-                  selected: @changeset.data.element_id,
-                  disabled: @read_only,
-                  id: Layout.form_field_id(@maybe_action, f, form_field,
-                    "process", @maybe_parent_id) %>
+            <div class="field has-addons">
+              <div class="control">
+                <button
+                  class="button"
+                  type="button"
+                  phx-click="new-element"
+                  phx-value-page-id=<%= @selected_page_id %>
+                >
+                  <span class="icon" >
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                  </span>
+                </button>
+              </div>
+              <div class="control is-expanded">
+                <div class="select is-fullwidth">
+                  <%= select f, form_field, @elements_select_options,
+                    selected: @changeset.data.element_id,
+                    disabled: @read_only,
+                    id: Layout.form_field_id(@maybe_action, f, form_field,
+                      "process", @maybe_parent_id) %>
+                </div>
               </div>
             </div>
-          </div>
+            <%= error_tag f, form_field %>
+          </fieldset>
         <% end %>
         <%= if("annotation_id" in @enabled_fields) do %>
-          <div class="field">
+          <fieldset>
             <%= label f, form_field = :annotation_id, class: "label" %>
-            <div class="control is-expanded">
-              <div class="select is-fullwidth">
-                <%= select f, form_field, @available_annotations,
-                  selected: @changeset.data.annotation_id,
-                  disabled: @read_only,
-                  id: Layout.form_field_id(@maybe_action, f, form_field,
-                    "process", @maybe_parent_id) %>
+            <div class="field has-addons">
+              <div class="control">
+                <button
+                  class="button"
+                  type="button"
+                  phx-click="new-annotation"
+                  phx-value-page-id=<%= @selected_page_id %>
+                  phx-value-element-id=<%= @selected_element_id %>
+                >
+                  <span class="icon" >
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                  </span>
+                </button>
+              </div>
+              <div class="control is-expanded">
+                <div class="select is-fullwidth">
+                  <%= select f, form_field, @annotations_select_options,
+                    selected: @changeset.data.annotation_id,
+                    disabled: @read_only,
+                    id: Layout.form_field_id(@maybe_action, f, form_field,
+                      "process", @maybe_parent_id) %>
+                </div>
               </div>
             </div>
-          </div>
+            <%= error_tag f, form_field %>
+          </fieldset>
         <% end %>
       </div>
-      <%= error_tag f, form_field %>
     </div>
   <% end %>
 
-  <%= if("element_id" in @enabled_fields) do %>
+  <%= if("element_id" in @enabled_fields and is_integer(f.data.element_id)) do %>
     <div class="field">
       <%= live_component @socket,
         UserDocsWeb.ElementLive.EmbeddedFormComponent, [
         form: f,
         read_only: @read_only,
-        select_lists: @select_lists,
+        action: @action,
+        elements: @select_lists.available_elements,
+        strategies_select_options: @strategies_select_options,
+        element_subform_disabled: @element_subform_disabled,
         id: subform_id("element", "step", @changeset.data.id, @changeset.data.element),
         base_form_id: subform_id("element", "step", @changeset.data.id, @changeset.data.element) <> "_"
       ] %>
     </div>
   <% end %>
 
-  <%= if("annotation_id" in @enabled_fields) do %>
+  <%= if("annotation_id" in @enabled_fields and is_integer(f.data.annotation_id)) do %>
     <%= live_component @socket,
       UserDocsWeb.AnnotationLive.EmbeddedFormComponent, [
       form: f,
       read_only: @read_only,
-      select_lists: @select_lists,
+      action: @action,
+      current_version: @current_version,
+      current_content: @current_content,
       enabled_fields: @enabled_annotation_fields,
+      versions_select_options: @versions_select_options,
+      annotation_types_select_options: @annotation_types_select_options,
+      contents_select_options: @contents_select_options,
+      language_codes_select_options: @language_codes_select_options,
+      form_disabled: @annotation_subform_disabled,
+      content_versions: @content_versions,
+      parent_cid: @myself.cid,
       id: subform_id("annotation", "step", @changeset.data.id, @changeset.data.element),
-      base_form_id: subform_id("annotation", "step", @changeset.data.id, @changeset.data.element) <> "_"
+      base_form_id: subform_id("annotation", "step", @changeset.data.id, @changeset.data.element) <> "_",
+      auto_gen_name: @auto_gen_annotation_name
     ] %>
   <% end %>
 
@@ -175,7 +218,7 @@
                   "process", @maybe_parent_id) %>
             <% else %>
               <div class="select">
-                <%= select f, :page_id, available_pages(assigns),
+                <%= select f, :page_id, @pages_select_options,
                   id: Layout.form_field_id(@maybe_action, f, form_field, "process", @maybe_parent_id) %>
               </div>
             <% end %>

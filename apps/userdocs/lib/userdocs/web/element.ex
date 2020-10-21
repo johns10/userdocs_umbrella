@@ -2,12 +2,14 @@ defmodule UserDocs.Web.Element do
   use Ecto.Schema
   import Ecto.Changeset
   alias UserDocs.Web.Page
+  alias UserDocs.Web.Strategy
 
+  @derive {Jason.Encoder, only: [:name, :selector, :strategy, :page]}
   schema "elements" do
     field :name, :string
-    field :strategy, :string
     field :selector, :string
 
+    belongs_to :strategy, Strategy
     belongs_to :page, Page
 
     timestamps()
@@ -16,20 +18,35 @@ defmodule UserDocs.Web.Element do
   @doc false
   def changeset(element, attrs) do
     element
-    |> cast(attrs, [:name, :strategy, :selector, :page_id])
+    |> cast(attrs, [:name, :strategy_id, :selector, :page_id])
+    |> foreign_key_constraint(:strategy_id)
     |> foreign_key_constraint(:page_id)
-    |> validate_required([:name, :strategy, :selector])
+    |> validate_required([:name, :strategy_id, :selector])
   end
 
-  def safe(element = %UserDocs.Web.Element{}, _handlers) do
+  def safe(element, handlers \\ %{})
+  def safe(element = %UserDocs.Web.Element{}, handlers) do
+    base_safe(element)
+    |> maybe_safe_strategy(handlers[:strategy], element.strategy, handlers)
+    |> maybe_safe_page(handlers[:page], element.page, handlers)
+  end
+  def safe(nil, _), do: nil
+
+  def base_safe(element) do
     %{
       id: element.id,
-      page_id: element.page_id,
-
       name: element.name,
-      strategy: element.strategy,
       selector: element.selector
     }
   end
-  def safe(_ , handlers), do: safe(%UserDocs.Web.Element{}, handlers)
+
+  def maybe_safe_strategy(element, nil, _, _), do: element
+  def maybe_safe_strategy(element, handler, strategy, handlers) do
+    Map.put(element, :strategy, handler.(strategy, handlers))
+  end
+
+  def maybe_safe_page(element, nil, _, _), do: element
+  def maybe_safe_page(element, handler, page, handlers) do
+    Map.put(element, :page, handler.(page, handlers))
+  end
 end

@@ -3,10 +3,14 @@ defmodule UserDocsWeb.ProjectLive.Index do
 
   alias UserDocs.Projects
   alias UserDocs.Projects.Project
+  use UserdocsWeb.LiveViewPowHelper
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, :projects, list_projects())}
+  def mount(_params, session, socket) do
+    { :ok,
+    socket
+    |> assign(:projects, list_projects())
+    |> maybe_assign_current_user(session)}
   end
 
   @impl true

@@ -4,7 +4,6 @@ defmodule UserDocs.Repo.Migrations.CreateContent do
   def change do
     create table(:content) do
       add :name, :string
-      add :description, :string
       add :team_id, references(:teams, on_delete: :nothing)
 
       timestamps()

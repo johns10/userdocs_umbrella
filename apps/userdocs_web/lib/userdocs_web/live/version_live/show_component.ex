@@ -1,13 +1,11 @@
 defmodule UserDocsWeb.VersionLive.ShowComponent do
   use UserDocsWeb, :live_component
 
-  alias UserDocs.Documents
-  alias UserDocs.Automation
+  require Logger
 
-  alias UserDocs.Web
+  alias UserDocsWeb.State
+
   alias UserDocs.Web.Page
-
-  alias UserDocs.Projects
 
   alias UserDocsWeb.PageLive
   alias UserDocsWeb.ProcessLive
@@ -23,43 +21,64 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
           <%= @version.name %>
         </p>
       </header>
-      <%= live_group(@socket, ProcessLive.Header, ProcessLive.ShowComponent, ProcessLive.FormComponent,
-        [
-          title: "Processes",
-          type: :process,
-          parent_type: :version,
-          struct: %Process{},
-          objects: @version.processes,
-          return_to: Routes.process_index_path(@socket, :index),
-          id: "version-" <> Integer.to_string(@version.id) <> "-processes",
-          parent: @version,
-          select_lists: %{
-            available_elements: @available_elements,
-            available_step_types: @available_step_types,
-            available_pages: @version.pages,
-            available_processes: @version.processes,
-            available_annotation_types: @available_annotation_types
-          }
-        ]
-      ) %>
-      <%= live_group(@socket, PageLive.Header, PageLive.ShowComponent, PageLive.FormComponent,
-        [
-          title: "Pages",
-          type: :page,
-          parent_type: :version,
-          struct: %Page{},
-          objects: @version.pages,
-          return_to: Routes.page_index_path(@socket, :index),
-          id: "version-" <> Integer.to_string(@version.id) <> "-pages",
-          parent: @version,
-          select_lists: %{
-            available_versions: @available_versions,
-            available_pages: @version.pages,
-            available_step_types: @available_step_types,
-            available_annotation_types: @available_annotation_types
-          }
-        ]
-      ) %>
+
+      <%= if Ecto.assoc_loaded?(@version.processes) do %>
+        <%= live_group(@socket, ProcessLive.Header, ProcessLive.ShowComponent, ProcessLive.FormComponent,
+          [
+            title: "Processes",
+            type: :process,
+            parent_type: :version,
+            struct: %Process{},
+            objects: @version.processes,
+            return_to: Routes.process_index_path(@socket, :index),
+            id: "version-#{@version.id}-processes",
+            parent: @version,
+            current_user: @current_user,
+            current_team: @current_team,
+            current_version: @current_version,
+            select_lists: %{
+              available_elements: @select_lists.available_elements,
+              available_versions: @available_versions,
+              available_step_types: @select_lists.available_step_types,
+              available_pages: @version.pages,
+              available_processes: @version.processes,
+              available_annotation_types: @select_lists.available_annotation_types,
+              available_content_versions: @select_lists.available_content_versions,
+              available_content: @select_lists.available_content,
+              language_codes: @select_lists.language_codes,
+              strategies: @select_lists.strategies
+            }
+          ]
+        ) %>
+      <%= end %>
+      <%= if Ecto.assoc_loaded?(@version.pages) do %>
+        <%= live_group(@socket, PageLive.Header, PageLive.ShowComponent, PageLive.FormComponent,
+          [
+            title: "Pages",
+            type: :page,
+            parent_type: :version,
+            struct: %Page{},
+            objects: @version.pages,
+            return_to: Routes.page_index_path(@socket, :index),
+            id: "version-" <> Integer.to_string(@version.id) <> "-pages",
+            parent: @version,
+            current_user: @current_user,
+            current_team: @current_team,
+            current_version: @current_version,
+            select_lists: %{
+              available_elements: @select_lists.available_elements,
+              available_versions: @available_versions,
+              available_pages: @version.pages,
+              available_step_types: @select_lists.available_step_types,
+              available_annotation_types: @select_lists.available_annotation_types,
+              available_content_versions: @select_lists.available_content_versions,
+              available_content: @select_lists.available_content,
+              language_codes: @select_lists.language_codes,
+              strategies: @select_lists.strategies
+            }
+          ]
+        ) %>
+      <%= end %>
     </div>
     """
   end
@@ -70,10 +89,6 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
     socket =
       socket
       |> assign(assigns)
-      |> assign(:available_step_types, step_types())
-      |> assign(:available_content, available_content())
-      |> assign(:available_annotation_types, annotation_types())
-      |> assign(:available_elements, elements())
 
     {:ok, socket}
   end
@@ -85,27 +100,5 @@ defmodule UserDocsWeb.VersionLive.ShowComponent do
       |> assign(:version, None)
 
     {:ok, socket}
-  end
-
-  #TODO: Needs to be fixed badly
-
-  defp processes do
-    Automation.list_processes()
-  end
-
-  defp elements do
-    Web.list_elements()
-  end
-
-  defp step_types do
-    Automation.list_step_types()
-  end
-
-  defp annotation_types do
-    Web.list_annotation_types()
-  end
-
-  defp available_content() do
-    Documents.list_content()
   end
 end

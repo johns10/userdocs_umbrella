@@ -7,7 +7,11 @@ defmodule UserDocs.Automation.Step do
   alias UserDocs.Automation.StepType
   alias UserDocs.Web.Annotation
   alias UserDocs.Automation.Process
+  alias UserDocs.Media.Screenshot
+  alias UserDocs.Automation.Step.Name
 
+  @derive {Jason.Encoder, only: [:order, :name, :url, :text, :width, :height, :page_reference,
+    :screenshot, :page, :process, :element, :annotation, :step_type]}
   schema "steps" do
     field :order, :integer
     field :name, :string
@@ -16,6 +20,8 @@ defmodule UserDocs.Automation.Step do
     field :width, :integer
     field :height, :integer
     field :page_reference, :string
+
+    has_one :screenshot, Screenshot
 
     belongs_to :page, Page
     belongs_to :process, Process
@@ -41,11 +47,21 @@ defmodule UserDocs.Automation.Step do
     |> validate_required([:order])
   end
 
-  def safe(step, handlers) do
-    annotation_handler = Map.get(handlers, :annotation)
-    element_handler = Map.get(handlers, :element)
-    step_type_handler = Map.get(handlers, :step_type)
+  def handle_changes(changes, state) do
+    UserDocs.Automation.Step.ChangeHandler.execute(changes, state)
+  end
 
+  def safe(annotation, handlers \\ %{})
+  def safe(step = %UserDocs.Automation.Step{}, handlers) do
+    base_safe(step)
+    |> maybe_safe_step_type(handlers[:step_type], step.step_type, handlers)
+    |> maybe_safe_annotation(handlers[:annotation], step.annotation, handlers)
+    |> maybe_safe_element(handlers[:element], step.element, handlers)
+    |> maybe_safe_screenshot(handlers[:screenshot], step.screenshot, handlers)
+  end
+  def safe(nil, _), do: nil
+
+  def base_safe(step) do
     %{
       id: step.id,
       order: step.order,
@@ -55,10 +71,30 @@ defmodule UserDocs.Automation.Step do
       width: step.width,
       height: step.height,
       page_reference: step.page_reference,
-
-      annotation: annotation_handler.(step.annotation, handlers),
-      element: element_handler.(step.element, handlers),
-      step_type: step_type_handler.(step.step_type, handlers)
     }
+  end
+
+  def maybe_safe_step_type(step, nil, _, _), do: step
+  def maybe_safe_step_type(step, handler, step_type, handlers) do
+    Map.put(step, :step_type, handler.(step_type, handlers))
+  end
+
+  def maybe_safe_annotation(step, nil, _, _), do: step
+  def maybe_safe_annotation(step, handler, annotation, handlers) do
+    Map.put(step, :annotation, handler.(annotation, handlers))
+  end
+
+  def maybe_safe_element(step, nil, _, _), do: step
+  def maybe_safe_element(step, handler, element, handlers) do
+    Map.put(step, :element, handler.(element, handlers))
+  end
+
+  def maybe_safe_screenshot(step, nil, _, _), do: step
+  def maybe_safe_screenshot(step, handler, screenshot, handlers) do
+    Map.put(step, :screenshot, handler.(screenshot, handlers))
+  end
+
+  def name(step = %UserDocs.Automation.Step{}) do
+    Name.execute(step)
   end
 end

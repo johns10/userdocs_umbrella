@@ -7,6 +7,8 @@ defmodule UserDocs.Repo.Migrations.CreateProjects do
       add :base_url, :string
       add :team_id, references(:teams, on_delete: :nothing)
 
+      add :default_version_id, :integer
+
       timestamps()
     end
 

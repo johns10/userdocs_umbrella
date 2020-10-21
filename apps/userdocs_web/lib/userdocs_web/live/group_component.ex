@@ -24,7 +24,8 @@ defmodule UserDocsWeb.GroupComponent do
           <div class="card-content <%= Layout.is_hidden?(assigns) %>">
             <div class="content">
               <%= for(object <- @objects) do %>
-                <%= live_show(@socket, @header, @show, @form,
+                <%=
+                  live_show(@socket, @header, @show, @form,
                   id: Atom.to_string(@type) <> "-"
                     <> Integer.to_string(object.id)
                     <> "-show",
@@ -32,6 +33,9 @@ defmodule UserDocsWeb.GroupComponent do
                   select_lists: @select_lists,
                   type: @type,
                   object: object,
+                  current_user: @current_user,
+                  current_team: @current_team,
+                  current_version: @current_version,
                   parent: @parent,
                   action: :edit,
                   struct: @struct,
@@ -44,6 +48,9 @@ defmodule UserDocsWeb.GroupComponent do
             type: @type,
             struct: @struct,
             object: %{},
+            current_user: @current_user,
+            current_team: @current_team,
+            current_version: @current_version,
             parent: @parent,
             parent_type: @parent_type,
             id: Atom.to_string(@parent_type) <> "-"

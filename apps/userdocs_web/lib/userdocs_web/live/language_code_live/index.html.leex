@@ -1,0 +1,35 @@
+<h1>Listing Language codes</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket, UserDocsWeb.LanguageCodeLive.FormComponent,
+    id: @language_code.id || :new,
+    title: @page_title,
+    action: @live_action,
+    language_code: @language_code,
+    return_to: Routes.language_code_index_path(@socket, :index) %>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Code</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="language_codes">
+    <%= for language_code <- @language_codes do %>
+      <tr id="language_code-<%= language_code.id %>">
+        <td><%= language_code.code %></td>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.language_code_show_path(@socket, :show, language_code) %></span>
+          <span><%= live_patch "Edit", to: Routes.language_code_index_path(@socket, :edit, language_code) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: language_code.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Language code", to: Routes.language_code_index_path(@socket, :new) %></span>

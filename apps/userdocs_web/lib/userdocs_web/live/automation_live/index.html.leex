@@ -1,26 +1,189 @@
-<span><%= link "Sign in", to: "http://localhost:4000/session/new" %></span>
-<span><%= link "Delete", to: "http://localhost:4000/session", method: :delete %></span>
+<main role="main" class="container">
+  <h2>Team</h2>
+  Default Team ID: <%= @current_user.default_team_id %></br>
+  Selected Team ID: <%= @selected_team_id %></br>
+  Current Team ID: <%= @current_team_id %></br>
+  Current Team Name: <%= @current_team.name %></br>
+  Current Team Default Project Id changeset: <%= @current_team_changeset.data.default_project_id %></br>
+  Current Team Default Project Id: <%= @current_team.default_project_id %></br>
+  Selected Project ID: <%= @selected_project_id %></br>
+  Current Project ID: <%= @current_project_id %></br>
+  Current Project Default Version Id: <%= @current_project.default_version_id %></br>
+  Current Version ID: <%= @current_version_id %></br>
 
-<%= live_component(@socket, UserDocsWeb.VersionLive.ShowComponent,
-[
-  available_versions: @available_versions,
-  version: @version
-]) %>
+  <%= if @live_action in [:new, :edit] do %>
+    <%=
+      case @form_type do
+        :version ->
+          live_modal @socket, UserDocsWeb.VersionLive.FormComponent,
+            id: @current_version.id || :new,
+            title: @title,
+            action: @live_action,
+            version: @current_version,
+            parent: @current_project,
+            return_to: Routes.automation_index_path(@socket, :index)
+        :project ->
+          live_modal @socket, UserDocsWeb.ProjectLive.FormComponent,
+            id: @current_project.id || :new,
+            title: @title,
+            action: @live_action,
+            project: @current_project,
+            parent: @current_team,
+            versions: @versions,
+            teams: @teams,
+            select_lists: %{
+              available_teams: @teams,
+              available_versions: @versions
+            },
+            return_to: Routes.automation_index_path(@socket, :index)
+        :content ->
+          live_modal @socket, UserDocsWeb.ContentLive.FormComponent,
+            id: @current_content.id || :new,
+            title: @title,
+            action: @live_action,
+            content: @current_content,
+            parent: @current_team,
+            current_user: @current_user,
+            select_lists: %{
+              teams: @teams
+            },
+            return_to: Routes.automation_index_path(@socket, :index)
+        :element ->
+          live_modal @socket, UserDocsWeb.ElementLive.FormComponent,
+            id: @current_element.id || :new,
+            title: @title,
+            action: @live_action,
+            element: @current_element,
+            parent: @current_page,
+            current_user: @current_user,
+            select_lists: %{
+              teams: @teams
+            },
+            return_to: Routes.automation_index_path(@socket, :index)
+        :annotation ->
+          live_modal @socket, UserDocsWeb.AnnotationLive.FormComponent,
+            id: @current_annotation.id || :new,
+            title: @title,
+            action: @live_action,
+            annotation: @current_annotation,
+            parent: @current_page,
+            current_user: @current_user,
+            current_version: @current_version,
+            related_element_name: @current_element.name,
+            select_lists: %{
+              teams: @teams
+            },
+            return_to: Routes.automation_index_path(@socket, :index)
+      end
+    %>
+  <% end %>
 
-<%= live_component(@socket, UserDocsWeb.ScreenShotHandler,
-[
-  id: "screenshot-handler-component"
-]) %>
+  <div class="field is-grouped">
+    <p class="control">
+      <%= UserDocsWeb.UserLive.ChangeCurrentTeam.render(assigns,
+        @current_user_changeset, @available_teams, "update_selected_team") %>
+    </p>
+    <p class="control">
+      <div class="field has-addons">
+        <div class="control">
+          <button class="button" phx-click="new-project" >
+            <span class="icon" >
+              <i class="fa fa-plus" aria-hidden="true"></i>
+            </span>
+          </span>
+        </div>
+        <%= UserDocsWeb.TeamLive.CurrentProject.render(assigns,
+          @current_team_changeset, @available_projects, "update_selected_project") %>
+        <div class="control">
+          <button class="button" phx-click="edit-project">
+            <span class="icon" >
+              <i class="fa fa-edit" aria-hidden="true"></i>
+            </span>
+          </span>
+        </div>
+      </div>
+    </p>
+    <p class="control">
+      <div class="field has-addons">
+        <div class="control">
+          <button class="button" phx-click="new-version" >
+            <span class="icon" >
+              <i class="fa fa-plus" aria-hidden="true"></i>
+            </span>
+          </span>
+        </div>
+        <%= UserDocsWeb.ProjectLive.CurrentVersion.render(assigns,
+          @current_project_changeset, @available_versions, "update_selected_version") %>
+        <%= if @current_version != nil do %>
+          <div class="control">
+            <button class="button" phx-click="edit-version">
+              <span class="icon" >
+                <i class="fa fa-edit" aria-hidden="true"></i>
+              </span>
+            </span>
+          </div>
+        <% end %>
+      </div>
+    </p>
+  </div>
 
-<nav class="navbar is-fixed-bottom" role="navigation" aria-label="main navigation">
+  <%=
+      live_component(@socket, UserDocsWeb.VersionLive.ShowComponent,
+      [
+        available_versions: @versions,
+        select_lists: @select_lists,
+        version: @version,
+        current_user: @current_user,
+        current_team: @current_team,
+        current_version: @current_version
+      ])
+  %>
 
-  <div class="navbar-brand">
-    <div class="navbar-item">
-      <div class="field is-grouped">
-        <p class="control">
-          <input class="input" type="text" placeholder="Selector" id="selector-transfer-field">
-        </p>
+  <%= live_component(@socket, UserDocsWeb.ScreenShotHandler,
+  [ id: "screenshot-handler-component" ]) %>
+  <%= live_component(@socket, UserDocsWeb.SelectorHandler,
+  [ id: "selector-handler" ]) %>
+
+  <div id="selector-tester" phx-hook="testSelector"></div>
+
+  <nav class="navbar is-fixed-bottom" role="navigation" aria-label="main navigation">
+
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <div class="field is-grouped">
+          <%= f = form_for :current_strategy, "#", phx_change: "update_current_strategy"%>
+            <div class="control">
+              <div class="select">
+                <%= select f, :strategy_id, @strategies_select_options,
+                  value: @current_strategy.id,
+                  id: "current-strategy",
+                  phx_hook: "configure"
+                %>
+              </div>
+            </div>
+          </form>
+          <%= f = form_for :selected, "#" %>
+            <div>
+              <div class="select">
+                <%= select f, :strategy_transfer_field, @strategies_select_options,
+                  value: @transferred_strategy.id,
+                  id: "strategy-transfer-field",
+                  disabled: true
+                %>
+              </div>
+            </div>
+          </form>
+          <p class="control">
+            <input
+              class="input"
+              type="text"
+              placeholder="Selector"
+              id="selector-transfer-field"
+              value="<%= @transferred_selector %>"
+            >
+          </p>
+        </div>
       </div>
     </div>
-  </div>
-</nav>
+  </nav>
+</main>

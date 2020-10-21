@@ -1,12 +1,18 @@
 defmodule UserDocsWeb.ContentLive.Index do
   use UserDocsWeb, :live_view
+  use UserdocsWeb.LiveViewPowHelper
 
   alias UserDocs.Documents
   alias UserDocs.Documents.Content
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, :content_collection, list_content())}
+  def mount(_params, session, socket) do
+    {
+      :ok,
+      socket
+      |> maybe_assign_current_user(session)
+      |> assign(:content_collection, list_content())
+    }
   end
 
   @impl true

@@ -7,10 +7,12 @@ defmodule UserDocsWeb.StepTypeLive.FormComponent do
   def update(%{step_type: step_type} = assigns, socket) do
     changeset = Automation.change_step_type(step_type)
 
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign(:changeset, changeset)}
+    {
+      :ok,
+      socket
+      |> assign(assigns)
+      |> assign(:changeset, changeset)
+    }
   end
 
   @impl true

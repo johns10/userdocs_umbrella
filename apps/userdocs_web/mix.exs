@@ -40,7 +40,7 @@ defmodule UserDocsWeb.MixProject do
     [
       {:phoenix, "~> 1.5.3"},
       {:phoenix_ecto, "~> 4.0"},
-      {:phoenix_live_view, "~> 0.14.0"},
+      {:phoenix_live_view, "~> 0.14.7"},
       {:floki, ">= 0.0.0", only: :test},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
@@ -52,7 +52,12 @@ defmodule UserDocsWeb.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:pow, "~> 1.0.20"},
-      {:dialyxir, "~> 0.5.0", only: [:dev], runtime: false}
+      {:uuid, "~> 1.1"},
+      {:dialyxir, "~> 0.5.0", only: [:dev], runtime: false},
+      {:ex_doc, "~> 0.22", only: :dev, runtime: false},
+      {:cors_plug, "~> 2.0"},
+      {:phx_gen_auth, "~> 0.5", only: [:dev], runtime: false},
+      {:pbkdf2_elixir, "~> 1.0"},
     ]
   end
 

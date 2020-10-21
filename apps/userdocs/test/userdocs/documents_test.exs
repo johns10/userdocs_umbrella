@@ -63,4 +63,189 @@ defmodule UserDocs.DocumentsTest do
       assert %Ecto.Changeset{} = Documents.change_content(content)
     end
   end
+
+  describe "documents" do
+    alias UserDocs.Documents.Document
+
+    @valid_attrs %{body: %{}, name: "some name", title: "some title"}
+    @update_attrs %{body: %{}, name: "some updated name", title: "some updated title"}
+    @invalid_attrs %{body: nil, name: nil, title: nil}
+
+    def document_fixture(attrs \\ %{}) do
+      {:ok, document} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Documents.create_document()
+
+      document
+    end
+
+    test "list_documents/0 returns all documents" do
+      document = document_fixture()
+      assert Documents.list_documents() == [document]
+    end
+
+    test "get_document!/1 returns the document with given id" do
+      document = document_fixture()
+      assert Documents.get_document!(document.id) == document
+    end
+
+    test "create_document/1 with valid data creates a document" do
+      assert {:ok, %Document{} = document} = Documents.create_document(@valid_attrs)
+      assert document.body == %{}
+      assert document.name == "some name"
+      assert document.title == "some title"
+    end
+
+    test "create_document/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Documents.create_document(@invalid_attrs)
+    end
+
+    test "update_document/2 with valid data updates the document" do
+      document = document_fixture()
+      assert {:ok, %Document{} = document} = Documents.update_document(document, @update_attrs)
+      assert document.body == %{}
+      assert document.name == "some updated name"
+      assert document.title == "some updated title"
+    end
+
+    test "update_document/2 with invalid data returns error changeset" do
+      document = document_fixture()
+      assert {:error, %Ecto.Changeset{}} = Documents.update_document(document, @invalid_attrs)
+      assert document == Documents.get_document!(document.id)
+    end
+
+    test "delete_document/1 deletes the document" do
+      document = document_fixture()
+      assert {:ok, %Document{}} = Documents.delete_document(document)
+      assert_raise Ecto.NoResultsError, fn -> Documents.get_document!(document.id) end
+    end
+
+    test "change_document/1 returns a document changeset" do
+      document = document_fixture()
+      assert %Ecto.Changeset{} = Documents.change_document(document)
+    end
+  end
+
+  describe "content_versions" do
+    alias UserDocs.Documents.ContentVersion
+
+    @valid_attrs %{body: "some body", language_code: "some language_code", name: "some name"}
+    @update_attrs %{body: "some updated body", language_code: "some updated language_code", name: "some updated name"}
+    @invalid_attrs %{body: nil, language_code: nil, name: nil}
+
+    def content_version_fixture(attrs \\ %{}) do
+      {:ok, content_version} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Documents.create_content_version()
+
+      content_version
+    end
+
+    test "list_content_versions/0 returns all content_versions" do
+      content_version = content_version_fixture()
+      assert Documents.list_content_versions() == [content_version]
+    end
+
+    test "get_content_version!/1 returns the content_version with given id" do
+      content_version = content_version_fixture()
+      assert Documents.get_content_version!(content_version.id) == content_version
+    end
+
+    test "create_content_version/1 with valid data creates a content_version" do
+      assert {:ok, %ContentVersion{} = content_version} = Documents.create_content_version(@valid_attrs)
+      assert content_version.body == "some body"
+      assert content_version.language_code == "some language_code"
+      assert content_version.name == "some name"
+    end
+
+    test "create_content_version/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Documents.create_content_version(@invalid_attrs)
+    end
+
+    test "update_content_version/2 with valid data updates the content_version" do
+      content_version = content_version_fixture()
+      assert {:ok, %ContentVersion{} = content_version} = Documents.update_content_version(content_version, @update_attrs)
+      assert content_version.body == "some updated body"
+      assert content_version.language_code == "some updated language_code"
+      assert content_version.name == "some updated name"
+    end
+
+    test "update_content_version/2 with invalid data returns error changeset" do
+      content_version = content_version_fixture()
+      assert {:error, %Ecto.Changeset{}} = Documents.update_content_version(content_version, @invalid_attrs)
+      assert content_version == Documents.get_content_version!(content_version.id)
+    end
+
+    test "delete_content_version/1 deletes the content_version" do
+      content_version = content_version_fixture()
+      assert {:ok, %ContentVersion{}} = Documents.delete_content_version(content_version)
+      assert_raise Ecto.NoResultsError, fn -> Documents.get_content_version!(content_version.id) end
+    end
+
+    test "change_content_version/1 returns a content_version changeset" do
+      content_version = content_version_fixture()
+      assert %Ecto.Changeset{} = Documents.change_content_version(content_version)
+    end
+  end
+
+  describe "language_codes" do
+    alias UserDocs.Documents.LanguageCode
+
+    @valid_attrs %{code: "some code"}
+    @update_attrs %{code: "some updated code"}
+    @invalid_attrs %{code: nil}
+
+    def language_code_fixture(attrs \\ %{}) do
+      {:ok, language_code} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Documents.create_language_code()
+
+      language_code
+    end
+
+    test "list_language_codes/0 returns all language_codes" do
+      language_code = language_code_fixture()
+      assert Documents.list_language_codes() == [language_code]
+    end
+
+    test "get_language_code!/1 returns the language_code with given id" do
+      language_code = language_code_fixture()
+      assert Documents.get_language_code!(language_code.id) == language_code
+    end
+
+    test "create_language_code/1 with valid data creates a language_code" do
+      assert {:ok, %LanguageCode{} = language_code} = Documents.create_language_code(@valid_attrs)
+      assert language_code.code == "some code"
+    end
+
+    test "create_language_code/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Documents.create_language_code(@invalid_attrs)
+    end
+
+    test "update_language_code/2 with valid data updates the language_code" do
+      language_code = language_code_fixture()
+      assert {:ok, %LanguageCode{} = language_code} = Documents.update_language_code(language_code, @update_attrs)
+      assert language_code.code == "some updated code"
+    end
+
+    test "update_language_code/2 with invalid data returns error changeset" do
+      language_code = language_code_fixture()
+      assert {:error, %Ecto.Changeset{}} = Documents.update_language_code(language_code, @invalid_attrs)
+      assert language_code == Documents.get_language_code!(language_code.id)
+    end
+
+    test "delete_language_code/1 deletes the language_code" do
+      language_code = language_code_fixture()
+      assert {:ok, %LanguageCode{}} = Documents.delete_language_code(language_code)
+      assert_raise Ecto.NoResultsError, fn -> Documents.get_language_code!(language_code.id) end
+    end
+
+    test "change_language_code/1 returns a language_code changeset" do
+      language_code = language_code_fixture()
+      assert %Ecto.Changeset{} = Documents.change_language_code(language_code)
+    end
+  end
 end

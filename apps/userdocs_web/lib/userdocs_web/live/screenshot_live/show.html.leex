@@ -1,0 +1,22 @@
+<h1>Show Screenshot</h1>
+
+<%= if @live_action in [:edit] do %>
+  <%= live_modal @socket, UserDocsWeb.ScreenshotLive.FormComponent,
+    id: @screenshot.id,
+    title: @page_title,
+    action: @live_action,
+    screenshot: @screenshot,
+    return_to: Routes.screenshot_show_path(@socket, :show, @screenshot) %>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @screenshot.name %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.screenshot_show_path(@socket, :edit, @screenshot), class: "button" %></span>
+<span><%= live_redirect "Back", to: Routes.screenshot_index_path(@socket, :index) %></span>

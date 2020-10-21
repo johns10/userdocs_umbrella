@@ -4,12 +4,15 @@ defmodule UserDocs.Media do
   """
 
   import Ecto.Query, warn: false
-  import ImageBase64Handler
-  import UUID
+
+  require Logger
+
+  alias UserDocsWeb.Endpoint
 
   alias UserDocs.Repo
-
   alias UserDocs.Media.File
+  alias UserDocs.Media.FileHelpers
+  alias UserDocs.Media.ScreenshotHelpers
 
   @doc """
   Returns the list of files.
@@ -40,6 +43,8 @@ defmodule UserDocs.Media do
   """
   def get_file!(id), do: Repo.get!(File, id)
 
+  @spec create_file(:invalid | %{optional(:__struct__) => none, optional(atom | binary) => any}) ::
+          any
   @doc """
   Creates a file.
 
@@ -58,59 +63,28 @@ defmodule UserDocs.Media do
     |> Repo.insert()
   end
 
-  def encode_hash_create_file(%{ "encoded_image" => raw_encoded_image}) do
-
-    [ meta_text | [ encoded_image | _ ] ] = String.split(raw_encoded_image, ",")
-    meta = image_meta(meta_text)
-
-    file_name = UUID.uuid4() <> "." <> meta.image_type
-
-    encoded_image
-    |> base64ToImage(file_name)
-
-    hash =
-      Elixir.File.stream!(file_name, [], 2048)
-      |> sha256()
-
-    {:ok, file_stats} = Elixir.File.stat(file_name)
-
-    file_attrs = %{
-      filename: file_name,
-      hash: hash,
-      size: file_stats.size,
-      content_type: meta.image_type
+  def create_file_and_screenshot(payload = %{ "encoded_image" => raw_encoded_image, "id" => step_id,
+    "step_type" => %{ "name" => step_type_name }, "element" => element
+    }) do
+      IO.puts("create_file_and_screenshot")
+      # IO.inspect(step_type_name)
+      # IO.inspect(element)
+    %{
+      name: "Screenshot for step #{step_id}",
+      file_id: nil,
+      step_id: step_id,
     }
-
-    %File{}
-    |> File.changeset(file_attrs)
-    |> Repo.insert()
+    |> upsert_screenshot()
+    |> ScreenshotHelpers.handle_screenshot_upsert_results()
+    |> ScreenshotHelpers.handle_screenshots_file(raw_encoded_image)
+    |> ScreenshotHelpers.maybe_resize_image(step_type_name, element)
+    |> ScreenshotHelpers.handle_file_disposition()
   end
-  def encode_hash_create_file(%{}), do: { :error, "Missing encoded image.  Failed to create file"}
-  def encode_hash_create_file(_) do
+  def create_file_and_screenshot(%{}), do: { :error, "Missing encoded image.  Failed to create file"}
+  def create_file_and_screenshot(_) do
     raise(ArgumentError, message: "Passed an invalid variable to " <> Atom.to_string(__MODULE__))
   end
 
-  defp image_meta(meta) do
-    [ "data:" <> type | [ encoding ]] = String.split(meta, ";")
-    "image/" <> image_type = type
-
-    %{
-      type: type,
-      encoding: encoding,
-      image_type: image_type
-    }
-  end
-
-  def sha256(chunks_enum) do
-    chunks_enum
-    |> Enum.reduce(
-        :crypto.hash_init(:sha256),
-        &(:crypto.hash_update(&2, &1))
-    )
-    |> :crypto.hash_final()
-    |> Base.encode16()
-    |> String.downcase()
-  end
   @doc """
   Updates a file.
 
@@ -156,5 +130,171 @@ defmodule UserDocs.Media do
   """
   def change_file(%File{} = file, attrs \\ %{}) do
     File.changeset(file, attrs)
+  end
+
+  alias UserDocs.Media.Screenshot
+
+  @doc """
+  Returns the list of screenshots.
+
+  ## Examples
+
+      iex> list_screenshots()
+      [%Screenshot{}, ...]
+
+  """
+  def list_screenshots(params \\ %{}, filters \\ %{}) do
+    base_screenshots_query()
+    |> maybe_filter_screenshots_by_version(filters[:version_id])
+    |> maybe_filter_by_step_id(filters[:step_id])
+    |> maybe_preload_files(params[:file])
+    |> Repo.all()
+  end
+
+  defp maybe_filter_screenshots_by_version(query, nil), do: query
+  defp maybe_filter_screenshots_by_version(query, version_id) do
+    from(screenshot in query,
+      left_join: step in assoc(screenshot, :step),
+      left_join: process in assoc(step, :process),
+      where: process.version_id == ^version_id,
+      order_by: step.order
+    )
+  end
+
+  defp maybe_preload_files(query, nil), do: query
+  defp maybe_preload_files(query, _) do
+    from(screenshots in query, preload: [:file])
+  end
+
+  defp maybe_filter_by_step_id(query, nil), do: query
+  defp maybe_filter_by_step_id(query, step_id) do
+    from(screenshot in query,
+      where: screenshot.step_id == ^step_id
+    )
+  end
+
+  defp base_screenshots_query(), do: from(screenshots in Screenshot)
+
+  @doc """
+  Gets a single screenshot.
+
+  Raises `Ecto.NoResultsError` if the Screenshot does not exist.
+
+  ## Examples
+
+      iex> get_screenshot!(123)
+      %Screenshot{}
+
+      iex> get_screenshot!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_screenshot!(id), do: Repo.get!(Screenshot, id)
+
+  @doc """
+  Creates a screenshot.
+
+  ## Examples
+
+      iex> create_screenshot(%{field: value})
+      {:ok, %Screenshot{}}
+
+      iex> create_screenshot(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_screenshot(attrs \\ %{}) do
+    { status, screenshot } =
+      %Screenshot{}
+      |> Screenshot.changeset(attrs)
+      |> Repo.insert()
+
+    screenshot =
+      case status do
+        :ok -> screenshot
+        _ -> screenshot
+      end
+
+    Endpoint.broadcast("screenshot", "create", screenshot)
+
+    { status, screenshot }
+  end
+
+  @doc """
+  Updates a screenshot.
+
+  ## Examples
+
+      iex> update_screenshot(screenshot, %{field: new_value})
+      {:ok, %Screenshot{}}
+
+      iex> update_screenshot(screenshot, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_screenshot(%Screenshot{} = screenshot, attrs) do
+    { status, screenshot } =
+      screenshot
+      |> Screenshot.changeset(attrs)
+      |> Repo.update()
+
+    screenshot =
+      case status do
+        :ok -> screenshot
+        _ -> screenshot
+      end
+
+    Endpoint.broadcast("screenshot", "update", screenshot)
+
+    {status, screenshot}
+  end
+  def update_screenshot(%Ecto.Changeset{} = screenshot) do
+    { status, screenshot } = Repo.update(screenshot)
+
+    screenshot =
+      case status do
+        :ok -> screenshot
+        _ -> screenshot
+      end
+
+    Endpoint.broadcast("screenshot", "update", screenshot)
+
+    {status, screenshot}
+  end
+
+  def upsert_screenshot(attrs \\ %{}) do
+    %Screenshot{}
+    |> Screenshot.changeset(attrs)
+    |> Repo.insert(on_conflict: :nothing)
+  end
+
+
+  @doc """
+  Deletes a screenshot.
+
+  ## Examples
+
+      iex> delete_screenshot(screenshot)
+      {:ok, %Screenshot{}}
+
+      iex> delete_screenshot(screenshot)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_screenshot(%Screenshot{} = screenshot) do
+    Repo.delete(screenshot)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking screenshot changes.
+
+  ## Examples
+
+      iex> change_screenshot(screenshot)
+      %Ecto.Changeset{data: %Screenshot{}}
+
+  """
+  def change_screenshot(%Screenshot{} = screenshot, attrs \\ %{}) do
+    Screenshot.changeset(screenshot, attrs)
   end
 end

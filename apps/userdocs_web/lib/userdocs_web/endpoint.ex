@@ -7,7 +7,9 @@ defmodule UserDocsWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_userdocs_web_key",
-    signing_salt: "zbnhmPNC"
+    signing_salt: "zbnhmPNC",
+    http_only: false,
+    same_site: false
   ]
 
   socket "/socket", UserDocsWeb.UserSocket,
@@ -51,5 +53,6 @@ defmodule UserDocsWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
   plug Pow.Plug.Session, otp_app: :userdocs_web
+  plug CORSPlug
   plug UserDocsWeb.Router
 end

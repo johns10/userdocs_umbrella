@@ -19,6 +19,42 @@ import {LiveSocket} from "phoenix_live_view"
 
 
 let Hooks = {}
+Hooks.editorSource = {
+  mounted() {
+    this.el.addEventListener("dragstart", e => {
+      console.log("Moving")
+      e.dataTransfer.dropEffect = "move";
+      const payload = {
+        "id": e.srcElement.attributes.id.value,
+        "type": e.srcElement.attributes.type.value
+      }
+      this.pushEvent("editor_drag_start", payload)
+    })
+  }
+}
+Hooks.docubit = {
+  mounted() {
+    this.el.addEventListener("drop", e => {
+      console.log("Dropping")
+      console.log()
+      e.preventDefault();
+      const payload = { 
+        "column-count": e.target.getAttribute("column-count"),
+        "row-count": e.target.getAttribute("row-count") ,
+        "element-id": e.target.getAttribute("element-id")
+      }
+      this.pushEvent("docubit_drop", payload)
+    })
+    this.el.addEventListener("dragenter", e => {
+      e.dataTransfer.dropEffect = 'move'
+      e.preventDefault();
+    })
+    this.el.addEventListener("dragover", e => {
+      e.dataTransfer.dropEffect = 'move'
+      e.preventDefault();
+    })
+  }
+}
 Hooks.executeStep = {
   mounted() {
     this.el.addEventListener("click", e => {
@@ -92,7 +128,6 @@ Hooks.testSelector = {
     });
   }
 };
-
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {

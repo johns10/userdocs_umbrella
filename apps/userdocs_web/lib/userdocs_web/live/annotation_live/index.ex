@@ -1,12 +1,18 @@
 defmodule UserDocsWeb.AnnotationLive.Index do
   use UserDocsWeb, :live_view
+  use UserdocsWeb.LiveViewPowHelper
+
 
   alias UserDocs.Web
   alias UserDocs.Web.Annotation
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, :annotations, list_annotations())}
+  def mount(_params, session, socket) do
+    {:ok,
+      socket
+      |> maybe_assign_current_user(session)
+      |> assign(:annotations, list_annotations())
+    }
   end
 
   @impl true
@@ -41,6 +47,6 @@ defmodule UserDocsWeb.AnnotationLive.Index do
   end
 
   defp list_annotations do
-    Web.list_annotations()
+    Web.list_annotations(%{content: true})
   end
 end

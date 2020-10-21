@@ -1,0 +1,17 @@
+<header class="card-header">
+  <p
+    class="card-header-title"
+    style="margin-bottom:0px;"
+  >
+    <%= @inner_content || "No Name" %>
+  </p>
+  <a
+    class="card-header-icon"
+    phx-click="<%= @expand_event %>"
+    phx-target="<%= @target %>"
+    aria-label="expand">
+    <span class="icon" >
+      <i class="fa fa-angle-down" aria-hidden="true"></i>
+    </span>
+  </a>
+</header>

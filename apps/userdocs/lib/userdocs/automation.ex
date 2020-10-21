@@ -3,6 +3,8 @@ defmodule UserDocs.Automation do
   The Automation context.
   """
 
+  require Logger
+
   import Ecto.Query, warn: false
   alias UserDocs.Repo
   alias UserDocsWeb.Endpoint
@@ -13,20 +15,31 @@ defmodule UserDocs.Automation do
     Repo.one from version in Projects.Version,
       where: version.id == ^version_id,
       left_join: pages in assoc(version, :pages), order_by: pages.order,
+      left_join: elements in assoc(pages, :elements), order_by: elements.name,
       left_join: processes in assoc(version, :processes), order_by: processes.order,
       left_join: annotations in assoc(pages, :annotations), order_by: annotations.name,
       left_join: steps in assoc(processes, :steps), order_by: steps.order,
+      left_join: screenshot in assoc(steps, :screenshot), order_by: screenshot.name,
       left_join: annotation in assoc(steps, :annotation), order_by: annotation.name,
+      left_join: element in assoc(steps, :element), order_by: element.name,
+      left_join: content in assoc(annotation, :content), order_by: content.name,
       preload: [
         :pages,
         pages: :elements,
+        pages: {pages, elements: {elements, :strategy}},
         pages: :annotations,
         pages: {pages, annotations: {annotations, :annotation_type}},
         processes: {processes, :steps},
         processes: {processes, steps: {steps, :step_type}},
         processes: {processes, steps: {steps, :element}},
         processes: {processes, steps: {steps, :annotation}},
-        processes: {processes, steps: {steps, annotation: {annotation, :annotation_type}}}
+        processes: {processes, steps: {steps, :screenshot}},
+        processes: {processes, steps: {steps, :page}},
+        processes: {processes, steps: {steps, element: {element, :strategy}}},
+        processes: {processes, steps: {steps, screenshot: {screenshot, :file}}},
+        processes: {processes, steps: {steps, annotation: {annotation, :annotation_type}}},
+        processes: {processes, steps: {steps, annotation: {annotation, :content}}},
+        processes: {processes, steps: {steps, annotation: {annotation, content: {content, :content_versions}}}}
       ]
   end
 
@@ -60,6 +73,12 @@ defmodule UserDocs.Automation do
 
   """
   def get_step_type!(id), do: Repo.get!(StepType, id)
+  def get_step_type!(%{ step_types: step_types }, id), do: get_step_type!(step_types, id)
+  def get_step_type!(step_types, id) when is_list(step_types) do
+    step_types
+    |> Enum.filter(fn(st) -> st.id == id end)
+    |> Enum.at(0)
+  end
 
   @spec create_step_type(
           :invalid
@@ -141,20 +160,103 @@ defmodule UserDocs.Automation do
       [%Step{}, ...]
 
   """
-  def list_steps(params \\ %{}, _filters \\ %{}) do
+  def list_steps(params \\ %{}, filters \\ %{}) do
     base_steps_query()
+    |> maybe_filter_by_process(filters[:process_id])
+    |> maybe_filter_steps_by_version(filters[:version_id])
+    |> maybe_filter_by_team(filters[:team_id])
     |> maybe_preload_processes(params[:processes])
+    |> maybe_preload_annotation(params[:annotation])
+    |> maybe_preload_annotation_type(params[:annotation_type])
+    |> maybe_preload_screenshot(params[:screenshot])
+    |> maybe_preload_step_type(params[:step_type])
+    |> maybe_preload_element(params[:element])
+    |> maybe_preload_content_versions(params[:content_versions])
+    |> maybe_preload_file(params[:content_versions])
     |> Repo.all()
   end
 
-  defp base_steps_query(), do: from(steps in Step)
-
-  defp maybe_preload_processes(query, nil), do: query
-  defp maybe_preload_processes(query, _) do
-    from(steps in query, preload: [:processes])
+  defp maybe_filter_steps_by_version(query, nil), do: query
+  defp maybe_filter_steps_by_version(query, version_id) do
+    from(step in query,
+      left_join: process in assoc(step, :process),
+      where: process.version_id == ^version_id,
+      order_by: step.order
+    )
   end
 
+  defp maybe_preload_file(query, nil), do: query
+  defp maybe_preload_file(query, _) do
+    from(step in query,
+      left_join: screenshot in assoc(step, :screenshot), order_by: screenshot.name,
+      preload: [
+        :screenshot,
+        screenshot: :file
+      ])
+  end
 
+  defp maybe_preload_annotation_type(query, nil), do: query
+  defp maybe_preload_annotation_type(query, _) do
+    from(step in query,
+      left_join: annotation in assoc(step, :annotation), order_by: annotation.name,
+      left_join: annotation_type in assoc(annotation, :annotation_type),
+      preload: [
+        :annotation,
+        annotation: :annotation_type
+      ])
+  end
+
+  defp maybe_filter_by_team(query, nil), do: query
+  defp maybe_filter_by_team(query, team_id) do
+    from(step in query,
+      left_join: process in assoc(step, :process),
+      left_join: version in assoc(process, :version),
+      left_join: project in assoc(version, :project),
+      where: project.team_id == ^team_id,
+      order_by: step.order
+    )
+  end
+
+  defp maybe_filter_by_process(query, nil), do: query
+  defp maybe_filter_by_process(query, process_id) do
+    from(step in query,
+      where: step.process_id == ^process_id,
+      order_by: step.order
+    )
+  end
+
+  defp maybe_preload_content_versions(query, nil), do: query
+  defp maybe_preload_content_versions(query, _) do
+    from(step in query,
+      left_join: annotation in assoc(step, :annotation), order_by: annotation.name,
+      left_join: content in assoc(annotation, :content), order_by: content.name,
+      preload: [
+        :annotation,
+        annotation: :content,
+        annotation: {annotation, content: {content, :content_versions}}
+      ])
+  end
+
+  defp maybe_preload_step_type(query, nil), do: query
+  defp maybe_preload_step_type(query, _), do: from(steps in query, preload: [:step_type])
+
+  defp maybe_preload_annotation(query, nil), do: query
+  defp maybe_preload_annotation(query, _), do: from(steps in query, preload: [:annotation])
+
+  defp maybe_preload_screenshot(query, nil), do: query
+  defp maybe_preload_screenshot(query, _), do: from(steps in query, preload: [:screenshot])
+
+  defp maybe_preload_processes(query, nil), do: query
+  defp maybe_preload_processes(query, _), do: from(steps in query, preload: [:processes])
+
+  defp maybe_preload_element(query, nil), do: query
+  defp maybe_preload_element(query, _), do: from(steps in query, preload: [:element])
+
+
+  defp base_steps_query(), do: from(steps in Step)
+
+
+  @spec get_step!(any, nil | maybe_improper_list | map) :: any
   @doc """
   Gets a single step.
 
@@ -169,7 +271,17 @@ defmodule UserDocs.Automation do
       ** (Ecto.NoResultsError)
 
   """
-  def get_step!(id), do: Repo.get!(Step, id)
+  def get_step!(id, params \\ %{}) do
+    base_step_query(id)
+    |> maybe_preload_element(params[:element])
+    |> maybe_preload_annotation(params[:element])
+    |> Repo.one!()
+  end
+
+  defp base_step_query(id) do
+    from(step in Step, where: step.id == ^id)
+  end
+
 
   @doc """
   Creates a step.
@@ -212,7 +324,38 @@ defmodule UserDocs.Automation do
       |> Step.changeset(attrs)
       |> Repo.update()
 
+    update_children(step)
     Endpoint.broadcast("step", "update", step)
+
+    {status, step}
+  end
+  def update_children(%{ annotation: annotation}) do
+    Endpoint.broadcast("annotation", "update", annotation)
+  end
+  def update_children(%{ element: element}) do
+    Endpoint.broadcast("element", "update", element)
+  end
+  def update_children(%{ content: content}) do
+    Endpoint.broadcast("content", "update", content)
+  end
+
+  def update_step_annotation_id(%Step{} = step, %{ name: name, annotation_id: annotation_id }) do
+    { status, step } =
+      step
+      |> Step.changeset(%{})
+      |> Ecto.Changeset.put_change(:annotation_id, annotation_id)
+      |> Ecto.Changeset.put_change(:name, name)
+      |> Repo.update()
+
+    {status, step}
+  end
+
+  def update_step_element_id(%Step{} = step, %{ element_id: element_id }) do
+    { status, step } =
+      step
+      |> Step.changeset(%{})
+      |> Ecto.Changeset.put_change(:element_id, element_id)
+      |> Repo.update()
 
     {status, step}
   end
@@ -344,6 +487,7 @@ defmodule UserDocs.Automation do
 
   alias UserDocs.Automation.Process
 
+  @spec list_processes(any, nil | maybe_improper_list | map) :: any
   @doc """
   Returns the list of processes.
 
@@ -353,10 +497,21 @@ defmodule UserDocs.Automation do
       [%Process{}, ...]
 
   """
-  def list_processes do
-    Repo.all from Process,
-      preload: []
+  def list_processes(_params \\ %{}, filters \\ %{}) do
+    base_processes_query()
+    |> maybe_filter_by_version(filters[:version_id])
+    |> Repo.all()
   end
+
+  defp maybe_filter_by_version(query, nil), do: query
+  defp maybe_filter_by_version(query, version_id) do
+    from(process in query,
+      where: process.version_id == ^version_id
+    )
+  end
+
+
+  defp base_processes_query(), do: from(processes in Process)
 
   @doc """
   Gets a single process.
@@ -372,11 +527,14 @@ defmodule UserDocs.Automation do
       ** (Ecto.NoResultsError)
 
   """
-  def get_process!(id, params \\ %{}) do
+  def get_process!(id, params \\ %{}) when is_integer(id) do
     base_process_query(id)
     |> maybe_preload_pages(params[:pages])
     |> maybe_preload_versions(params[:versions])
     |> Repo.one!()
+  end
+  def get_process!(state, id) when is_integer(id) do
+    UserDocs.State.get!(state, id, :processes, Process)
   end
 
   defp base_process_query(id) do

@@ -18,7 +18,6 @@ import NProgress from "nprogress"
 import {LiveSocket} from "phoenix_live_view"
 import {handle_message} from "./commands.js"
 
-
 chrome.runtime.onMessage.addListener(
 	function(message, sender, sendResponse) {
     console.log("Extension received message")
@@ -27,7 +26,7 @@ chrome.runtime.onMessage.addListener(
               "from the extension");
             
   console.log("handling message in the listener")
-  handle_message(message, 'extension')
+  handle_message(message, { environment: 'extension' })
 });
 
 const updateEvent = new CustomEvent('update', {
@@ -44,6 +43,35 @@ Hooks.fileTransfer = {
     })
   }
 };
+Hooks.selectorTransfer = {
+  mounted() {
+    this.el.addEventListener("selector", e => {
+      console.log("Got a selector")
+      console.log(e.detail)
+      this.pushEventTo('#selector-handler', "transfer_selector", e.detail)
+    })
+  }
+};
+Hooks.configure = {
+  mounted() {
+    this.handleEvent("configure", (message) => {
+      handle_message(message, { environment: 'extension' })
+    })
+  }
+};
+Hooks.testSelector = {
+  mounted() {
+    this.handleEvent("test_selector", (message) => {
+      console.log("Testing Selector");
+      console.log(message)
+      chrome.storage.local.get(['activeTabId'], function (result) {
+        message.payload.activeTabId = result.activeTabId
+        handle_message(message, {environment: 'extension'})
+      });
+    })
+  }
+};
+
 Hooks.jobRunner = {
   mounted() {
     this.handleEvent("message", (message) =>
@@ -57,7 +85,7 @@ Hooks.jobRunner = {
           chrome.storage.local.get(['activeTabId', 'activeWindowId'], function (result) {
             message.payload.activeTabId = result.activeTabId
             message.payload.activeWindowId = result.activeWindowId
-            handle_message(message, 'extension')
+            handle_message(message, { environment: 'extension' })
           })
         }
       }
@@ -72,6 +100,7 @@ Hooks.jobRunner = {
     })
   }
 };
+
 Hooks.executeStep = {
   mounted() {
     this.handleEvent("message", (message) =>
@@ -85,7 +114,7 @@ Hooks.executeStep = {
           chrome.storage.local.get(['activeTabId', 'activeWindowId'], function (result) {
             message.payload.activeTabId = result.activeTabId
             message.payload.activeWindowId = result.activeWindowId
-            handle_message(message, 'extension')
+            handle_message(message, { environment: 'extension' })
           })
         }
       }
@@ -101,46 +130,39 @@ Hooks.executeStep = {
     })
   }
 };
+
 Hooks.CopySelector = {
   mounted: function mounted() {
     this.el.addEventListener("click", function (e) {
       console.log("Copying Selector");
-      console.log(e.srcElement.attributes);
-      var selector = document.getElementById("selector-transfer-field").value;
-      var targetId = e.srcElement.attributes["target"].value;
-      var target = document.getElementById(targetId);
-      target.value = selector;
-    });
-  }
-};
-Hooks.testSelector = {
-  mounted: function mounted() {
-    this.el.addEventListener("click", function (e) {
-      console.log("Testing Selector");
-      chrome.storage.local.get(['activeTabId'], function (result) {
-        console.log(e.srcElement.attributes);
-        var message = {
-          type: 'command',
-          subType: 'testSelector',
-          target: result.activeTabId,
-          args: {
-            selector: e.srcElement.attributes["selector"].value
-          }
-        };
-        messageHandler.apply(message);
-      });
+      console.log(e.srcElement.attributes)
+
+      const selector = document.getElementById("selector-transfer-field").value;
+      const strategy = document.getElementById("strategy-transfer-field").value;
+
+      const selectorId = e.srcElement.attributes["selector"].value;
+      const strategyId = e.srcElement.attributes["strategy"].value;
+
+      const selectorField = document.getElementById(selectorId);
+      const strategyField = document.getElementById(strategyId);
+
+      selectorField.value = selector;
+      strategyField.value = strategy;
     });
   }
 };
 
 var xhr = new XMLHttpRequest();
 xhr.responseType = 'document';
-xhr.open('GET', 'http://localhost:4000/automation', true)
+xhr.open('GET', 'http://localhost:4000', true)
 xhr.onload = function(e) {
   document.documentElement.replaceChild(this.response.head, document.head)
   document.documentElement.replaceChild(this.response.body, document.body)
 
-  var csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+  console.log("hello")
+
+  let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+  console.log(csrfToken)
   let liveSocket = new LiveSocket("ws://localhost:4000/live", Socket, {
     params: { _csrf_token: csrfToken},
     hooks: Hooks

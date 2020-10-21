@@ -43,3 +43,8 @@ config :userdocs_web, :pow,
   user: UserDocs.Users.User,
   repo: UserDocs.Repo,
   cache_store_backend: Pow.Store.Backend.MnesiaCache
+
+config :cors_plug,
+  origin: ["chrome-extension://ohmjkpckjphdcdophkflpmdmihpiaejf", "http://localhost"],
+  max_age: 86400,
+  methods: ["GET", "POST", "OPTIONS"]

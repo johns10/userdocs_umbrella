@@ -5,10 +5,10 @@ defmodule UserDocs.Repo.Migrations.CreateUsers do
     create table(:users) do
       add :email, :string, null: false
       add :password_hash, :string
+      add :default_team_id, :integer
 
       timestamps()
     end
-
     create unique_index(:users, [:email])
   end
 end

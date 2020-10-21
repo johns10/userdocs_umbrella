@@ -7,8 +7,12 @@
   phx_submit: "save" %>
 
   <%= label f, :project_id %>
-  <%= select f, :project_id, DomainHelpers.select_list(Projects.list_projects) %>
+  <%= select f, :project_id, @projects_select_list %>
   <%= error_tag f, :project_id %>
+
+  <%= label f, :strategy_id %>
+  <%= select f, :strategy_id, @strategies_select_options %>
+  <%= error_tag f, :strategy_id %>
 
   <%= label f, :name %>
   <%= text_input f, :name %>

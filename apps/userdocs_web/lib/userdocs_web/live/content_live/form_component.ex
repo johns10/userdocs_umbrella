@@ -3,14 +3,21 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
 
   alias UserDocs.Documents
 
+  alias UserDocsWeb.DomainHelpers
+
   @impl true
   def update(%{content: content} = assigns, socket) do
     changeset = Documents.change_content(content)
 
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign(:changeset, changeset)}
+
+
+    {
+      :ok,
+      socket
+      |> assign(assigns)
+      |> assign(:teams_select_options, DomainHelpers.select_list_temp(assigns.select_lists.teams, :name, false))
+      |> assign(:changeset, changeset)
+    }
   end
 
   @impl true
@@ -33,7 +40,9 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Content updated successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+         # |> push_redirect(to: socket.assigns.return_to)
+         |> push_patch(to: socket.assigns.return_to)
+        }
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
@@ -46,7 +55,9 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Content created successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+         # |> push_redirect(to: socket.assigns.return_to)
+         |> push_patch(to: socket.assigns.return_to)
+        }
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}

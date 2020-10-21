@@ -1,0 +1,41 @@
+<h1>Listing Screenshots</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket, UserDocsWeb.ScreenshotLive.FormComponent,
+    id: @screenshot.id || :new,
+    title: @page_title,
+    action: @live_action,
+    screenshot: @screenshot,
+    return_to: Routes.screenshot_index_path(@socket, :index) %>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Step ID</th>
+      <th>File ID</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="screenshots">
+    <%= for screenshot <- @screenshots do %>
+      <tr id="screenshot-<%= screenshot.id %>">
+        <td><%= screenshot.id %></td>
+        <td><%= screenshot.name %></td>
+        <td><%= screenshot.step_id %></td>
+        <td><%= screenshot.file_id %></td>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.screenshot_show_path(@socket, :show, screenshot) %></span>
+          <span><%= live_patch "Edit", to: Routes.screenshot_index_path(@socket, :edit, screenshot) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: screenshot.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Screenshot", to: Routes.screenshot_index_path(@socket, :new) %></span>

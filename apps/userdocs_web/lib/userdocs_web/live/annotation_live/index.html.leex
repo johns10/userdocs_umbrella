@@ -6,6 +6,7 @@
     title: @page_title,
     action: @live_action,
     annotation: @annotation,
+    current_user: @current_user,
     return_to: Routes.annotation_index_path(@socket, :index) %>
 <% end %>
 
@@ -14,7 +15,6 @@
     <tr>
       <th>Name</th>
       <th>Label</th>
-      <th>Description</th>
 
       <th></th>
     </tr>
@@ -24,7 +24,6 @@
       <tr id="annotation-<%= annotation.id %>">
         <td><%= annotation.name %></td>
         <td><%= annotation.label %></td>
-        <td><%= annotation.description %></td>
 
         <td>
           <span><%= live_redirect "Show", to: Routes.annotation_show_path(@socket, :show, annotation) %></span>

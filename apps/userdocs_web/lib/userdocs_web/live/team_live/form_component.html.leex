@@ -16,5 +16,10 @@
   <%= text_input f, :name %>
   <%= error_tag f, :name %>
 
+  <%= label f, :default_project_id %>
+  <%= number_input f, :default_project_id %>
+  <%= error_tag f, :default_project_id %>
+
+
   <%= submit "Save", phx_disable_with: "Saving..." %>
 </form>
