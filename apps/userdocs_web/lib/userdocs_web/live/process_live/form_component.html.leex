@@ -7,6 +7,27 @@
 
   <h4><%= @title %></h2>
 
+  <%= if(:parent in assigns and @action in [:new]) do %>
+    <%= hidden_input f, :version_id,
+      value: @parent_id,
+      id: Layout.form_field_id(@maybe_action, f, :version_id,
+        "page", @parent_id) %>
+  <% else %>
+    <div class="field">
+      <%= label f, :version_id, class: :label %>
+      <div class="control">
+        <div class="select">
+          <%= select f, :version_id,
+            @available_versions,
+            value: @parent_id,
+            id: Layout.form_field_id(@maybe_action, f, :version_id,
+              "page", @parent_id) %>
+        </div>
+      </div>
+      <%= error_tag f, :version_id %>
+    </div>
+  <% end %>
+
   <div class="field">
     <%= label f, :order %>
     <div class="control">
@@ -15,7 +36,7 @@
         type: "text",
         readonly: @read_only,
         id: Layout.form_field_id(@maybe_action, f, :order,
-          "page", @maybe_parent_id) %>
+          "page", @parent_id) %>
     </div>
     <%= error_tag f, :order %>
   </div>
@@ -28,10 +49,12 @@
         type: "text",
         readonly: @read_only,
         id: Layout.form_field_id(@maybe_action, f, :name,
-          "page", @maybe_parent_id) %>
+          "page", @parent_id) %>
     </div>
     <%= error_tag f, :name %>
   </div>
+
+
 
   <%= if(LiveHelpers.maybe_action(assigns) in [:edit, :new]) do %>
     <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>

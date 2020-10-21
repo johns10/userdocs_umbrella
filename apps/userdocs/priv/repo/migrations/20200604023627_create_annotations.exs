@@ -5,7 +5,6 @@ defmodule UserDocs.Repo.Migrations.CreateAnnotations do
     create table(:annotations) do
       add :name, :string
       add :label, :string
-      add :description, :string
       add :x_orientation, :string
       add :y_orientation, :string
       add :size, :integer
@@ -19,6 +18,7 @@ defmodule UserDocs.Repo.Migrations.CreateAnnotations do
       add :annotation_type_id, references(:annotation_types, on_delete: :nothing)
       add :page_id, references(:pages, on_delete: :nothing)
       add :content_id, references(:content, on_delete: :nothing)
+      add :content_version_id, references(:content, on_delete: :nothing)
 
       timestamps()
     end

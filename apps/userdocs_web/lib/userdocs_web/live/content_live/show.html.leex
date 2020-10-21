@@ -16,11 +16,6 @@
     <%= @content.name %>
   </li>
 
-  <li>
-    <strong>Description:</strong>
-    <%= @content.description %>
-  </li>
-
 </ul>
 
 <span><%= live_patch "Edit", to: Routes.content_show_path(@socket, :edit, @content), class: "button" %></span>

@@ -2,6 +2,7 @@ defmodule UserDocs.Automation.StepType do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:args, :name]}
   schema "step_types" do
     field :args, {:array, :string}
     field :name, :string

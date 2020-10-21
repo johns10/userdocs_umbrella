@@ -47,8 +47,6 @@ defmodule UserDocsWeb.ProcessLive.Runner do
   @impl true
   def handle_event("update_status", %{ "status" => status } = payload, socket) do
 
-    IO.inspect(status)
-
     socket =
       socket
       |> assign(:status, String.to_atom(status))
@@ -56,12 +54,6 @@ defmodule UserDocsWeb.ProcessLive.Runner do
 
     {:noreply, socket}
   end
-
-  def maybe_strategy(nil), do: ""
-  def maybe_strategy(element), do: element.strategy
-
-  def maybe_selector(nil), do: ""
-  def maybe_selector(element), do: element.selector
 
   @impl true
   def mount(socket) do

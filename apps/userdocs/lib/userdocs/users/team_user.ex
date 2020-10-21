@@ -1,12 +1,15 @@
 defmodule UserDocs.Users.TeamUser do
   use Ecto.Schema
   import Ecto.Changeset
-  
+
+  alias UserDocs.Users.User
+  alias UserDocs.Users.Team
+
   @primary_key false
 
   schema "team_users" do
-    field :team_id, :id
-    field :user_id, :id
+    belongs_to :team, Team
+    belongs_to :user, User
 
     timestamps()
   end
@@ -15,6 +18,8 @@ defmodule UserDocs.Users.TeamUser do
   def changeset(team_user, attrs) do
     team_user
     |> cast(attrs, [:team_id, :user_id])
+    |> foreign_key_constraint(:team_id)
+    |> foreign_key_constraint(:user_id)
     |> validate_required([])
   end
 end

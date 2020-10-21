@@ -5,10 +5,13 @@ defmodule UserDocs.Web.Annotation do
   alias UserDocs.Web.AnnotationType
   alias UserDocs.Web.Page
   alias UserDocs.Documents.Content
+  alias UserDocs.Documents.ContentVersion
 
+  @derive {Jason.Encoder, only: [:name, :label, :x_orientation, :y_orientation,
+    :size, :color, :thickness, :x_offset, :y_offset, :font_size, :font_color, :page,
+    :annotation_type, :content, :content_version]}
   schema "annotations" do
     field :name, :string
-    field :description, :string
     field :label, :string
     field :x_orientation, :string
     field :y_orientation, :string
@@ -24,6 +27,7 @@ defmodule UserDocs.Web.Annotation do
 
     belongs_to :annotation_type, AnnotationType
     belongs_to :content, Content
+    belongs_to :content_version, ContentVersion
 
     timestamps()
   end
@@ -31,16 +35,25 @@ defmodule UserDocs.Web.Annotation do
   @doc false
   def changeset(annotation, attrs) do
     annotation
-    |> cast(attrs, [:name, :label, :description,
-    :x_orientation, :y_orientation, :size, :color, :thickness, :x_offset, :y_offset, :font_size,
-    :page_id, :annotation_type_id, :content_id])
-    |> validate_required([:name, :description])
+    |> cast(attrs, [:name, :label,
+      :x_orientation, :y_orientation, :size, :color, :thickness, :x_offset, :y_offset, :font_size,
+      :page_id, :annotation_type_id, :content_id, :content_version_id])
+    |> cast_assoc(:content)
+    |> foreign_key_constraint(:page_id)
+    |> validate_required([:name, :page_id])
   end
 
+  def safe(annotation, handlers \\ %{})
   def safe(annotation = %UserDocs.Web.Annotation{}, handlers) do
-    annotation_type_handler = Map.get(handlers, :annotation_type)
+    base_safe(annotation)
+    |> maybe_safe_annotation_type(handlers[:annotation_type], annotation.annotation_type, handlers)
+    |> maybe_safe_content(handlers[:content], annotation.content, handlers)
+  end
+  def safe(nil, _), do: nil
 
+  def base_safe(annotation = %UserDocs.Web.Annotation{}) do
     %{
+      id: annotation.id,
       label: annotation.label,
       x_orientation: annotation.x_orientation,
       y_orientation: annotation.y_orientation,
@@ -49,10 +62,17 @@ defmodule UserDocs.Web.Annotation do
       thickness: annotation.thickness,
       x_offset: annotation.x_offset,
       y_offset: annotation.y_offset,
-      font_size: annotation.font_size,
-
-      annotation_type: annotation_type_handler.(annotation.annotation_type, handlers)
+      font_size: annotation.font_size
     }
   end
-  def safe(nil, _), do: nil
+
+  def maybe_safe_annotation_type(annotation, nil, _, _), do: annotation
+  def maybe_safe_annotation_type(annotation, handler, annotation_type, handlers) do
+    Map.put(annotation, :annotation_type, handler.(annotation_type, handlers))
+  end
+
+  def maybe_safe_content(annotation, nil, _, _), do: annotation
+  def maybe_safe_content(annotation, handler, content, handlers) do
+    Map.put(annotation, :content, handler.(content, handlers))
+  end
 end

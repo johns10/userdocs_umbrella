@@ -17,7 +17,7 @@ defmodule UserDocsWeb.StepLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Step")
-    |> assign(:step, Automation.get_step!(id))
+    |> assign(:step, Automation.get_step!(id, %{element: true, annotation: true}))
   end
 
   defp apply_action(socket, :new, _params) do
@@ -41,6 +41,6 @@ defmodule UserDocsWeb.StepLive.Index do
   end
 
   defp list_steps do
-    Automation.list_steps()
+    Automation.list_steps(%{element: true})
   end
 end

@@ -1,14 +1,18 @@
 defmodule UserDocsWeb.Router do
   use UserDocsWeb, :router
+
+  import UserDocsWeb.UserAuth
   use Pow.Phoenix.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
+    plug UserDocsWeb.TestPlug
     plug :fetch_live_flash
     plug :put_root_layout, {UserDocsWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :api do
@@ -22,16 +26,18 @@ defmodule UserDocsWeb.Router do
 
   scope "/" do
     pipe_through :browser
-
     pow_routes()
   end
 
   scope "/", UserDocsWeb do
-    pipe_through [:browser, :protected]
+    # pipe_through [:browser, :protected]
+    pipe_through [:browser]
 
     live "/", PageLive, :index
     live "/automation", AutomationLive.Index, :index
-    live "/index.html", AutomationLive.Index, :index
+    live "/process_administrator", ProcessAdministratorLive.Index, :index
+    live "/document", DocumentLive.Index, :index
+    live "/index.html", ProcessAdministratorLive.Index, :index
 
     live "/content", ContentLive.Index, :index
     live "/content/new", ContentLive.Index, :new
@@ -110,6 +116,32 @@ defmodule UserDocsWeb.Router do
     live "/files/:id", FileLive.Show, :show
     live "/files/:id/show/edit", FileLive.Show, :edit
 
+    live "/screenshots", ScreenshotLive.Index, :index
+    live "/screenshots/new", ScreenshotLive.Index, :new
+    live "/screenshots/:id/edit", ScreenshotLive.Index, :edit
+    live "/screenshots/:id", ScreenshotLive.Show, :show
+    live "/screenshots/:id/show/edit", ScreenshotLive.Show, :edit
+
+    live "/documents", DocumentLive.Index, :index
+    live "/documents/new", DocumentLive.Index, :new
+    live "/documents/:id/edit", DocumentLive.Index, :edit
+    live "/documents/:id", DocumentLive.Show, :show
+    live "/documents/:id/show/edit", DocumentLive.Show, :edit
+
+    live "/documents/:id/editor", DocumentLive.Editor, :edit
+
+    live "/content_versions", ContentVersionLive.Index, :index
+    live "/content_versions/new", ContentVersionLive.Index, :new
+    live "/content_versions/:id/edit", ContentVersionLive.Index, :edit
+    live "/content_versions/:id", ContentVersionLive.Show, :show
+    live "/content_versions/:id/show/edit", ContentVersionLive.Show, :edit
+
+    live "/language_codes", LanguageCodeLive.Index, :index
+    live "/language_codes/new", LanguageCodeLive.Index, :new
+    live "/language_codes/:id/edit", LanguageCodeLive.Index, :edit
+    live "/language_codes/:id", LanguageCodeLive.Show, :show
+    live "/language_codes/:id/show/edit", LanguageCodeLive.Show, :edit
+
   end
 
   # Other scopes may use custom stacks.
@@ -132,5 +164,38 @@ defmodule UserDocsWeb.Router do
       pow_routes()
       live_dashboard "/dashboard", metrics: UserDocsWeb.Telemetry
     end
+  end
+
+  ## Authentication routes
+
+  scope "/", UserDocsWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    get "/users/register", UserRegistrationController, :new
+    post "/users/register", UserRegistrationController, :create
+    get "/users/log_in", UserSessionController, :new
+    post "/users/log_in", UserSessionController, :create
+    get "/users/reset_password", UserResetPasswordController, :new
+    post "/users/reset_password", UserResetPasswordController, :create
+    get "/users/reset_password/:token", UserResetPasswordController, :edit
+    put "/users/reset_password/:token", UserResetPasswordController, :update
+  end
+
+  scope "/", UserDocsWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    get "/users/settings", UserSettingsController, :edit
+    put "/users/settings/update_password", UserSettingsController, :update_password
+    put "/users/settings/update_email", UserSettingsController, :update_email
+    get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+  end
+
+  scope "/", UserDocsWeb do
+    pipe_through [:browser]
+
+    delete "/users/log_out", UserSessionController, :delete
+    get "/users/confirm", UserConfirmationController, :new
+    post "/users/confirm", UserConfirmationController, :create
+    get "/users/confirm/:token", UserConfirmationController, :confirm
   end
 end

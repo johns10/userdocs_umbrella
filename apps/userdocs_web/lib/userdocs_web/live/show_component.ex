@@ -33,7 +33,6 @@ defmodule UserDocsWeb.ShowComponent do
         </a>
       </header>
       <div class="card-content <%= Layout.is_hidden?(assigns) %>">
-        <%= live_component @socket, @show, @opts %>
         <%= live_form @socket, @form,
           type: @type,
           title: @title,
@@ -42,10 +41,14 @@ defmodule UserDocsWeb.ShowComponent do
           select_lists: @select_lists,
           parent: @parent,
           object: @object,
+          current_user: @current_user,
+          current_team: @current_team,
+          current_version: @current_version,
           id: Atom.to_string(@type) <> "-"
             <> Integer.to_string(@object.id)
             <> "-edit-form"
         %>
+        <%= live_component @socket, @show, @opts %>
         <hr>
       </div>
     </div>

@@ -1,0 +1,22 @@
+<h1>Show Language code</h1>
+
+<%= if @live_action in [:edit] do %>
+  <%= live_modal @socket, UserDocsWeb.LanguageCodeLive.FormComponent,
+    id: @language_code.id,
+    title: @page_title,
+    action: @live_action,
+    language_code: @language_code,
+    return_to: Routes.language_code_show_path(@socket, :show, @language_code) %>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Code:</strong>
+    <%= @language_code.code %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.language_code_show_path(@socket, :edit, @language_code), class: "button" %></span>
+<span><%= live_redirect "Back", to: Routes.language_code_index_path(@socket, :index) %></span>

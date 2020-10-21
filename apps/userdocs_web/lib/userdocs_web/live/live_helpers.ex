@@ -21,12 +21,14 @@ defmodule UserDocsWeb.LiveHelpers do
   """
   def live_modal(socket, component, opts) do
     path = Keyword.fetch!(opts, :return_to)
+
     modal_opts = [
       id: :modal,
       return_to: path,
       component: component,
       opts: opts
     ]
+
     live_component(socket, UserDocsWeb.ModalComponent, modal_opts)
   end
 
@@ -38,6 +40,24 @@ defmodule UserDocsWeb.LiveHelpers do
     hidden = Keyword.fetch!(opts, :hidden)
     action = Keyword.fetch!(opts, :action)
     select_lists = Keyword.fetch!(opts, :select_lists)
+
+    current_user = try do
+      Keyword.fetch!(opts, :current_user)
+    rescue
+      _ -> None
+    end
+
+    current_team = try do
+      Keyword.fetch!(opts, :current_team)
+    rescue
+      _ -> None
+    end
+
+    current_version = try do
+      Keyword.fetch!(opts, :current_version)
+    rescue
+      _ -> None
+    end
 
     log_string =
       "Creating live footer of type " <> Atom.to_string(type) <> "\n"
@@ -53,6 +73,9 @@ defmodule UserDocsWeb.LiveHelpers do
       hidden: hidden,
       component: component,
       select_lists: select_lists,
+      current_user: current_user,
+      current_team: current_team,
+      current_version: current_version,
       opts: opts
     ]
     live_component(socket, UserDocsWeb.FooterComponent, footer_opts)
@@ -67,6 +90,24 @@ defmodule UserDocsWeb.LiveHelpers do
     title = Keyword.fetch!(opts, :title)
     parent = Keyword.fetch!(opts, :parent)
     select_lists = Keyword.fetch!(opts, :select_lists)
+
+    current_user = try do
+      Keyword.fetch!(opts, :current_user)
+    rescue
+      _ -> None
+    end
+
+    current_team = try do
+      Keyword.fetch!(opts, :current_team)
+    rescue
+      _ -> None
+    end
+
+    current_version = try do
+      Keyword.fetch!(opts, :current_version)
+    rescue
+      _ -> None
+    end
 
     log_string =
       "Creating live group of type " <> Atom.to_string(type) <> "\n"
@@ -91,6 +132,9 @@ defmodule UserDocsWeb.LiveHelpers do
       form: form_component,
       header: header,
       select_lists: select_lists,
+      current_user: current_user,
+      current_team: current_team,
+      current_version: current_version,
       opts: opts
     ]
     live_component(socket, UserDocsWeb.GroupComponent, group_opts)
@@ -104,6 +148,24 @@ defmodule UserDocsWeb.LiveHelpers do
     struct = Keyword.fetch!(opts, :struct)
     parent = Keyword.fetch!(opts, :parent)
 
+    current_user = try do
+      Keyword.fetch!(opts, :current_user)
+    rescue
+      _ -> None
+    end
+
+    current_team = try do
+      Keyword.fetch!(opts, :current_team)
+    rescue
+      _ -> None
+    end
+
+    current_version = try do
+      Keyword.fetch!(opts, :current_version)
+    rescue
+      _ -> None
+    end
+
     show_opts = [
       id: Keyword.fetch!(opts, :id),
       title: title,
@@ -116,6 +178,9 @@ defmodule UserDocsWeb.LiveHelpers do
       struct: struct,
       object: object,
       header: header,
+      current_user: current_user,
+      current_team: current_team,
+      current_version: current_version,
       opts: [ {type, object} | opts ]
     ]
     |> Keyword.put(type, object)
@@ -133,6 +198,24 @@ defmodule UserDocsWeb.LiveHelpers do
     parent = Keyword.fetch!(opts, :parent)
     id = Keyword.fetch!(opts, :id)
 
+    current_user = try do
+      Keyword.fetch!(opts, :current_user)
+    rescue
+      _ -> None
+    end
+
+    current_team = try do
+      Keyword.fetch!(opts, :current_team)
+    rescue
+      _ -> None
+    end
+
+    current_version = try do
+      Keyword.fetch!(opts, :current_version)
+    rescue
+      _ -> None
+    end
+
     log_string =
       "Creating live form of type " <> Atom.to_string(type) <> "\n"
       <> "  title: " <> title <> "\n"
@@ -149,6 +232,9 @@ defmodule UserDocsWeb.LiveHelpers do
       select_lists: select_lists,
       parent: parent,
       struct: struct,
+      current_user: current_user,
+      current_team: current_team,
+      current_version: current_version,
       opts: opts
     ]
     |> Keyword.put(type, maybe_object(action, object, struct))
@@ -183,18 +269,28 @@ defmodule UserDocsWeb.LiveHelpers do
     live_component(socket, form, form_opts)
   end
 
+  def maybe_assign_opt(socket, target_key, source_key) do
+    try do
+      Phoenix.LiveView.assign(socket, target_key, Keyword.fetch!(socket.assigns.opts, source_key))
+    rescue
+      AttributeError -> socket
+    end
+  end
+
+  def maybe_add_to_component(component_opts, opts, key) do
+    IO.puts("Attempting to add #{key} to component opts")
+    try do
+      value = Keyword.fetch!(opts, key)
+      component_opts ++ [{key, value}]
+    rescue
+      AttributeError -> component_opts
+    end
+  end
+
   def maybe_push_redirect(socket = %{assigns: %{return_to: return_to}}) do
     LiveView.push_redirect(socket, to: return_to)
   end
   def maybe_push_redirect(socket), do: socket
-
-  def maybe_action(assigns) do
-    try do
-      Map.get(assigns, :action)
-    rescue
-      _ -> :edit
-    end
-  end
 
   def read_only?(assigns) do
     action =
@@ -229,7 +325,16 @@ defmodule UserDocsWeb.LiveHelpers do
   end
   def enabled_fields(objects, id) when is_integer(id) do
     Enum.filter(objects, fn(x) -> x.id == id end)
-      |> Enum.at(0)
-      |> Map.get(:args)
+    |> Enum.at(0)
+    |> Map.get(:args)
+  end
+
+  ### MARKED FOR DELETION ###
+  def maybe_action(assigns) do
+    try do
+      Map.get(assigns, :action)
+    rescue
+      _ -> :edit
+    end
   end
 end

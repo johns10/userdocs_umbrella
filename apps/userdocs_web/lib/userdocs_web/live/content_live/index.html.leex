@@ -6,6 +6,7 @@
     title: @page_title,
     action: @live_action,
     content: @content,
+    current_user: @current_user,
     return_to: Routes.content_index_path(@socket, :index) %>
 <% end %>
 
@@ -13,7 +14,6 @@
   <thead>
     <tr>
       <th>Name</th>
-      <th>Description</th>
 
       <th></th>
     </tr>
@@ -22,7 +22,6 @@
     <%= for content <- @content_collection do %>
       <tr id="content-<%= content.id %>">
         <td><%= content.name %></td>
-        <td><%= content.description %></td>
 
         <td>
           <span><%= live_redirect "Show", to: Routes.content_show_path(@socket, :show, content) %></span>

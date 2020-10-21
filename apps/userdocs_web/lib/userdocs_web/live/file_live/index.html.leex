@@ -15,7 +15,6 @@
       <th>Filename</th>
       <th>Size</th>
       <th>Content type</th>
-      <th>Hash</th>
 
       <th></th>
     </tr>
@@ -26,7 +25,6 @@
         <td><%= file.filename %></td>
         <td><%= file.size %></td>
         <td><%= file.content_type %></td>
-        <td><%= file.hash %></td>
 
         <td>
           <span><%= live_redirect "Show", to: Routes.file_show_path(@socket, :show, file) %></span>

@@ -64,7 +64,7 @@ config :userdocs_web,
 config :userdocs_web, UserDocsWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
+      # ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/userdocs_web/(live|views)/.*(ex)$",
       ~r"lib/userdocs_web/templates/.*(eex)$"

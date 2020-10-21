@@ -31,3 +31,8 @@ MnesiaCore.nonode@nohost_1593_293020_175000
 MnesiaCore.nonode@nohost_1593_291161_165000
 Mnesia.nonode@nohost/DECISION_TAB.LOG
 Mnesia.nonode@nohost/LATEST.LOG
+
+# Ignore the images
+*.jpeg
+*.png
+*.jpg

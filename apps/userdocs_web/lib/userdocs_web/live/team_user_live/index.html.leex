@@ -18,14 +18,14 @@
   </thead>
   <tbody id="team_users">
     <%= for team_user <- @team_users do %>
-      <tr id="team_user-<%= team_user.id %>">
+      <tr id="team_user-<%= team_user.user_id %>-<%= team_user.team_id %>">
         <td><%= team_user.user_id %></td>
         <td><%= team_user.team_id %></td>
 
         <td>
           <span><%= live_redirect "Show", to: Routes.team_user_show_path(@socket, :show, team_user) %></span>
           <span><%= live_patch "Edit", to: Routes.team_user_index_path(@socket, :edit, team_user) %></span>
-          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: team_user.id, data: [confirm: "Are you sure?"] %></span>
+          <!--<span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: team_user.id, data: [confirm: "Are you sure?"] %></span>-->
         </td>
       </tr>
     <% end %>

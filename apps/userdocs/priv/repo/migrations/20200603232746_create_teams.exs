@@ -4,6 +4,7 @@ defmodule UserDocs.Repo.Migrations.CreateTeams do
   def change do
     create table(:teams) do
       add :name, :string
+      add :default_project_id, :integer
 
       timestamps()
     end

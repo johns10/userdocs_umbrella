@@ -12,6 +12,7 @@
 <table>
   <thead>
     <tr>
+      <th>Step ID</th>
       <th>Process ID</th>
       <th>Order</th>
       <th>Name</th>
@@ -22,6 +23,7 @@
   <tbody id="steps">
     <%= for step <- @steps do %>
       <tr id="step-<%= step.id %>">
+        <td><%= step.id %></td>
         <td><%= step.process_id %></td>
         <td><%= step.order %></td>
         <td><%= step.name %></td>

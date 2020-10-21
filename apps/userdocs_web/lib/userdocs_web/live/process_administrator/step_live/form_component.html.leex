@@ -1,0 +1,133 @@
+<%= f = form_for @changeset, "#",
+  id: @id,
+  phx_target: @myself.cid,
+  phx_change: "validate",
+  phx_submit: "save" %>
+
+  <%= hidden_input(f, :name, [
+    id: ID.form_field(f.data, :name),
+    value: @current_object.name
+  ]) %>
+
+  <div class="field is-grouped">
+
+    <%= Layout.select_input(f, :process_id, @select_lists.processes_select, [
+      placeholder: @parent_id || "",
+      id: ID.form_field(f.data, :process_id)
+    ], "control") %>
+
+    <%= Layout.number_input(f, :order, [
+      id: ID.form_field(f.data, :order)
+    ], "control") %>
+
+    <%= Layout.select_input(f, :step_type_id, @select_lists.step_types_select, [
+      placeholder: @parent_id || "",
+      id: ID.form_field(f.data, :step_type_id)
+    ], "control") %>
+
+  </div>
+
+  <%= Layout.select_input(f, :annotation_id, @select_lists.annotations, [
+    placeholder: @parent_id || "",
+    id: ID.form_field(f.data, :annotation_id),
+    hidden: "annotation_id" not in @enabled_step_fields
+  ]) %>
+
+  <%= if "annotation_id" in @enabled_step_fields do %>
+    <section class="card">
+      <%= inputs_for f, :annotation, [id: ID.nested_form(f.data, f.data.annotation)], fn fa -> %>
+        <section class="card">
+          <div class="card-content">
+            <div class="content">
+              <%= AnnotationLive.FormComponent.render_fields(assigns, fa, ID.prefix(f.data)) %>
+            </div>
+          </div>
+        </section>
+      <% end %>
+    </section>
+    <div class="level"></div>
+  <% end %>
+
+  <%= Layout.select_input(f, :element_id, @select_lists.elements_select, [
+    placeholder: @parent_id || "",
+    id: ID.form_field(f.data, :element_id),
+    hidden: "element_id" not in @enabled_step_fields
+  ]) %>
+
+  <%= if "element_id" in @enabled_step_fields do %>
+    <%= inputs_for f, :element, [id: ID.nested_form(f.data, f.data.element)], fn fe -> %>
+      <section class="card">
+        <div class="card-content">
+          <div class="content">
+            <h4><%= fe.data.name %></h4>
+            <%= ElementLive.FormComponent.render_fields(assigns, fe, ID.prefix(f.data)) %>
+          </div>
+        </div>
+      </section>
+    <% end %>
+    <div class="level"></div>
+  <% end %>
+
+  <%= if "page_reference" in @enabled_step_fields do %>
+    <div class="field">
+      <%= label(f, :page_reference, [ class: :label ]) %>
+      <div class="control">
+        <label class="radio">
+          <%= radio_button(f, :page_reference, "url", [
+            id: ID.form_field(f.data, :page_reference_url),
+            label: "url",
+          ]) %>
+            Type
+        </label>
+        <label class="radio">
+          <%= radio_button(f, :page_reference, "page", [
+            id: ID.form_field(f.data, :page_reference_page),
+            label: "page",
+          ]) %>
+            Select
+        </label>
+      </div>
+      <%= error_tag(f, :page_reference) %>
+    </div>
+  <% end %>
+
+  <%=
+    Layout.select_input(f, :page_id, @select_lists.pages_select, [
+      placeholder: @parent_id || "",
+      id: ID.form_field(f.data, :page_id),
+      hidden: not(
+        ("page_id" in @enabled_step_fields) and
+        (@current_object.page_reference == "page")
+      )
+    ])
+  %>
+
+  <%= Layout.text_input(f, [
+    field_name: :url,
+    id: ID.form_field(f.data, :url),
+    hidden: not(
+      ("url" in @enabled_step_fields) and
+      (@current_object.page_reference == "url")
+    )
+  ]) %>
+
+  <%= Layout.text_input(f, [
+    field_name: :text,
+    id: ID.form_field(f.data, :text),
+    hidden: not("text" in @enabled_step_fields)
+  ]) %>
+
+  <%= Layout.text_input(f, [
+    field_name: :width,
+    id: ID.form_field(f.data, :width),
+    hidden: not("width" in @enabled_step_fields)
+  ]) %>
+
+  <%= Layout.text_input(f, [
+    field_name: :height,
+    id: ID.form_field(f.data, :height),
+    hidden: not("height" in @enabled_step_fields)
+  ]) %>
+
+  <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
+</form>

@@ -22,6 +22,9 @@ defmodule UserDocsWeb.ProcessLive.ShowComponent do
             <> Integer.to_string(object.id)
             <> "-show",
           title: "Edit step",
+          current_user: @current_user,
+          current_team: @current_team,
+          current_version: @current_version,
           select_lists: @select_lists,
           type: :step,
           object: object,
@@ -35,6 +38,9 @@ defmodule UserDocsWeb.ProcessLive.ShowComponent do
         struct: %Automation.Step{},
         object: %{},
         parent: @process,
+        current_user: @current_user,
+        current_team: @current_team,
+        current_version: @current_version,
         parent_type: :process,
         id: "process-"
           <> Integer.to_string(@process.id) <> "-"

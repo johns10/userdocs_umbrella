@@ -42,7 +42,9 @@ defmodule UserDocs.MixProject do
       {:jason, "~> 1.0"},
       {:pow, "~> 1.0.20"},
       {:image64, "~> 0.0.1"},
-      {:uuid, "~> 1.1"}
+      {:uuid, "~> 1.1"},
+      {:mogrify, "~> 0.8.0"},
+      {:ex_doc, "~> 0.22", only: :dev, runtime: false}
     ]
   end
 

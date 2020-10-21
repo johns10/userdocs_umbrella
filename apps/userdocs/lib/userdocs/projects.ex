@@ -17,9 +17,30 @@ defmodule UserDocs.Projects do
       [%Project{}, ...]
 
   """
-  def list_projects do
-    Repo.all(Project)
+  def list_projects(_params \\ %{}, filters \\ %{}) do
+    base_projects_query()
+    |> maybe_filter_by_team(filters[:team_id])
+    |> maybe_filter_projects_by_user(filters[:user_id])
+    |> Repo.all()
   end
+
+  defp maybe_filter_by_team(query, nil), do: query
+  defp maybe_filter_by_team(query, team_id) do
+    from(item in query,
+      where: item.team_id == ^team_id
+    )
+  end
+
+  defp maybe_filter_projects_by_user(query, nil), do: query
+  defp maybe_filter_projects_by_user(query, team_id) do
+    from(project in query,
+      left_join: team in assoc(project, :team),
+      left_join: user in assoc(team, :users),
+      where: user.id == ^team_id
+    )
+  end
+
+  def base_projects_query(), do: from(project in Project)
 
   @doc """
   Gets a single project.
@@ -36,6 +57,10 @@ defmodule UserDocs.Projects do
 
   """
   def get_project!(id), do: Repo.get!(Project, id)
+  @spec get_project!(maybe_improper_list | map, any) :: any
+  def get_project!(state, id) do
+    UserDocs.State.get!(state, id, :projects, UserDocs.Projects.Project)
+  end
 
   @doc """
   Creates a project.
@@ -113,9 +138,53 @@ defmodule UserDocs.Projects do
       [%Version{}, ...]
 
   """
-  def list_versions do
-    Repo.all from Version
+  def list_versions(params \\ %{}, filters \\ %{}) do
+    base_versions_query()
+    |> maybe_filter_by_project(filters[:project_id])
+    |> maybe_filter_version_by_team(filters[:team_id])
+    |> maybe_filter_versions_by_user(params[:user_id])
+    |> maybe_filter_by_version_ids(filters[:version_ids])
+    |> maybe_preload_strategy(params[:strategy])
+    |> Repo.all()
   end
+
+  defp maybe_preload_strategy(query, nil), do: query
+  defp maybe_preload_strategy(query, _), do: from(version in query, preload: [:strategy])
+
+  defp maybe_filter_by_project(query, nil), do: query
+  defp maybe_filter_by_project(query, project_id) do
+    from(version in query,
+      where: version.project_id == ^project_id
+    )
+  end
+
+  defp maybe_filter_version_by_team(query, nil), do: query
+  defp maybe_filter_version_by_team(query, team_id) do
+    from(version in query,
+      left_join: project in Project,
+      on: project.id == version.project_id,
+      where: project.team_id == ^team_id
+    )
+  end
+
+  defp maybe_filter_by_version_ids(query, nil), do: query
+  defp maybe_filter_by_version_ids(query, version_ids) do
+    from(version in query,
+      where: version.id in ^version_ids
+    )
+  end
+
+  defp maybe_filter_versions_by_user(query, nil), do: query
+  defp maybe_filter_versions_by_user(query, user_id) do
+    from(version in query,
+      left_join: project in assoc(version, :project),
+      left_join: team in assoc(project, :team),
+      left_join: user in assoc(team, :users),
+      where: user.id == ^user_id
+    )
+  end
+
+  def base_versions_query(), do: from(version in Version)
 
   @doc """
   Gets a single version.
@@ -136,6 +205,11 @@ defmodule UserDocs.Projects do
     |> maybe_preload_pages(params[:pages])
     |> Repo.one!()
   end
+  def get_version!(%{ versions: versions }, id, _params, _filters) do
+    versions
+    |> Enum.filter(fn(v) -> v.id == id end)
+    |> Enum.at(0)
+  end
 
   defp base_version_query(id) do
     from(version in Version, where: version.id == ^id)
@@ -143,6 +217,20 @@ defmodule UserDocs.Projects do
 
   defp maybe_preload_pages(query, nil), do: query
   defp maybe_preload_pages(query, _), do: from(version in query, preload: [:pages])
+
+  # TODO: Move these into the base query
+  def get_annotation_version!(id) do
+    Repo.one from version in Version,
+      left_join: page in UserDocs.Web.Page, on: page.version_id == version.id,
+      left_join: annotation in UserDocs.Web.Annotation, on: annotation.page_id == page.id,
+      where: annotation.id == ^id
+  end
+  def get_step_version!(id) do
+    Repo.one from version in Version,
+      left_join: process in UserDocs.Automation.Process, on: process.version_id == version.id,
+      left_join: step in UserDocs.Automation.Step, on: step.process_id == process.id,
+      where: step.id == ^id
+  end
 
   @doc """
   Creates a version.

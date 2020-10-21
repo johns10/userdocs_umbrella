@@ -22,6 +22,9 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
           parent_type: :page,
           struct: %Web.Element{},
           objects: @page.elements,
+          current_user: @current_user,
+          current_team: @current_team,
+          current_version: @current_version,
           return_to: Routes.element_index_path(@socket, :index),
           id: "page-"
             <> Integer.to_string(@page.id)
@@ -41,6 +44,9 @@ defmodule UserDocsWeb.PageLive.ShowComponent do
           parent_type: :page,
           struct: %Web.Annotation{},
           objects: @page.annotations,
+          current_user: @current_user,
+          current_team: @current_team,
+          current_version: @current_version,
           return_to: Routes.annotation_index_path(@socket, :index),
           id: "page-"
             <> Integer.to_string(@page.id)

@@ -1,0 +1,43 @@
+<h1>Listing Content versions</h1>
+
+<%= @current_user.default_team_id %>
+
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket, UserDocsWeb.ContentVersionLive.FormComponent,
+    id: @content_version.id || :new,
+    title: @page_title,
+    action: @live_action,
+    content_version: @content_version,
+    current_user: @current_user,
+    parent: nil,
+    return_to: Routes.content_version_index_path(@socket, :index) %>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Language code</th>
+      <th>Name</th>
+      <th>Body</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="content_versions">
+    <%= for content_version <- @content_versions do %>
+      <tr id="content_version-<%= content_version.id %>">
+        <td><%= content_version.language_code.code %></td>
+        <td><%= content_version.name %></td>
+        <td><%= content_version.body %></td>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.content_version_show_path(@socket, :show, content_version) %></span>
+          <span><%= live_patch "Edit", to: Routes.content_version_index_path(@socket, :edit, content_version) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: content_version.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Content version", to: Routes.content_version_index_path(@socket, :new) %></span>

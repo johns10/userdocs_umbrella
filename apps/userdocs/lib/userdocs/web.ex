@@ -4,9 +4,9 @@ defmodule UserDocs.Web do
   """
 
   import Ecto.Query, warn: false
-  alias UserDocs.Repo
-  alias UserDocsWeb.Endpoint
 
+  alias UserDocsWeb.Endpoint
+  alias UserDocs.Repo
   alias UserDocs.Web.Page
 
   @doc """
@@ -21,21 +21,32 @@ defmodule UserDocs.Web do
   def list_pages(params \\ %{}, filters \\ %{}) do
     base_pages_query()
     |> maybe_preload_elements(params[:elements])
+    |> maybe_preload_annotations(params[:annotations])
     |> maybe_filter_by_version(filters[:version_id])
+    |> maybe_filter_pages_by_team_id(filters[:team_id])
     |> Repo.all()
-
   end
 
   defp maybe_preload_elements(query, nil), do: query
-  defp maybe_preload_elements(query, _) do
-    from(pages in query, preload: [:elements])
-  end
+  defp maybe_preload_elements(query, _), do: from(pages in query, preload: [:elements])
+
+  defp maybe_preload_annotations(query, nil), do: query
+  defp maybe_preload_annotations(query, _), do: from(pages in query, preload: [:annotations])
 
   defp maybe_filter_by_version(query, nil), do: query
   defp maybe_filter_by_version(query, version_id) do
     from(page in query,
       where: page.version_id == ^version_id
     )
+  end
+
+  defp maybe_filter_pages_by_team_id(query, nil), do: query
+  defp maybe_filter_pages_by_team_id(query, team_id) do
+    from(page in query,
+      left_join: version in UserDocs.Projects.Version, on: version.id == page.version_id,
+      left_join: project in UserDocs.Projects.Project, on: version.project_id == project.id,
+      left_join: team in UserDocs.Users.Team, on: project.team_id == team.id,
+      where: team.id == ^team_id)
   end
 
   defp base_pages_query(), do: from(pages in Page)
@@ -55,6 +66,12 @@ defmodule UserDocs.Web do
 
   """
   def get_page!(id), do: Repo.get!(Page, id)
+  def get_page!(%{ pages: pages }, id), do: get_page!(pages, id)
+  def get_page!(pages, id) when is_list(pages) do
+    pages
+    |> Enum.filter(fn(p) -> p.id == id end)
+    |> Enum.at(0)
+  end
 
   @doc """
   Creates a page.
@@ -103,11 +120,11 @@ defmodule UserDocs.Web do
       |> Page.changeset(attrs)
       |> Repo.update()
 
-      page =
-        case status do
-          :ok -> page
-          _ -> page
-        end
+    page =
+      case status do
+        :ok -> page
+        _ -> page
+      end
 
     Endpoint.broadcast("page", "update", page)
 
@@ -250,14 +267,29 @@ defmodule UserDocs.Web do
       [%Element{}, ...]
 
   """
-  def list_elements(_params \\ %{}, filters \\ %{}) do
+  def list_elements(params \\ %{}, filters \\ %{}) do
     base_elements_query()
-    |> maybe_filter_by_page(filters[:page_id])
+    |> maybe_filter_element_by_page(filters[:page_id])
+    |> maybe_filter_by_version_id(filters[:team_id])
+    |> maybe_preload_strategy(params[:strategy])
     |> Repo.all()
   end
 
-  defp maybe_filter_by_page(query, nil), do: query
-  defp maybe_filter_by_page(query, page_id) do
+  defp maybe_preload_strategy(query, nil), do: query
+  defp maybe_preload_strategy(query, _), do: from(elements in query, preload: [:strategy])
+
+  defp maybe_filter_by_version_id(query, nil), do: query
+  defp maybe_filter_by_version_id(query, team_id) do
+    from(element in query,
+      left_join: page in UserDocs.Web.Page, on: page.id == element.page_id,
+      left_join: version in UserDocs.Projects.Version, on: version.id == page.version_id,
+      left_join: project in UserDocs.Projects.Project, on: project.id == version.project_id,
+      left_join: team in UserDocs.Users.Team, on: team.id == project.team_id,
+      where: team.id == ^team_id)
+  end
+
+  defp maybe_filter_element_by_page(query, nil), do: query
+  defp maybe_filter_element_by_page(query, page_id) do
     from(element in query,
       where: element.page_id == ^page_id
     )
@@ -280,6 +312,9 @@ defmodule UserDocs.Web do
 
   """
   def get_element!(id), do: Repo.get!(Element, id)
+  def get_element!(state, id) do
+    UserDocs.State.get!(state, id, :elements, Element)
+  end
 
 
   @doc """
@@ -368,9 +403,60 @@ defmodule UserDocs.Web do
       [%Annotation{}, ...]
 
   """
-  def list_annotations do
-    Repo.all(Annotation)
+  def list_annotations(params \\ %{}, filters \\ %{}) do
+    base_annotation_query()
+    |> maybe_filter_annotation_by_page(filters[:page_id])
+    |> maybe_filter_annotation_by_version_id(filters[:version_id])
+    |> maybe_filter_annotation_by_team_id(filters[:team_id])
+    |> maybe_preload_content(params[:content])
+    |> maybe_preload_content_versions(params[:content_versions])
+    |> maybe_preload_annotation_type(params[:annotation_type])
+    |> order_by(:name)
+    |> Repo.all()
   end
+
+  defp maybe_preload_annotation_type(query, nil), do: query
+  defp maybe_preload_annotation_type(query, _), do: from(annotations in query, preload: [:annotation_type])
+
+  defp maybe_preload_content(query, nil), do: query
+  defp maybe_preload_content(query, _), do: from(annotations in query, preload: [:content])
+
+  defp maybe_preload_content_versions(query, nil), do: query
+  defp maybe_preload_content_versions(query, _) do
+    from(annotation in query,
+      left_join: content in UserDocs.Documents.Content, on: annotation.content_id == content.id,
+      preload: [
+        :content,
+        content: :content_versions,
+      ])
+  end
+
+  defp maybe_filter_annotation_by_version_id(query, nil), do: query
+  defp maybe_filter_annotation_by_version_id(query, version_id) do
+    from(annotation in query,
+      left_join: page in assoc(annotation, :page),
+      where: page.version_id == ^version_id)
+  end
+
+  defp maybe_filter_annotation_by_team_id(query, nil), do: query
+  defp maybe_filter_annotation_by_team_id(query, team_id) do
+    from(annotation in query,
+      left_join: page in UserDocs.Web.Page, on: page.id == annotation.page_id,
+      left_join: version in UserDocs.Projects.Version, on: version.id == page.version_id,
+      left_join: project in UserDocs.Projects.Project, on: version.project_id == project.id,
+      left_join: team in UserDocs.Users.Team, on: project.team_id == team.id,
+      where: team.id == ^team_id)
+  end
+
+
+  defp maybe_filter_annotation_by_page(query, nil), do: query
+  defp maybe_filter_annotation_by_page(query, page_id) do
+    from(annotation in query,
+      where: annotation.page_id == ^page_id
+    )
+  end
+
+  def base_annotation_query(), do: from(annotations in Annotation)
 
   @doc """
   Gets a single annotation.
@@ -387,6 +473,12 @@ defmodule UserDocs.Web do
 
   """
   def get_annotation!(id), do: Repo.get!(Annotation, id)
+  def get_annotation!(%{ annotations: annotations }, id), do: get_annotation!(annotations, id)
+  def get_annotation!(annotations, id) when is_list(annotations) do
+    annotations
+    |> Enum.filter(fn(a) -> a.id == id end)
+    |> Enum.at(0)
+  end
 
   @doc """
   Creates a annotation.
@@ -401,9 +493,14 @@ defmodule UserDocs.Web do
 
   """
   def create_annotation(attrs \\ %{}) do
-    %Annotation{}
-    |> Annotation.changeset(attrs)
-    |> Repo.insert()
+    {status, annotation} =
+      %Annotation{}
+      |> Annotation.changeset(attrs)
+      |> Repo.insert()
+
+    Endpoint.broadcast("annotation", "create", annotation)
+
+    {status, annotation}
   end
 
   @doc """
@@ -419,14 +516,14 @@ defmodule UserDocs.Web do
 
   """
   def update_annotation(%Annotation{} = annotation, attrs) do
-    {status, page} =
+    {status, annotation} =
       annotation
       |> Annotation.changeset(attrs)
       |> Repo.update()
 
-    Endpoint.broadcast("page", "create", page)
+    Endpoint.broadcast("annotation", "update", annotation)
 
-    { status, page }
+    { status, annotation }
   end
 
   @doc """
@@ -456,5 +553,20 @@ defmodule UserDocs.Web do
   """
   def change_annotation(%Annotation{} = annotation, attrs \\ %{}) do
     Annotation.changeset(annotation, attrs)
+  end
+
+  alias UserDocs.Web.Strategy
+
+  @doc """
+  Returns the list of annotation_types.
+
+  ## Examples
+
+      iex> list_annotation_types()
+      [%AnnotationType{}, ...]
+
+  """
+  def list_strategies do
+    Repo.all(Strategy)
   end
 end

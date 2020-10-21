@@ -18,4 +18,11 @@ defmodule UserDocsWeb.ProcessLive.Show do
 
   defp page_title(:show), do: "Show Process"
   defp page_title(:edit), do: "Edit Process"
+
+  def form_id(process) do
+    case process do
+      nil -> "process-new-form"
+      _ -> "process-#{process.id}-form"
+    end
+  end
 end
