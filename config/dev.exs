@@ -32,9 +32,27 @@ config :userdocs_web, UserDocsWeb.Endpoint,
     ]
   ]
 
-
 config :userdocs_web,
   uploads_directory: "/media"
+
+config :process_administrator_web, ProcessAdministratorWeb.Endpoint,
+  http: [port: 4001],
+  debug_errors: true,
+  code_reloader: true,
+  check_origin: false,
+  watchers: [
+    node: [
+      "node_modules/webpack/bin/webpack.js",
+      "--mode",
+      "development",
+      "--watch-stdin",
+      cd: Path.expand("../apps/userdocs_web/assets", __DIR__)
+    ]
+  ]
+
+config :process_administrator_web,
+  uploads_directory: "/media"
+
 
 # ## SSL Support
 #
