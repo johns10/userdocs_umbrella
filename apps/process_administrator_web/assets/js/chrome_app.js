@@ -17,7 +17,7 @@ import {Socket} from "phoenix"
 import NProgress from "nprogress"
 import {LiveSocket} from "phoenix_live_view"
 import {handle_message} from "./commands.js"
-import {Hooks} from "./commands.js"
+import {Hooks} from "./hooks.js"
 
 let DOMAIN = "app.davenport.rocks"
 let PORT = "4001"
@@ -37,39 +37,14 @@ chrome.runtime.onMessage.addListener(
   handle_message(message, { environment: 'extension' })
 });
 
-const updateEvent = new CustomEvent('update', {
-  bubbles: false,
-  detail: {  }
-});
-
-console.log("Before xhr cookie")
-console.log((' ' + document.cookie).slice(1))
-
 var xhr = new XMLHttpRequest();
 xhr.responseType = 'document';
 xhr.open('GET', APP_URL, true)
 xhr.onload = function(e) {
   document.documentElement.replaceChild(this.response.head, document.head)
   document.documentElement.replaceChild(this.response.body, document.body)
-
-  console.log("After xhrc cookie")
-  console.log((' ' + document.cookie).slice(1))
-
+  
   let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-  let newCookie = document.querySelector("[data-phx-main='true']").getAttribute("data-phx-session")
-
-  console.log(newCookie)
-  console.log(csrfToken)
-
-  /*
-  let newCookieString = COOKIE_KEY + "=" + newCookie + ";domain=.davenport.rocks;";
-  console.log(newCookieString)
-
-  document.cookie = newCookieString
-  */
-
-  console.log("After setting cookie")
-  console.log(document.cookie)
 
   let liveSocket = new LiveSocket(WEBSOCKETS_URI, Socket, {
     params: { _csrf_token: csrfToken},

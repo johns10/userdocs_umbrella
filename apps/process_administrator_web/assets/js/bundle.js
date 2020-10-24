@@ -3906,6 +3906,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var phoenix_live_view__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! phoenix_live_view */ "../../../deps/phoenix_live_view/priv/static/phoenix_live_view.js");
 /* harmony import */ var phoenix_live_view__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(phoenix_live_view__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _commands_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./commands.js */ "./js/commands.js");
+/* harmony import */ var _hooks_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./hooks.js */ "./js/hooks.js");
 // We need to import the CSS so that webpack will load it.
 // The MiniCssExtractPlugin is used to separate it out into
 // its own CSS file.
@@ -3938,12 +3939,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     environment: 'extension'
   });
 });
-var updateEvent = new CustomEvent('update', {
-  bubbles: false,
-  detail: {}
-});
-console.log("Before xhr cookie");
-console.log((' ' + document.cookie).slice(1));
 var xhr = new XMLHttpRequest();
 xhr.responseType = 'document';
 xhr.open('GET', APP_URL, true);
@@ -3951,25 +3946,12 @@ xhr.open('GET', APP_URL, true);
 xhr.onload = function (e) {
   document.documentElement.replaceChild(this.response.head, document.head);
   document.documentElement.replaceChild(this.response.body, document.body);
-  console.log("After xhrc cookie");
-  console.log((' ' + document.cookie).slice(1));
   var csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
-  var newCookie = document.querySelector("[data-phx-main='true']").getAttribute("data-phx-session");
-  console.log(newCookie);
-  console.log(csrfToken);
-  /*
-  let newCookieString = COOKIE_KEY + "=" + newCookie + ";domain=.davenport.rocks;";
-  console.log(newCookieString)
-    document.cookie = newCookieString
-  */
-
-  console.log("After setting cookie");
-  console.log(document.cookie);
   var liveSocket = new phoenix_live_view__WEBPACK_IMPORTED_MODULE_4__["LiveSocket"](WEBSOCKETS_URI, phoenix__WEBPACK_IMPORTED_MODULE_2__["Socket"], {
     params: {
       _csrf_token: csrfToken
     },
-    hooks: _commands_js__WEBPACK_IMPORTED_MODULE_5__["Hooks"]
+    hooks: _hooks_js__WEBPACK_IMPORTED_MODULE_6__["Hooks"]
   });
   window.addEventListener("phx:page-loading-start", function (info) {
     return nprogress__WEBPACK_IMPORTED_MODULE_3___default.a.start();
@@ -4691,6 +4673,150 @@ function testSelector(job, configuration, proceed) {
   }
 }
 
+
+
+/***/ }),
+
+/***/ "./js/hooks.js":
+/*!*********************!*\
+  !*** ./js/hooks.js ***!
+  \*********************/
+/*! exports provided: Hooks */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Hooks", function() { return Hooks; });
+/* harmony import */ var _commands_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./commands.js */ "./js/commands.js");
+
+var Hooks = {};
+Hooks.fileTransfer = {
+  mounted: function mounted() {
+    var _this = this;
+
+    this.el.addEventListener("message", function (e) {
+      console.log("Got a file");
+
+      _this.pushEventTo('#screenshot-handler-component', "create_screenshot", e.detail);
+    });
+  }
+};
+Hooks.selectorTransfer = {
+  mounted: function mounted() {
+    var _this2 = this;
+
+    this.el.addEventListener("selector", function (e) {
+      console.log("Got a selector");
+      console.log(e.detail);
+
+      _this2.pushEventTo('#selector-handler', "transfer_selector", e.detail);
+    });
+  }
+};
+Hooks.configure = {
+  mounted: function mounted() {
+    this.handleEvent("configure", function (message) {
+      Object(_commands_js__WEBPACK_IMPORTED_MODULE_0__["handle_message"])(message, {
+        environment: 'extension'
+      });
+    });
+  }
+};
+Hooks.testSelector = {
+  mounted: function mounted() {
+    this.handleEvent("test_selector", function (message) {
+      console.log("Testing Selector");
+      console.log(message);
+      chrome.storage.local.get(['activeTabId'], function (result) {
+        message.payload.activeTabId = result.activeTabId;
+        Object(_commands_js__WEBPACK_IMPORTED_MODULE_0__["handle_message"])(message, {
+          environment: 'extension'
+        });
+      });
+    });
+  }
+};
+Hooks.jobRunner = {
+  mounted: function mounted() {
+    var _this3 = this;
+
+    this.handleEvent("message", function (message) {
+      var type = message.type;
+
+      if (type === 'process') {
+        var thisProcessId = _this3.el.attributes["phx-value-process-id"].value;
+        var messageProcessId = message.payload.process.id;
+
+        if (thisProcessId == messageProcessId) {
+          chrome.storage.local.get(['activeTabId', 'activeWindowId'], function (result) {
+            message.payload.activeTabId = result.activeTabId;
+            message.payload.activeWindowId = result.activeWindowId;
+            Object(_commands_js__WEBPACK_IMPORTED_MODULE_0__["handle_message"])(message, {
+              environment: 'extension'
+            });
+          });
+        }
+      }
+    }), this.el.addEventListener("message", function (e) {
+      console.log("Got a job update");
+      var payload = {
+        status: e.detail.status,
+        error: e.detail.error
+      };
+
+      _this3.pushEventTo('#' + e.detail.element_id, "update_status", payload);
+    });
+  }
+};
+Hooks.executeStep = {
+  mounted: function mounted() {
+    var _this4 = this;
+
+    this.handleEvent("message", function (message) {
+      var type = message.type;
+
+      if (type === 'step') {
+        var thisStepId = _this4.el.attributes["phx-value-step-id"].value;
+        var messageStepId = message.payload.process.steps[0].id;
+
+        if (thisStepId == messageStepId) {
+          chrome.storage.local.get(['activeTabId', 'activeWindowId'], function (result) {
+            message.payload.activeTabId = result.activeTabId;
+            message.payload.activeWindowId = result.activeWindowId;
+            Object(_commands_js__WEBPACK_IMPORTED_MODULE_0__["handle_message"])(message, {
+              environment: 'extension'
+            });
+          });
+        }
+      }
+    }), this.el.addEventListener("message", function (e) {
+      console.log("Got a step update");
+      console.log(e.detail);
+      var payload = {
+        status: e.detail.status,
+        error: e.detail.error
+      };
+
+      _this4.pushEventTo('#' + e.detail.element_id, "update_job_status", payload);
+    });
+  }
+};
+Hooks.CopySelector = {
+  mounted: function mounted() {
+    this.el.addEventListener("click", function (e) {
+      console.log("Copying Selector");
+      console.log(e.srcElement.attributes);
+      var selector = document.getElementById("selector-transfer-field").value;
+      var strategy = document.getElementById("strategy-transfer-field").value;
+      var selectorId = e.srcElement.attributes["selector"].value;
+      var strategyId = e.srcElement.attributes["strategy"].value;
+      var selectorField = document.getElementById(selectorId);
+      var strategyField = document.getElementById(strategyId);
+      selectorField.value = selector;
+      strategyField.value = strategy;
+    });
+  }
+};
 
 
 /***/ }),

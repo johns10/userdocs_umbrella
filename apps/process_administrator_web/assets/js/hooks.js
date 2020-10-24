@@ -1,3 +1,4 @@
+import {handle_message} from "./commands.js"
 
 let Hooks = {}
 Hooks.fileTransfer = {
