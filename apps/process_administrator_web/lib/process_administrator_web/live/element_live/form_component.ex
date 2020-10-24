@@ -57,6 +57,7 @@ defmodule ProcessAdministratorWeb.ElementLive.FormComponent do
               <button
                 class="button"
                 type="button"
+                id="<%= ID.strategy_field(form.data.page_id, form.data.id) %>"
                 selector="<%= ID.form_field(form.data, :strategy_id, prefix) %>"
                 strategy="<%= ID.form_field(form.data, :selector, prefix) %>"
                 phx-hook="CopySelector"

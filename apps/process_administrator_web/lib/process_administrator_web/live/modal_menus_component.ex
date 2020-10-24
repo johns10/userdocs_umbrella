@@ -14,7 +14,6 @@ defmodule ProcessAdministratorWeb.ModalMenus do
   def render(assigns) do
     ~L"""
       <div id="<%= @id %>">
-        <p>face</p>
         <%= if @action in [:new, :edit] do %>
           <%=
             case @type do

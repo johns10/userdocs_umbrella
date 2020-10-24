@@ -1,17 +1,5 @@
 <main role="main" class="container">
   <%= if @auth_state == :logged_in do %>
-    <h2>Team</h2>
-    Default Team ID: <%= @current_user.default_team_id %></br>
-    Selected Team ID: <%= # @selected_team_id %></br>
-    Current Team ID: <%= # @current_team_id %></br>
-    Current Team Name: <%= # @current_team.name %></br>
-    Current Team Default Project Id changeset: <%= # @current_team_changeset.data.default_project_id %></br>
-    Current Team Default Project Id: <%= # @current_team.default_project_id %></br>
-    Selected Project ID: <%= # @selected_project_id %></br>
-    Current Project ID: <%= # @current_project_id %></br>
-    Current Project Default Version Id: <%= # @current_project.default_version_id %></br>
-    Current Version ID: <%= # @current_version_id %></br>
-
     <%= LiveHelpers.live_version_picker(@socket, [
       id: "version-selector",
       current_user: @current_user,
