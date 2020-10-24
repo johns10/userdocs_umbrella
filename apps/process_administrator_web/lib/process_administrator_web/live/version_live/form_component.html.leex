@@ -1,0 +1,22 @@
+<%= f = form_for @changeset, "#",
+  id: "version-form",
+  phx_target: @myself.cid,
+  phx_change: "validate",
+  phx_submit: "save" %>
+
+  <%= Layout.text_input(f, [
+    field_name: :name
+  ]) %>
+
+  <%= Layout.form_row([
+    Layout.select_input(f, :strategy_id, @select_lists.strategies_select, [
+      id: ID.form_field(f.data, :strategy_id),
+    ]),
+    Layout.select_input(f, :project_id, @select_lists.projects_select, [
+      placeholder: @parent_id || "",
+      id: ID.form_field(f.data, :project_id),
+    ])
+  ]) %>
+
+  <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
+</form>

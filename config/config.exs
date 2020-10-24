@@ -27,6 +27,19 @@ config :userdocs_web, UserDocsWeb.Endpoint,
   pubsub_server: UserDocs.PubSub,
   live_view: [signing_salt: "EkPV4O8j"]
 
+config :process_administrator_web,
+  namespace: ProcessAdministratorWeb,
+  ecto_repos: [UserDocs.Repo],
+  generators: [context_app: :userdocs]
+
+# Configures the endpoint
+config :process_administrator_web, ProcessAdministratorWeb.Endpoint,
+  url: [host: "localhost"],
+  secret_key_base: "uYNO0z5S7TuzLxe//ihPPyhDY+9/juUgfW4fFJkw+nKlP/omZmmVMmcIWuBolrzY",
+  render_errors: [view: ProcessAdministratorWeb.ErrorView, accepts: ~w(html json), layout: false],
+  pubsub_server: UserDocs.PubSub,
+  live_view: [signing_salt: "EkPV4O8j"]
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
@@ -44,6 +57,12 @@ config :userdocs_web, :pow,
   repo: UserDocs.Repo,
   cache_store_backend: Pow.Store.Backend.MnesiaCache,
   routes_backend: UserDocsWeb.Pow.Routes
+
+config :process_administrator_web, :pow,
+  user: UserDocs.Users.User,
+  repo: UserDocs.Repo,
+  cache_store_backend: Pow.Store.Backend.MnesiaCache,
+  routes_backend: ProcessAdministratorWeb.Pow.Routes
 
 config :cors_plug,
   origin: ["chrome-extension://ohmjkpckjphdcdophkflpmdmihpiaejf", "http://localhost"],

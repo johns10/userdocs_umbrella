@@ -2,8 +2,6 @@ defmodule UserDocs.Web.Annotation.ChangeHandler do
 
   require Logger
 
-  alias UserDocsWeb.LiveHelpers
-
   alias UserDocs.Web
   alias UserDocs.Automation
   alias UserDocs.Documents

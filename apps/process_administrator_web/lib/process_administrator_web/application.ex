@@ -1,4 +1,4 @@
-defmodule UserDocsWeb.Application do
+defmodule ProcessAdministratorWeb.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -8,14 +8,17 @@ defmodule UserDocsWeb.Application do
   def start(_type, _args) do
     children = [
       # Start the Telemetry supervisor
-      UserDocsWeb.Telemetry,
+      ProcessAdministratorWeb.Telemetry,
       # Start the Endpoint (http/https)
-      UserDocsWeb.Endpoint
+      ProcessAdministratorWeb.Endpoint,
+      # Start a worker by calling: UserDocsWeb.Worker.start_link(arg)
+      # {UserDocsWeb.Worker, arg}
+      Pow.Store.Backend.MnesiaCache
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: UserDocsWeb.Supervisor]
+    opts = [strategy: :one_for_one, name: ProcessAdministratorWeb.Supervisor]
     :pg2.join(UserDocs.PubSub, self())
     Supervisor.start_link(children, opts)
   end
@@ -23,7 +26,7 @@ defmodule UserDocsWeb.Application do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    UserDocsWeb.Endpoint.config_change(changed, removed)
+    ProcessAdministratorWeb.Endpoint.config_change(changed, removed)
     :ok
   end
 end
