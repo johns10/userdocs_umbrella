@@ -93,14 +93,7 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
 
   def handle_event("test_selector", %{ "element-id" => element_id }, socket) do
     element_id = String.to_integer(element_id)
-
     element = UserDocs.Web.get_element!(element_id, %{ strategy: true }, %{}, socket.assigns.data)
-
-
-    test =
-      socket.assigns.data.elements
-      |> Enum.filter(fn(e) -> e.id == element_id end)
-      |> Enum.at(0)
 
     payload =  %{
       type: "step",
@@ -139,7 +132,6 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
   end
 
   defp save_step(socket, :edit, step_params) do
-    IO.puts("Saving step in formzs")
     case Automation.update_step(socket.assigns.step, step_params) do
       {:ok, _step} ->
         {

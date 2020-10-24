@@ -17,4 +17,8 @@ defmodule UserDocs.State do
     |> Enum.filter(fn(o) -> o.id == id end)
     |> Enum.at(0)
   end
+
+  def get(state, key, _module) do
+    Map.get(state, key)
+  end
 end

@@ -4,7 +4,7 @@
   phx_change: "validate",
   phx_submit: "save" %>
 
-  <%= Layout.select_input(f, :team_id, @select_lists.teams_select, [
+  <%= Layout.select_input(f, :team_id, @select_lists.teams, [
     placeholder: @parent_id || "",
     id: ID.form_field(f.data, :team_id)
   ]) %>

@@ -26,7 +26,7 @@ defmodule ProcessAdministratorWeb.ContentLive.FormComponent do
   def render_fields(assigns, form, prefix \\ "") do
     ~L"""
       <div class="field is-grouped">
-        <%= Layout.select_input(form, :team_id, @select_lists.teams_select, [
+        <%= Layout.select_input(form, :team_id, @select_lists.teams, [
             value: form.data.team_id || @parent_id
           ], "control") %>
 

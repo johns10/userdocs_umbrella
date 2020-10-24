@@ -13,6 +13,7 @@ defmodule ProcessAdministratorWeb.GroupComponent do
           <p class="card-header-title"  style="margin-bottom:0px;">
             <%= @object.name || "No Name" %>
           </p>
+          <%= @runner %>
           <a
             class="card-header-icon"
             phx-click="expand"

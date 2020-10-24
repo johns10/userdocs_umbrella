@@ -238,25 +238,11 @@ defmodule ProcessAdministratorWeb.IndexLive do
   def content_class([]), do: "content is-hidden"
   def content_class(_), do: "content"
 
-  def handle_event("edit-content", _, socket) do
-    IO.puts("Edit Content")
+  def handle_event("new-process", _, socket) do
+    IO.puts("New Process")
     message =
       base_message()
-      |> content_message(socket)
-      |> Map.put(:object, socket.assigns.annotation.content)
-      |> Map.put(:action, :edit)
-      |> Map.put(:title, "Edit Content")
-
-    send(self(), {:edit_content, message})
-
-    {:noreply, socket}
-  end
-
-  def handle_event("new-content", _, socket) do
-    IO.puts("New Content")
-    message =
-      base_message()
-      |> content_message(socket)
+      |> process_message(socket)
       |> Map.put(:object, %Content{})
       |> Map.put(:action, :new)
       |> Map.put(:title, "New Content")
@@ -266,20 +252,16 @@ defmodule ProcessAdministratorWeb.IndexLive do
     {:noreply, socket}
   end
 
-  def content_message(message, socket) do
-    select_list_constructors = [
-      {
-        :teams,
-        UserDocs.Users.User,
-        :teams,
-        socket.assigns.current_user
-      }
-    ]
+  def process_message(message, socket) do
+    select_lists = %{
+      versions:
+        DomainHelpers.select_list_temp(socket.assigns.data.versions, :name, false)
+    }
 
     message
-    |> Map.put(:type, :content)
+    |> Map.put(:type, :process)
     |> Map.put(:parent, %{id: 0})
-    |> Map.put(:select_list_constructors, select_list_constructors)
+    |> Map.put(:select_lists, :select_lists)
   end
 
   def handle_event("edit-project", _, socket) do
@@ -313,7 +295,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
   def project_message(message, socket) do
     select_list_constructors = [
       {
-        :teams_select,
+        :teams,
         UserDocs.Users.User,
         :teams,
         socket.assigns.current_user
@@ -357,13 +339,13 @@ defmodule ProcessAdministratorWeb.IndexLive do
   def version_message(message, socket) do
     select_list_constructors = [
       {
-        :projects_select,
+        :projects,
         UserDocs.Users.Team,
         :projects,
         socket.assigns.current_team
       },
       {
-        :strategies_select,
+        :strategies,
         :strategies
       }
     ]
@@ -400,6 +382,13 @@ defmodule ProcessAdministratorWeb.IndexLive do
     |> Map.put(:step_type, Automation.get_step_type!(state.step_types, step.step_type_id))
     |> Map.put(:annotation, annotation)
     |> Map.put(:element, element)
+  end
+
+  def preload_process(process, state) do
+    raw_steps = UserDocs.Automation.list_steps(%{}, %{ process_id: process.id })
+    preloaded_steps = Enum.map(raw_steps, &preload_step(&1, state))
+    process
+    |> Map.put(:steps, preloaded_steps)
   end
 
   @impl true
