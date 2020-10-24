@@ -1,4 +1,6 @@
 defmodule ProcessAdministratorWeb.ID do
+  require Logger
+
   def group(type, id) do
     type
     <> "-group-"
@@ -48,6 +50,10 @@ defmodule ProcessAdministratorWeb.ID do
     <> Atom.to_string(name)
   end
 
+  def type_from_struct(nil) do
+    Logger.error("Tried to get a type from a nil object")
+    "nil"
+  end
   def type_from_struct(object) do
     object.__meta__.schema
     |> Atom.to_string()
@@ -65,21 +71,33 @@ defmodule ProcessAdministratorWeb.ID do
   end
 
   def strategy_field(page_id, element_id) do
-    "page-"
-    <> Integer.to_string(page_id)
-    <> "-element-"
-    <> Integer.to_string(element_id)
+    page_prefix(page_id) <> "-"
+    <> element_prefix(element_id)
     <> "-strategy-field"
   end
 
   def selector_field(page_id, element_id) do
-    "page-"
-    <> Integer.to_string(page_id)
-    <> "-element-"
-    <> Integer.to_string(element_id)
+    page_prefix(page_id) <> "-"
+    <> element_prefix(element_id)
     <> "-form-selector-field"
   end
 
+  def page_prefix(nil), do: "page-not-assigned"
+  def page_prefix(page_id) do
+    "page-"
+    <> Integer.to_string(page_id)
+  end
+
+  def element_prefix(nil), do: "element-not-assigned"
+  def element_prefix(page_id) do
+    "element-"
+    <> Integer.to_string(page_id)
+  end
+
+  def prefix(nil) do
+    Logger.error("Tried to generate a prefix for a nil object")
+    "nil"
+  end
   def prefix(object) do
     type_from_struct(object) <> "-"
     <> maybe_id(object.id) <> "-"

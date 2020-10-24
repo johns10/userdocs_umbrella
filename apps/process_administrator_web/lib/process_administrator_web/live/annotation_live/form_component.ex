@@ -33,7 +33,7 @@ defmodule ProcessAdministratorWeb.AnnotationLive.FormComponent do
     ~L"""
       <%= hidden_input(form, :name, [
         id: ID.form_field(form.data, :name, prefix),
-        value: @current_object.annotation.name
+        value: form.data.name
       ]) %>
 
       <div class="field is-grouped">

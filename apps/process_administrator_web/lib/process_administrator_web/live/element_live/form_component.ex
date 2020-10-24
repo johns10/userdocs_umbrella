@@ -44,7 +44,7 @@ defmodule ProcessAdministratorWeb.ElementLive.FormComponent do
         <p class="control is-expanded">
           <div class="field has-addons">
 
-            <%= Layout.select_input(form, :strategy_id, @select_lists.strategies_select, [
+            <%= Layout.select_input(form, :strategy_id, @select_lists.strategies, [
                 id: ID.form_field(form.data, :strategy_id, prefix), label: false
               ], "control") %>
 

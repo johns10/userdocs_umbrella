@@ -3,12 +3,9 @@ defmodule ProcessAdministratorWeb.ModalMenus do
   use Phoenix.HTML
 
 
-  alias ProcessAdministratorWeb.VersionLive
-  alias ProcessAdministratorWeb.ProjectLive
-  alias ProcessAdministratorWeb.ContentLive
-  alias ProcessAdministratorWeb.ElementLive
-  alias ProcessAdministratorWeb.AnnotationLive
-  alias ProcessAdministratorWeb.LiveHelpers
+  alias ProcessAdministratorWeb.VersionLive.FormComponent, as: VersionForm
+  alias ProcessAdministratorWeb.ProjectLive.FormComponent, as: ProjectForm
+  alias ProcessAdministratorWeb.ProcessLive.FormComponent, as: ProcessForm
 
   @impl true
   def render(assigns) do
@@ -18,7 +15,7 @@ defmodule ProcessAdministratorWeb.ModalMenus do
           <%=
             case @type do
               :version ->
-                LiveHelpers.live_modal @socket, VersionLive.FormComponent,
+                LiveHelpers.live_modal @socket, VersionForm,
                   id: @object.id || :new,
                   title: @title,
                   action: @action,
@@ -26,52 +23,28 @@ defmodule ProcessAdministratorWeb.ModalMenus do
                   parent_id: @parent.id,
                   return_to: Routes.automation_index_path(@socket, :index),
                   select_lists: %{
-                    strategies_select: @select_lists.strategies_select,
-                    projects_select: @select_lists.projects_select
+                    strategies: @select_lists.strategies,
+                    projects: @select_lists.projects
                   }
               :project ->
-                LiveHelpers.live_modal @socket, ProjectLive.FormComponent,
+                LiveHelpers.live_modal @socket, ProjectForm,
                   id: @object.id || :new,
                   title: @title,
                   action: @action,
                   project: @object,
                   parent_id: @parent.id,
                   select_lists: %{
-                    teams_select: @select_lists.teams_select,
+                    teams: @select_lists.teams,
                   }
-              :content ->
-                LiveHelpers.live_modal @socket, ContentLive.FormComponent,
+              :process ->
+                LiveHelpers.live_modal @socket, ProcessForm,
                   id: @object.id || :new,
                   title: @title,
                   action: @action,
-                  content: @object,
+                  project: @object,
                   parent_id: @parent.id,
                   select_lists: %{
-                    teams_select: @select_lists.teams,
-                  }
-              :element ->
-                LiveHelpers.live_modal @socket, ElementLive.FormComponent,
-                  id: @current_element.id || :new,
-                  title: @title,
-                  action: @action,
-                  element: @current_element,
-                  parent: @current_page,
-                  current_user: @current_user,
-                  select_lists: %{
-                    teams: @data.teams
-                  }
-              :annotation ->
-                LiveHelpers.live_modal @socket, AnnotationLive.FormComponent,
-                  id: @current_annotation.id || :new,
-                  title: @title,
-                  action: @action,
-                  annotation: @current_annotation,
-                  parent: @current_page,
-                  current_user: @current_user,
-                  current_version: @current_version,
-                  related_element_name: @current_element.name,
-                  select_lists: %{
-                    teams: @data.teams
+                    versions: @select_lists.versions,
                   }
             end
           %>

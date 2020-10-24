@@ -89,6 +89,7 @@ defmodule ProcessAdministratorWeb.LiveHelpers do
       select_lists: Keyword.fetch!(opts, :select_lists),
       content: Keyword.fetch!(opts, :content),
       object_type: Keyword.fetch!(opts, :object_type),
+      runner: Keyword.fetch!(opts, :runner),
       opts: opts
     ]
 

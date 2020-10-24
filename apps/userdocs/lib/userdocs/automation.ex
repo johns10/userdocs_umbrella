@@ -175,6 +175,23 @@ defmodule UserDocs.Automation do
     |> maybe_preload_file(params[:content_versions])
     |> Repo.all()
   end
+  def list_steps(_params, filters, state) do
+    UserDocs.State.get(state, :steps, AnnotationType)
+    |> maybe_filter_by_process(filters[:process_id], state)
+  end
+
+  defp maybe_filter_by_process(query, nil), do: query
+  defp maybe_filter_by_process(query, process_id) do
+    from(step in query,
+      where: step.process_id == ^process_id,
+      order_by: step.order
+    )
+  end
+  defp maybe_filter_by_process(steps, nil, _), do: steps
+  defp maybe_filter_by_process(steps, process_id, state) do
+    state.steps
+    |> Enum.filter(fn(s) -> s.process_id == process_id end)
+  end
 
   defp maybe_filter_steps_by_version(query, nil), do: query
   defp maybe_filter_steps_by_version(query, version_id) do
@@ -213,14 +230,6 @@ defmodule UserDocs.Automation do
       left_join: version in assoc(process, :version),
       left_join: project in assoc(version, :project),
       where: project.team_id == ^team_id,
-      order_by: step.order
-    )
-  end
-
-  defp maybe_filter_by_process(query, nil), do: query
-  defp maybe_filter_by_process(query, process_id) do
-    from(step in query,
-      where: step.process_id == ^process_id,
       order_by: step.order
     )
   end

@@ -30,6 +30,11 @@
           object: process,
           object_type: UserDocs.Automation.Process,
           object_form: ProcessLive.FormComponent,
+          runner:
+            live_component(@socket, ProcessLive.Runner, [
+              id: "process-" <> Integer.to_string(process.id) <> "-runner",
+              process: preload_process(process, assigns)
+            ]),
           child_type: UserDocs.Automation.Step,
           new_form_component: StepLive.FormComponent,
           data: %{
@@ -48,6 +53,7 @@
               Enum.filter(@pages, fn(p) -> p.version_id == @current_version.id end), :name, false),
           },
           content:
+            # TODO: Figure out how to base this on the process.steps for an obvious performance improvement
             for step <- Enum.filter(@steps, fn(s) -> s.process_id == process.id end) do
               {
                 &LiveHelpers.live_collapsible_form/2,
@@ -79,8 +85,8 @@
                     pages: @pages,
                   },
                   select_lists: %{
-                    teams_select: DomainHelpers.select_list_temp(@teams, :name, false),
-                    strategies_select: DomainHelpers.select_list_temp(@strategies, :name, false),
+                    teams: DomainHelpers.select_list_temp(@teams, :name, false),
+                    strategies: DomainHelpers.select_list_temp(@strategies, :name, false),
                     language_codes: DomainHelpers.select_list_temp(@language_codes, :code, false),
                     step_types_select: DomainHelpers.select_list_temp(@step_types, :name, false),
                     annotations: DomainHelpers.select_list_temp(@annotations, :name, false),
@@ -110,15 +116,6 @@
             end
       ]) %>
     <% end %>
-
-    <%=
-      strategy =
-        @strategies
-        |> Enum.filter(fn(s) -> s.id == @current_version.strategy_id end)
-        |> Enum.at(0)
-
-      strategy.name
-    %>
 
     <%= live_component(@socket, UserDocsWeb.ScreenShotHandler,
     [ id: "screenshot-handler-component" ]) %>
