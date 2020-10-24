@@ -14,6 +14,7 @@ defmodule UserDocsWeb.ProcessAdministratorLive.CollapsableFormComponent do
           <p class="card-header-title" style="margin-bottom:0px;">
             <%= @title  %>
           </p>
+          <%= @runner %>
           <a
             class="card-header-icon"
             phx-click="expand"

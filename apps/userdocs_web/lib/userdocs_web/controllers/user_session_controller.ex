@@ -17,7 +17,6 @@ defmodule UserDocsWeb.UserSessionController do
       render(conn, "new.html", error_message: "Invalid email or password")
     end
   end
-
   def delete(conn, _params) do
     conn
     |> put_flash(:info, "Logged out successfully.")

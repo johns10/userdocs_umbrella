@@ -28,12 +28,11 @@ defmodule UserDocsWeb.ProcessAdministratorLive.ContentVersionLive.FormComponent 
 
   def render_fields(assigns, form, prefix \\ "") do
     ~L"""
-      <div class="field is-grouped">
+      <%= hidden_input form, :content_id %>
+      <%= hidden_input form, :version_id %>
+      <%= hidden_input form, :temp_id %>
 
-        <%= Layout.select_input(form, :content_id, @select_lists.content, [
-          value: form.data.content_id,
-          id: ID.form_field(form.data, :content_id, prefix)
-        ], "control") %>
+      <div class="field is-grouped">
 
         <%= Layout.select_input(form, :language_code_id, @select_lists.language_codes, [
           value: form.data.language_code_id,

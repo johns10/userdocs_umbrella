@@ -506,6 +506,7 @@ function applyAnnotation(job, configuration, proceed) {
 function blur(job, configuration) {}
 
 function badge(job, configuration, proceed) {
+  console.log("Applying badge annotation");
   var step = current_step(job);
   var selector = step.element.selector;
   var strategy = step.element.strategy;
@@ -517,7 +518,7 @@ function badge(job, configuration, proceed) {
   var color = step.annotation.color;
   var xOffset = step.annotation.x_offset;
   var yOffset = step.annotation.y_offset;
-  var fontSize = 25;
+  var fontSize = step.annotation.font_size;
   var wrapper = document.createElement('div');
   var badge = document.createElement('span');
   var label = document.createElement('span');
@@ -534,6 +535,7 @@ function badge(job, configuration, proceed) {
   };
   var x = x_calcs[badge_x];
   var y = y_calcs[badge_y];
+  console.log("Placing a badge at " + x.toString() + ", " + y.toString());
   wrapper.style.display = 'static';
   wrapper.style.justifyContent = 'center';
   wrapper.style.alignItems = 'center';
@@ -835,6 +837,7 @@ function waitForElement(job, configuration, proceed) {
       step.status = "running_prechecks";
       clearTimeout(timeout);
       clearInterval(interval);
+      console.log(element);
       console.log("found");
       success(job, configuration, proceed);
     }
@@ -869,6 +872,7 @@ function getElement(strategy, selector) {
     element = document.querySelector(selector);
   }
 
+  console.log(element);
   return element;
 }
 

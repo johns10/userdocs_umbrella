@@ -319,6 +319,7 @@ defmodule UserDocs.Automation do
 
   """
   def update_step(%Step{} = step, attrs) do
+    IO.puts("Updatiung step")
     {status, step} =
       step
       |> Step.changeset(attrs)
@@ -329,35 +330,55 @@ defmodule UserDocs.Automation do
 
     {status, step}
   end
-  def update_children(%{ annotation: annotation}) do
+  def update_children(object) do
+    Map.get(object, :annotation)
+    object
+    |> maybe_update_annotation(Map.get(object, :annotation, nil))
+    |> maybe_update_element(Map.get(object, :element, nil))
+    |> maybe_update_content(Map.get(object, :content, nil))
+  end
+
+  def maybe_update_annotation(object, nil), do: object
+  def maybe_update_annotation(_, annotation) do
     Endpoint.broadcast("annotation", "update", annotation)
   end
-  def update_children(%{ element: element}) do
+
+  def maybe_update_element(object, nil), do: object
+  def maybe_update_element(_, element) do
     Endpoint.broadcast("element", "update", element)
   end
-  def update_children(%{ content: content}) do
+
+  def maybe_update_content(object, nil), do: object
+  def maybe_update_content(_, content) do
+    IO.puts("Updating content")
     Endpoint.broadcast("content", "update", content)
+
+    content
+    |> maybe_update_content_versions(Map.get(content, :content_versions, nil))
   end
 
-  def update_step_annotation_id(%Step{} = step, %{ name: name, annotation_id: annotation_id }) do
-    { status, step } =
-      step
-      |> Step.changeset(%{})
-      |> Ecto.Changeset.put_change(:annotation_id, annotation_id)
-      |> Ecto.Changeset.put_change(:name, name)
-      |> Repo.update()
+  def maybe_update_content_versions(object, nil), do: object
+  def maybe_update_content_versions(object, content_versions) do
+    IO.puts("Updating content versions")
+    Enum.each(content_versions, fn(cv) ->
+      Endpoint.broadcast("content_version", "update", cv)
+    end)
+  end
 
-    {status, step}
+
+  def update_step_annotation_id(%Step{} = step, %{ name: name, annotation_id: annotation_id }) do
+    step
+    |> Step.changeset(%{})
+    |> Ecto.Changeset.put_change(:annotation_id, annotation_id)
+    |> Ecto.Changeset.put_change(:name, name)
+    |> Repo.update()
   end
 
   def update_step_element_id(%Step{} = step, %{ element_id: element_id }) do
-    { status, step } =
-      step
-      |> Step.changeset(%{})
-      |> Ecto.Changeset.put_change(:element_id, element_id)
-      |> Repo.update()
-
-    {status, step}
+    step
+    |> Step.changeset(%{})
+    |> Ecto.Changeset.put_change(:element_id, element_id)
+    |> Repo.update()
   end
 
   @doc """

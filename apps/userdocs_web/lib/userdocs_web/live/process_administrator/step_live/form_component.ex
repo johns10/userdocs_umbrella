@@ -11,6 +11,7 @@ defmodule UserDocsWeb.ProcessAdministratorLive.StepLive.FormComponent do
 
   alias UserDocs.Automation
   alias UserDocs.ChangeTracker
+  alias UserDocs.Documents
   alias UserDocs.Documents.ContentVersion
 
   @impl true
@@ -59,6 +60,7 @@ defmodule UserDocsWeb.ProcessAdministratorLive.StepLive.FormComponent do
       |> assign(:auto_gen_name, "")
       |> assign(:nested_element_expanded, false)
       |> assign(:nested_annotation_expanded, false)
+      |> assign(:nested_annotation_content_expanded, false)
     }
   end
 
@@ -87,52 +89,57 @@ defmodule UserDocsWeb.ProcessAdministratorLive.StepLive.FormComponent do
   @impl true
   def handle_event("expand-annotation", _, socket), do: {:noreply, expand(socket, :nested_annotation_expanded)}
   def handle_event("expand-element", _, socket), do: {:noreply, expand(socket, :nested_element_expanded)}
+  def handle_event("expand-annotation-content", _, socket), do: {:noreply, expand(socket, :nested_annotation_content_expanded)}
 
-  @impl true
-  def handle_event("add-content-version", _, socket) do
-    # TODO: May not be necessary
-    """
-    { _status, current_object } =
-      case Ecto.Changeset.apply_action(changeset, :update) do
-        { :ok, current_object } -> { :ok, current_object }
-        { _, _ } -> { :nok, socket.assigns.current_object }
-      end
-    """
+  def handle_event("test_selector", %{ "element-id" => element_id }, socket) do
+    element_id = String.to_integer(element_id)
+
+    element = UserDocs.Web.get_element!(element_id, %{ strategy: true }, %{}, socket.assigns.data)
+
+
+    test =
+      socket.assigns.data.elements
+      |> Enum.filter(fn(e) -> e.id == element_id end)
+      |> Enum.at(0)
+
+    payload =  %{
+      type: "step",
+      payload: %{
+        process: %{
+          steps: [
+            %{
+              id: 0,
+              selector: element.selector,
+              strategy: element.strategy,
+              step_type: %{
+                name: "Test Selector"
+              }
+            }
+           ],
+        },
+        element_id: socket.assigns.id,
+        status: "not_started",
+        active_annotations: []
+      }
+    }
 
     {
       :noreply,
       socket
-      |> assign(changeset: ContentVersion.add_content_version(socket.assigns))
+      |> push_event("test_selector", payload)
     }
   end
 
   @impl true
-  def handle_event("remove-content-version", %{"remove" => remove_id}, socket) do
-    # TODO: May not be necessary
-    """
-    { _status, current_step } =
-      case Ecto.Changeset.apply_action(changeset, :update) do
-        { :ok, current_step } -> { :ok, current_step }
-        { _, _ } -> { :nok, socket.assigns.current_step }
-      end
-    """
-
-      {
-        :noreply,
-        socket
-        |> assign(changeset: ContentVersion.remove_content_version(socket.assigns, remove_id))
-      }
-  end
-
-  @impl true
   def handle_event("delete-content-version", %{"id" => id}, socket) do
-    content_version = Documents.get_content_version!(id, %{}, %{}, socket.assigns)
+    content_version = Documents.get_content_version!(String.to_integer(id), %{}, %{}, socket.assigns.data)
     {:ok, _} = Documents.delete_content_version(content_version)
 
     {:noreply, socket}
   end
 
   defp save_step(socket, :edit, step_params) do
+    IO.puts("Saving step in formzs")
     case Automation.update_step(socket.assigns.step, step_params) do
       {:ok, _step} ->
         {

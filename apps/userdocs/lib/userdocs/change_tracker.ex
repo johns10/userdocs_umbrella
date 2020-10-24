@@ -27,7 +27,7 @@ defmodule UserDocs.ChangeTracker do
 
     # Run the changes through the handle_changes function in the domain
     # This produces the changes
-    state = apply(
+    apply(
       current_object.__meta__.schema,
       :handle_changes,
       [ current_changes.changes, state ]

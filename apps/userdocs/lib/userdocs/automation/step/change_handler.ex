@@ -6,6 +6,7 @@ defmodule UserDocs.Automation.Step.ChangeHandler do
 
   alias UserDocs.Web
   alias UserDocs.Automation
+  alias UserDocs.Documents
 
   alias UserDocs.Automation.Step
   alias UserDocs.Automation.Step.Name
@@ -53,12 +54,20 @@ defmodule UserDocs.Automation.Step.ChangeHandler do
   end
   def execute(%{annotation_id: annotation_id}, state) do
     Logger.debug("Handling a change to annotation id: #{annotation_id}")
+    annotation = Web.get_annotation!(state.data, annotation_id)
+    content = Documents.get_content!(
+      annotation.content_id, %{ content_version: true }, %{}, state.data.content)
+
+    annotation =
+      annotation
+      |> Map.put(:content, content)
+
     Automation.update_step_annotation_id(
       state.step,
       new_object =
         state.current_object
         |> Map.put(:annotation_id, annotation_id)
-        |> Map.put(:annotation, Web.get_annotation!(state.data, annotation_id))
+        |> Map.put(:annotation, annotation)
     )
 
     %{
@@ -67,13 +76,13 @@ defmodule UserDocs.Automation.Step.ChangeHandler do
       changeset:
         state.changeset.data
         |> Map.put(:annotation_id, annotation_id)
-        |> Map.put(:annotation, Web.get_annotation!(state.data, annotation_id))
+        |> Map.put(:annotation, annotation)
         |> (&(Map.put(state.changeset, :data, &1))).(),
 
       step:
         state.step
         |> Map.put(:annotation_id, annotation_id)
-        |> Map.put(:annotation, Web.get_annotation!(state.data, annotation_id))
+        |> Map.put(:annotation, annotation)
         |> (&(Map.put(&1, :name, Name.execute(&1)))).()
 
     }
@@ -102,17 +111,32 @@ defmodule UserDocs.Automation.Step.ChangeHandler do
       step:
         state.step
         |> Map.put(:element_id, element_id)
-        |> Map.put(:element, Web.get_element!(state.data, element_id))
+        |> Map.put(:element, element)
         |> (&(Map.put(&1, :name, Name.execute(&1)))).()
 
     }
   end
-  def execute(%{element_id: element_id}, socket) do
-    Logger.debug("Handling a change to element id: #{element_id}")
-    %{}
+
+  def execute(%{annotation: %{ changes: %{ content_id: _ }} = annotation}, state) do
+    Logger.debug("Handling a change to the nested annotations content id")
+    %{ annotation: annotation } = Annotation.ChangeHandler.execute(annotation.changes, state)
+    %{
+      current_object:
+        Map.put(state.current_object, :annotation, annotation),
+
+      changeset:
+        state.changeset.data
+        |> Map.put(:annotation, annotation)
+        |> (&(Map.put(state.changeset, :data, &1))).(),
+
+      step:
+        state.step
+        |> Map.put(:annotation, annotation)
+    }
   end
+
   def execute(%{annotation: %{ changes: %{annotation_type_id: annotation_type_id}} = annotation}, state) do
-    Logger.debug("Handling a change to content id in the annotation type: #{annotation_type_id}")
+    Logger.debug("Handling a change to annotation_type_id in the annotation type: annotation_type_id")
     changes = Annotation.ChangeHandler.execute(annotation.changes, state)
     %{
       enabled_annotation_fields:
@@ -126,6 +150,7 @@ defmodule UserDocs.Automation.Step.ChangeHandler do
         |> (&(Map.put(&1, :name, Name.execute(&1)))).(),
     }
   end
+
   def execute(%{annotation: annotation}, state) do
     Logger.debug("Handling a change to the nested annotation:")
     changes = Annotation.ChangeHandler.execute(annotation.changes, state)
@@ -134,12 +159,7 @@ defmodule UserDocs.Automation.Step.ChangeHandler do
         Map.put(state.current_object, :annotation, changes.annotation)
     }
   end
-  def execute(%{annotation: %{changes: %{content_id: content_id}}}, socket) do
-    # In this function we'll fetch the versions, and the content versions for the selected
-    # content id, and pick the current content version as the first item in content_versions
-    Logger.debug("Handling a change to content id in the annotation: #{content_id}")
-    %{}
-  end
+
   def execute(object, socket) do
     IO.puts("No changes we need to respond to on the step form")
     %{}

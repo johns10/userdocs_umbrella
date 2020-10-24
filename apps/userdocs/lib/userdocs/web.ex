@@ -189,7 +189,13 @@ defmodule UserDocs.Web do
       ** (Ecto.NoResultsError)
 
   """
-  def get_annotation_type!(id), do: Repo.get!(AnnotationType, id)
+  def get_annotation_type!(id, _params \\ %{}, _filters \\ %{})
+  def get_annotation_type!(id, _params, _filters) do
+    Repo.get!(AnnotationType, id)
+  end
+  def get_annotation_type!(id, _params, _filters, state) do
+    UserDocs.State.get!(state, id, :annotation_types, AnnotationType)
+  end
 
   @doc """
   Creates a annotation_type.
@@ -278,6 +284,17 @@ defmodule UserDocs.Web do
   defp maybe_preload_strategy(query, nil), do: query
   defp maybe_preload_strategy(query, _), do: from(elements in query, preload: [:strategy])
 
+  defp maybe_preload_strategy(object, nil, _), do: object
+  defp maybe_preload_strategy(object, _, state) do
+    strategy =
+      state.strategies
+      |> Enum.filter(fn(s) -> s.id == object.strategy_id end)
+      |> Enum.at(0)
+
+    object
+    |> Map.put(:strategy, strategy)
+  end
+
   defp maybe_filter_by_version_id(query, nil), do: query
   defp maybe_filter_by_version_id(query, team_id) do
     from(element in query,
@@ -311,11 +328,20 @@ defmodule UserDocs.Web do
       ** (Ecto.NoResultsError)
 
   """
-  def get_element!(id), do: Repo.get!(Element, id)
-  def get_element!(state, id) do
+  def get_element!(id, _params \\ %{}, _filters \\ %{})
+  def get_element!(id, _params, _filters) when is_integer(id) do
+    Repo.get!(Element, id)
+  end
+  def get_element!(id, params, _filters, state) when is_integer(id) do
     UserDocs.State.get!(state, id, :elements, Element)
+    |> maybe_preload_strategy(params[:strategy], state)
   end
 
+
+  def get_content!(id, params, _filters, state) do
+    UserDocs.State.get!(state, id, :content, Content)
+    |> maybe_preload_strategy(params[:content_versions], state)
+  end
 
   @doc """
   Creates a element.
@@ -474,10 +500,8 @@ defmodule UserDocs.Web do
   """
   def get_annotation!(id), do: Repo.get!(Annotation, id)
   def get_annotation!(%{ annotations: annotations }, id), do: get_annotation!(annotations, id)
-  def get_annotation!(annotations, id) when is_list(annotations) do
-    annotations
-    |> Enum.filter(fn(a) -> a.id == id end)
-    |> Enum.at(0)
+  def get_annotation!(id, _params, _filters, state) do
+    UserDocs.State.get!(state, id, :annotations, Annotation)
   end
 
   @doc """
@@ -526,6 +550,13 @@ defmodule UserDocs.Web do
     { status, annotation }
   end
 
+  def update_annotation_content_id(%Annotation{} = annotation, %{ content_id: content_id }) do
+    annotation
+    |> Annotation.changeset(%{})
+    |> Ecto.Changeset.put_change(:content_id, content_id)
+    |> Repo.update()
+  end
+
   @doc """
   Deletes a annotation.
 
@@ -558,13 +589,7 @@ defmodule UserDocs.Web do
   alias UserDocs.Web.Strategy
 
   @doc """
-  Returns the list of annotation_types.
-
-  ## Examples
-
-      iex> list_annotation_types()
-      [%AnnotationType{}, ...]
-
+  Returns the list of strategies.
   """
   def list_strategies do
     Repo.all(Strategy)

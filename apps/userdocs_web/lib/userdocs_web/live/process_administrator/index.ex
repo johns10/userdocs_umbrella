@@ -34,13 +34,10 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
   def mount(_params, session, socket) do
     Endpoint.subscribe("process")
     Endpoint.subscribe("page")
-    Endpoint.subscribe("version_process")
+    Endpoint.subscribe("process")
     Endpoint.subscribe("step")
-    Endpoint.subscribe("step::annotation-id")
-    Endpoint.subscribe("step::element-id")
     Endpoint.subscribe("element")
     Endpoint.subscribe("annotation")
-    Endpoint.subscribe("content_version")
     Endpoint.subscribe("content")
 
     # Get Data from the Database
@@ -50,22 +47,30 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
       |> validate_logged_in(session)
       |> initialize()
 
-    IO.inspect(socket.assigns.auth_state)
-
     {:ok, socket}
   end
 
   def validate_logged_in(socket, session) do
     try do
-      socket
-      |> maybe_assign_current_user(session)
-      |> assign(:auth_state, :logged_in)
+      case maybe_assign_current_user(socket, session) do
+        %{ assigns: %{ current_user: nil }} ->
+          socket
+          |> assign(:auth_state, :not_logged_in)
+          |> assign(:changeset, UserDocs.Users.change_user(%UserDocs.Users.User{}))
+        %{ assigns: %{ current_user: _ }} ->
+          socket
+          |> maybe_assign_current_user(session)
+          |> assign(:auth_state, :logged_in)
+          |> (&(assign(&1, :changeset, UserDocs.Users.change_user(&1.assigns.current_user)))).()
+        error ->
+          IO.inspect(error)
+          socket
+      end
     rescue
-      _ ->
+      FunctionClauseError ->
         socket
-        |> assign(:action, :edit)
-        |> assign(:changeset, UserDocs.Users.change_user(%UserDocs.Users.User{}))
         |> assign(:auth_state, :not_logged_in)
+        |> assign(:changeset, UserDocs.Users.change_user(%UserDocs.Users.User{}))
     end
   end
 
@@ -84,9 +89,8 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
     |> (&(  assign(&1, :versions,         State.versions(&1.assigns.current_user.default_team_id))          )).()
     |> (&(  assign(&1, :content,          State.content(&1.assigns.current_user.default_team_id))           )).()
     |> (&(  assign(&1, :content_versions, State.content_versions(&1.assigns.current_user.default_team_id))  )).()
-    |> (&(  State.apply_changes(&1, Select.initialize(&1.assigns)))).()
+    |> (&(  State.apply_changes(&1, Select.initialize(&1.assigns))                                          )).()
     |> (&(  assign(&1, :current_strategy, &1.assigns.current_version.strategy)                              )).()
-    |> State.report()
     |> (&(  assign(&1, :processes,        State.processes(&1.assigns.current_version.id))                   )).()
     |> (&(  assign(&1, :steps,            State.steps(&1.assigns.current_version.id))                       )).()
     |> (&(  assign(&1, :annotations,      State.annotations(&1.assigns.current_version.id))                 )).()
@@ -94,10 +98,11 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
     |> (&(  assign(&1, :pages,            State.pages(&1.assigns.current_version.id))                       )).()
     |> (&(  assign(&1, :current_processes,Version.processes(&1.assigns.current_version.id, &1.assigns.processes))   )).()
     |> assign(:process_menu, [])
+    |> State.report()
   end
 
   def initialize(%{ assigns: %{ auth_state: _ }} = socket) do
-    IO.inspect("User not logged in")
+    Logger.debug("User not logged in")
     socket
   end
 
@@ -261,8 +266,6 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
   end
 
   def content_message(message, socket) do
-    IO.puts("Content Message")
-    IO.inspect(Map.keys(socket.assigns))
     select_list_constructors = [
       {
         :teams,
@@ -377,19 +380,30 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
   end
 
   def preload_step(step, state) do
-    annotation =
-      Web.get_annotation!(state.annotations, step.annotation_id)
-
-    annotation =
-      if annotation do
-        Map.put(annotation, :content, Documents.get_content!(state.content, annotation.content_id))
+    element =
+      if step.element_id do
+        element = Web.get_element!(step.element_id, %{ strategy: true }, %{}, state)
       end
 
+    annotation =
+      if step.annotation_id do
+        annotation = Web.get_annotation!(step.annotation_id, %{}, %{}, state)
+
+        annotation
+        |> Map.put(:content, Documents.get_content!(annotation.content_id, %{}, %{}, state.content))
+        |> Map.put(:annotation_type, Web.get_annotation_type!(annotation.annotation_type_id, %{}, %{}, state))
+      end
 
     step
     |> Map.put(:page, Web.get_page!(state.pages, step.page_id))
     |> Map.put(:step_type, Automation.get_step_type!(state.step_types, step.step_type_id))
     |> Map.put(:annotation, annotation)
-    |> Map.put(:element, Web.get_element!(state.elements, step.element_id))
+    |> Map.put(:element, element)
+  end
+
+  @impl true
+  def handle_event("login", %{"user" => user_params}, socket) do
+    IO.puts("Handling login")
+    { :noreply, socket}
   end
 end

@@ -66,7 +66,13 @@
                 @socket,
                 [
                   id: ID.form(step, :edit, Step),
-                  title: step.name,
+                  title:
+                    step.name,
+                  runner:
+                    live_component(@socket, StepLive.Runner, [
+                      id: "step-" <> Integer.to_string(step.id) <> "-runner",
+                      step: preload_step(step, assigns),
+                      step_type_name: preload_step(step, assigns).step_type.name]),
                   parent: process,
                   object: preload_step(step, assigns),
                   object_type: Step,
@@ -76,6 +82,7 @@
                     annotation_types: @annotation_types,
                     content_versions: @content_versions,
                     annotations: @annotations,
+                    strategies: @strategies,
                     step_types: @step_types,
                     processes: @processes,
                     elements: @elements,
@@ -175,7 +182,7 @@
       </div>
     </nav>
   <% else %>
-    <%= form_for @changeset, "#", fn f -> %>
+    <%= form_for @changeset, "http://app.davenport.rocks:4000/session", [as: :user], fn f -> %>
       <%= if @changeset.action do %>
         <div class="alert alert-danger">
           <p>Oops, something went wrong! Please check the errors below.</p>

@@ -4,7 +4,6 @@ defmodule UserDocsWeb.PageLive do
 
   @impl true
   def mount(_params, session, socket) do
-    socket = maybe_assign_current_user(socket, session)
     {:ok, assign(socket, query: "", results: %{})}
   end
 

@@ -292,6 +292,7 @@ function blur(job, configuration) {
 }
 
 function badge(job, configuration, proceed) {
+  console.log("Applying badge annotation")
   const step = current_step(job)
   const selector = step.element.selector
   const strategy = step.element.strategy
@@ -304,7 +305,7 @@ function badge(job, configuration, proceed) {
   var color = step.annotation.color
   var xOffset = step.annotation.x_offset
   var yOffset = step.annotation.y_offset
-  var fontSize = step.font_size;
+  var fontSize = step.annotation.font_size;
 
   var wrapper = document.createElement('div');
   var badge = document.createElement('span');
@@ -325,6 +326,8 @@ function badge(job, configuration, proceed) {
 
   const x = x_calcs[badge_x]
   const y = y_calcs[badge_y]
+
+  console.log("Placing a badge at " + x.toString() + ", " + y.toString())
 
   wrapper.style.display = 'static';
   wrapper.style.justifyContent = 'center';
@@ -640,6 +643,7 @@ function waitForElement(job, configuration, proceed) {
       step.status = "running_prechecks"
       clearTimeout(timeout)
       clearInterval(interval)
+      console.log(element)
       console.log("found")
       success(job, configuration, proceed)
     }
@@ -679,6 +683,7 @@ function getElement(strategy, selector) {
   } else if (strategy.name == 'css') {
     element = document.querySelector(selector)
   }
+  console.log(element)
   return element
 }
 

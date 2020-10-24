@@ -42,7 +42,8 @@ import_config "#{Mix.env()}.exs"
 config :userdocs_web, :pow,
   user: UserDocs.Users.User,
   repo: UserDocs.Repo,
-  cache_store_backend: Pow.Store.Backend.MnesiaCache
+  cache_store_backend: Pow.Store.Backend.MnesiaCache,
+  routes_backend: UserDocsWeb.Pow.Routes
 
 config :cors_plug,
   origin: ["chrome-extension://ohmjkpckjphdcdophkflpmdmihpiaejf", "http://localhost"],

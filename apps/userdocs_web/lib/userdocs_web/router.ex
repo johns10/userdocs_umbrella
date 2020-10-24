@@ -1,27 +1,19 @@
 defmodule UserDocsWeb.Router do
   use UserDocsWeb, :router
 
-  import UserDocsWeb.UserAuth
   use Pow.Phoenix.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
-    plug UserDocsWeb.TestPlug
     plug :fetch_live_flash
     plug :put_root_layout, {UserDocsWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug :fetch_current_user
   end
 
   pipeline :api do
     plug :accepts, ["json"]
-  end
-
-  pipeline :protected do
-    plug Pow.Plug.RequireAuthenticated,
-      error_handler: Pow.Phoenix.PlugErrorHandler
   end
 
   scope "/" do
@@ -29,16 +21,41 @@ defmodule UserDocsWeb.Router do
     pow_routes()
   end
 
+  pipeline :protected do
+    plug Pow.Plug.RequireAuthenticated,
+      error_handler: Pow.Phoenix.PlugErrorHandler
+  end
+
+  pipeline :not_authenticated do
+    plug Pow.Plug.RequireNotAuthenticated,
+      error_handler: UserDocsWeb.AuthErrorHandler
+  end
+
+  scope "/", UserDocsWeb do
+    pipe_through [:browser, :not_authenticated]
+
+    get "/session", SessionController, :new, as: :login
+    post "/session", SessionController, :create, as: :login
+  end
+
+  scope "/", UserDocsWeb do
+    pipe_through [:browser, :protected]
+
+    delete "/logout", SessionController, :delete, as: :logout
+  end
+
   scope "/", UserDocsWeb do
     # pipe_through [:browser, :protected]
     pipe_through [:browser]
 
     live "/", PageLive, :index
+
     live "/automation", AutomationLive.Index, :index
     live "/process_administrator", ProcessAdministratorLive.Index, :index
     live "/document", DocumentLive.Index, :index
-    live "/index.html", ProcessAdministratorLive.Index, :index
+    live "/process_administrator_extension.html", ProcessAdministratorLive.Index, :index
 
+    # These routes are basically not part of the application:
     live "/content", ContentLive.Index, :index
     live "/content/new", ContentLive.Index, :new
     live "/content/:id/edit", ContentLive.Index, :edit
@@ -166,36 +183,4 @@ defmodule UserDocsWeb.Router do
     end
   end
 
-  ## Authentication routes
-
-  scope "/", UserDocsWeb do
-    pipe_through [:browser, :redirect_if_user_is_authenticated]
-
-    get "/users/register", UserRegistrationController, :new
-    post "/users/register", UserRegistrationController, :create
-    get "/users/log_in", UserSessionController, :new
-    post "/users/log_in", UserSessionController, :create
-    get "/users/reset_password", UserResetPasswordController, :new
-    post "/users/reset_password", UserResetPasswordController, :create
-    get "/users/reset_password/:token", UserResetPasswordController, :edit
-    put "/users/reset_password/:token", UserResetPasswordController, :update
-  end
-
-  scope "/", UserDocsWeb do
-    pipe_through [:browser, :require_authenticated_user]
-
-    get "/users/settings", UserSettingsController, :edit
-    put "/users/settings/update_password", UserSettingsController, :update_password
-    put "/users/settings/update_email", UserSettingsController, :update_email
-    get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
-  end
-
-  scope "/", UserDocsWeb do
-    pipe_through [:browser]
-
-    delete "/users/log_out", UserSessionController, :delete
-    get "/users/confirm", UserConfirmationController, :new
-    post "/users/confirm", UserConfirmationController, :create
-    get "/users/confirm/:token", UserConfirmationController, :confirm
-  end
 end

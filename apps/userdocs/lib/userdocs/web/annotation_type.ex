@@ -17,7 +17,6 @@ defmodule UserDocs.Web.AnnotationType do
     |> validate_required([:name])
   end
 
-  @spec safe(%UserDocs.Web.AnnotationType{}, Map) :: %{name: binary}
   def safe(annotation_type = %UserDocs.Web.AnnotationType{}, _handlers) do
     %{
       name: annotation_type.name

@@ -31,6 +31,16 @@ defmodule UserDocs.Documents do
   defp maybe_preload_content_versions(query, nil), do: query
   defp maybe_preload_content_versions(query, _), do: from(version in query, preload: [:content_versions])
 
+  defp maybe_preload_content_versions(content, nil, _), do: content
+  defp maybe_preload_content_versions(content, thing, state) do
+    content_versions =
+      state.content_versions
+      |> Enum.filter(fn(cv) -> cv.content_id == content.id end)
+
+    content
+    |> Map.put(content, :content_versions, content_versions)
+  end
+
   defp maybe_filter_by_team(query, nil), do: query
   defp maybe_filter_by_team(query, team_id) do
     from(content in query,
@@ -52,10 +62,17 @@ defmodule UserDocs.Documents do
       ** (Ecto.NoResultsError)
 
   """
-  def get_content!(id), do: Repo.get!(Content, id)
-  def get_content!(state, id) do
-    UserDocs.State.get!(state, id, :content, UserDocs.Documents.Content)
+
+  def get_content!(id, _params \\ %{}, _filters \\ %{})
+  def get_content!(id, _params, _filters) do
+    Repo.get!(Content, id)
   end
+  def get_content!(id, params, _filters, state) do
+    UserDocs.State.get!(state, id, :content, Content)
+    |> maybe_preload_content_versions(params[:content_versions], state)
+  end
+
+
 
   @doc """
   Creates a content.
@@ -300,11 +317,11 @@ defmodule UserDocs.Documents do
 
   """
   def get_content_version!(id, _params \\ %{}, _filters \\ %{})
-  def get_content_version!(id, _params, _filters) do
+  def get_content_version!(id, _params, _filters) when is_integer(id) do
     Repo.get!(ContentVersion, id)
   end
-  def get_content_version!(id, _params, _filters, state) do
-    UserDocs.State.get!(state, id, :elements, Element)
+  def get_content_version!(id, _params, _filters, state) when is_integer(id) do
+    UserDocs.State.get!(state, id, :content_versions, ContentVersion)
   end
 
   @doc """
@@ -360,7 +377,7 @@ defmodule UserDocs.Documents do
   def delete_content_version(%ContentVersion{} = content_version) do
     content_version
     |> Repo.delete()
-    |> Subscription.broadcast("content_version", "update")
+    |> Subscription.broadcast("content_version", "delete")
   end
 
   @doc """
