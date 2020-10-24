@@ -131,7 +131,7 @@ defmodule UserDocs.TestDataset do
 
   _step_types = [
     navigate = %{
-      args: ["url", "page_id"],
+      args: ["url", "page_id", "page_reference"],
       name: "Navigate"
     },
     wait = %{

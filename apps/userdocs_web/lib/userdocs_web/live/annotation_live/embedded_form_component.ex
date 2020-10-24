@@ -101,7 +101,7 @@ defmodule UserDocsWeb.AnnotationLive.EmbeddedFormComponent do
                           <%= label fp, :x_orientation, class: :label %>
                           <div class="control">
                             <div class="select">
-                              <%= select fp, :x_orientation, [{ "Right", "R" }, {"Middle", "M"}, { "Left", "L" }],
+                              <%= select fp, :x_orientation, ["Right": "Right", "Middle": "M", "Left": "L"],
                                 readonly: @read_only %>
                             </div>
                           </div>
@@ -116,7 +116,7 @@ defmodule UserDocsWeb.AnnotationLive.EmbeddedFormComponent do
                           <%= label fp, :y_orientation, class: :label %>
                           <div class="control">
                             <div class="select">
-                              <%= select fp, :y_orientation, [{ "Top", "T" }, {"Middle", "M"}, { "Bottom", "B" }],
+                              <%= select fp, :y_orientation, ["Top": "T", "Middle": "M", "Bottom": "B"],
                                 readonly: @read_only %>
                             </div>
                           </div>

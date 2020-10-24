@@ -152,18 +152,34 @@ Hooks.CopySelector = {
   }
 };
 
+console.log("Before xhr cookie")
+console.log((' ' + document.cookie).slice(1))
+
 var xhr = new XMLHttpRequest();
 xhr.responseType = 'document';
-xhr.open('GET', 'http://localhost:4000', true)
+xhr.open('GET', 'http://app.davenport.rocks:4000/process_administrator', true)
 xhr.onload = function(e) {
   document.documentElement.replaceChild(this.response.head, document.head)
   document.documentElement.replaceChild(this.response.body, document.body)
 
-  console.log("hello")
+  console.log("After xhrc cookie")
+  console.log((' ' + document.cookie).slice(1))
 
   let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+  let newCookie = document.querySelector("[data-phx-main='true']").getAttribute("data-phx-session")
+
+  console.log(newCookie)
   console.log(csrfToken)
-  let liveSocket = new LiveSocket("ws://localhost:4000/live", Socket, {
+
+  let newCookieString = "_userdocs_web_key=" + newCookie + ";domain=.davenport.rocks;";
+  console.log(newCookieString)
+
+  document.cookie = newCookieString
+
+  console.log("After setting cookie")
+  console.log(document.cookie)
+
+  let liveSocket = new LiveSocket("ws://app.davenport.rocks:4000/live", Socket, {
     params: { _csrf_token: csrfToken},
     hooks: Hooks
   })
@@ -177,3 +193,33 @@ xhr.onload = function(e) {
 }
 xhr.send()
 
+
+/*
+var xhr = new XMLHttpRequest();
+xhr.open('GET', 'http://localhost:4000', true)
+xhr.responseType = 'document'
+xhr.onload = function(e) {
+  console.log(this.response)
+  let sess = new XMLHttpRequest();
+  sess.open('GET', 'http://localhost:4000/api/v1/session', true)
+  sess.onload = function(e) {
+    console.log(this.response)
+
+    document.cookie = "_userdocs_web_key" + this.response.cookie
+    
+    let liveSocket = new LiveSocket("ws://localhost:4000/live", Socket, {
+      params: { _csrf_token: this.response.csrfToken},
+      hooks: Hooks
+    })
+  
+    window.addEventListener("phx:page-loading-start", info => NProgress.start())
+    window.addEventListener("phx:page-loading-stop", info => NProgress.done())
+    
+    liveSocket.connect()
+    
+    window.liveSocket = liveSocket
+  }
+  sess.send()
+}
+xhr.send()
+*/

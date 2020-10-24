@@ -27,6 +27,26 @@
 
   </div>
 
+  <%= Layout.select_input(f, :element_id, @select_lists.elements_select, [
+    placeholder: @parent_id || "",
+    id: ID.form_field(f.data, :element_id),
+    hidden: "element_id" not in @enabled_step_fields
+  ]) %>
+
+  <%= if "element_id" in @enabled_step_fields do %>
+    <%= inputs_for f, :element, [id: ID.nested_form(f.data, f.data.element)], fn fe -> %>
+      <section class="card">
+        <div class="card-content">
+          <div class="content">
+            <h4><%= fe.data.name %></h4>
+            <%= ElementLive.FormComponent.render_fields(assigns, fe, ID.prefix(f.data)) %>
+          </div>
+        </div>
+      </section>
+    <% end %>
+    <div class="level"></div>
+  <% end %>
+
   <%= Layout.select_input(f, :annotation_id, @select_lists.annotations, [
     placeholder: @parent_id || "",
     id: ID.form_field(f.data, :annotation_id),
@@ -45,26 +65,6 @@
         </section>
       <% end %>
     </section>
-    <div class="level"></div>
-  <% end %>
-
-  <%= Layout.select_input(f, :element_id, @select_lists.elements_select, [
-    placeholder: @parent_id || "",
-    id: ID.form_field(f.data, :element_id),
-    hidden: "element_id" not in @enabled_step_fields
-  ]) %>
-
-  <%= if "element_id" in @enabled_step_fields do %>
-    <%= inputs_for f, :element, [id: ID.nested_form(f.data, f.data.element)], fn fe -> %>
-      <section class="card">
-        <div class="card-content">
-          <div class="content">
-            <h4><%= fe.data.name %></h4>
-            <%= ElementLive.FormComponent.render_fields(assigns, fe, ID.prefix(f.data)) %>
-          </div>
-        </div>
-      </section>
-    <% end %>
     <div class="level"></div>
   <% end %>
 

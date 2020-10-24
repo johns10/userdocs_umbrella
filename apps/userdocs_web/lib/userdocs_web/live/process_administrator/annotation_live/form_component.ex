@@ -30,8 +30,6 @@ defmodule UserDocsWeb.ProcessAdministratorLive.AnnotationLive.FormComponent do
   end
 
   def render_fields(assigns, form, prefix \\ "") do
-    IO.puts("Rendering Annotation Form")
-    IO.inspect(prefix)
     ~L"""
       <%= hidden_input(form, :name, [
         id: ID.form_field(form.data, :name, prefix),
@@ -60,7 +58,7 @@ defmodule UserDocsWeb.ProcessAdministratorLive.AnnotationLive.FormComponent do
 
         <%=
           Layout.select_input(form, :x_orientation,
-            [{ "R", "Right" }, {"M", "Middle"}, { "L", "Left" }], [
+            [{ "Right", "R" }, {"Middle", "M"}, { "Left", "L" }], [
               placeholder: form.data.x_orientation || "",
               id: ID.form_field(form.data, :x_orientation, prefix),
               hidden: "x_orientation" not in @enabled_annotation_fields
@@ -69,7 +67,7 @@ defmodule UserDocsWeb.ProcessAdministratorLive.AnnotationLive.FormComponent do
 
         <%=
           Layout.select_input(form, :y_orientation,
-            [{ "T", "Top" }, {"M", "Middle"}, { "B", "Botton" }], [
+            [{ "Top", "T" }, {"Middle", "M"}, { "Bottom", "B" }], [
               placeholder: form.data.y_orientation || "",
               id: ID.form_field(form.data, :y_orientation, prefix),
               hidden: not("y_orientation" in @enabled_annotation_fields),
@@ -100,6 +98,12 @@ defmodule UserDocsWeb.ProcessAdministratorLive.AnnotationLive.FormComponent do
           id: ID.form_field(form.data, :y_offset, prefix),
           hidden: not("y_offset" in @enabled_annotation_fields)
         ], "control") %>
+
+        <%= Layout.text_input(form, [
+          field_name: :font_size,
+          id: ID.form_field(form.data, :font_size),
+          hidden: not("font_size" in @enabled_annotation_fields)
+        ]) %>
 
       </div>
 

@@ -36,23 +36,40 @@ defmodule UserDocsWeb.ProcessAdministratorLive.ContentLive.FormComponent do
 
       </div>
 
-      <h4>Content Versions</h4>
+      <%= if false do %>
+        <section class="card">
+          <header class="card-header">
+            <p class="card-header-title" style="margin-bottom:0px;">
+              Content Versions
+            </p>
+            <a
+              class="card-header-icon"
+              phx-click="expand-annotation-content"
+              phx-target="<%= @myself.cid %>"
+              aria-label="expand">
+              <span class="icon" >
+                <i class="fa fa-angle-down" aria-hidden="true"></i>
+              </span>
+            </a>
+          </header>
+          <div class="card-content <%= is_expanded?(@nested_annotation_content_expanded) %>">
+            <div class="content">
 
-      <%= inputs_for form, :content_versions, fn fcv -> %>
+              <%= inputs_for form, :content_versions, fn fcv -> %>
 
-        <%= FormComponent.render_fields(assigns, fcv,
-          prefix <> ID.prefix(form.data)) %>
+                <%= FormComponent.render_fields(assigns, fcv,
+                  prefix <> ID.prefix(form.data)) %>
 
+              <% end %>
+
+              <a class="button" href="#" phx-click="add-content-version"
+                phx-target="<%= @myself.cid %>">
+                Add a content translation
+              </a>
+            </div>
+          </div>
+        </section>
       <% end %>
-
-      <a
-        class="button"
-        href="#"
-        phx-click="add-content-version"
-        phx-target="<%= @myself.cid %>"
-      >
-        Add a content translation
-      </a>
     """
   end
 
@@ -111,4 +128,7 @@ defmodule UserDocsWeb.ProcessAdministratorLive.ContentLive.FormComponent do
         {:noreply, assign(socket, changeset: changeset)}
     end
   end
+
+  def is_expanded?(false), do: " is-hidden"
+  def is_expanded?(true), do: ""
 end

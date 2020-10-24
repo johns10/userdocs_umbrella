@@ -59,31 +59,6 @@ defmodule UserDocsWeb.ProcessAdministratorLive.LiveHelpers do
     ]
     live_component(socket, NestedFormComponent, form_opts)
   end
-  """
-  def live_embedded_form(socket, opts) do
-    type_key =
-      Keyword.fetch!(opts, :object_type)
-      |> type_atom_from_module()
-
-    form_opts = [
-      id: Keyword.fetch!(opts, :id),
-      parent: Keyword.fetch!(opts, :parent),
-      parent_changeset: Keyword.fetch!(opts, :parent_changeset),
-      key: Keyword.fetch!(opts, :key),
-      object: Keyword.fetch!(opts, :object),
-      object_type: Keyword.fetch!(opts, :object_type),
-      object_form: Keyword.fetch!(opts, :object_form),
-      select_options: Keyword.fetch!(opts, :select_options),
-      selected: Keyword.fetch!(opts, :selected),
-      data: Keyword.fetch!(opts, :data),
-      select_lists: Keyword.fetch!(opts, :select_lists),
-      event_name: Keyword.fetch!(opts, :event_name),
-    ]
-    |> Keyword.put(type_key, Keyword.fetch!(opts, :object))
-
-    live_component(socket, EmbeddedFormComponent, form_opts)
-  end
-  """
 
   def live_collapsible_form(socket, opts) do
     form_opts = [
@@ -96,6 +71,7 @@ defmodule UserDocsWeb.ProcessAdministratorLive.LiveHelpers do
       action: Keyword.fetch!(opts, :action),
       data: Keyword.fetch!(opts, :data),
       select_lists: Keyword.fetch!(opts, :select_lists),
+      runner: Keyword.fetch!(opts, :runner),
     ]
 
     live_component(socket, CollapsableFormComponent, form_opts)

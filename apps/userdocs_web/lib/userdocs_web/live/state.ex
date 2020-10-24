@@ -157,6 +157,7 @@ defmodule UserDocsWeb.State do
   def plural("element"), do: "elements"
   def plural("step"), do: "steps"
   def plural("annotation"), do: "annotations"
+  def plural("content_version"), do: "content_versions"
   def plural(item) do
     raise(ArgumentError, "Plural not implemented for #{item}")
   end
@@ -186,12 +187,19 @@ defmodule UserDocsWeb.State do
       rescue
         _ -> raise(RuntimeError, "Failed to query versions for state report")
       end
+    strategies =
+      try do
+        Enum.count(socket.assigns.strategies)
+      rescue
+        _ -> raise(RuntimeError, "Failed to query strategies for state report")
+      end
     log_string =
       """
         Teams: #{teams}
         Team_users: #{team_users}
         Projects: #{projects}
         Versions: #{versions}
+        strategies: #{strategies}
       """
     Logger.info(log_string)
 

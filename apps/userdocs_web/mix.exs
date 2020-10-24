@@ -51,7 +51,7 @@ defmodule UserDocsWeb.MixProject do
       {:userdocs, in_umbrella: true},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:pow, "~> 1.0.20"},
+      {:pow, "~> 1.0.21"},
       {:uuid, "~> 1.1"},
       {:dialyxir, "~> 0.5.0", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},

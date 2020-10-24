@@ -9,7 +9,8 @@ defmodule UserDocsWeb.Endpoint do
     key: "_userdocs_web_key",
     signing_salt: "zbnhmPNC",
     http_only: false,
-    same_site: false
+    same_site: "None",
+    #secure: true
   ]
 
   socket "/socket", UserDocsWeb.UserSocket,

@@ -1,4 +1,5 @@
 defmodule UserDocs.State do
+  require Logger
 
   #You can pass in a list (IE socket.assigns.data.projects)
   def get!(state, id, _key, _module) when is_list(state) do
@@ -6,6 +7,7 @@ defmodule UserDocs.State do
   end
   #You can pass in the state (IE socket.assigns.data), and it'll go get the list
   def get!(state, id, key, _module) do
+    # Logger.debug("Querying id: #{id}, Keys in state #{inspect(Map.keys(state))}")
     get!(Map.get(state, key), id)
   end
   def get!(nil, id), do: raise(RuntimeError, "Couldn't find the datatype in the state.")

@@ -37,7 +37,7 @@ chrome.pageAction.onClicked.addListener(function(tab) {
 		console.log('activeWindowId is set to ' + tab.windowId);
 	});
 	chrome.windows.create({
-		url: chrome.runtime.getURL("index.html"),
+		url: chrome.runtime.getURL("process_administrator_extension.html"),
 		type: "popup"},
 			function(window) {
 				chrome.storage.local.set({extensionWindowId: window.id}, function() {
@@ -48,5 +48,3 @@ chrome.pageAction.onClicked.addListener(function(tab) {
         });
 			});
 });
-
-console.log( 'Background.html done.' );

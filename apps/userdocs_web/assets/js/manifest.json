@@ -21,17 +21,15 @@
 	],
 	"permissions": [
 		"cookies",
-		"http://*/*", 
-		"https://*/*",
+		"http://app.davenport.rocks/",
 		"activeTab",
 		"tabs",
-		"<all_urls>",
 		"storage",
 		"desktopCapture"
 	],
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self' 'unsafe-eval'; script-src-elem 'self' 'unsafe-eval'",
 	"web_accessible_resources": [
-		"index.html",
+		"process_administrator_index.html",
 		"css/*",
 		"bundle.js",
 		"bundle.js.map",
