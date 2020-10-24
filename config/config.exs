@@ -65,6 +65,11 @@ config :process_administrator_web, :pow,
   routes_backend: ProcessAdministratorWeb.Pow.Routes
 
 config :cors_plug,
-  origin: ["chrome-extension://ohmjkpckjphdcdophkflpmdmihpiaejf", "http://localhost"],
+  origin: [
+    "chrome-extension://iclibnblhjdakhhijcioglkmdihjelgg",
+    "chrome-extension://ohmjkpckjphdcdophkflpmdmihpiaejf",
+    "http://localhost",
+    "http://app.davenport.rocks"
+  ],
   max_age: 86400,
   methods: ["GET", "POST", "OPTIONS"]

@@ -52,9 +52,6 @@ defmodule ProcessAdministratorWeb.IndexLive do
   end
 
   def validate_logged_in(socket, session) do
-    IO.inspect(
-      maybe_assign_current_user(socket, session)
-    )
     try do
       case maybe_assign_current_user(socket, session) do
         %{ assigns: %{ current_user: nil }} ->
