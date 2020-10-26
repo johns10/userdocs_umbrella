@@ -1,8 +1,9 @@
 defmodule ProcessAdministratorWeb.VersionLive.FormComponent do
-  use UserDocsWeb, :live_component
+  use ProcessAdministratorWeb, :live_component
 
   alias UserDocs.Projects
   alias ProcessAdministratorWeb.Layout
+  alias ProcessAdministratorWeb.ID
 
   @impl true
   def update(%{version: version} = assigns, socket) do
@@ -14,9 +15,6 @@ defmodule ProcessAdministratorWeb.VersionLive.FormComponent do
       |> assign(assigns)
       |> assign(:changeset, changeset)
     }
-  end
-  def update(assigns, socket) do
-    raise(RuntimeError, "Version Live Failed to update because it was called without a version")
   end
 
   @impl true

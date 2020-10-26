@@ -1,5 +1,5 @@
 defmodule ProcessAdministratorWeb.EmbeddedFormComponent do
-  use UserDocsWeb, :live_component
+  use ProcessAdministratorWeb, :live_component
   use Phoenix.HTML
 
   alias ProcessAdministratorWeb.VersionLive

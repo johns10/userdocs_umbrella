@@ -1,8 +1,9 @@
 defmodule ProcessAdministratorWeb.ProjectLive.FormComponent do
-  use UserDocsWeb, :live_component
+  use ProcessAdministratorWeb, :live_component
 
   alias UserDocs.Projects
   alias ProcessAdministratorWeb.Layout
+  alias ProcessAdministratorWeb.ID
 
   @impl true
   def update(%{project: project} = assigns, socket) do

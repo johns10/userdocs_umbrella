@@ -1,5 +1,5 @@
 defmodule ProcessAdministratorWeb.StepLive.FormComponent do
-  use UserDocsWeb, :live_component
+  use ProcessAdministratorWeb, :live_component
 
   require Logger
 
@@ -7,6 +7,7 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
   alias ProcessAdministratorWeb.Layout
   alias ProcessAdministratorWeb.AnnotationLive
   alias ProcessAdministratorWeb.ElementLive
+  alias ProcessAdministratorWeb.PageLive
   alias ProcessAdministratorWeb.ID
 
   alias UserDocs.Automation
@@ -49,6 +50,39 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
         annotation_type_id
       )
 
+    page_field_ids =
+      if step.page_id != nil do
+        %{}
+        |> Map.put(:version_id, ID.form_field(step.element, :name))
+        |> Map.put(:order, ID.form_field(step.element, :order))
+        |> Map.put(:name, ID.form_field(step.element, :name))
+        |> Map.put(:url, ID.form_field(step.element, :url))
+      else
+        %{}
+        |> Map.put(:version_id, "")
+        |> Map.put(:order, "")
+        |> Map.put(:name, "")
+        |> Map.put(:url, "")
+      end
+
+
+    step_field_ids =
+      %{}
+      |> Map.put(:name, ID.form_field(step, :name))
+      |> Map.put(:process_id, ID.form_field(step, :process_id))
+      |> Map.put(:order, ID.form_field(step, :order))
+      |> Map.put(:step_type_id, ID.form_field(step, :step_type_id))
+      |> Map.put(:element_id, ID.form_field(step, :element_id))
+      |> Map.put(:annotation_id, ID.form_field(step, :annotation_id))
+      |> Map.put(:page_reference_url, ID.form_field(step, :page_reference_url))
+      |> Map.put(:page_reference_page, ID.form_field(step, :page_reference_page))
+      |> Map.put(:page_id, ID.form_field(step, :page_id))
+      |> Map.put(:url, ID.form_field(step, :url))
+      |> Map.put(:text, ID.form_field(step, :text))
+      |> Map.put(:width, ID.form_field(step, :width))
+      |> Map.put(:height, ID.form_field(step, :height))
+      |> Map.put(:page, page_field_ids)
+
     {
       :ok,
       socket
@@ -61,6 +95,7 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
       |> assign(:nested_element_expanded, false)
       |> assign(:nested_annotation_expanded, false)
       |> assign(:nested_annotation_content_expanded, false)
+      |> assign(:field_ids, step_field_ids)
     }
   end
 

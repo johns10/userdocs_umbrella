@@ -228,6 +228,8 @@ defmodule ProcessAdministratorWeb.Layout do
     |> maybe_opt(opts, :hidden)
     |> maybe_opt(opts, :disabled)
     |> maybe_opt(opts, :placeholder)
+    |> maybe_opt(opts, :selected)
+    |> maybe_opt(opts, :phx_debounce)
   end
 
   """

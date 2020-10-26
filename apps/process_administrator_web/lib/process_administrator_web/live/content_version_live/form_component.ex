@@ -1,5 +1,5 @@
 defmodule ProcessAdministratorWeb.ContentVersionLive.FormComponent do
-  use UserDocsWeb, :live_component
+  use ProcessAdministratorWeb, :live_component
 
   require Logger
 

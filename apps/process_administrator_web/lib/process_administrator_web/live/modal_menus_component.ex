@@ -1,8 +1,9 @@
 defmodule ProcessAdministratorWeb.ModalMenus do
-  use UserDocsWeb, :live_component
+  use ProcessAdministratorWeb, :live_component
   use Phoenix.HTML
 
 
+  alias ProcessAdministratorWeb.LiveHelpers
   alias ProcessAdministratorWeb.VersionLive.FormComponent, as: VersionForm
   alias ProcessAdministratorWeb.ProjectLive.FormComponent, as: ProjectForm
   alias ProcessAdministratorWeb.ProcessLive.FormComponent, as: ProcessForm
@@ -41,7 +42,7 @@ defmodule ProcessAdministratorWeb.ModalMenus do
                   id: @object.id || :new,
                   title: @title,
                   action: @action,
-                  project: @object,
+                  process: @object,
                   parent_id: @parent.id,
                   select_lists: %{
                     versions: @select_lists.versions,

@@ -5,7 +5,7 @@
   phx_submit: "save" %>
 
   <%= Layout.select_input(f, :team_id, @select_lists.teams, [
-    placeholder: @parent_id || "",
+    selected: @parent_id || "",
     id: ID.form_field(f.data, :team_id)
   ]) %>
 

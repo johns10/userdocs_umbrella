@@ -14,13 +14,22 @@ defmodule ProcessAdministratorWeb.State do
   end
 
   def update_object(state, type, id, object) do
-    # IO.inspect("Updating #{type} #{id}. #{field} to #{value}")
+    Logger.debug("Updating #{type}, id #{id}")
     values =
       state
       |> Map.get(type)
       |> Enum.map(fn(o) -> if o.id == id do object else o end end)
 
     Map.put(%{}, type, values)
+  end
+
+  def create_object(state, type, id, object) do
+    Logger.debug("Creating #{type}, id #{id}")
+    objects =
+      state
+      |> Map.get(type)
+
+    Map.put(%{}, type, [object | objects])
   end
 
   def update_object_field(state, type, id, field, value) do
@@ -43,9 +52,9 @@ defmodule ProcessAdministratorWeb.State do
     #Enum.reduce(changes, socket, fn({x, y}, acc) -> Phoenix.LiveView.assign(acc, x, y) end)
     Enum.reduce(changes, socket,
       fn({key, value}, current_socket) ->
-        # IO.puts("Updating Key #{key}")
+        IO.puts("Updating Key #{key}")
         current_socket = Phoenix.LiveView.assign(current_socket, key, value)
-        # IO.puts("Updated value to #{Map.get(current_socket, key)}")
+        #IO.puts("Updated value to #{Map.get(current_socket, key)}")
         current_socket
       end
     )
@@ -158,6 +167,9 @@ defmodule ProcessAdministratorWeb.State do
   def plural("step"), do: "steps"
   def plural("annotation"), do: "annotations"
   def plural("content_version"), do: "content_versions"
+  def plural("version"), do: "versions"
+  def plural("project"), do: "projects"
+  def plural("process"), do: "processes"
   def plural(item) do
     raise(ArgumentError, "Plural not implemented for #{item}")
   end

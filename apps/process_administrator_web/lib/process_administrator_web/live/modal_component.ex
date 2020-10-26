@@ -1,25 +1,31 @@
 defmodule ProcessAdministratorWeb.ModalComponent do
-  use UserDocsWeb, :live_component
+  use ProcessAdministratorWeb, :live_component
 
   @impl true
   def render(assigns) do
     ~L"""
-    <div id="<%= @id %>" class="phx-modal"
+    <%= @opts[:action] %>
+    <div id="<%= @id %>" class="modal is-active"
       phx-capture-click="close"
       phx-window-keydown="close"
       phx-key="escape"
       phx-target="#<%= @id %>"
       phx-page-loading>
 
-      <div class="phx-modal-content">
-        <div
-          class="phx-modal-close"
-          phx-click="close"
-          phx-target="<%= @myself.cid %>"
-        >
-          <%= raw("&times;") %>
+      <div
+        class="modal-background"
+        phx-click="close"
+        phx-target="<%= @myself.cid %>"
+      ></div>
+      <div class="modal-content">
+        <div class="box">
+          <div
+            class="modal-close is-large"
+            phx-click="close"
+            phx-target="<%= @myself.cid %>"
+          ></div>
+          <%= live_component @socket, @component, @opts %>
         </div>
-        <%= live_component @socket, @component, @opts %>
       </div>
     </div>
     """

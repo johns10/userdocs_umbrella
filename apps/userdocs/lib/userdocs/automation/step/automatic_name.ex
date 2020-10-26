@@ -4,8 +4,12 @@ defmodule UserDocs.Automation.Step.Name do
 
   import UserDocs.Name
 
-  def execute(%{ step_type: %{ name: name }} = step) do
+  def execute(%{ step_type: %{ name: name }} = step) when is_bitstring(name) do
     generate(name, step)
+  end
+  def execute(%{ step_type: %Ecto.Association.NotLoaded{}, name: name}) do
+    Logger.warn("Step.Name failed because the association wasn't loaded.  Returning current name.")
+    name
   end
 
   def generate("Apply Annotation" = name, step) do
