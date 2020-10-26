@@ -39,7 +39,7 @@ defmodule ProcessAdministratorWeb.ID do
   def form_field(data, name, %{}), do: form_field(data,name)
   def form_field(data, name, prefix), do: nested_form_field(data,name,prefix)
   def form_field(data, name) do
-    Logger.debug("Generating form field ID")
+    # Logger.debug("Generating form field ID")
     prefix(data)
     <> Atom.to_string(name)
   end

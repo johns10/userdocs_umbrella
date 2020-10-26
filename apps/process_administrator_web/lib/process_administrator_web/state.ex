@@ -170,6 +170,7 @@ defmodule ProcessAdministratorWeb.State do
   def plural("version"), do: "versions"
   def plural("project"), do: "projects"
   def plural("process"), do: "processes"
+  def plural("page"), do: "pages"
   def plural(item) do
     raise(ArgumentError, "Plural not implemented for #{item}")
   end
@@ -205,6 +206,12 @@ defmodule ProcessAdministratorWeb.State do
       rescue
         _ -> raise(RuntimeError, "Failed to query strategies for state report")
       end
+      annotations =
+      try do
+        Enum.count(socket.assigns.annotations)
+      rescue
+        _ -> raise(RuntimeError, "Failed to query annotations for state report")
+      end
     log_string =
       """
         Teams: #{teams}
@@ -212,6 +219,7 @@ defmodule ProcessAdministratorWeb.State do
         Projects: #{projects}
         Versions: #{versions}
         strategies: #{strategies}
+        annotations: #{annotations}
       """
     Logger.info(log_string)
 

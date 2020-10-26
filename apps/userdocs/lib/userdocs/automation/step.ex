@@ -44,6 +44,7 @@ defmodule UserDocs.Automation.Step do
     |> foreign_key_constraint(:step_type)
     |> cast_assoc(:element)
     |> cast_assoc(:annotation)
+    |> cast_assoc(:page)
     |> validate_required([:order])
   end
 

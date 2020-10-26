@@ -66,10 +66,10 @@
                     runner:
                       live_component(@socket, StepLive.Runner, [
                         id: "step-" <> Integer.to_string(step.id) <> "-runner",
-                        step: preload_step(step, assigns),
-                        step_type_name: preload_step(step, assigns).step_type.name]),
+                        step: preload_step(step, assigns, process),
+                        step_type_name: preload_step(step, assigns, process).step_type.name]),
                     parent: process,
-                    object: preload_step(step, assigns),
+                    object: preload_step(step, assigns, process),
                     object_type: Step,
                     object_form: StepLive.FormComponent,
                     action: :edit,
@@ -98,7 +98,7 @@
                       processes_select: DomainHelpers.select_list_temp(
                         Enum.filter(@processes, fn(p) -> p.version_id == @current_version.id end), :name, false),
                       pages_select: DomainHelpers.select_list_temp(
-                        Enum.filter(@pages, fn(p) -> p.version_id == @current_version.id end), :name, false),
+                        Enum.filter(@pages, fn(p) -> p.version_id == @current_version.id end), :name, true),
                       annotation_types: DomainHelpers.select_list_temp(@annotation_types, :name, false),
                     },
                     # TODO: Add last_page_navigated to logic here.

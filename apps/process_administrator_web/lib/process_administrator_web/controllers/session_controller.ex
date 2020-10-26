@@ -14,7 +14,7 @@ defmodule ProcessAdministratorWeb.SessionController do
       {:ok, conn} ->
         conn
         |> put_flash(:info, "Welcome back!")
-        |> redirect(to: Routes.page_path(conn, :index))
+        |> redirect(to: Routes.index_path(conn, :index))
 
       {:error, conn} ->
         changeset = Pow.Plug.change_user(conn, conn.params["user"])
@@ -28,6 +28,6 @@ defmodule ProcessAdministratorWeb.SessionController do
   def delete(conn, _params) do
     conn
     |> Pow.Plug.delete()
-    |> redirect(to: Routes.page_path(conn, :index))
+    |> redirect(to: Routes.index_path(conn, :index))
   end
 end

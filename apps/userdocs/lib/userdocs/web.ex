@@ -66,11 +66,8 @@ defmodule UserDocs.Web do
 
   """
   def get_page!(id), do: Repo.get!(Page, id)
-  def get_page!(%{ pages: pages }, id), do: get_page!(pages, id)
-  def get_page!(pages, id) when is_list(pages) do
-    pages
-    |> Enum.filter(fn(p) -> p.id == id end)
-    |> Enum.at(0)
+  def get_page!(id, _params, _filters, state) do
+    UserDocs.State.get!(state, id, :pages, Page)
   end
 
   @doc """

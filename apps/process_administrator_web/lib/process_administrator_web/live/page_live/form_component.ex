@@ -27,24 +27,27 @@ defmodule ProcessAdministratorWeb.PageLive.FormComponent do
 
   def render_fields(assigns, form, opts \\ []) do
     ~L"""
-      <%= Layout.select_input(form, :version_id, @select_lists.versions, [
-        selected: @parent_id || "",
-        id: @field_ids.version_id || ""
-      ], "control") %>
+      <div class="field is-grouped">
+        <%= Layout.select_input(form, :version_id, @select_lists.versions, [
+          # TODO: This is bad, find a way to get it out
+          selected: @current_object.process.version_id || "",
+          id: @field_ids.version_id || ""
+        ], "control") %>
 
-      <%= Layout.number_input(form, :order, [
-        id: @field_ids.order || ""
-      ], "control") %>
+        <%= Layout.number_input(form, :order, [
+          id: @field_ids.order || ""
+        ], "control") %>
 
-      <%= Layout.text_input(form, [
-        field_name: :name,
-        id: @field_ids.name
-      ]) %>
+        <%= Layout.text_input(form, [
+          field_name: :name,
+          id: @field_ids.name
+        ], "control") %>
 
-      <%= Layout.text_input(form, [
-        field_name: :url,
-        id: @field_ids.url
-      ]) %>
+        <%= Layout.text_input(form, [
+          field_name: :url,
+          id: @field_ids.url
+        ], "control is-expanded") %>
+      </div>
     """
   end
 

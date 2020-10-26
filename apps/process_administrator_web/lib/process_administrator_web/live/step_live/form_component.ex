@@ -8,12 +8,15 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
   alias ProcessAdministratorWeb.AnnotationLive
   alias ProcessAdministratorWeb.ElementLive
   alias ProcessAdministratorWeb.PageLive
+  alias ProcessAdministratorWeb.State
   alias ProcessAdministratorWeb.ID
 
   alias UserDocs.Automation
   alias UserDocs.ChangeTracker
   alias UserDocs.Documents
   alias UserDocs.Documents.ContentVersion
+  alias UserDocs.Web
+  alias UserDocs.Web.Page
 
   @impl true
   def update(%{step: step} = assigns, socket) do
@@ -50,13 +53,28 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
         annotation_type_id
       )
 
+    element_field_ids =
+      if step.element_id != nil do
+        %{}
+        |> Map.put(:page_id, ID.form_field(step.element, :page_id))
+        |> Map.put(:order, ID.form_field(step.element, :order))
+        |> Map.put(:name, ID.form_field(step.element, :name))
+        |> Map.put(:strategy_id, ID.form_field(step.element, :strategy_id))
+      else
+        %{}
+        |> Map.put(:page_id, "")
+        |> Map.put(:order, "")
+        |> Map.put(:name, "")
+        |> Map.put(:strategy_id, "")
+      end
+
     page_field_ids =
       if step.page_id != nil do
         %{}
-        |> Map.put(:version_id, ID.form_field(step.element, :name))
-        |> Map.put(:order, ID.form_field(step.element, :order))
-        |> Map.put(:name, ID.form_field(step.element, :name))
-        |> Map.put(:url, ID.form_field(step.element, :url))
+        |> Map.put(:version_id, ID.form_field(step.page, :version_id))
+        |> Map.put(:order, ID.form_field(step.page, :order))
+        |> Map.put(:name, ID.form_field(step.page, :name))
+        |> Map.put(:url, ID.form_field(step.page, :url))
       else
         %{}
         |> Map.put(:version_id, "")
@@ -64,6 +82,7 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
         |> Map.put(:name, "")
         |> Map.put(:url, "")
       end
+
 
 
     step_field_ids =
@@ -82,6 +101,7 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
       |> Map.put(:width, ID.form_field(step, :width))
       |> Map.put(:height, ID.form_field(step, :height))
       |> Map.put(:page, page_field_ids)
+      |> Map.put(:element, element_field_ids)
 
     {
       :ok,
@@ -155,6 +175,15 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
       :noreply,
       socket
       |> push_event("test_selector", payload)
+    }
+  end
+
+  def handle_event("new-page", _, socket) do
+    changes = UserDocs.Automation.Step.ChangeHandler.execute(%{ page: %Page{} }, socket.assigns)
+
+    {
+      :noreply,
+      State.apply_changes(socket, changes)
     }
   end
 

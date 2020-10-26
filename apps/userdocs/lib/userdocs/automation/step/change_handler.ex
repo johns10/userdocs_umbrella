@@ -5,6 +5,7 @@ defmodule UserDocs.Automation.Step.ChangeHandler do
   alias UserDocsWeb.LiveHelpers
 
   alias UserDocs.Web
+  alias UserDocs.Web.Page
   alias UserDocs.Automation
   alias UserDocs.Documents
 
@@ -40,16 +41,6 @@ defmodule UserDocs.Automation.Step.ChangeHandler do
     %{
       current_object:
         Map.put(state.current_object, :page_reference, page_reference)
-    }
-  end
-  def execute(%{page_id: page_id}, state) do
-    Logger.debug("Handling a change to page id: #{page_id}")
-    %{
-      current_object:
-        state.current_object
-        |> Map.put(:page_id, page_id)
-        |> Map.put(:page, Web.get_page!(state.data, page_id))
-        |> (&(Map.put(&1, :name, Name.execute(&1)))).(),
     }
   end
   def execute(%{annotation_id: annotation_id}, state) do
@@ -114,6 +105,44 @@ defmodule UserDocs.Automation.Step.ChangeHandler do
         |> Map.put(:element, element)
         |> (&(Map.put(&1, :name, Name.execute(&1)))).()
 
+    }
+  end
+  def execute(%{page_id: page_id}, state) do
+    Logger.debug("Handling a change to page id: #{page_id}")
+    page = Web.get_page!(page_id, %{}, %{}, state.data) # Fetch Page
+    { :ok, new_step } =
+      Automation.update_step(state.step, %{ page_id: page_id }) # Update name and page id
+
+    %{
+      current_object:
+        new_step
+        |> Map.put(:page, page),
+
+      changeset:
+        state.changeset.data
+        |> Map.put(:page_id, page_id)
+        |> Map.put(:page, page)
+        |> (&(Map.put(state.changeset, :data, &1))).(),
+
+      step: new_step
+    }
+  end
+  def execute(%{ page: %Page{} }, state) do
+    Logger.debug("Handling a change to a new page")
+    { :ok, step } =
+      UserDocs.Automation.update_step_page_id(state.step, %{ page_id: nil })
+
+    step = Map.put(step, :page, nil)
+    changeset = UserDocs.Automation.change_step(step)
+    new_page = UserDocs.Web.change_page(%UserDocs.Web.Page{})
+    new_changeset = Ecto.Changeset.put_assoc(changeset, :page, new_page)
+
+    %{
+      current_object: step,
+
+      changeset: new_changeset,
+
+      step: step
     }
   end
 
