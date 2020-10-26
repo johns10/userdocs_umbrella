@@ -180,7 +180,6 @@ defmodule ProcessAdministratorWeb.IndexLive do
 
   def execute_preloads(socket, "process", "create", payload) do
     Logger.debug("Executing Preloads")
-    IO.inspect(payload)
     socket
   end
   def execute_preloads(socket, _, _, _), do: socket
@@ -194,10 +193,9 @@ defmodule ProcessAdministratorWeb.IndexLive do
       |> String.to_atom()
 
     changes = State.create_object(socket.assigns, type, payload.id, payload)
-    IO.inspect(changes)
+    # IO.inspect(changes)
     socket = State.apply_changes(socket, changes)
-    IO.puts("Updated assigns")
-    IO.inspect(socket.assigns.processes)
+    # IO.puts("Updated assigns")
     socket
   end
   def update_socket_data(socket, topic, "update", payload) do
@@ -207,8 +205,6 @@ defmodule ProcessAdministratorWeb.IndexLive do
       topic
       |> State.plural()
       |> String.to_atom()
-
-    IO.inspect(type)
 
     changes = State.update_object(socket.assigns, type, payload.id, payload)
     State.apply_changes(socket, changes)
@@ -338,7 +334,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
     {:noreply, State.apply_changes(socket, changes)}
   end
 
-  def preload_step(step, state) do
+  def preload_step(step, state, process) do
     element =
       if step.element_id do
         element = Web.get_element!(step.element_id, %{ strategy: true }, %{}, state)
@@ -348,21 +344,27 @@ defmodule ProcessAdministratorWeb.IndexLive do
       if step.annotation_id do
         annotation = Web.get_annotation!(step.annotation_id, %{}, %{}, state)
 
-        annotation
-        |> Map.put(:content, Documents.get_content!(annotation.content_id, %{}, %{}, state.content))
-        |> Map.put(:annotation_type, Web.get_annotation_type!(annotation.annotation_type_id, %{}, %{}, state))
+        # TODO: THis guard shouldn't be necessary.  I'm misloading annotations somehow
+        if annotation do
+          annotation
+          |> Map.put(:content, Documents.get_content!(annotation.content_id, %{}, %{}, state.content))
+          |> Map.put(:annotation_type, Web.get_annotation_type!(annotation.annotation_type_id, %{}, %{}, state))
+        else
+          annotation
+        end
       end
 
     step
-    |> Map.put(:page, Web.get_page!(state.pages, step.page_id))
+    |> Map.put(:page, Web.get_page!(step.page_id, %{}, %{}, state))
     |> Map.put(:step_type, Automation.get_step_type!(state.step_types, step.step_type_id))
     |> Map.put(:annotation, annotation)
     |> Map.put(:element, element)
+    |> Map.put(:process, process)
   end
 
   def preload_process(process, state) do
     raw_steps = UserDocs.Automation.list_steps(%{}, %{ process_id: process.id }, state)
-    preloaded_steps = Enum.map(raw_steps, &preload_step(&1, state))
+    preloaded_steps = Enum.map(raw_steps, &preload_step(&1, state, process))
     process
     |> Map.put(:steps, preloaded_steps)
   end

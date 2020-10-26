@@ -329,51 +329,76 @@ defmodule UserDocs.Automation do
   """
   def update_step(%Step{} = step, attrs) do
     IO.puts("Updatiung step")
-    {status, step} =
-      step
-      |> Step.changeset(attrs)
-      |> Repo.update()
 
-    update_children(step)
+    changeset = Step.changeset(step, attrs)
+
+    name =
+      UserDocs.Automation.Step.Name.execute(changeset.data)
+
+    changeset =
+      Ecto.Changeset.put_change(changeset, :name, name)
+
+    {status, step} = Repo.update(changeset)
+
+    update_children(step, changeset)
+
     Endpoint.broadcast("step", "update", step)
 
     {status, step}
   end
-  def update_children(object) do
-    Map.get(object, :annotation)
+  def update_children(object, changeset) do
+    IO.puts("Updating Children")
     object
-    |> maybe_update_annotation(Map.get(object, :annotation, nil))
-    |> maybe_update_element(Map.get(object, :element, nil))
-    |> maybe_update_content(Map.get(object, :content, nil))
+    |> maybe_broadcast_annotation(Map.get(object, :annotation, nil))
+    |> maybe_broadcast_element(Map.get(object, :element, nil))
+    |> maybe_broadcast_content(Map.get(object, :content, nil))
+    |> maybe_broadcast_page(Map.get(object, :page, nil), changeset)
   end
 
-  def maybe_update_annotation(object, nil), do: object
-  def maybe_update_annotation(_, annotation) do
+  def maybe_broadcast_annotation(object, nil), do: object
+  def maybe_broadcast_annotation(object, annotation) do
     Endpoint.broadcast("annotation", "update", annotation)
+    object
   end
 
-  def maybe_update_element(object, nil), do: object
-  def maybe_update_element(_, element) do
+  def maybe_broadcast_element(object, nil), do: object
+  def maybe_broadcast_element(object, element) do
     Endpoint.broadcast("element", "update", element)
+    object
   end
 
-  def maybe_update_content(object, nil), do: object
-  def maybe_update_content(_, content) do
+  def maybe_broadcast_content(object, nil), do: object
+  def maybe_broadcast_content(object, content) do
     IO.puts("Updating content")
     Endpoint.broadcast("content", "update", content)
-
-    content
-    |> maybe_update_content_versions(Map.get(content, :content_versions, nil))
+    object
   end
 
-  def maybe_update_content_versions(object, nil), do: object
-  def maybe_update_content_versions(object, content_versions) do
-    IO.puts("Updating content versions")
-    Enum.each(content_versions, fn(cv) ->
-      Endpoint.broadcast("content_version", "update", cv)
-    end)
+  def maybe_broadcast_page(object, nil, _), do: object
+  def maybe_broadcast_page(object, page, changeset = %Ecto.Changeset{}) do
+    action = determine_action(changeset)
+    broadcast_page(object, page, action)
   end
 
+  def determine_action(changeset) do
+    try do
+      changeset.changes.page.action
+    rescue
+      _ -> nil
+    end
+  end
+
+  def broadcast_page(_, page, :insert = action) do
+    Logger.debug("#{action} page")
+    Endpoint.broadcast("page", "create", page)
+  end
+  def broadcast_page(_, page, :update = action) do
+    Logger.debug("#{action} page")
+    Endpoint.broadcast("page", "update", page)
+  end
+  def broadcast_page(_, page, nil = action) do
+    Logger.debug("#{action} page")
+  end
 
   def update_step_annotation_id(%Step{} = step, %{ name: name, annotation_id: annotation_id }) do
     step
@@ -387,6 +412,12 @@ defmodule UserDocs.Automation do
     step
     |> Step.changeset(%{})
     |> Ecto.Changeset.put_change(:element_id, element_id)
+    |> Repo.update()
+  end
+
+  def update_step_page_id(%Step{} = step, attrs) do
+    step
+    |> Step.changeset(attrs)
     |> Repo.update()
   end
 

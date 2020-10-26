@@ -58,6 +58,7 @@ defmodule ProcessAdministratorWeb.Layout do
     button_opts =
       [ class: :button, phx_click: event ]
       |> maybe_opt(opts, :target)
+      |> maybe_opt(opts, :phx_target)
       |> maybe_opt(opts, :button_class, :button)
 
     content_tag(button_opts[:button_class], button_opts) do

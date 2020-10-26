@@ -38,7 +38,8 @@
           <div class="content">
             <h4><%= fe.data.name %></h4>
             <%= ElementLive.FormComponent.render_fields(
-                assigns, fe, ID.prefix(f.data)) %>
+                Map.put(assigns, :field_ids, @field_ids.element),
+                fe, ID.prefix(f.data)) %>
           </div>
         </div>
       </section>
@@ -88,33 +89,37 @@
     </div>
   <% end %>
 
-  <%=
-    Layout.select_input(f, :page_id, @select_lists.pages_select, [
-      selected: f.data.page_id || "",
-      id: @field_ids.page_id,
-      hidden: not(
-        ("page_id" in @enabled_step_fields) and
-        (@current_object.page_reference == "page")
-      )
-    ])
-  %>
+  <%= label f, :page_id, class: "label" %>
+  <div class="field has-addons">
+    <%=
+      Layout.select_input(f, :page_id, @select_lists.pages_select, [
+        selected: f.data.page_id || "",
+        id: @field_ids.page_id,
+        label: false,
+        hidden: not(
+          ("page_id" in @enabled_step_fields) and
+          (@current_object.page_reference == "page")
+        )
+      ], "control")
+    %>
+    <%= Layout.new_item_button("new-page", [ button_class: :a, phx_target: @myself.cid ], "control") %>
+  </div>
 
-  <%= if "page_id" in @enabled_step_fields do %>
-    <section class="card">
-      <%= inputs_for f, :annotation, [id: ID.nested_form(f.data, f.data.page)], fn fp -> %>
-        <section class="card">
-          <div class="card-content">
-            <div class="content">
-              <%= PageLive.FormComponent.render_fields(
-                Map.put(assigns, :field_ids, @field_ids.page),
-                fp, [ prefix: ID.prefix(f.data) ]) %>
-            </div>
+  <%= if "page_id" in @enabled_step_fields and @current_object.page_reference == "page" do %>
+    <%= inputs_for f, :page, [id: ID.nested_form(f.data, f.data.page)], fn fp -> %>
+      <section class="card">
+        <div class="card-content">
+          <div class="content">
+            <%= PageLive.FormComponent.render_fields(
+              Map.put(assigns, :field_ids, @field_ids.page),
+              fp, [ prefix: ID.prefix(f.data) ]) %>
           </div>
-        </section>
-      <% end %>
-    </section>
+        </div>
+      </section>
+    <% end %>
     <div class="level"></div>
   <% end %>
+
 
   <%= Layout.text_input(f, [
     field_name: :url,
