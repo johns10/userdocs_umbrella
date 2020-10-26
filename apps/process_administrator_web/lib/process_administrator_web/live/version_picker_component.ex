@@ -1,5 +1,5 @@
 defmodule ProcessAdministratorWeb.VersionPicker do
-  use UserDocsWeb, :live_component
+  use ProcessAdministratorWeb, :live_component
   use Phoenix.HTML
 
   alias ProcessAdministratorWeb.State
@@ -65,6 +65,13 @@ defmodule ProcessAdministratorWeb.VersionPicker do
 
           </div>
         </p>
+
+        <p class="control">
+          <div class="field">
+            <%= Layout.new_item_button("new-process", [], "control") %>
+          </div>
+        </p>
+
       </div>
     """
   end

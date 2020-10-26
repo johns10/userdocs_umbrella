@@ -40,7 +40,7 @@ defmodule UserDocs.MixProject do
       {:ecto_sql, "~> 3.4"},
       {:postgrex, ">= 0.0.0"},
       {:jason, "~> 1.0"},
-      {:pow, "~> 1.0.20"},
+      {:pow, "~> 1.0.21"},
       {:image64, "~> 0.0.1"},
       {:uuid, "~> 1.1"},
       {:mogrify, "~> 0.8.0"},

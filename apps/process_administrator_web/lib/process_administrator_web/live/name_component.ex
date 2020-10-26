@@ -1,5 +1,5 @@
 defmodule ProcessAdministratorWeb.NameComponent do
-  use UserDocsWeb, :live_component
+  use ProcessAdministratorWeb, :live_component
 
   alias ProcessAdministratorWeb.ID
 

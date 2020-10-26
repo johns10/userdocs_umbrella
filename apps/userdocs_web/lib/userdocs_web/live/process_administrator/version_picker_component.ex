@@ -4,7 +4,6 @@ defmodule UserDocsWeb.ProcessAdministratorLive.VersionPicker do
 
   alias UserDocsWeb.State
 
-  alias UserDocs.Projects.Select
   alias UserDocsWeb.ProcessAdministratorLive.Layout
 
   @impl true
@@ -85,24 +84,5 @@ defmodule UserDocsWeb.ProcessAdministratorLive.VersionPicker do
       |> assign(assigns)
       |> State.apply_changes(Select.initialize_select_options(assigns))
     }
-  end
-
-  @impl true
-  def handle_event("select_team", %{ "team" => %{"id" => id} }, socket) do
-    changes = Select.handle_team_selection(socket.assigns, String.to_integer(id))
-    {:noreply, State.apply_changes(socket, changes)}
-  end
-
-  @impl true
-  def handle_event("select_project", %{ "project" => %{"id" => id} }, socket) do
-    changes = Select.handle_project_selection(socket.assigns, String.to_integer(id))
-    {:noreply, State.apply_changes(socket, changes)}
-  end
-
-  @impl true
-  def handle_event("select_version", %{ "version" => %{"id" => id} }, socket) do
-    changes = Select.handle_version_selection(socket.assigns, String.to_integer(id))
-    send(socket.root_pid, {:update_current_version, changes})
-    {:noreply, State.apply_changes(socket, changes)}
   end
 end

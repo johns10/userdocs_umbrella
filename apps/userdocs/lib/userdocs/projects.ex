@@ -5,6 +5,7 @@ defmodule UserDocs.Projects do
 
   import Ecto.Query, warn: false
   alias UserDocs.Repo
+  alias UserDocs.Subscription
 
   alias UserDocs.Projects.Project
 
@@ -78,6 +79,7 @@ defmodule UserDocs.Projects do
     %Project{}
     |> Project.changeset(attrs)
     |> Repo.insert()
+    |> Subscription.broadcast("project", "create")
   end
 
   @doc """
@@ -96,6 +98,7 @@ defmodule UserDocs.Projects do
     project
     |> Project.changeset(attrs)
     |> Repo.update()
+    |> Subscription.broadcast("project", "update")
   end
 
   @doc """
@@ -248,6 +251,7 @@ defmodule UserDocs.Projects do
     %Version{}
     |> Version.changeset(attrs)
     |> Repo.insert()
+    |> Subscription.broadcast("version", "create")
   end
 
   @doc """
@@ -266,6 +270,7 @@ defmodule UserDocs.Projects do
     version
     |> Version.changeset(attrs)
     |> Repo.update()
+    |> Subscription.broadcast("version", "update")
   end
 
   @doc """

@@ -5,15 +5,18 @@ defmodule ProcessAdministratorWeb.IndexLive do
   use ProcessAdministratorWeb, :live_view
   use ProcessAdministratorWeb.LiveViewPowHelper
 
+  alias ProcessAdministratorWeb.Endpoint
+  alias ProcessAdministratorWeb.DomainHelpers
   alias ProcessAdministratorWeb.ID
+  alias ProcessAdministratorWeb.State
   alias ProcessAdministratorWeb.ProcessLive
   alias ProcessAdministratorWeb.StepLive
   alias ProcessAdministratorWeb.LiveHelpers
+  alias ProcessAdministratorWeb.Layout
 
-  alias ProcessAdministratorWeb.State
-
-  alias ProcessAdministratorWeb.Endpoint
-  alias ProcessAdministratorWeb.DomainHelpers
+  alias ProcessAdministratorWeb.ProjectLive.Messages, as: ProjectMessage
+  alias ProcessAdministratorWeb.VersionLive.Messages, as: VersionMessage
+  alias ProcessAdministratorWeb.ProcessLive.Messages, as: ProcessMessage
 
   alias UserDocs.Automation.Step
   alias UserDocs.Web
@@ -27,13 +30,14 @@ defmodule ProcessAdministratorWeb.IndexLive do
   alias UserDocs.Projects.Project
   alias UserDocs.Documents
   alias UserDocs.Documents.Content
+  alias UserDocs.Projects.Select
 
   alias ProcessAdministratorWeb.State
 
-
   @impl true
   def mount(_params, session, socket) do
-    Endpoint.subscribe("process")
+    Endpoint.subscribe("version")
+    Endpoint.subscribe("project")
     Endpoint.subscribe("page")
     Endpoint.subscribe("process")
     Endpoint.subscribe("step")
@@ -108,14 +112,20 @@ defmodule ProcessAdministratorWeb.IndexLive do
   end
 
   def handle_info({:close_modal}, socket) do
+    IO.puts("Close modal info")
+    { :noreply, close_modal(socket) }
+  end
+
+  def close_modal(socket) do
+    IO.puts("Close modal function")
     Phoenix.LiveView.send_update(
       ProcessAdministratorWeb.ModalMenus,
       id: "modal-menus",
-      action: :show
-    )
-    { :noreply, socket }
+      action: :show)
+    socket
   end
-  def handle_info({_, message = %{ target: "ModalMenus"}}, socket) do
+
+  def call_menu(message, socket) do
     {_, message} = Map.pop(message, :target)
 
     Phoenix.LiveView.send_update(
@@ -126,44 +136,10 @@ defmodule ProcessAdministratorWeb.IndexLive do
       action: message.action,
       parent: message.parent,
       type: message.type,
-      select_lists:
-        Enum.reduce(
-          message.select_list_constructors, %{},
-          &construct_select_lists(socket, &1, &2)
-        )
+      select_lists: message.select_lists
     )
 
-    { :noreply, socket }
-  end
-
-  # This function finds the children of the thing in the submitted type
-  # It is primarily used to construct the select lists in the menu
-  # This should be moved somewhere else too.  It doesn't belong here
-  # Refactor to use a domain function directly.  This is nasty.
-  def construct_select_lists(
-    socket, { target, module, function, object }, select_lists
-  ) do
-    options =
-      Kernel.apply(
-        module,
-        function,
-        [
-          object,
-          socket.assigns
-        ]
-      )
-
-    select_options = DomainHelpers.select_list_temp(options, :name, false)
-
-    Map.put(select_lists, target, select_options)
-  end
-  def construct_select_lists(socket, { target, key }, select_lists) do
-    select_options =
-      socket.assigns
-      |> Map.get(key)
-      |> DomainHelpers.select_list_temp(:name, false)
-
-    Map.put(select_lists, target, select_options)
+    socket
   end
 
   def handle_info({:update_current_version, changes}, socket) do
@@ -180,24 +156,79 @@ defmodule ProcessAdministratorWeb.IndexLive do
 
   # TODO: Must implement either updating the state tree/components
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
-    Logger.debug("Handling a subscription on topic #{topic}, event #{event}")
+    Logger.debug("Handling info on topic #{topic}, event #{event}")
+    {
+      :noreply,
+      socket
+      |> update_components(topic, event, payload)
+      |> execute_preloads(topic, event, payload)
+      |> update_socket_data(topic, event, payload)
+      |> update_additional_data(topic, event, payload)
+    }
+  end
+
+  def update_components(socket, "process", _, _) do
+    close_modal(socket)
+  end
+  def update_components(socket, "version", _, _) do
+    close_modal(socket)
+  end
+  def update_components(socket, "project", _, _) do
+    close_modal(socket)
+  end
+  def update_components(socket, _, _, _), do: socket
+
+  def execute_preloads(socket, "process", "create", payload) do
+    Logger.debug("Executing Preloads")
+    IO.inspect(payload)
+    socket
+  end
+  def execute_preloads(socket, _, _, _), do: socket
+
+  def update_socket_data(socket, topic, "create", payload) do
+    Logger.debug("Updating State on topic #{topic}, event create")
 
     type =
       topic
       |> State.plural()
       |> String.to_atom()
 
-    socket =
-      State.apply_changes(
-        socket,
-        State.update_object(socket.assigns, type, payload.id, payload)
-      )
+    changes = State.create_object(socket.assigns, type, payload.id, payload)
+    IO.inspect(changes)
+    socket = State.apply_changes(socket, changes)
+    IO.puts("Updated assigns")
+    IO.inspect(socket.assigns.processes)
+    socket
+  end
+  def update_socket_data(socket, topic, "update", payload) do
+    Logger.debug("Updating State on topic #{topic}, event update")
 
-    {:noreply, socket}
+    type =
+      topic
+      |> State.plural()
+      |> String.to_atom()
+
+    IO.inspect(type)
+
+    changes = State.update_object(socket.assigns, type, payload.id, payload)
+    State.apply_changes(socket, changes)
+  end
+
+  def update_additional_data(socket, "process", _, _) do
+    current_processes =
+      Version.processes(
+        socket.assigns.current_version.id,
+        socket.assigns.processes)
+      |> Enum.sort(&(&1.order <= &2.order))
+
+    assign(socket, :current_processes, current_processes )
+  end
+  def update_additional_data(socket, _, _, _) do
+    socket
   end
   # TODO: Must implement either updating the state tree/components
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
-    Logger.debug("Handling a subscription on topic #{topic}, event #{event}")
+    Logger.debug("Handling a subscription on topic #{topic}, event #{event} old")
     args = String.split(topic, "::")
     type =
       args
@@ -238,128 +269,73 @@ defmodule ProcessAdministratorWeb.IndexLive do
   def content_class([]), do: "content is-hidden"
   def content_class(_), do: "content"
 
+  @impl true
   def handle_event("new-process", _, socket) do
     IO.puts("New Process")
-    message =
-      base_message()
-      |> process_message(socket)
-      |> Map.put(:object, %Content{})
-      |> Map.put(:action, :new)
-      |> Map.put(:title, "New Content")
-
-    send(self(), {:new_content, message})
-
-    {:noreply, socket}
-  end
-
-  def process_message(message, socket) do
-    select_lists = %{
-      versions:
-        DomainHelpers.select_list_temp(socket.assigns.data.versions, :name, false)
+    {
+      :noreply,
+      ProcessMessage.new_modal_menu(socket)
+      |> call_menu(socket)
     }
-
-    message
-    |> Map.put(:type, :process)
-    |> Map.put(:parent, %{id: 0})
-    |> Map.put(:select_lists, :select_lists)
   end
 
+  @impl true
   def handle_event("edit-project", _, socket) do
     IO.puts("Edit Project")
-    message =
-      base_message()
-      |> project_message(socket)
-      |> Map.put(:object, socket.assigns.current_project)
-      |> Map.put(:action, :edit)
-      |> Map.put(:title, "Edit Project")
-
-    send(self(), {:edit_project, message})
-
-    {:noreply, socket}
+    {
+      :noreply,
+      ProjectMessage.edit_modal_menu(socket)
+      |> call_menu(socket)
+    }
   end
 
+  @impl true
   def handle_event("new-project", _, socket) do
     IO.puts("New Project")
-    message =
-      base_message()
-      |> project_message(socket)
-      |> Map.put(:object, %Project{})
-      |> Map.put(:action, :new)
-      |> Map.put(:title, "New Project")
-
-    send(self(), {:new_version, message})
-
-    {:noreply, socket}
-  end
-
-  def project_message(message, socket) do
-    select_list_constructors = [
-      {
-        :teams,
-        UserDocs.Users.User,
-        :teams,
-        socket.assigns.current_user
-      }
-    ]
-
-    message
-    |> Map.put(:type, :project)
-    |> Map.put(:parent, socket.assigns.current_team)
-    |> Map.put(:select_list_constructors, select_list_constructors)
-  end
-
-  def handle_event("edit-version", _, socket) do
-    IO.puts("Edit Versionzs")
-    message =
-      base_message()
-      |> version_message(socket)
-      |> Map.put(:object, socket.assigns.current_version)
-      |> Map.put(:action, :edit)
-      |> Map.put(:title, "Edit Version")
-
-    send(self(), {:edit_version, message})
-
-    {:noreply, socket}
-  end
-
-  def handle_event("new-version", _, socket) do
-    IO.puts("New Versionzs")
-    message =
-      base_message()
-      |> version_message(socket)
-      |> Map.put(:object, %Version{})
-      |> Map.put(:action, :new)
-      |> Map.put(:title, "New Version")
-
-    send(self(), {:new_version, message})
-
-    {:noreply, socket}
-  end
-
-  def version_message(message, socket) do
-    select_list_constructors = [
-      {
-        :projects,
-        UserDocs.Users.Team,
-        :projects,
-        socket.assigns.current_team
-      },
-      {
-        :strategies,
-        :strategies
-      }
-    ]
-
-    message
-    |> Map.put(:type, :version)
-    |> Map.put(:parent, socket.assigns.current_project)
-    |> Map.put(:select_list_constructors, select_list_constructors)
-  end
-
-  def base_message() do
-    %{
-      target: "ModalMenus"
+    {
+      :noreply,
+      ProjectMessage.new_modal_menu(socket)
+      |> call_menu(socket)
     }
+  end
+
+  @impl true
+  def handle_event("edit-version", _, socket) do
+    IO.puts("Edit Versions")
+    {
+      :noreply,
+      VersionMessage.edit_modal_menu(socket)
+      |> call_menu(socket)
+    }
+  end
+
+  @impl true
+  def handle_event("new-version", _, socket) do
+    IO.puts("New Versions")
+    {
+      :noreply,
+      VersionMessage.new_modal_menu(socket)
+      |> call_menu(socket)
+    }
+  end
+
+  @impl true
+  def handle_event("select_team", %{ "team" => %{"id" => id} }, socket) do
+    changes = Select.handle_team_selection(socket.assigns, String.to_integer(id))
+    {:noreply, State.apply_changes(socket, changes)}
+  end
+
+  @impl true
+  def handle_event("select_project", %{ "project" => %{"id" => id} }, socket) do
+    changes = Select.handle_project_selection(socket.assigns, String.to_integer(id))
+    {:noreply, State.apply_changes(socket, changes)}
+  end
+
+  @impl true
+  def handle_event("select_version", %{ "version" => %{"id" => id} }, socket) do
+    changes = Select.handle_version_selection(socket.assigns, String.to_integer(id))
+    send(socket.root_pid, {:update_current_version, changes})
+    {:noreply, State.apply_changes(socket, changes)}
   end
 
   def preload_step(step, state) do
@@ -385,7 +361,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
   end
 
   def preload_process(process, state) do
-    raw_steps = UserDocs.Automation.list_steps(%{}, %{ process_id: process.id })
+    raw_steps = UserDocs.Automation.list_steps(%{}, %{ process_id: process.id }, state)
     preloaded_steps = Enum.map(raw_steps, &preload_step(&1, state))
     process
     |> Map.put(:steps, preloaded_steps)

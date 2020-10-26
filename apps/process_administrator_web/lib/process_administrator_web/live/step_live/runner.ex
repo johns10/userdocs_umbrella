@@ -1,5 +1,5 @@
 defmodule ProcessAdministratorWeb.StepLive.Runner do
-  use UserDocsWeb, :live_component
+  use ProcessAdministratorWeb, :live_component
   use Phoenix.HTML
 
   alias UserDocs.Automation.Runner

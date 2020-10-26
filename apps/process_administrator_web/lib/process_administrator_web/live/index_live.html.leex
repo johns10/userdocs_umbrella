@@ -22,150 +22,150 @@
       action: @modal_action,
     ]) %>
 
-    <%= for process <- @current_processes do %>
-      <%=
-        LiveHelpers.live_group(@socket, [
-          id: ID.group("process", process.id),
-          parent: @current_version,
-          object: process,
-          object_type: UserDocs.Automation.Process,
-          object_form: ProcessLive.FormComponent,
-          runner:
-            live_component(@socket, ProcessLive.Runner, [
-              id: "process-" <> Integer.to_string(process.id) <> "-runner",
-              process: preload_process(process, assigns)
-            ]),
-          child_type: UserDocs.Automation.Step,
-          new_form_component: StepLive.FormComponent,
-          data: %{
-            step_types: @step_types,
-            annotation_types: @annotation_types,
-          },
-          # TODO: Add last_page_navigated to logic here.
-          select_lists: %{
-            step_types_select: DomainHelpers.select_list_temp(@step_types, :name, false),
-            elements_select: DomainHelpers.select_list_temp(@elements, :name, false),
-            annotations: DomainHelpers.select_list_temp(@annotations, :name, false),
-            versions: DomainHelpers.select_list_temp(@versions, :name, false),
-            processes_select: DomainHelpers.select_list_temp(
-              Enum.filter(@processes, fn(p) -> p.version_id == @current_version.id end), :name, false),
-            pages_select: DomainHelpers.select_list_temp(
-              Enum.filter(@pages, fn(p) -> p.version_id == @current_version.id end), :name, false),
-          },
-          content:
-            # TODO: Figure out how to base this on the process.steps for an obvious performance improvement
-            for step <- Enum.filter(@steps, fn(s) -> s.process_id == process.id end) do
-              {
-                &LiveHelpers.live_collapsible_form/2,
-                @socket,
-                [
-                  id: ID.form(step, :edit, Step),
-                  title:
-                    step.name,
-                  runner:
-                    live_component(@socket, StepLive.Runner, [
-                      id: "step-" <> Integer.to_string(step.id) <> "-runner",
-                      step: preload_step(step, assigns),
-                      step_type_name: preload_step(step, assigns).step_type.name]),
-                  parent: process,
-                  object: preload_step(step, assigns),
-                  object_type: Step,
-                  object_form: StepLive.FormComponent,
-                  action: :edit,
-                  data: %{
-                    annotation_types: @annotation_types,
-                    content_versions: @content_versions,
-                    annotations: @annotations,
-                    strategies: @strategies,
-                    step_types: @step_types,
-                    processes: @processes,
-                    elements: @elements,
-                    projects: @projects,
-                    content: @content,
-                    pages: @pages,
-                  },
-                  select_lists: %{
-                    teams: DomainHelpers.select_list_temp(@teams, :name, false),
-                    strategies: DomainHelpers.select_list_temp(@strategies, :name, false),
-                    language_codes: DomainHelpers.select_list_temp(@language_codes, :code, false),
-                    step_types_select: DomainHelpers.select_list_temp(@step_types, :name, false),
-                    annotations: DomainHelpers.select_list_temp(@annotations, :name, false),
-                    elements_select: DomainHelpers.select_list_temp(@elements, :name, false),
-                    content: DomainHelpers.select_list_temp(@content, :name, false),
-                    content_versions: DomainHelpers.select_list_temp(@content_versions, :name, false),
-                    versions: DomainHelpers.select_list_temp(@versions, :name, false),
-                    processes_select: DomainHelpers.select_list_temp(
-                      Enum.filter(@processes, fn(p) -> p.version_id == @current_version.id end), :name, false),
-                    pages_select: DomainHelpers.select_list_temp(
-                      Enum.filter(@pages, fn(p) -> p.version_id == @current_version.id end), :name, false),
-                    annotation_types: DomainHelpers.select_list_temp(@annotation_types, :name, false),
-                  },
-                  # TODO: Add last_page_navigated to logic here.
-                  select_lists: %{
-                    step_types_select: DomainHelpers.select_list_temp(@step_types, :name, false),
-                    elements_select: DomainHelpers.select_list_temp(@elements, :name, false),
-                    annotations: DomainHelpers.select_list_temp(@annotations, :name, false),
-                    processes_select: DomainHelpers.select_list_temp(
-                      Enum.filter(@processes, fn(p) -> p.version_id == @current_version.id end), :name, false),
-                    pages_select: DomainHelpers.select_list_temp(
-                      Enum.filter(@pages, fn(p) -> p.version_id == @current_version.id end), :name, false),
-                  },
-                  content: []
-                ]
-              }
-            end
-      ]) %>
-    <% end %>
+    <%= if @current_version do %>
+      <%= for process <- @current_processes do %>
+        <%=
+          LiveHelpers.live_group(@socket, [
+            id: ID.group("process", process.id),
+            parent: @current_version,
+            object: process,
+            object_type: UserDocs.Automation.Process,
+            object_form: ProcessLive.FormComponent,
+            runner:
+              live_component(@socket, ProcessLive.Runner, [
+                id: "process-" <> Integer.to_string(process.id) <> "-runner",
+                process: preload_process(process, assigns)
+              ]),
+            child_type: UserDocs.Automation.Step,
+            new_form_component: StepLive.FormComponent,
+            data: %{
+              step_types: @step_types,
+              annotation_types: @annotation_types,
+            },
+            # TODO: Add last_page_navigated to logic here.
+            select_lists: %{
+              step_types_select: DomainHelpers.select_list_temp(@step_types, :name, false),
+              elements_select: DomainHelpers.select_list_temp(@elements, :name, false),
+              annotations: DomainHelpers.select_list_temp(@annotations, :name, false),
+              versions: DomainHelpers.select_list_temp(@versions, :name, false),
+              processes_select: DomainHelpers.select_list_temp(
+                Enum.filter(@processes || [], fn(p) -> p.version_id == Map.get(@current_version, :id, nil) end), :name, false),
+              pages_select: DomainHelpers.select_list_temp(
+                Enum.filter(@pages || [], fn(p) -> p.version_id == Map.get(@current_version, :id, nil) end), :name, false),
+            },
+            content:
+              # TODO: Figure out how to base this on the process.steps for an obvious performance improvement
+              for step <- Enum.filter(@steps, fn(s) -> s.process_id == process.id end) do
+                {
+                  &LiveHelpers.live_collapsible_form/2,
+                  @socket,
+                  [
+                    id: ID.form(step, :edit, Step),
+                    title:
+                      step.name,
+                    runner:
+                      live_component(@socket, StepLive.Runner, [
+                        id: "step-" <> Integer.to_string(step.id) <> "-runner",
+                        step: preload_step(step, assigns),
+                        step_type_name: preload_step(step, assigns).step_type.name]),
+                    parent: process,
+                    object: preload_step(step, assigns),
+                    object_type: Step,
+                    object_form: StepLive.FormComponent,
+                    action: :edit,
+                    data: %{
+                      annotation_types: @annotation_types,
+                      content_versions: @content_versions,
+                      annotations: @annotations,
+                      strategies: @strategies,
+                      step_types: @step_types,
+                      processes: @processes,
+                      elements: @elements,
+                      projects: @projects,
+                      content: @content,
+                      pages: @pages,
+                    },
+                    select_lists: %{
+                      teams: DomainHelpers.select_list_temp(@teams, :name, false),
+                      strategies: DomainHelpers.select_list_temp(@strategies, :name, false),
+                      language_codes: DomainHelpers.select_list_temp(@language_codes, :code, false),
+                      step_types_select: DomainHelpers.select_list_temp(@step_types, :name, false),
+                      annotations: DomainHelpers.select_list_temp(@annotations, :name, false),
+                      elements_select: DomainHelpers.select_list_temp(@elements, :name, false),
+                      content: DomainHelpers.select_list_temp(@content, :name, false),
+                      content_versions: DomainHelpers.select_list_temp(@content_versions, :name, false),
+                      versions: DomainHelpers.select_list_temp(@versions, :name, false),
+                      processes_select: DomainHelpers.select_list_temp(
+                        Enum.filter(@processes, fn(p) -> p.version_id == @current_version.id end), :name, false),
+                      pages_select: DomainHelpers.select_list_temp(
+                        Enum.filter(@pages, fn(p) -> p.version_id == @current_version.id end), :name, false),
+                      annotation_types: DomainHelpers.select_list_temp(@annotation_types, :name, false),
+                    },
+                    # TODO: Add last_page_navigated to logic here.
+                    select_lists: %{
+                      step_types_select: DomainHelpers.select_list_temp(@step_types, :name, false),
+                      elements_select: DomainHelpers.select_list_temp(@elements, :name, false),
+                      annotations: DomainHelpers.select_list_temp(@annotations, :name, false),
+                      processes_select: DomainHelpers.select_list_temp(
+                        Enum.filter(@processes, fn(p) -> p.version_id == @current_version.id end), :name, false),
+                      pages_select: DomainHelpers.select_list_temp(
+                        Enum.filter(@pages, fn(p) -> p.version_id == @current_version.id end), :name, false),
+                    },
+                    content: []
+                  ]
+                }
+              end
+        ]) %>
+      <% end %>
+      <%= live_component(@socket, UserDocsWeb.ScreenShotHandler, [ id: "screenshot-handler-component" ]) %>
 
-    <%= live_component(@socket, UserDocsWeb.ScreenShotHandler,
-    [ id: "screenshot-handler-component" ]) %>
-    <%= live_component(@socket, UserDocsWeb.SelectorHandler,
-    [ id: "selector-handler" ]) %>
+      <%= live_component(@socket, UserDocsWeb.SelectorHandler, [ id: "selector-handler" ]) %>
 
-    <div id="selector-tester" phx-hook="testSelector"></div>
+      <div id="selector-tester" phx-hook="testSelector"></div>
 
-    <nav class="navbar is-fixed-bottom" role="navigation" aria-label="main navigation">
+      <nav class="navbar is-fixed-bottom" role="navigation" aria-label="main navigation">
 
-      <div class="navbar-brand">
-        <div class="navbar-item">
-          <div class="field is-grouped">
-            <%= f = form_for :current_strategy, "#", phx_change: "update_current_strategy"%>
-              <div class="control">
-                <div class="select">
-                  <%= select f, :strategy_id,
-                    DomainHelpers.select_list_temp(@strategies, :name, false),
-                    value: Enum.filter(@strategies, fn(s) -> s.id == @current_version.strategy_id end) |> Enum.at(0) |> Map.get(:id),
-                    id: "current-strategy",
-                    phx_hook: "configure"
-                  %>
+        <div class="navbar-brand">
+          <div class="navbar-item">
+            <div class="field is-grouped">
+              <%= f = form_for :current_strategy, "#", phx_change: "update_current_strategy"%>
+                <div class="control">
+                  <div class="select">
+                    <%= select f, :strategy_id,
+                      DomainHelpers.select_list_temp(@strategies, :name, false),
+                      value: Enum.filter(@strategies, fn(s) -> s.id == @current_version.strategy_id end) |> Enum.at(0) |> Map.get(:id),
+                      id: "current-strategy",
+                      phx_hook: "configure"
+                    %>
+                  </div>
                 </div>
-              </div>
-            </form>
-            <%= f = form_for :selected, "#" %>
-              <div>
-                <div class="select">
-                  <%= select f, :strategy_transfer_field,
-                    DomainHelpers.select_list_temp(@strategies, :name, false),
-                    value: @transferred_strategy.id,
-                    id: "strategy-transfer-field",
-                    disabled: true
-                  %>
+              </form>
+              <%= f = form_for :selected, "#" %>
+                <div>
+                  <div class="select">
+                    <%= select f, :strategy_transfer_field,
+                      DomainHelpers.select_list_temp(@strategies, :name, false),
+                      value: @transferred_strategy.id,
+                      id: "strategy-transfer-field",
+                      disabled: true
+                    %>
+                  </div>
                 </div>
-              </div>
-            </form>
-            <p class="control">
-              <input
-                class="input"
-                type="text"
-                placeholder="Selector"
-                id="selector-transfer-field"
-                value="<%= @transferred_selector %>"
-              >
-            </p>
+              </form>
+              <p class="control">
+                <input
+                  class="input"
+                  type="text"
+                  placeholder="Selector"
+                  id="selector-transfer-field"
+                  value="<%= @transferred_selector %>"
+                >
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    <% end %>
   <% else %>
     <%= form_for @changeset, "http://app.davenport.rocks:4001/session", [as: :user], fn f -> %>
       <%= if @changeset.action do %>

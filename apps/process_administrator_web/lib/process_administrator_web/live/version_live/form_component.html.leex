@@ -13,8 +13,8 @@
       id: ID.form_field(f.data, :strategy_id),
     ]),
     Layout.select_input(f, :project_id, @select_lists.projects, [
-      placeholder: @parent_id || "",
-      id: ID.form_field(f.data, :project_id),
+      selected: @parent_id || "",
+      id: ID.form_field(f.data, :project_id)
     ])
   ]) %>
 

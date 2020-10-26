@@ -1,5 +1,5 @@
 defmodule ProcessAdministratorWeb.ProcessLive.FormComponent do
-  use UserDocsWeb, :live_component
+  use ProcessAdministratorWeb, :live_component
 
   alias UserDocs.Automation
   alias ProcessAdministratorWeb.Layout
@@ -14,6 +14,9 @@ defmodule ProcessAdministratorWeb.ProcessLive.FormComponent do
       socket
       |> assign(assigns)
       |> assign(:changeset, changeset)
+      |> assign(:version_field_id, ID.form_field(process, :version_id))
+      |> assign(:order_field_id, ID.form_field(process, :order))
+      |> assign(:name_field_id, ID.form_field(process, :name))
     }
   end
 

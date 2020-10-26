@@ -1,5 +1,5 @@
 defmodule ProcessAdministratorWeb.SessionController do
-  use UserDocsWeb, :controller
+  use ProcessAdministratorWeb, :controller
 
   def new(conn, _params) do
     changeset = Pow.Plug.change_user(conn)

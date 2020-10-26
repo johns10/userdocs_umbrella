@@ -6,18 +6,20 @@
   class: "form-horizontal" %>
 
   <div class="field is-grouped">
-    <div class="control">
-      <%= Layout.select_input(f, :version_id, @select_lists.versions, [
-        id: ID.form_field(f.data, :version_id),
-        placeholder: @parent_id || ""
-      ]) %>
-    </div>
-    <div class="control">
-      <%= Layout.number_input(f, :order, [ id: ID.form_field(f.data, :order) ]) %>
-    </div>
-    <div class="control is-expanded">
-      <%= Layout.text_input(f, :name, [ id: ID.form_field(f.data, :name) ]) %>
-    </div>
+    <%= Layout.select_input(f, :version_id, @select_lists.versions, [
+        id: @version_field_id || "",
+        selected: @parent_id || "",
+      ], "control") %>
+
+    <%= Layout.number_input(f, :order, [
+        id: @order_field_id || "",
+        phx_debounce: "blur"
+      ], "control") %>
+
+    <%= Layout.text_input(f, :name, [
+        id: @name_field_id || "",
+        phx_debounce: "blur"
+      ], "control is-expanded") %>
   </div>
 
   <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
