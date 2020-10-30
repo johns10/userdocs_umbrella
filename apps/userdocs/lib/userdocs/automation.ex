@@ -405,7 +405,13 @@ defmodule UserDocs.Automation do
 
   def change_step_with_nested_data(%Step{} = step, attrs \\ %{}, state \\ %{}) do
     changeset = Step.change_nested_foreign_keys(step, attrs)
-    { :ok, new_step } = Repo.update(changeset)
+    IO.inspect(changeset)
+    { :ok, new_step } =
+      if changeset.action == nil do
+        {:ok, Ecto.Changeset.apply_changes(changeset)}
+      else
+        Repo.update(changeset)
+      end
     preloaded_new_step = update_step_preloads(new_step, changeset.changes, state)
     Step.change_remaining(preloaded_new_step, changeset.params)
   end

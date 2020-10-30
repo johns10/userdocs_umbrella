@@ -14,7 +14,6 @@ defmodule UserDocs.Automation.Step.Name do
 
   def generate("Apply Annotation" = name, step) do
     Logger.debug("Automatic name generation: #{name}")
-    (step)
     ""
     |> maybe_field(step, :order, ". ")
     |> maybe_field(step, [:step_type, :name], " ")

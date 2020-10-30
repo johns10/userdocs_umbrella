@@ -146,22 +146,6 @@ defmodule UserDocs.StepChange do
 
     end
 
-    test "change_nested_foreign_keys returns a changeset that changes the ids, and removes the nested params" do
-      fx = change_fixture()
-      step = fx.step_with_element
-      attrs = %{
-        element_id: fx.element_one.id,
-        element:
-          WebFixtures.element_attrs(:valid)
-          |> Map.put(:page_id, fx.page.id)
-          |> Map.put(:strategy_id, fx.strategy.id)
-          |> Map.put(:id, fx.element_two.id)
-      }
-      changeset = Step.change_nested_foreign_keys(step, attrs)
-      assert changeset.changes.element_id == fx.element_one.id
-      assert Map.get(changeset.params, :element, nil) == nil
-    end
-
     test "update_step updates the data in the changes with preloads" do
       fx = change_fixture()
       step = fx.empty_step
@@ -177,13 +161,6 @@ defmodule UserDocs.StepChange do
       new_step = Automation.update_step_with_nested_data(step, attrs, fx.state)
       assert new_step.annotation_id == fx.annotation_one.id
       assert step.annotation == fx.annotation_one
-    end
-    test "creating an empty step, and adding an element updates the preload" do
-      fx = change_fixture()
-      step = fx.empty_step
-      attrs = %{ element_id: fx.element_two.id }
-      new_step = Automation.update_step_with_nested_data(step, attrs, fx.state)
-      assert new_step.element == fx.element_two
     end
 
     test "creating a step, and changing to a nil element updates the preloads.  Adding attrs and applying creates a new element" do
@@ -201,7 +178,6 @@ defmodule UserDocs.StepChange do
       assert updated_element.name == attrs.element.name
       assert final_step.element.name == attrs.element.name
     end
-    """
 
     test "creating a step with an element, and changing to a nil element updates the preloads" do
       fx = change_fixture()
@@ -210,6 +186,33 @@ defmodule UserDocs.StepChange do
       { :ok, new_step } = Automation.update_step_with_nested_data(step, attrs, fx.state)
       assert Map.delete(new_step.element, :__meta__) == Map.delete(%Element{}, :__meta__)
     end
+
+    test "creating an empty step, and adding an element updates the preload" do
+      fx = change_fixture()
+      step = fx.empty_step
+      attrs = %{ element_id: fx.element_two.id }
+      { :ok, new_step } = Automation.update_step_with_nested_data(step, attrs, fx.state)
+      assert new_step.element == fx.element_two
+    end
+    """
+
+    test "change_nested_foreign_keys returns a changeset that changes the ids, and removes the nested params" do
+      fx = change_fixture()
+      step = fx.step_with_element
+      attrs = %{
+        element_id: fx.element_one.id,
+        element:
+          WebFixtures.element_attrs(:valid)
+          |> Map.put(:page_id, fx.page.id)
+          |> Map.put(:strategy_id, fx.strategy.id)
+          |> Map.put(:id, fx.element_two.id)
+      }
+      changeset = Step.change_nested_foreign_keys(step, attrs)
+      assert changeset.changes.element_id == fx.element_one.id
+      assert Map.get(changeset.params, :element, nil) == nil
+      Step.change_remaining(step, attrs)
+    end
+
 
 
   end
