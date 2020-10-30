@@ -50,13 +50,6 @@ defmodule UserDocs.Web.Annotation do
     |> validate_required([:page_id])
   end
 
-  def generate_name(changeset) do
-    IO.inspect(changeset)
-    IO.inspect(changeset.data)
-    IO.inspect(changeset.changes)
-    changeset
-  end
-
   def safe(annotation, handlers \\ %{})
   def safe(annotation = %UserDocs.Web.Annotation{}, handlers) do
     base_safe(annotation)
@@ -94,8 +87,6 @@ defmodule UserDocs.Web.Annotation do
     case Ecto.Changeset.apply_action(changeset, :update) do
       { :ok, annotation } ->
         name = name(annotation)
-        IO.puts("Annotation Name")
-        IO.inspect(name)
         Ecto.Changeset.put_change(changeset, :name, name)
       { :error, changeset } -> changeset
     end

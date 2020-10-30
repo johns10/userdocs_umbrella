@@ -252,7 +252,6 @@ defmodule UserDocs.DocumentsTest do
 
     test "change_content_version/1 returns a content_version changeset" do
       content_version = content_version_fixture()
-      IO.inspect(content_version)
       assert %Ecto.Changeset{} = Documents.change_content_version(content_version)
     end
   end

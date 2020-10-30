@@ -144,8 +144,6 @@ defmodule UserDocs.StepChange do
 
       changeset = Automation.change_step(step, step_attrs)
 
-      #IO.inspect(changeset)
-
     end
 
     test "change_nested_foreign_keys returns a changeset that changes the ids, and removes the nested params" do
@@ -210,7 +208,6 @@ defmodule UserDocs.StepChange do
       step = fx.step_with_element
       attrs = %{ element_id: nil }
       { :ok, new_step } = Automation.update_step_with_nested_data(step, attrs, fx.state)
-      IO.inspect(new_step)
       assert Map.delete(new_step.element, :__meta__) == Map.delete(%Element{}, :__meta__)
     end
 

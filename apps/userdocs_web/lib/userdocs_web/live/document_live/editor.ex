@@ -137,11 +137,11 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   def handle_event("docubit_drop", %{ "element-id" => element_id, "column-count" => column_count, "row-count" => row_count}, socket
   ) when is_binary(column_count) and is_binary(row_count) do
     IO.puts("Dropping on docubit element #{element_id} column #{column_count}, row #{row_count}")
-    IO.inspect(socket.assigns.dragging)
+    Logger.debug(socket.assigns.dragging)
     type = socket.assigns.dragging.type
     id = String.to_integer(socket.assigns.dragging.id)
-    IO.inspect(type)
-    IO.inspect(id)
+    Logger.debug(type)
+    Logger.debug(id)
 
     document = Editor.add_item_to_document_column(
       socket.assigns.document,
@@ -167,7 +167,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   def handle_event("change-language", %{"language" => %{"id" => id}}, socket)
   when is_binary(id) do
     IO.puts("Changing Language")
-    IO.inspect(id)
+    Logger.debug(id)
     language_code_id = String.to_integer(id)
 
     current_language_code =
@@ -186,10 +186,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   @impl true
   def handle_event("delete_body_item", %{ "body-element-id" => address }, socket) do
     IO.puts("Handling a delete item event")
-    IO.inspect(locate_body_item(socket.assigns.document.body, address))
     new_body = delete_body_item(address, socket.assigns.document.body)
-
-    IO.inspect(new_body)
 
     { _status, new_document } =
       Documents.update_document(socket.assigns.document,

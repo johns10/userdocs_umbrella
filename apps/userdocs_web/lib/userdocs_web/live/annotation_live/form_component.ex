@@ -265,7 +265,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
       try do
         assigns.current_step.annotation.label
       rescue
-        _ -> IO.inspect("FAIL")
+        _ -> Logger.error("FAIL")
       end
     element_name =
       try do

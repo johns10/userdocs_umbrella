@@ -56,7 +56,6 @@ defmodule UserDocs.Documents.DocuBit.Renderers.Editor do
   end
 
   def content(docubit, _) do
-    # IO.inspect(docubit)
     [
       content_tag(:h1) do
         [ docubit.data.title, delete(docubit.body_element_id)]

@@ -63,7 +63,7 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
           |> assign(:auth_state, :logged_in)
           |> (&(assign(&1, :changeset, UserDocs.Users.change_user(&1.assigns.current_user)))).()
         error ->
-          IO.inspect(error)
+          Logger.error(error)
           socket
       end
     rescue

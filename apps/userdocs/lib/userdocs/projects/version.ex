@@ -30,11 +30,9 @@ defmodule UserDocs.Projects.Version do
   end
 
   def processes(version = %UserDocs.Projects.Version{}, processes) do
-    IO.inspect("API Processes")
     processes(version.id, processes)
   end
   def processes(version_id, processes) when is_integer(version_id) do
-    IO.inspect("Private Processes")
     Enum.filter(processes, fn(p) -> p.version_id == version_id end)
   end
 end

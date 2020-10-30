@@ -30,7 +30,6 @@ defmodule UserDocsWeb.ProcessAdministratorLive.StepLive.Runner do
   def handle_event("execute_step", %{"step-id" => step_id}, socket) do
     _log_string = "Executing step " <> step_id
     IO.puts(_log_string)
-    IO.inspect(socket.assigns.step)
 
     payload =  %{
       type: "step",

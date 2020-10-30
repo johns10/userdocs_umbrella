@@ -122,9 +122,6 @@ defmodule UserDocs.Automation.Step do
     annotation = step.annotation
     element = step.element
 
-    IO.inspect(annotation)
-    IO.inspect(element)
-
     name =
       UserDocs.Web.Annotation.Name.execute(annotation, element)
 
