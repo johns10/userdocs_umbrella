@@ -6,6 +6,7 @@ defmodule UserDocs.Automation.Runner do
   alias UserDocs.Web.AnnotationType
   alias UserDocs.Web.Element
   alias UserDocs.Web.Strategy
+  alias UserDocs.Web.Page
 
   def parse(process = %UserDocs.Automation.Process{}) do
     handlers = %{
@@ -26,7 +27,8 @@ defmodule UserDocs.Automation.Runner do
       element: &Element.safe/2,
       step_type: &StepType.safe/2,
       strategy: &Strategy.safe/2,
-      annotation_type: &AnnotationType.safe/2
+      annotation_type: &AnnotationType.safe/2,
+      page: &Page.safe/2,
     }
 
     Step.safe(step, handlers)

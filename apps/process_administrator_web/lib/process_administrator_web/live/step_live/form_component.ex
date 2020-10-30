@@ -12,15 +12,19 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
   alias ProcessAdministratorWeb.ID
 
   alias UserDocs.Automation
+  alias UserDocs.Automation.Step.ChangeHandler
   alias UserDocs.ChangeTracker
   alias UserDocs.Documents
   alias UserDocs.Documents.ContentVersion
   alias UserDocs.Web
   alias UserDocs.Web.Page
+  alias UserDocs.Web.Element
+  alias UserDocs.Web.Annotation
 
   @impl true
   def update(%{step: step} = assigns, socket) do
     changeset = Automation.change_step(step)
+
     step_type_id =
       try do
         step.step_type_id
@@ -54,54 +58,26 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
       )
 
     element_field_ids =
-      if step.element_id != nil do
-        %{}
-        |> Map.put(:page_id, ID.form_field(step.element, :page_id))
-        |> Map.put(:order, ID.form_field(step.element, :order))
-        |> Map.put(:name, ID.form_field(step.element, :name))
-        |> Map.put(:strategy_id, ID.form_field(step.element, :strategy_id))
-      else
-        %{}
-        |> Map.put(:page_id, "")
-        |> Map.put(:order, "")
-        |> Map.put(:name, "")
-        |> Map.put(:strategy_id, "")
-      end
+      ProcessAdministratorWeb.ElementLive.FormComponent.field_ids(step.element)
 
     page_field_ids =
-      if step.page_id != nil do
-        %{}
-        |> Map.put(:version_id, ID.form_field(step.page, :version_id))
-        |> Map.put(:order, ID.form_field(step.page, :order))
-        |> Map.put(:name, ID.form_field(step.page, :name))
-        |> Map.put(:url, ID.form_field(step.page, :url))
-      else
-        %{}
-        |> Map.put(:version_id, "")
-        |> Map.put(:order, "")
-        |> Map.put(:name, "")
-        |> Map.put(:url, "")
-      end
+      ProcessAdministratorWeb.PageLive.FormComponent.field_ids(step.page)
 
-
+    annotation_field_ids =
+      ProcessAdministratorWeb.AnnotationLive.FormComponent.field_ids(step.annotation)
 
     step_field_ids =
-      %{}
-      |> Map.put(:name, ID.form_field(step, :name))
-      |> Map.put(:process_id, ID.form_field(step, :process_id))
-      |> Map.put(:order, ID.form_field(step, :order))
-      |> Map.put(:step_type_id, ID.form_field(step, :step_type_id))
-      |> Map.put(:element_id, ID.form_field(step, :element_id))
-      |> Map.put(:annotation_id, ID.form_field(step, :annotation_id))
-      |> Map.put(:page_reference_url, ID.form_field(step, :page_reference_url))
-      |> Map.put(:page_reference_page, ID.form_field(step, :page_reference_page))
-      |> Map.put(:page_id, ID.form_field(step, :page_id))
-      |> Map.put(:url, ID.form_field(step, :url))
-      |> Map.put(:text, ID.form_field(step, :text))
-      |> Map.put(:width, ID.form_field(step, :width))
-      |> Map.put(:height, ID.form_field(step, :height))
+      field_ids(step)
       |> Map.put(:page, page_field_ids)
       |> Map.put(:element, element_field_ids)
+      |> Map.put(:annotation, annotation_field_ids)
+
+    form_ids =
+      %{}
+      |> Map.put(:prefix, ID.prefix(step))
+      |> Map.put(:element, nested_form_id(step, step.element))
+      |> Map.put(:page, nested_form_id(step, step.page))
+      |> Map.put(:annotation, nested_form_id(step, step.annotation))
 
     {
       :ok,
@@ -116,23 +92,22 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
       |> assign(:nested_annotation_expanded, false)
       |> assign(:nested_annotation_content_expanded, false)
       |> assign(:field_ids, step_field_ids)
+      |> assign(:form_ids, form_ids)
     }
   end
 
   @impl true
   def handle_event("validate", %{"step" => step_params}, socket) do
+    IO.inspect(socket.assigns.step.annotation.name)
     changeset =
-      socket.assigns.step
-      |> Automation.change_step(step_params)
-      |> Map.put(:action, :validate)
-
-    socket_changes = ChangeTracker.execute(socket.assigns, step_params, &Automation.change_step/2)
+      Automation.change_step_with_nested_data(
+        socket.assigns.step, step_params, socket.assigns)
 
     {
       :noreply,
       socket
       |> assign(:changeset, changeset)
-      |> LiveHelpers.apply_changes(socket_changes)
+      |> assign(:step, changeset.data)
     }
   end
 
@@ -178,21 +153,43 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
     }
   end
 
-  def handle_event("new-page", _, socket) do
-    changes = UserDocs.Automation.Step.ChangeHandler.execute(%{ page: %Page{} }, socket.assigns)
+  def handle_event("new-element", _, socket) do
+    { step, changeset } =
+      Automation.new_step_element(
+        socket.assigns.step, socket.assigns.changeset)
+
+    IO.puts("New Element")
 
     {
       :noreply,
-      State.apply_changes(socket, changes)
+      socket
+      |> assign(:changeset, changeset)
+      |> assign(:step, step)
     }
   end
 
-  @impl true
-  def handle_event("delete-content-version", %{"id" => id}, socket) do
-    content_version = Documents.get_content_version!(String.to_integer(id), %{}, %{}, socket.assigns.data)
-    {:ok, _} = Documents.delete_content_version(content_version)
+  def handle_event("new-page", _, socket) do
+    { step, changeset } =
+      Automation.new_page_annotation(socket.assigns.step)
 
-    {:noreply, socket}
+    {
+      :noreply,
+      socket
+      |> assign(:changeset, changeset)
+      |> assign(:step, step)
+    }
+  end
+
+  def handle_event("new-annotation", _, socket) do
+    { step, changeset } =
+      Automation.new_step_annotation(socket.assigns.step)
+
+    {
+      :noreply,
+      socket
+      |> assign(:changeset, changeset)
+      |> assign(:step, step)
+    }
   end
 
   defp save_step(socket, :edit, step_params) do
@@ -225,4 +222,33 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
     socket
     |> assign(key, not Map.get(socket.assigns, key))
   end
+
+  def field_ids(step = %Automation.Step{}) do
+    %{}
+    |> Map.put(:name, ID.form_field(step, :name))
+    |> Map.put(:process_id, ID.form_field(step, :process_id))
+    |> Map.put(:order, ID.form_field(step, :order))
+    |> Map.put(:step_type_id, ID.form_field(step, :step_type_id))
+    |> Map.put(:element_id, ID.form_field(step, :element_id))
+    |> Map.put(:annotation_id, ID.form_field(step, :annotation_id))
+    |> Map.put(:page_reference_url, ID.form_field(step, :page_reference_url))
+    |> Map.put(:page_reference_page, ID.form_field(step, :page_reference_page))
+    |> Map.put(:page_id, ID.form_field(step, :page_id))
+    |> Map.put(:url, ID.form_field(step, :url))
+    |> Map.put(:text, ID.form_field(step, :text))
+    |> Map.put(:width, ID.form_field(step, :width))
+    |> Map.put(:height, ID.form_field(step, :height))
+  end
+
+  def nested_form_id(step = %Automation.Step{}, element = %Web.Element{}) do
+    ID.nested_form(step, element)
+  end
+  def nested_form_id(step = %Automation.Step{}, page = %Web.Page{}) do
+    ID.nested_form(step, page)
+  end
+  def nested_form_id(step = %Automation.Step{}, annotation = %Web.Annotation{}) do
+    ID.nested_form(step, annotation)
+  end
+  def nested_form_id(_, _), do: ""
+
 end

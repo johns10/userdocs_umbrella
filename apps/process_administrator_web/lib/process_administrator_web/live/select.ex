@@ -1,7 +1,7 @@
 defmodule ProcessAdministratorWeb.Index.Select do
   require Logger
 
-  use UserDocsWeb, :live_view
+  use ProcessAdministratorWeb, :live_view
 
   alias UserDocs.Users
   alias UserDocs.Projects

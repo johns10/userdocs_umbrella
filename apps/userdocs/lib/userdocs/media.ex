@@ -7,9 +7,10 @@ defmodule UserDocs.Media do
 
   require Logger
 
-  alias UserDocsWeb.Endpoint
+  alias UserDocs.Subscription
 
   alias UserDocs.Repo
+
   alias UserDocs.Media.File
   alias UserDocs.Media.FileHelpers
   alias UserDocs.Media.ScreenshotHelpers
@@ -204,20 +205,10 @@ defmodule UserDocs.Media do
 
   """
   def create_screenshot(attrs \\ %{}) do
-    { status, screenshot } =
-      %Screenshot{}
-      |> Screenshot.changeset(attrs)
-      |> Repo.insert()
-
-    screenshot =
-      case status do
-        :ok -> screenshot
-        _ -> screenshot
-      end
-
-    Endpoint.broadcast("screenshot", "create", screenshot)
-
-    { status, screenshot }
+    %Screenshot{}
+    |> Screenshot.changeset(attrs)
+    |> Repo.insert()
+    |> Subscription.broadcast("screenshot", "create")
   end
 
   @doc """
@@ -233,33 +224,14 @@ defmodule UserDocs.Media do
 
   """
   def update_screenshot(%Screenshot{} = screenshot, attrs) do
-    { status, screenshot } =
-      screenshot
-      |> Screenshot.changeset(attrs)
-      |> Repo.update()
-
-    screenshot =
-      case status do
-        :ok -> screenshot
-        _ -> screenshot
-      end
-
-    Endpoint.broadcast("screenshot", "update", screenshot)
-
-    {status, screenshot}
+    screenshot
+    |> Screenshot.changeset(attrs)
+    |> Repo.update()
+    |> Subscription.broadcast("screenshot", "update")
   end
   def update_screenshot(%Ecto.Changeset{} = screenshot) do
-    { status, screenshot } = Repo.update(screenshot)
-
-    screenshot =
-      case status do
-        :ok -> screenshot
-        _ -> screenshot
-      end
-
-    Endpoint.broadcast("screenshot", "update", screenshot)
-
-    {status, screenshot}
+    Repo.update(screenshot)
+    |> Subscription.broadcast("screenshot", "update")
   end
 
   def upsert_screenshot(attrs \\ %{}) do

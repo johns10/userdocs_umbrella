@@ -452,9 +452,7 @@ function navigate(job, configuration, proceed) {
   const activeTabId = job.activeTabId
   const step = current_step(job)
 
-  console.log("-----------Navigating---------")
-  console.log(step)
-  payload = (step.page_reference == "url") ? { url: step.url } : { url: step.page.url }
+  const payload = (step.page_reference == "url") ? { url: step.url } : { url: step.page.url }
 
   const log_string = "Executing a navigate step to " + activeTabId
   console.log(log_string)

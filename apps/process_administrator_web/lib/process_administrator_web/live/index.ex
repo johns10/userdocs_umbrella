@@ -144,7 +144,11 @@ defmodule ProcessAdministratorWeb.IndexLive do
 
   def handle_info({:update_current_version, changes}, socket) do
     current_processes =
-      Version.processes(changes.current_version_id, socket.assigns.processes)
+      UserDocs.Automation.list_processes(%{},
+        %{ version_id: changes.current_version.id })
+
+    IO.inspect(changes)
+    IO.inspect(current_processes)
 
     {
       :noreply,

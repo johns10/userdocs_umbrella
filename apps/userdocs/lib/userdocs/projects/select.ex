@@ -5,6 +5,7 @@ defmodule UserDocs.Projects.Select do
     %{}
     |> current_team_id(state)
     |> current_team(state)
+    |> IO.inspect()
     |> current_project_id(state)
     |> current_project(state)
     |> current_version_id(state)
@@ -64,6 +65,7 @@ defmodule UserDocs.Projects.Select do
     Map.put(changes, :current_team, current_team(teams, team_id))
   end
   defp current_team(teams, team_id) do
+    IO.inspect(teams)
     teams
     |> Enum.filter(fn(t) -> t.id == team_id end)
     |> Enum.at(0)

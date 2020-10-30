@@ -239,11 +239,19 @@ defmodule UserDocs.Users do
       [%Team{}, ...]
 
   """
-  def list_teams(_params \\ %{}, filters \\ %{}) do
+  def list_teams(params \\ %{}, filters \\ %{}) do
     base_teams_query()
     |> maybe_filter_team_by_user(filters[:user_id])
     |> maybe_filter_by_ids(filters[:ids])
+    |> maybe_preload_teams_users(params[:users])
     |> Repo.all()
+  end
+
+  defp maybe_preload_teams_users(query, nil), do: query
+  defp maybe_preload_teams_users(query, _) do
+    from(team in query,
+      left_join: users in assoc(team, :users)
+    )
   end
 
   defp maybe_filter_team_by_user(query, nil), do: query
@@ -278,10 +286,26 @@ defmodule UserDocs.Users do
       ** (Ecto.NoResultsError)
 
   """
-  def get_team!(id) do
-    Repo.one from team in Team,
-      where: team.id == ^id,
-      preload: [:users]
+  def get_team!(id, params \\ %{}) do
+    try do
+      base_team_query(id)
+      |> maybe_preload_team_users(params[:users])
+      |> Repo.one!()
+    rescue
+      Ecto.NoResultsError -> nil
+      e -> e
+    end
+  end
+
+  defp maybe_preload_team_users(query, nil), do: query
+  defp maybe_preload_team_users(query, _) do
+    from(team in query,
+      left_join: users in assoc(team, :users)
+    )
+  end
+
+  defp base_team_query(id) do
+    from(team in Team, where: team.id == ^id)
   end
 
   def get_version_team!(id) do

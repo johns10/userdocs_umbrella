@@ -10,11 +10,11 @@
 
   <%= Layout.form_row([
     Layout.select_input(f, :strategy_id, @select_lists.strategies, [
-      id: ID.form_field(f.data, :strategy_id),
+      id: @field_ids.strategy_id,
     ]),
     Layout.select_input(f, :project_id, @select_lists.projects, [
       selected: @parent_id || "",
-      id: ID.form_field(f.data, :project_id)
+      id: @field_ids.project_id
     ])
   ]) %>
 

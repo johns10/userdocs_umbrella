@@ -23,19 +23,21 @@ defmodule ProcessAdministratorWeb.ElementLive.FormComponent do
 
   def render_fields(assigns, form, prefix \\ "") do
     ~L"""
+      <%= hidden_input(form, :id, [ value: form.data.id ]) %>
+
       <div class="field is-grouped">
 
         <%= Layout.select_input(form, :page_id, @select_lists.pages_select, [
           placeholder: @parent_id || "",
-          id: ID.form_field(form.data, :page_id, prefix),
+          id: prefix <> @field_ids.page_id,
         ], "control") %>
 
         <%= Layout.text_input(form, :name, [
-          id: ID.form_field(form.data, :name, prefix)
+          id: prefix <> @field_ids.name
         ], "control") %>
 
         <%= Layout.number_input(form, :order, [
-          id: ID.form_field(form.data, :order, prefix)
+          id: prefix <> @field_ids.order
         ]) %>
 
       </div>
@@ -45,12 +47,12 @@ defmodule ProcessAdministratorWeb.ElementLive.FormComponent do
           <div class="field has-addons">
 
             <%= Layout.select_input(form, :strategy_id, @select_lists.strategies, [
-                id: ID.form_field(form.data, :strategy_id, prefix), label: false
+                id: prefix <> @field_ids.strategy_id, label: false
               ], "control") %>
 
             <%= Layout.text_input(form, :selector, [
                 label: false,
-                id: ID.form_field(form.data, :selector, prefix)
+                id: prefix <> @field_ids.selector
               ], "control is-expanded") %>
 
             <div class="control">
@@ -145,5 +147,22 @@ defmodule ProcessAdministratorWeb.ElementLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
+  end
+
+  def field_ids(element = %Web.Element{}) do
+    %{}
+    |> Map.put(:page_id, ID.form_field(element, :page_id))
+    |> Map.put(:order, ID.form_field(element, :order))
+    |> Map.put(:name, ID.form_field(element, :name))
+    |> Map.put(:strategy_id, ID.form_field(element, :strategy_id))
+    |> Map.put(:selector, ID.form_field(element, :selector))
+  end
+  def field_ids(_) do
+    %{}
+    |> Map.put(:page_id, "")
+    |> Map.put(:order, "")
+    |> Map.put(:name, "")
+    |> Map.put(:strategy_id, "")
+    |> Map.put(:selector, "")
   end
 end

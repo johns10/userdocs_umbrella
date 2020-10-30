@@ -7,7 +7,12 @@ defmodule UserDocs.Automation do
 
   import Ecto.Query, warn: false
   alias UserDocs.Repo
-  alias UserDocsWeb.Endpoint
+  alias UserDocs.Subscription
+
+  alias UserDocs.Web
+  alias UserDocs.Web.Page
+  alias UserDocs.Web.Annotation
+  alias UserDocs.Web.Element
 
   alias UserDocs.Projects
 
@@ -176,7 +181,7 @@ defmodule UserDocs.Automation do
     |> Repo.all()
   end
   def list_steps(_params, filters, state) do
-    UserDocs.State.get(state, :steps, AnnotationType)
+    UserDocs.State.get(state, :steps, Step)
     |> maybe_filter_by_process(filters[:process_id], state)
   end
 
@@ -188,7 +193,7 @@ defmodule UserDocs.Automation do
     )
   end
   defp maybe_filter_by_process(steps, nil, _), do: steps
-  defp maybe_filter_by_process(steps, process_id, state) do
+  defp maybe_filter_by_process(_steps, process_id, state) do
     state.steps
     |> Enum.filter(fn(s) -> s.process_id == process_id end)
   end
@@ -305,14 +310,60 @@ defmodule UserDocs.Automation do
 
   """
   def create_step(attrs \\ %{}) do
-    {status, step} =
-      %Step{}
-      |> Step.changeset(attrs)
-      |> Repo.insert()
+    %Step{}
+    |> Step.changeset(attrs)
+    |> Repo.insert()
+    |> Subscription.broadcast("step", "create")
+  end
 
-    Endpoint.broadcast("step", "create", step)
+  def new_step_element(step, changeset) do
+    { :ok, step } =
+      update_step_element_id(step, %{ element_id: nil })
 
-    {status, step}
+    step = Map.put(step, :element, nil)
+
+    changes =
+      changeset.changes
+      |> Map.drop([:element, :element_id])
+
+    new_changeset =
+      step
+      |> change_step()
+      |> Map.put(:changes, changes)
+      |> Ecto.Changeset.put_assoc(:element, %Element{})
+      |> Ecto.Changeset.put_change(:element_id, nil)
+
+    { step, new_changeset }
+  end
+
+  def new_step_annotation(step) do
+    { :ok, step } =
+      update_step_annotation_id(step, %{ annotation_id: nil })
+
+    step = Map.put(step, :annotation, nil)
+
+    changeset =
+      step
+      |> change_step()
+      |> Ecto.Changeset.put_assoc(:annotation, %Annotation{})
+      |> Ecto.Changeset.put_change(:annotation_id, nil)
+
+    { step, changeset }
+  end
+
+  def new_step_page(step) do
+    { :ok, step } =
+      update_step_page_id(step, %{ page_id: nil })
+
+    step = Map.put(step, :page, nil)
+
+    changeset =
+      step
+      |> change_step()
+      |> Ecto.Changeset.put_assoc(:page, %Page{})
+      |> Ecto.Changeset.put_change(:page_id, nil)
+
+    { step, changeset }
   end
 
   @doc """
@@ -327,50 +378,83 @@ defmodule UserDocs.Automation do
       {:error, %Ecto.Changeset{}}
 
   """
+
   def update_step(%Step{} = step, attrs) do
-    IO.puts("Updatiung step")
-
-    changeset = Step.changeset(step, attrs)
-
-    name =
-      UserDocs.Automation.Step.Name.execute(changeset.data)
-
-    changeset =
-      Ecto.Changeset.put_change(changeset, :name, name)
-
-    {status, step} = Repo.update(changeset)
-
-    update_children(step, changeset)
-
-    Endpoint.broadcast("step", "update", step)
-
-    {status, step}
+    step
+    |> Step.changeset(attrs)
+    |> Repo.update()
+    |> Subscription.broadcast("step", "update")
   end
+
+  def update_step_with_nested_data(%Step{} = step, attrs, state) do
+    with changeset <- Step.change_nested_foreign_keys(step, attrs), # get the changeset with updated foreign keys
+      { :ok, new_step } <- Repo.update(changeset), # Apply to database and get new step
+      preloaded_new_step <- update_step_preloads(new_step, changeset.changes, state), # Preload data according to changes
+      updated_changeset <- Step.change_remaining(preloaded_new_step, changeset.params), # Apply the changeset to the remaining fields
+      { status, final_step } <- Repo.update(updated_changeset), # Apply the changes to the database
+      { :ok, final_step} <- update_children(final_step, changeset),
+      { :ok, step } <- Subscription.broadcast({status, final_step}, "step", "update")
+    do
+      { :ok, step }
+    else
+      err -> err
+    end
+  end
+
   def update_children(object, changeset) do
     IO.puts("Updating Children")
+
+    element_action =
+      try do
+        changeset.changes.element.action
+      rescue
+        _-> nil
+      end
+
+    annotation_action =
+      try do
+        changeset.changes.annotation.action
+      rescue
+        _-> nil
+      end
+
+    IO.puts("Annotation #{annotation_action} Element #{element_action}")
+
     object
-    |> maybe_broadcast_annotation(Map.get(object, :annotation, nil))
-    |> maybe_broadcast_element(Map.get(object, :element, nil))
+    |> maybe_broadcast_annotation(
+        Map.get(object, :annotation, nil), annotation_action)
+
+    |> maybe_broadcast_element(
+      Map.get(object, :element, nil), element_action)
+
     |> maybe_broadcast_content(Map.get(object, :content, nil))
     |> maybe_broadcast_page(Map.get(object, :page, nil), changeset)
   end
 
-  def maybe_broadcast_annotation(object, nil), do: object
-  def maybe_broadcast_annotation(object, annotation) do
-    Endpoint.broadcast("annotation", "update", annotation)
+  def maybe_broadcast_annotation(object, _, nil), do: object
+  def maybe_broadcast_annotation(object, annotation, :update) do
+    Subscription.broadcast({:ok, annotation}, "annotation", "update")
+    object
+  end
+  def maybe_broadcast_annotation(object, annotation, :insert) do
+    Subscription.broadcast({:ok, annotation}, "annotation", "create")
     object
   end
 
-  def maybe_broadcast_element(object, nil), do: object
-  def maybe_broadcast_element(object, element) do
-    Endpoint.broadcast("element", "update", element)
+  def maybe_broadcast_element(object, _, nil), do: object
+  def maybe_broadcast_element(object, element, :update) do
+    Subscription.broadcast({:ok, element}, "element", "update")
+    object
+  end
+  def maybe_broadcast_element(object, element, :insert) do
+    Subscription.broadcast({:ok, element}, "element", "create")
     object
   end
 
   def maybe_broadcast_content(object, nil), do: object
   def maybe_broadcast_content(object, content) do
     IO.puts("Updating content")
-    Endpoint.broadcast("content", "update", content)
+    Subscription.broadcast({:ok, content}, "content", "update")
     object
   end
 
@@ -378,6 +462,7 @@ defmodule UserDocs.Automation do
   def maybe_broadcast_page(object, page, changeset = %Ecto.Changeset{}) do
     action = determine_action(changeset)
     broadcast_page(object, page, action)
+    object
   end
 
   def determine_action(changeset) do
@@ -390,21 +475,20 @@ defmodule UserDocs.Automation do
 
   def broadcast_page(_, page, :insert = action) do
     Logger.debug("#{action} page")
-    Endpoint.broadcast("page", "create", page)
+    Subscription.broadcast({:ok, page}, "page", "create")
   end
   def broadcast_page(_, page, :update = action) do
     Logger.debug("#{action} page")
-    Endpoint.broadcast("page", "update", page)
+    Subscription.broadcast({:ok, page}, "page", "update")
   end
-  def broadcast_page(_, page, nil = action) do
+  def broadcast_page(_, _page, nil = action) do
     Logger.debug("#{action} page")
   end
 
-  def update_step_annotation_id(%Step{} = step, %{ name: name, annotation_id: annotation_id }) do
+  def update_step_annotation_id(%Step{} = step, %{ annotation_id: annotation_id }) do
     step
     |> Step.changeset(%{})
     |> Ecto.Changeset.put_change(:annotation_id, annotation_id)
-    |> Ecto.Changeset.put_change(:name, name)
     |> Repo.update()
   end
 
@@ -449,6 +533,81 @@ defmodule UserDocs.Automation do
   def change_step(%Step{} = step, attrs \\ %{}) do
     Step.changeset(step, attrs)
   end
+
+  def change_step_with_nested_data(%Step{} = step, attrs \\ %{}, state \\ %{}) do
+    changeset = Step.change_nested_foreign_keys(step, attrs)
+    { :ok, new_step } = Repo.update(changeset)
+    preloaded_new_step = update_step_preloads(new_step, changeset.changes, state)
+    Step.change_remaining(preloaded_new_step, changeset.params)
+  end
+
+  # Depreciate
+  def guard_params(%Step{} = step, changes, params) do
+    params
+    |> maybe_ignore_nested_params(changes, :element_id, "element")
+    |> maybe_ignore_nested_params(changes, :annotation_id, "annotation")
+  end
+  # Depreciate
+  def maybe_ignore_nested_params(params, changes, key, key_to_delete) do
+    if Map.has_key?(changes, key) do
+      Map.delete(params, key_to_delete)
+    else
+      params
+    end
+  end
+  # Depreciate
+  def handle_foreign_key_changes(%Step{} = step, attrs, state) do
+    changeset =
+      Step.change_foreign_keys(step, attrs)
+      |> validate_assoc_action()
+
+    { :ok, new_step } = Repo.update(changeset)
+
+    {
+      changeset,
+      new_step
+      |> update_step_preloads(changeset.changes, state)
+    }
+  end
+
+  # Depreciate
+  def update_step_preloads(step, changes, state) do
+    step
+    |> maybe_update_annotation(changes, state)
+    |> maybe_update_element(changes, state)
+  end
+
+
+
+
+  def maybe_update_annotation(step, %{ annotation_id: nil }, _) do
+    Map.put(step, :annotation, %Annotation{})
+  end
+  def maybe_update_annotation(
+    step, %{ annotation_id: annotation_id }, state
+  ) when is_integer(annotation_id) do
+    annotation =
+      UserDocs.Web.get_annotation!(annotation_id, %{}, %{}, state.data)
+
+    Map.put(step, :annotation, annotation)
+  end
+  def maybe_update_annotation(step, _, _), do: step
+
+  def maybe_update_element(step, %{ element_id: nil }, _) do
+    Map.put(step, :element, %Element{})
+  end
+  def maybe_update_element(
+    step, %{ element_id: element_id }, state
+  ) when is_integer(element_id) do
+    element =
+      UserDocs.Web.get_element!(element_id, %{ strategy: true }, %{}, state.data)
+
+      Map.put(step, :element, element)
+  end
+  def maybe_update_element(step, _, _), do: step
+
+
+
 
   alias UserDocs.Automation.Job
 
@@ -548,7 +707,6 @@ defmodule UserDocs.Automation do
 
   alias UserDocs.Automation.Process
 
-  @spec list_processes(any, nil | maybe_improper_list | map) :: any
   @doc """
   Returns the list of processes.
 
@@ -563,12 +721,21 @@ defmodule UserDocs.Automation do
     |> maybe_filter_by_version(filters[:version_id])
     |> Repo.all()
   end
+  def list_processes(_params, filters, state) do
+    UserDocs.State.get(state, :processes, Process)
+    |> maybe_filter_by_version(filters[:version_id], state)
+  end
 
   defp maybe_filter_by_version(query, nil), do: query
   defp maybe_filter_by_version(query, version_id) do
     from(process in query,
       where: process.version_id == ^version_id
     )
+  end
+  defp maybe_filter_by_version(steps, nil, _), do: steps
+  defp maybe_filter_by_version(_steps, version_id, state) do
+    state.steps
+    |> Enum.filter(fn(p) -> p.version_id == version_id end)
   end
 
 
@@ -588,13 +755,14 @@ defmodule UserDocs.Automation do
       ** (Ecto.NoResultsError)
 
   """
-  def get_process!(id, params \\ %{}) when is_integer(id) do
+  def get_process!(id, params \\ %{})
+  def get_process!(id, params) when is_integer(id) do
     base_process_query(id)
     |> maybe_preload_pages(params[:pages])
     |> maybe_preload_versions(params[:versions])
     |> Repo.one!()
   end
-  def get_process!(state, id) when is_integer(id) do
+  def get_process!(id, _params, state) when is_integer(id) do
     UserDocs.State.get!(state, id, :processes, Process)
   end
 
@@ -623,14 +791,10 @@ defmodule UserDocs.Automation do
 
   """
   def create_process(attrs \\ %{}) do
-    {status, process} =
-      %Process{}
-      |> Process.changeset(attrs)
-      |> Repo.insert()
-
-    Endpoint.broadcast("process", "create", process)
-
-    {status, process}
+    %Process{}
+    |> Process.changeset(attrs)
+    |> Repo.insert()
+    |> Subscription.broadcast("process", "create")
   end
 
   @doc """
@@ -646,14 +810,10 @@ defmodule UserDocs.Automation do
 
   """
   def update_process(%Process{} = process, attrs) do
-    {status, process} =
-      process
-      |> Process.changeset(attrs)
-      |> Repo.update()
-
-    Endpoint.broadcast("process", "update", process)
-
-    {status, process}
+    process
+    |> Process.changeset(attrs)
+    |> Repo.update()
+    |> Subscription.broadcast("process", "update")
   end
 
   @doc """

@@ -6,6 +6,7 @@ defmodule UserDocs.Automation.Step.ChangeHandler do
 
   alias UserDocs.Web
   alias UserDocs.Web.Page
+  alias UserDocs.Web.Element
   alias UserDocs.Automation
   alias UserDocs.Documents
 
@@ -25,10 +26,13 @@ defmodule UserDocs.Automation.Step.ChangeHandler do
   end
   def execute(%{step_type_id: step_type_id}, state) do
     Logger.debug("Handling a change to step type id: #{step_type_id}")
+    step_type = Automation.get_step_type!(state.data, step_type_id)
+    IO.puts("Changing to step type #{step_type.name}")
+
     %{
       current_object:
         state.current_object
-        |> Map.put(:step_type, Automation.get_step_type!(state.data, step_type_id))
+        |> Map.put(:step_type, step_type)
         |> Map.put(:step_type_id, step_type_id)
         |> (&(Map.put(&1, :name, Name.execute(&1)))).(),
 
@@ -49,20 +53,21 @@ defmodule UserDocs.Automation.Step.ChangeHandler do
     content = Documents.get_content!(
       annotation.content_id, %{ content_version: true }, %{}, state.data.content)
 
+    { :ok, new_step } =
+      Automation.update_step(state.step, %{ annotation_id: annotation_id })
+
     annotation =
       annotation
       |> Map.put(:content, content)
 
-    Automation.update_step_annotation_id(
-      state.step,
-      new_object =
-        state.current_object
-        |> Map.put(:annotation_id, annotation_id)
-        |> Map.put(:annotation, annotation)
-    )
+    new_step =
+      new_step
+      |> Map.put(:annotation_id, annotation_id)
+      |> Map.put(:annotation, annotation)
+      |> (&(Map.put(&1, :name, Name.execute(&1)))).()
 
     %{
-      current_object: new_object,
+      current_object: new_step,
 
       changeset:
         state.changeset.data
@@ -70,28 +75,46 @@ defmodule UserDocs.Automation.Step.ChangeHandler do
         |> Map.put(:annotation, annotation)
         |> (&(Map.put(state.changeset, :data, &1))).(),
 
-      step:
-        state.step
-        |> Map.put(:annotation_id, annotation_id)
-        |> Map.put(:annotation, annotation)
-        |> (&(Map.put(&1, :name, Name.execute(&1)))).()
-
+      step: new_step
     }
   end
+  def execute(%{ annotation: %Annotation{} }, state) do
+    Logger.debug("Handling a change to a new page")
+    { :ok, step } =
+      UserDocs.Automation.update_step_annotation_id(
+        state.step, %{ annotation_id: nil })
+
+    step = Map.put(step, :annotation, nil)
+    changeset = Automation.change_step(step)
+
+    new_annotation =
+      Web.change_annotation(%Annotation{})
+
+    new_changeset =
+      Ecto.Changeset.put_assoc(changeset, :annotation, new_annotation)
+
+    %{
+      current_object: step,
+
+      changeset: new_changeset,
+
+      step: step
+    }
+  end
+
   def execute(%{element_id: element_id}, state) do
     Logger.debug("Handling a change to element id: #{element_id}")
-    element = Web.get_element!(state.data, element_id)
+    element = Web.get_element!(element_id, %{ strategy: true }, %{}, state.data)
 
-    Automation.update_step_element_id(
-      state.step,
-      new_object =
-        state.current_object
-        |> Map.put(:element_id, element_id)
-        |> Map.put(:element, element)
-    )
+    { :ok, new_step } =
+      Automation.update_step(state.step, %{ element_id: element_id })
+
+    new_step =
+      new_step
+      |> Map.put(:element, element)
 
     %{
-      current_object: new_object,
+      current_object: new_step,
 
       changeset:
         state.changeset.data
@@ -99,14 +122,30 @@ defmodule UserDocs.Automation.Step.ChangeHandler do
         |> Map.put(:element, element)
         |> (&(Map.put(state.changeset, :data, &1))).(),
 
-      step:
-        state.step
-        |> Map.put(:element_id, element_id)
-        |> Map.put(:element, element)
-        |> (&(Map.put(&1, :name, Name.execute(&1)))).()
-
+      step: new_step
     }
   end
+  def execute(%{ element: %Element{} }, state) do
+    Logger.debug("Handling a change to a new page")
+    { :ok, step } =
+      UserDocs.Automation.update_step_element_id(
+        state.step, %{ element_id: nil })
+
+    step = Map.put(step, :element, nil)
+    changeset = Automation.change_step(step)
+    new_element = Web.change_element(%Element{})
+    new_changeset =
+      Ecto.Changeset.put_assoc(changeset, :element, new_element)
+
+    %{
+      current_object: step,
+
+      changeset: new_changeset,
+
+      step: step
+    }
+  end
+
   def execute(%{page_id: page_id}, state) do
     Logger.debug("Handling a change to page id: #{page_id}")
     page = Web.get_page!(page_id, %{}, %{}, state.data) # Fetch Page

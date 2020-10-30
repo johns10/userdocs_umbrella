@@ -6,10 +6,19 @@ defmodule UserDocs.Web.Annotation do
   alias UserDocs.Web.Page
   alias UserDocs.Documents.Content
   alias UserDocs.Documents.ContentVersion
+  alias UserDocs.Web.Annotation.Name
 
   @derive {Jason.Encoder, only: [:name, :label, :x_orientation, :y_orientation,
     :size, :color, :thickness, :x_offset, :y_offset, :font_size, :font_color, :page,
     :annotation_type, :content, :content_version]}
+
+  @fields [
+    :name, :label, :x_orientation, :y_orientation,
+    :size, :color, :thickness, :x_offset, :y_offset,
+    :font_size, :page_id, :annotation_type_id,
+    :content_id, :content_version_id
+  ]
+
   schema "annotations" do
     field :name, :string
     field :label, :string
@@ -35,12 +44,17 @@ defmodule UserDocs.Web.Annotation do
   @doc false
   def changeset(annotation, attrs) do
     annotation
-    |> cast(attrs, [:name, :label,
-      :x_orientation, :y_orientation, :size, :color, :thickness, :x_offset, :y_offset, :font_size,
-      :page_id, :annotation_type_id, :content_id, :content_version_id])
+    |> cast(attrs, @fields)
     |> cast_assoc(:content)
     |> foreign_key_constraint(:page_id)
-    |> validate_required([:name, :page_id])
+    |> validate_required([:page_id])
+  end
+
+  def generate_name(changeset) do
+    IO.inspect(changeset)
+    IO.inspect(changeset.data)
+    IO.inspect(changeset.changes)
+    changeset
   end
 
   def safe(annotation, handlers \\ %{})
@@ -74,5 +88,20 @@ defmodule UserDocs.Web.Annotation do
   def maybe_safe_content(annotation, nil, _, _), do: annotation
   def maybe_safe_content(annotation, handler, content, handlers) do
     Map.put(annotation, :content, handler.(content, handlers))
+  end
+
+  def put_name(changeset) do
+    case Ecto.Changeset.apply_action(changeset, :update) do
+      { :ok, annotation } ->
+        name = name(annotation)
+        IO.puts("Annotation Name")
+        IO.inspect(name)
+        Ecto.Changeset.put_change(changeset, :name, name)
+      { :error, changeset } -> changeset
+    end
+  end
+
+  def name(annotation = %UserDocs.Web.Annotation{}) do
+    Name.execute(annotation)
   end
 end

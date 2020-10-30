@@ -9,11 +9,18 @@ defmodule ProcessAdministratorWeb.ProjectLive.FormComponent do
   def update(%{project: project} = assigns, socket) do
     changeset = Projects.change_project(project)
 
+    field_ids =
+      %{}
+      |> Map.put(:team_id, ID.form_field(project, :team_id))
+      |> Map.put(:name, ID.form_field(project, :name))
+      |> Map.put(:base_url, ID.form_field(project, :base_url))
+
     {
       :ok,
       socket
       |> assign(assigns)
       |> assign(:changeset, changeset)
+      |> assign(:field_ids, field_ids)
     }
   end
 
