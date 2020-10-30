@@ -352,13 +352,14 @@ defmodule UserDocs.Automation do
   end
 
   def update_children(object, changeset) do
+    Logger.debug("Updating Children")
     Enum.each([ :annotation, :element, :page, :content ], fn(child) ->
       case Ecto.Changeset.fetch_change(changeset, child) do
         { :ok, change } ->
-          IO.inspect("Updated a #{child}")
+          Logger.debug("Updating a #{child}")
           broadcast_child(object, child, change.action)
         :error ->
-          IO.inspect("Tried to update a #{child}, but there was no change.")
+          Logger.debug("Tried to update a #{child}, but there was no change.")
       end
     end)
     object
@@ -417,7 +418,7 @@ defmodule UserDocs.Automation do
   end
 
   def maybe_update_annotation(step, %{ annotation_id: nil }, _) do
-    Map.put(step, :annotation, %Annotation{})
+    Map.put(step, :annotation, nil)
   end
   def maybe_update_annotation(
     step, %{ annotation_id: annotation_id }, state

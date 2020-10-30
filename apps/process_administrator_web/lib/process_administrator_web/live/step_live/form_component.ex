@@ -192,7 +192,7 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
   end
 
   defp save_step(socket, :edit, step_params) do
-    case Automation.update_step(socket.assigns.step, step_params) do
+    case Automation.update_step_with_nested_data(socket.assigns.step, step_params, socket.assigns) do
       {:ok, _step} ->
         {
           :noreply,
