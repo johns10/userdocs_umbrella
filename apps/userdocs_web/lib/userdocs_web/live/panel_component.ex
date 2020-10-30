@@ -92,7 +92,7 @@ defmodule UserDocsWeb.PanelComponent do
 
   def maybe_hidden(class, true), do: class <> ""
   def maybe_hidden(class, false), do: class <> " is-hidden"
-  def maybe_hidden(_, _), do: IO.inspect("Maybe hidden"); ""
+  def maybe_hidden(_, _), do: Logger.debug("Maybe hidden"); ""
 
   def expand(socket) do
     socket

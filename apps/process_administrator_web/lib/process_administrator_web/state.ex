@@ -33,7 +33,7 @@ defmodule ProcessAdministratorWeb.State do
   end
 
   def update_object_field(state, type, id, field, value) do
-    # IO.inspect("Updating #{type} #{id}. #{field} to #{value}")
+    # Logger.debug("Updating #{type} #{id}. #{field} to #{value}")
     values =
       state
       |> Map.get(type)

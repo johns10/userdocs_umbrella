@@ -68,7 +68,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
           |> assign(:auth_state, :logged_in)
           |> (&(assign(&1, :changeset, UserDocs.Users.change_user(&1.assigns.current_user)))).()
         error ->
-          IO.inspect(error)
+          Logger.error(error)
           socket
       end
     rescue
@@ -147,9 +147,6 @@ defmodule ProcessAdministratorWeb.IndexLive do
       UserDocs.Automation.list_processes(%{},
         %{ version_id: changes.current_version.id })
 
-    IO.inspect(changes)
-    IO.inspect(current_processes)
-
     {
       :noreply,
       socket
@@ -197,9 +194,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
       |> String.to_atom()
 
     changes = State.create_object(socket.assigns, type, payload.id, payload)
-    # IO.inspect(changes)
     socket = State.apply_changes(socket, changes)
-    # IO.puts("Updated assigns")
     socket
   end
   def update_socket_data(socket, topic, "update", payload) do

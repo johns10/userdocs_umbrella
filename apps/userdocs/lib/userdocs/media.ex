@@ -68,8 +68,6 @@ defmodule UserDocs.Media do
     "step_type" => %{ "name" => step_type_name }, "element" => element
     }) do
       IO.puts("create_file_and_screenshot")
-      # IO.inspect(step_type_name)
-      # IO.inspect(element)
     %{
       name: "Screenshot for step #{step_id}",
       file_id: nil,
