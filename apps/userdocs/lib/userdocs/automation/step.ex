@@ -35,7 +35,7 @@ defmodule UserDocs.Automation.Step do
   end
 
   def inspect_changeset(changeset) do
-    IO.inspect(changeset.changes)
+    IO.inspect(changeset.data)
     changeset
   end
 
@@ -82,34 +82,17 @@ defmodule UserDocs.Automation.Step do
     |> cast(attrs, [ :name ])
   end
 
-  #depreciate
-  def apply_foreign_key_changes(changeset) do
-    IO.puts("Applying Foreign Key Changes")
-    changeset
-    |> maybe_apply_foreign_key_change(Ecto.Changeset.get_change(changeset, :element_id, nil), :element_id)
-    |> maybe_apply_foreign_key_change(Ecto.Changeset.get_change(changeset, :annotation_id, nil), :annotation_id)
-    |> maybe_apply_foreign_key_change(Ecto.Changeset.get_change(changeset, :annotation_id, nil), :annotation_id)
-  end
-  #depreciate
-  def maybe_apply_foreign_key_change(changeset, nil, _), do: changeset
-  def maybe_apply_foreign_key_change(changeset, change, change_key) do
-    IO.puts("Applying Foreign Key Change to #{change_key}")
-    changeset
-    |> Map.put(:data, Ecto.Changeset.apply_changes(changeset))
-    |> Ecto.Changeset.delete_change(change_key)
-  end
-
   # This function removes nested params if the underlying id changed, because
   # we'll replace them with new ones in the data later
   def handle_params(changeset) do
-    Logger.debug("Original Params: #{inspect(changeset.params)}")
+    # Logger.debug("Original Params: #{inspect(changeset.params)}")
 
     updated_params =
       changeset.params
       |> maybe_remove_nested_params(changeset.changes, :element_id, "element")
       |> maybe_remove_nested_params(changeset.changes, :annotation_id, "annotation")
 
-    Logger.debug("Updated Params: #{inspect(updated_params)}")
+    # Logger.debug("Updated Params: #{inspect(updated_params)}")
 
     Map.put(changeset, :params, updated_params)
   end
@@ -121,20 +104,6 @@ defmodule UserDocs.Automation.Step do
     else
       params
     end
-  end
-  #depreciate
-  def cast_attrs(step, attrs) do
-    step
-    |> cast(attrs, [
-        :order, :name, :url, :text, :width,
-        :height, :page_reference ])
-  end
-  #depreciate
-  def cast_keys(step, attrs) do
-    step
-    |> cast(attrs, [
-        :process_id, :page_id, :element_id,
-        :annotation_id, :step_type_id ])
   end
 
   def foreign_key_constraints(step) do
@@ -167,6 +136,11 @@ defmodule UserDocs.Automation.Step do
   end
 
   def maybe_update_action(changeset, nil, _), do: changeset
+  def maybe_update_action(
+    changeset, %{ action: :insert, data: %{ id: nil }} = nested_changeset, key
+  ) do
+    changeset
+  end
   def maybe_update_action(
     changeset, %{ action: :update, data: %{ id: nil }} = nested_changeset, key
   ) do

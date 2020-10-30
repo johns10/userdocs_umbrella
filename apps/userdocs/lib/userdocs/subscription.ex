@@ -4,12 +4,12 @@ defmodule UserDocs.Subscription do
 
   alias ProcessAdministratorWeb.Endpoint
 
-  def broadcast({ status, result }, type, operation) do
+  def broadcast({ status, result }, type, operation, endpoint \\ Endpoint) do
     Logger.debug("#{operation} broadcast triggered on #{type}")
     case status do
       :ok ->
         try do
-          Endpoint.broadcast(type, operation, result)
+          endpoint.broadcast(type, operation, result)
         rescue
           UndefinedFunctionError ->
             Logger.error("UndefinedFunctionError, Endpoint Unavailable.")
