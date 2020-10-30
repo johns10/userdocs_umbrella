@@ -316,56 +316,6 @@ defmodule UserDocs.Automation do
     |> Subscription.broadcast("step", "create")
   end
 
-  def new_step_element(step, changeset) do
-    { :ok, step } =
-      update_step_element_id(step, %{ element_id: nil })
-
-    step = Map.put(step, :element, nil)
-
-    changes =
-      changeset.changes
-      |> Map.drop([:element, :element_id])
-
-    new_changeset =
-      step
-      |> change_step()
-      |> Map.put(:changes, changes)
-      |> Ecto.Changeset.put_assoc(:element, %Element{})
-      |> Ecto.Changeset.put_change(:element_id, nil)
-
-    { step, new_changeset }
-  end
-
-  def new_step_annotation(step) do
-    { :ok, step } =
-      update_step_annotation_id(step, %{ annotation_id: nil })
-
-    step = Map.put(step, :annotation, nil)
-
-    changeset =
-      step
-      |> change_step()
-      |> Ecto.Changeset.put_assoc(:annotation, %Annotation{})
-      |> Ecto.Changeset.put_change(:annotation_id, nil)
-
-    { step, changeset }
-  end
-
-  def new_step_page(step) do
-    { :ok, step } =
-      update_step_page_id(step, %{ page_id: nil })
-
-    step = Map.put(step, :page, nil)
-
-    changeset =
-      step
-      |> change_step()
-      |> Ecto.Changeset.put_assoc(:page, %Page{})
-      |> Ecto.Changeset.put_change(:page_id, nil)
-
-    { step, changeset }
-  end
-
   @doc """
   Updates a step.
 
@@ -388,12 +338,12 @@ defmodule UserDocs.Automation do
 
   def update_step_with_nested_data(%Step{} = step, attrs, state) do
     with changeset <- Step.change_nested_foreign_keys(step, attrs), # get the changeset with updated foreign keys
-      { :ok, new_step } <- Repo.update(changeset), # Apply to database and get new step
-      preloaded_new_step <- update_step_preloads(new_step, changeset.changes, state), # Preload data according to changes
-      updated_changeset <- Step.change_remaining(preloaded_new_step, changeset.params), # Apply the changeset to the remaining fields
-      { status, final_step } <- Repo.update(updated_changeset), # Apply the changes to the database
-      { :ok, final_step} <- update_children(final_step, changeset),
-      { :ok, step } <- Subscription.broadcast({status, final_step}, "step", "update")
+      { :ok, step } <- Repo.update(changeset), # Apply to database and get new step
+      step <- update_step_preloads(step, changeset.changes, state), # Preload data according to changes
+      changeset <- Step.change_remaining(step, changeset.params), # Apply the changeset to the remaining fields
+      { status, step } <- Repo.update(changeset), # Apply the changes to the database
+      step <- update_children(step, changeset),
+      { :ok, step } <- Subscription.broadcast({status, step}, "step", "update")
     do
       { :ok, step }
     else
@@ -402,108 +352,26 @@ defmodule UserDocs.Automation do
   end
 
   def update_children(object, changeset) do
-    IO.puts("Updating Children")
-
-    element_action =
-      try do
-        changeset.changes.element.action
-      rescue
-        _-> nil
+    Enum.each([ :annotation, :element, :page, :content ], fn(child) ->
+      case Ecto.Changeset.fetch_change(changeset, child) do
+        { :ok, change } ->
+          IO.inspect("Updated a #{child}")
+          broadcast_child(object, child, change.action)
+        :error ->
+          IO.inspect("Tried to update a #{child}, but there was no change.")
       end
-
-    annotation_action =
-      try do
-        changeset.changes.annotation.action
-      rescue
-        _-> nil
-      end
-
-    IO.puts("Annotation #{annotation_action} Element #{element_action}")
-
-    object
-    |> maybe_broadcast_annotation(
-        Map.get(object, :annotation, nil), annotation_action)
-
-    |> maybe_broadcast_element(
-      Map.get(object, :element, nil), element_action)
-
-    |> maybe_broadcast_content(Map.get(object, :content, nil))
-    |> maybe_broadcast_page(Map.get(object, :page, nil), changeset)
-  end
-
-  def maybe_broadcast_annotation(object, _, nil), do: object
-  def maybe_broadcast_annotation(object, annotation, :update) do
-    Subscription.broadcast({:ok, annotation}, "annotation", "update")
-    object
-  end
-  def maybe_broadcast_annotation(object, annotation, :insert) do
-    Subscription.broadcast({:ok, annotation}, "annotation", "create")
+    end)
     object
   end
 
-  def maybe_broadcast_element(object, _, nil), do: object
-  def maybe_broadcast_element(object, element, :update) do
-    Subscription.broadcast({:ok, element}, "element", "update")
-    object
-  end
-  def maybe_broadcast_element(object, element, :insert) do
-    Subscription.broadcast({:ok, element}, "element", "create")
-    object
+  def broadcast_child(object, key, action) do
+    type = Atom.to_string(key)
+    Subscription.broadcast({ :ok, Map.get(object, key) }, type, action(action))
   end
 
-  def maybe_broadcast_content(object, nil), do: object
-  def maybe_broadcast_content(object, content) do
-    IO.puts("Updating content")
-    Subscription.broadcast({:ok, content}, "content", "update")
-    object
-  end
+  def action(:insert), do: "create"
+  def action(:update), do: "update"
 
-  def maybe_broadcast_page(object, nil, _), do: object
-  def maybe_broadcast_page(object, page, changeset = %Ecto.Changeset{}) do
-    action = determine_action(changeset)
-    broadcast_page(object, page, action)
-    object
-  end
-
-  def determine_action(changeset) do
-    try do
-      changeset.changes.page.action
-    rescue
-      _ -> nil
-    end
-  end
-
-  def broadcast_page(_, page, :insert = action) do
-    Logger.debug("#{action} page")
-    Subscription.broadcast({:ok, page}, "page", "create")
-  end
-  def broadcast_page(_, page, :update = action) do
-    Logger.debug("#{action} page")
-    Subscription.broadcast({:ok, page}, "page", "update")
-  end
-  def broadcast_page(_, _page, nil = action) do
-    Logger.debug("#{action} page")
-  end
-
-  def update_step_annotation_id(%Step{} = step, %{ annotation_id: annotation_id }) do
-    step
-    |> Step.changeset(%{})
-    |> Ecto.Changeset.put_change(:annotation_id, annotation_id)
-    |> Repo.update()
-  end
-
-  def update_step_element_id(%Step{} = step, %{ element_id: element_id }) do
-    step
-    |> Step.changeset(%{})
-    |> Ecto.Changeset.put_change(:element_id, element_id)
-    |> Repo.update()
-  end
-
-  def update_step_page_id(%Step{} = step, attrs) do
-    step
-    |> Step.changeset(attrs)
-    |> Repo.update()
-  end
 
   @doc """
   Deletes a step.
@@ -541,44 +409,12 @@ defmodule UserDocs.Automation do
     Step.change_remaining(preloaded_new_step, changeset.params)
   end
 
-  # Depreciate
-  def guard_params(%Step{} = step, changes, params) do
-    params
-    |> maybe_ignore_nested_params(changes, :element_id, "element")
-    |> maybe_ignore_nested_params(changes, :annotation_id, "annotation")
-  end
-  # Depreciate
-  def maybe_ignore_nested_params(params, changes, key, key_to_delete) do
-    if Map.has_key?(changes, key) do
-      Map.delete(params, key_to_delete)
-    else
-      params
-    end
-  end
-  # Depreciate
-  def handle_foreign_key_changes(%Step{} = step, attrs, state) do
-    changeset =
-      Step.change_foreign_keys(step, attrs)
-      |> validate_assoc_action()
-
-    { :ok, new_step } = Repo.update(changeset)
-
-    {
-      changeset,
-      new_step
-      |> update_step_preloads(changeset.changes, state)
-    }
-  end
-
-  # Depreciate
+  #TODO: Move this somewhere else.  Otherwise ok.
   def update_step_preloads(step, changes, state) do
     step
     |> maybe_update_annotation(changes, state)
     |> maybe_update_element(changes, state)
   end
-
-
-
 
   def maybe_update_annotation(step, %{ annotation_id: nil }, _) do
     Map.put(step, :annotation, %Annotation{})
@@ -594,7 +430,7 @@ defmodule UserDocs.Automation do
   def maybe_update_annotation(step, _, _), do: step
 
   def maybe_update_element(step, %{ element_id: nil }, _) do
-    Map.put(step, :element, %Element{})
+    Map.put(step, :element, nil)
   end
   def maybe_update_element(
     step, %{ element_id: element_id }, state
@@ -605,9 +441,6 @@ defmodule UserDocs.Automation do
       Map.put(step, :element, element)
   end
   def maybe_update_element(step, _, _), do: step
-
-
-
 
   alias UserDocs.Automation.Job
 

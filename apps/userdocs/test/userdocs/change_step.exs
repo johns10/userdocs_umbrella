@@ -147,7 +147,6 @@ defmodule UserDocs.StepChange do
       #IO.inspect(changeset)
 
     end
-    """
 
     test "change_nested_foreign_keys returns a changeset that changes the ids, and removes the nested params" do
       fx = change_fixture()
@@ -181,15 +180,6 @@ defmodule UserDocs.StepChange do
       assert new_step.annotation_id == fx.annotation_one.id
       assert step.annotation == fx.annotation_one
     end
-
-    test "creating a step with an element, and changing to a nil element updates the preloads" do
-      fx = change_fixture()
-      step = fx.step_with_element
-      attrs = %{ element_id: nil }
-      new_step = Automation.update_step_with_nested_data(step, attrs, fx.state)
-      assert Map.delete(new_step.element, :__meta__) == Map.delete(%Element{}, :__meta__)
-    end
-
     test "creating an empty step, and adding an element updates the preload" do
       fx = change_fixture()
       step = fx.empty_step
@@ -202,16 +192,28 @@ defmodule UserDocs.StepChange do
       fx = change_fixture()
       step = fx.step_with_element
       attrs = %{ element_id: nil }
-      new_step = Automation.update_step_with_nested_data(step, attrs, fx.state)
+      { :ok, new_step } = Automation.update_step_with_nested_data(step, attrs, fx.state)
       attrs = %{
         element:
           WebFixtures.element_attrs(:valid)
           |> Map.put(:strategy_id, fx.strategy.id)
       }
-      final_step = Automation.update_step_with_nested_data(new_step, attrs, fx.state)
+      { :ok, final_step } = Automation.update_step_with_nested_data(new_step, attrs, fx.state)
       updated_element = Web.get_element!(final_step.element.id)
       assert updated_element.name == attrs.element.name
+      assert final_step.element.name == attrs.element.name
     end
+    """
+
+    test "creating a step with an element, and changing to a nil element updates the preloads" do
+      fx = change_fixture()
+      step = fx.step_with_element
+      attrs = %{ element_id: nil }
+      { :ok, new_step } = Automation.update_step_with_nested_data(step, attrs, fx.state)
+      IO.inspect(new_step)
+      assert Map.delete(new_step.element, :__meta__) == Map.delete(%Element{}, :__meta__)
+    end
+
 
   end
 end

@@ -98,7 +98,6 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
 
   @impl true
   def handle_event("validate", %{"step" => step_params}, socket) do
-    IO.inspect(socket.assigns.step.annotation.name)
     changeset =
       Automation.change_step_with_nested_data(
         socket.assigns.step, step_params, socket.assigns)
@@ -154,41 +153,41 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
   end
 
   def handle_event("new-element", _, socket) do
-    { step, changeset } =
-      Automation.new_step_element(
-        socket.assigns.step, socket.assigns.changeset)
-
-    IO.puts("New Element")
+    changeset =
+      Automation.change_step_with_nested_data(
+        socket.assigns.step, %{ element_id: nil }, socket.assigns)
 
     {
       :noreply,
       socket
       |> assign(:changeset, changeset)
-      |> assign(:step, step)
+      |> assign(:step, changeset.data)
     }
   end
 
   def handle_event("new-page", _, socket) do
-    { step, changeset } =
-      Automation.new_page_annotation(socket.assigns.step)
+    changeset =
+      Automation.change_step_with_nested_data(
+        socket.assigns.step, %{ page_id: nil }, socket.assigns)
 
     {
       :noreply,
       socket
       |> assign(:changeset, changeset)
-      |> assign(:step, step)
+      |> assign(:step, changeset.data)
     }
   end
 
   def handle_event("new-annotation", _, socket) do
-    { step, changeset } =
-      Automation.new_step_annotation(socket.assigns.step)
+    changeset =
+      Automation.change_step_with_nested_data(
+        socket.assigns.step, %{ annotation_id: nil }, socket.assigns)
 
     {
       :noreply,
       socket
       |> assign(:changeset, changeset)
-      |> assign(:step, step)
+      |> assign(:step, changeset.data)
     }
   end
 
