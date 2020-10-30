@@ -51,6 +51,7 @@ defmodule ProcessAdministratorWeb.GroupComponent do
             <%=
               LiveHelpers.live_form(@socket, @new_form_component, [
                 action: :new,
+                object: @new_form_object,
                 id: ID.form(@object, :new, @child_type),
                 parent: @object,
                 type: @child_type,

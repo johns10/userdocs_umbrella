@@ -85,6 +85,7 @@ defmodule ProcessAdministratorWeb.LiveHelpers do
       object_form: Keyword.fetch!(opts, :object_form),
       child_type: Keyword.fetch!(opts, :child_type),
       new_form_component: Keyword.fetch!(opts, :new_form_component),
+      new_form_object: Keyword.fetch!(opts, :new_form_object),
       data: Keyword.fetch!(opts, :data),
       select_lists: Keyword.fetch!(opts, :select_lists),
       content: Keyword.fetch!(opts, :content),

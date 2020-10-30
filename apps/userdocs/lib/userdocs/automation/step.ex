@@ -50,7 +50,6 @@ defmodule UserDocs.Automation.Step do
     |> cast_assoc(:page)
     |> put_annotation_name()
     |> put_name()
-    |> cast(attrs, [ :name ])
     |> validate_required([:order])
   end
 
@@ -68,7 +67,7 @@ defmodule UserDocs.Automation.Step do
     |> cast(attrs, [ :process_id, :step_type_id ])
     |> foreign_key_constraint(:process)
     |> foreign_key_constraint(:step_type)
-    |> cast(attrs, [:order, :url, :text, :width, :height, :page_reference ])
+    |> cast(attrs, [ :name, :order, :url, :text, :width, :height, :page_reference ])
     |> foreign_key_constraint(:process)
     |> foreign_key_constraint(:step_type)
     |> cast_assoc(:element)
@@ -77,13 +76,22 @@ defmodule UserDocs.Automation.Step do
     |> validate_assoc_action()
     |> put_annotation_name()
     |> put_name()
-    |> cast(attrs, [ :name ])
   end
 
   def inspect_changeset(changeset) do
-    IO.inspect(changeset.data)
+    IO.inspect(changeset.changes)
     changeset
   end
+
+  def validate_action(changeset) do
+    UserDocs.Automation.Step.Action.validate(changeset)
+  end
+
+  def validate_assoc_action(changeset) do
+    UserDocs.Automation.Step.Action.validate_assoc(changeset)
+  end
+
+  # This function adds a new struct if the id changed to nil, mostly to control the change action
 
   # This function removes nested params if the underlying id changed, because
   # we'll replace them with new ones in the data later
@@ -109,10 +117,6 @@ defmodule UserDocs.Automation.Step do
     end
   end
 
-  def validate_assoc_action(changeset) do
-    UserDocs.Automation.Step.Action.validate_assoc(changeset)
-  end
-
   def safe(step, handlers) do
     UserDocs.Automation.Step.Safe.apply(step, handlers)
   end
@@ -129,12 +133,12 @@ defmodule UserDocs.Automation.Step do
 
     Ecto.Changeset.update_change(changeset, :annotation,
       fn(a) -> Ecto.Changeset.put_change(a, :name, name) end)
-
   end
 
   def put_name(changeset) do
     step = apply_changes(changeset)
     name = Name.execute(step)
+    Logger.debug("Changing Step Name to #{name}")
     Ecto.Changeset.put_change(changeset, :name, name)
   end
 
