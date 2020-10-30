@@ -1,6 +1,8 @@
 defmodule UserDocsWeb.PanelComponent do
   use UserDocsWeb, :live_component
 
+  require Logger
+
   @impl true
   def render(assigns) do
     ~L"""

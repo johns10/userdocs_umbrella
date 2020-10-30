@@ -133,14 +133,9 @@ defmodule UserDocs.Automation.Step do
   end
 
   def put_name(changeset) do
-    case Ecto.Changeset.apply_action(changeset, :update) do
-      { :ok, step } ->
-        name = Name.execute(step)
-        # Logger.debug("Putting Step Name #{name}")
-        Ecto.Changeset.put_change(changeset, :name, name)
-
-      { :error, changeset } -> changeset
-    end
+    step = apply_changes(changeset)
+    name = Name.execute(step)
+    Ecto.Changeset.put_change(changeset, :name, name)
   end
 
   def name(step = %UserDocs.Automation.Step{}) do
