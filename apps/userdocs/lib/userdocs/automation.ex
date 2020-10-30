@@ -424,7 +424,7 @@ defmodule UserDocs.Automation do
     step, %{ annotation_id: annotation_id }, state
   ) when is_integer(annotation_id) do
     annotation =
-      UserDocs.Web.get_annotation!(annotation_id, %{}, %{}, state.data)
+      UserDocs.Web.get_annotation!(annotation_id, %{ annotation_type: true }, %{}, state.data)
 
     Map.put(step, :annotation, annotation)
   end

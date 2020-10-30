@@ -71,7 +71,6 @@ defmodule UserDocs.Automation.Step do
     |> cast(attrs, [:order, :url, :text, :width, :height, :page_reference ])
     |> foreign_key_constraint(:process)
     |> foreign_key_constraint(:step_type)
-    |> inspect_changeset()
     |> cast_assoc(:element)
     |> cast_assoc(:annotation)
     |> cast_assoc(:page)
@@ -119,23 +118,21 @@ defmodule UserDocs.Automation.Step do
   end
 
   def put_annotation_name(changeset) do
-    case Ecto.Changeset.apply_action(changeset, :update) do
-      { :ok, step } ->
-        annotation = Ecto.Changeset.fetch_field(changeset, :annotation)
-        element = Ecto.Changeset.fetch_field(changeset, :element)
+    step = apply_changes(changeset)
+    annotation = step.annotation
+    element = step.element
 
-        name =
-          UserDocs.Web.Annotation.Name.execute(annotation, element)
+    IO.inspect(annotation)
+    IO.inspect(element)
 
-        Logger.debug("Putting Annotation Name #{name}")
+    name =
+      UserDocs.Web.Annotation.Name.execute(annotation, element)
 
-        changeset = Ecto.Changeset.update_change(changeset, :annotation,
-          fn(a) -> Ecto.Changeset.put_change(a, :name, name) end)
+    Logger.debug("Putting annotation name #{name}")
 
-        changeset
+    Ecto.Changeset.update_change(changeset, :annotation,
+      fn(a) -> Ecto.Changeset.put_change(a, :name, name) end)
 
-      { :error, changeset } -> changeset
-    end
   end
 
   def put_name(changeset) do

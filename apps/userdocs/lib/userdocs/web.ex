@@ -412,6 +412,16 @@ defmodule UserDocs.Web do
 
   defp maybe_preload_annotation_type(query, nil), do: query
   defp maybe_preload_annotation_type(query, _), do: from(annotations in query, preload: [:annotation_type])
+  defp maybe_preload_annotation_type(object, nil, _), do: object
+  defp maybe_preload_annotation_type(object, _, state) do
+    annotation_type =
+      state.annotation_types
+      |> Enum.filter(fn(at) -> at.id == object.annotation_type_id end)
+      |> Enum.at(0)
+
+    object
+    |> Map.put(:annotation_type, annotation_type)
+  end
 
   defp maybe_preload_content(query, nil), do: query
   defp maybe_preload_content(query, _), do: from(annotations in query, preload: [:content])
@@ -469,8 +479,9 @@ defmodule UserDocs.Web do
   """
   def get_annotation!(id), do: Repo.get!(Annotation, id)
   def get_annotation!(%{ annotations: annotations }, id), do: get_annotation!(annotations, id)
-  def get_annotation!(id, _params, _filters, state) do
+  def get_annotation!(id, params, _filters, state) do
     UserDocs.State.get!(state, id, :annotations, Annotation)
+    |> maybe_preload_annotation_type(params[:annotation_type], state)
   end
 
   @doc """
