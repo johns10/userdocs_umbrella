@@ -6,15 +6,15 @@
 
   <%= Layout.select_input(f, :team_id, @select_lists.teams, [
     selected: @parent_id || "",
-    id: ID.form_field(f.data, :team_id)
+    id: @field_ids.team_id
   ]) %>
 
   <%= Layout.text_input(f, :name, [
-    id: ID.form_field(f.data, :name)
+    id: @field_ids.name
   ]) %>
 
   <%= Layout.text_input(f, :base_url, [
-    id: ID.form_field(f.data, :base_url)
+    id: @field_ids.base_url
   ]) %>
 
   <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>

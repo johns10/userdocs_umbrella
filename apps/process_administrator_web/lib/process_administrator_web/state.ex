@@ -107,7 +107,7 @@ defmodule ProcessAdministratorWeb.State do
   end
 
   def teams(user_id) do
-    Users.list_teams(%{}, %{ user_id: user_id })
+    teams = Users.list_teams(%{}, %{ user_id: user_id })
   end
 
   def processes(version_id) do

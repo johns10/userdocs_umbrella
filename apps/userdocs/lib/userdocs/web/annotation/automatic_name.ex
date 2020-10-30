@@ -1,14 +1,23 @@
-defmodule UserDocs.Web.Annotation.AutomaticName do
+defmodule UserDocs.Web.Annotation.Name do
 
   require Logger
 
   import UserDocs.Name
 
-  def execute(%{ annotation_type: %{ name:  name } } = annotation, element) do
-    Logger.debug("Automatic name generation: #{name}")
+  alias UserDocs.Web.Annotation
+  alias UserDocs.Web.Element
+
+  def execute(
+    %Annotation{ annotation_type: %{ name:  name } } = annotation,
+    %Element{} = element
+    ) do
     ""
     |> maybe_field(annotation, :label, ": ")
     |> field(name, " ")
     |> maybe_field(element, :name, "")
+  end
+
+  def execute(_, _) do
+    ""
   end
 end

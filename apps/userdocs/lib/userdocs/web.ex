@@ -5,8 +5,8 @@ defmodule UserDocs.Web do
 
   import Ecto.Query, warn: false
 
-  alias UserDocsWeb.Endpoint
   alias UserDocs.Repo
+  alias UserDocs.Subscription
   alias UserDocs.Web.Page
 
   @doc """
@@ -83,20 +83,10 @@ defmodule UserDocs.Web do
 
   """
   def create_page(attrs \\ %{}) do
-    {status, page} =
-      %Page{}
-      |> Page.changeset(attrs)
-      |> Repo.insert()
-
-    page =
-      case status do
-        :ok -> page
-        _ -> page
-      end
-
-    Endpoint.broadcast("page", "create", page)
-
-    {status, page}
+    %Page{}
+    |> Page.changeset(attrs)
+    |> Repo.insert()
+    |> Subscription.broadcast("page", "create")
   end
 
   @doc """
@@ -112,20 +102,10 @@ defmodule UserDocs.Web do
 
   """
   def update_page(%Page{} = page, attrs) do
-    {status, page} =
-      page
-      |> Page.changeset(attrs)
-      |> Repo.update()
-
-    page =
-      case status do
-        :ok -> page
-        _ -> page
-      end
-
-    Endpoint.broadcast("page", "update", page)
-
-    {status, page}
+    page
+    |> Page.changeset(attrs)
+    |> Repo.update()
+    |> Subscription.broadcast("page", "update")
   end
 
   @doc """
@@ -353,14 +333,10 @@ defmodule UserDocs.Web do
 
   """
   def create_element(attrs \\ %{}) do
-    {status, element} =
-      %Element{}
-      |> Element.changeset(attrs)
-      |> Repo.insert()
-
-    Endpoint.broadcast("element", "create", element)
-
-    {status, element}
+    %Element{}
+    |> Element.changeset(attrs)
+    |> Repo.insert()
+    |> Subscription.broadcast("element", "create")
   end
 
   @doc """
@@ -376,14 +352,10 @@ defmodule UserDocs.Web do
 
   """
   def update_element(%Element{} = element, attrs) do
-    {status, element} =
-      element
-      |> Element.changeset(attrs)
-      |> Repo.update()
-
-    Endpoint.broadcast("element", "update", element)
-
-    {status, element}
+    element
+    |> Element.changeset(attrs)
+    |> Repo.update()
+    |> Subscription.broadcast("element", "update")
   end
 
   @doc """
@@ -514,14 +486,10 @@ defmodule UserDocs.Web do
 
   """
   def create_annotation(attrs \\ %{}) do
-    {status, annotation} =
-      %Annotation{}
-      |> Annotation.changeset(attrs)
-      |> Repo.insert()
-
-    Endpoint.broadcast("annotation", "create", annotation)
-
-    {status, annotation}
+    %Annotation{}
+    |> Annotation.changeset(attrs)
+    |> Repo.insert()
+    |> Subscription.broadcast("annotation", "create")
   end
 
   @doc """
@@ -537,12 +505,16 @@ defmodule UserDocs.Web do
 
   """
   def update_annotation(%Annotation{} = annotation, attrs) do
-    {status, annotation} =
-      annotation
-      |> Annotation.changeset(attrs)
-      |> Repo.update()
+    IO.puts("Updatiung annotation")
+    changeset = Annotation.changeset(annotation, attrs)
 
-    Endpoint.broadcast("annotation", "update", annotation)
+    #name = UserDocs.Web.Annotation.Name.execute(changeset.data)
+
+    #changeset = Ecto.Changeset.put_change(changeset, :name, "name")
+
+    {status, annotation} = Repo.update(changeset)
+
+    Subscription.broadcast({status, annotation}, "annotation", "update")
 
     { status, annotation }
   end
@@ -590,5 +562,11 @@ defmodule UserDocs.Web do
   """
   def list_strategies do
     Repo.all(Strategy)
+  end
+
+  def create_strategy(attrs \\ %{}) do
+    %Strategy{}
+    |> Strategy.changeset(attrs)
+    |> Repo.insert()
   end
 end

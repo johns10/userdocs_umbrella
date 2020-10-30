@@ -21,12 +21,12 @@ defmodule UserDocs.UsersTest do
 
     test "list_teams/0 returns all teams" do
       team = team_fixture()
-      assert Users.list_teams() == [team]
+      assert Users.list_teams(%{ users: true }) == [team]
     end
 
     test "get_team!/1 returns the team with given id" do
       team = team_fixture()
-      assert Users.get_team!(team.id) == team
+      assert Users.get_team!(team.id, %{ users: true }) == team
     end
 
     test "create_team/1 with valid data creates a team" do

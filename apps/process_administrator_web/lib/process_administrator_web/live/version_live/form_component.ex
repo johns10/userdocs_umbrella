@@ -9,11 +9,17 @@ defmodule ProcessAdministratorWeb.VersionLive.FormComponent do
   def update(%{version: version} = assigns, socket) do
     changeset = Projects.change_version(version)
 
+    field_ids =
+      %{}
+      |> Map.put(:strategy_id, ID.form_field(version, :strategy_id))
+      |> Map.put(:project_id, ID.form_field(version, :project_id))
+
     {
       :ok,
       socket
       |> assign(assigns)
       |> assign(:changeset, changeset)
+      |> assign(:field_ids, field_ids)
     }
   end
 

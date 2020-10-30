@@ -32,13 +32,13 @@ defmodule UserDocs.Documents do
   defp maybe_preload_content_versions(query, _), do: from(version in query, preload: [:content_versions])
 
   defp maybe_preload_content_versions(content, nil, _), do: content
-  defp maybe_preload_content_versions(content, thing, state) do
+  defp maybe_preload_content_versions(content, _, state) do
     content_versions =
       state.content_versions
       |> Enum.filter(fn(cv) -> cv.content_id == content.id end)
 
     content
-    |> Map.put(content, :content_versions, content_versions)
+    |> Map.put(:content_versions, content_versions)
   end
 
   defp maybe_filter_by_team(query, nil), do: query
@@ -199,7 +199,7 @@ defmodule UserDocs.Documents do
   def create_document(attrs \\ %{})
   def create_document(attrs = %{ "body" => ""}) do
     IO.puts("Creating a document with an empty body")
-    result = create_document(Map.put(attrs, "body", UserDocs.Documents.Document.default_body))
+    create_document(Map.put(attrs, "body", UserDocs.Documents.Document.default_body))
   end
   def create_document(attrs) do
     %Document{}

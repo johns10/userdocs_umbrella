@@ -1,7 +1,7 @@
 defmodule ProcessAdministratorWeb.Layout do
-  use UserDocsWeb, :view
+  use ProcessAdministratorWeb, :view
   alias Phoenix.HTML.Form
-  alias UserDocsWeb.ErrorHelpers
+  alias ProcessAdministratorWeb.ErrorHelpers
 
   alias ProcessAdministratorWeb.Layout
 

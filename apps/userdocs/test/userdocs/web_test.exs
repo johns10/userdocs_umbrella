@@ -123,15 +123,30 @@ defmodule UserDocs.WebTest do
 
   describe "elements" do
     alias UserDocs.Web.Element
+    alias UserDocs.Web.Strategy
 
-    @valid_attrs %{name: "some name", selector: "some selector", strategy: "some strategy"}
-    @update_attrs %{name: "some updated name", selector: "some updated selector", strategy: "some updated strategy"}
+    @valid_attrs %{
+      name: "some name",
+      selector: "some selector"
+    }
+
+    @update_attrs %{
+      name: "some updated name",
+      selector: "some updated selector",
+    }
+
     @invalid_attrs %{name: nil, selector: nil, strategy: nil}
+    @strategy %{ name: "strategy" }
 
-    def element_fixture(attrs \\ %{}) do
+    def element_fixture(attrs \\ %{}, strategy_attrs \\ @strategy) do
+      {:ok, strategy} =
+        strategy_attrs
+        |> Web.create_strategy()
+
       {:ok, element} =
         attrs
         |> Enum.into(@valid_attrs)
+        |> Map.put(:strategy_id, strategy.id)
         |> Web.create_element()
 
       element
@@ -148,10 +163,11 @@ defmodule UserDocs.WebTest do
     end
 
     test "create_element/1 with valid data creates a element" do
-      assert {:ok, %Element{} = element} = Web.create_element(@valid_attrs)
+      assert {:ok, %Strategy{} = strategy} = Web.create_strategy(@strategy)
+      attrs = Map.put(@valid_attrs, :strategy_id, strategy.id)
+      assert {:ok, %Element{} = element} = Web.create_element(attrs)
       assert element.name == "some name"
       assert element.selector == "some selector"
-      assert element.strategy == "some strategy"
     end
 
     test "create_element/1 with invalid data returns error changeset" do
@@ -163,7 +179,6 @@ defmodule UserDocs.WebTest do
       assert {:ok, %Element{} = element} = Web.update_element(element, @update_attrs)
       assert element.name == "some updated name"
       assert element.selector == "some updated selector"
-      assert element.strategy == "some updated strategy"
     end
 
     test "update_element/2 with invalid data returns error changeset" do
@@ -186,15 +201,30 @@ defmodule UserDocs.WebTest do
 
   describe "annotations" do
     alias UserDocs.Web.Annotation
+    alias UserDocs.Web.Page
 
-    @valid_attrs %{description: "some description", label: "some label", name: "some name"}
-    @update_attrs %{description: "some updated description", label: "some updated label", name: "some updated name"}
-    @invalid_attrs %{description: nil, label: nil, name: nil}
+    @valid_attrs %{
+      label: "some label",
+      name: "some name"
+    }
 
-    def annotation_fixture(attrs \\ %{}) do
+    @update_attrs %{
+      label: "some updated label",
+      name: "some updated name"
+    }
+
+    @invalid_attrs %{description: nil, label: nil, name: nil, page_id: nil}
+    @page_attrs %{url: "some url", version_id: ""}
+
+    def annotation_fixture(attrs \\ %{}, page_attrs \\ @page_attrs) do
+      {:ok, page} =
+        page_attrs
+        |> Web.create_page()
+
       {:ok, annotation} =
         attrs
         |> Enum.into(@valid_attrs)
+        |> Map.put(:page_id, Integer.to_string(page.id))
         |> Web.create_annotation()
 
       annotation
@@ -211,8 +241,9 @@ defmodule UserDocs.WebTest do
     end
 
     test "create_annotation/1 with valid data creates a annotation" do
-      assert {:ok, %Annotation{} = annotation} = Web.create_annotation(@valid_attrs)
-      assert annotation.description == "some description"
+      {:ok, %Page{} = page } = Web.create_page(@page_attrs)
+      attrs = Map.put(@valid_attrs, :page_id, page.id)
+      assert {:ok, %Annotation{} = annotation} = Web.create_annotation(attrs)
       assert annotation.label == "some label"
       assert annotation.name == "some name"
     end
@@ -223,10 +254,11 @@ defmodule UserDocs.WebTest do
 
     test "update_annotation/2 with valid data updates the annotation" do
       annotation = annotation_fixture()
-      assert {:ok, %Annotation{} = annotation} = Web.update_annotation(annotation, @update_attrs)
-      assert annotation.description == "some updated description"
-      assert annotation.label == "some updated label"
-      assert annotation.name == "some updated name"
+      assert {:ok, %Annotation{} = annotation} =
+        Web.update_annotation(annotation, @update_attrs)
+
+      assert annotation.label == @update_attrs.label
+      assert annotation.name == @update_attrs.name
     end
 
     test "update_annotation/2 with invalid data returns error changeset" do

@@ -27,4 +27,19 @@ defmodule UserDocs.Web.Page do
     |> foreign_key_constraint(:version_id)
     |> validate_required([:url])
   end
+
+  def safe(page, handlers \\ %{})
+  def safe(page = %UserDocs.Web.Page{}, handlers) do
+    base_safe(page)
+  end
+  def safe(nil, _), do: nil
+  def safe(page, _), do: raise(ArgumentError, "Web.Page.Safe failed because it got an invalid argument: #{inspect(page)}")
+
+  def base_safe(page = %UserDocs.Web.Page{}) do
+    %{
+      id: page.id,
+      order: page.order,
+      url: page.url,
+    }
+  end
 end

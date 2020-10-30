@@ -22,7 +22,6 @@ defmodule ProcessAdministratorWeb.ModalMenus do
                   action: @action,
                   version: @object,
                   parent_id: @parent.id,
-                  return_to: Routes.automation_index_path(@socket, :index),
                   select_lists: %{
                     strategies: @select_lists.strategies,
                     projects: @select_lists.projects

@@ -1,16 +1,5 @@
 defmodule UserDocs.Documents.ContentVersion.ContentVersions do
 
-  """
-  This is still a little hokey - some of this is dependant on the contents of the assigns.
-  Not everything is totally clear and explicit.  It expects
-  assigns:
-    %{
-        changeset: changeset,
-        current_object: current_object,
-        data: data,
-        parent_id: parent_id
-    }
-  """
 
   alias UserDocs.Documents
   alias UserDocs.Web
@@ -20,6 +9,15 @@ defmodule UserDocs.Documents.ContentVersion.ContentVersions do
   require Logger
 
   def add_content_version(state) do
+    # This is still a little hokey - some of this is dependant on the contents of the assigns.
+    # Not everything is totally clear and explicit.  It expects
+    # assigns:
+    #   %{
+    #       changeset: changeset,
+    #       current_object: current_object,
+    #       data: data,
+    #       parent_id: parent_id
+    #   }
     # Try and fetch the content versions from the content changes (indicates there's
     # Fresh changes).  If that fails, we need to go and get them from the "current_step"
     # It's definitely debatable whether I need to check the changes.  These will probably
@@ -34,7 +32,7 @@ defmodule UserDocs.Documents.ContentVersion.ContentVersions do
           |> Enum.map(&Documents.change_content_version(&1))
       end
     process =
-      Automation.get_process!(state.data, state.parent_id)
+      Automation.get_process!(state.parent_id, %{}, state.data)
 
     content_versions =
       existing_content_versions

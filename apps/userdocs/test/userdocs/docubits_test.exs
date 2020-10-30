@@ -1,4 +1,4 @@
-defmodule UserDocs.DocumentsTest do
+defmodule UserDocs.DocubitsTest do
   use UserDocs.DataCase
 
   alias UserDocs.Documents
@@ -9,6 +9,7 @@ defmodule UserDocs.DocumentsTest do
     @row_only UserDocs.Documents.DocuBit.test_docubit_row()
     @valid_docubit UserDocs.Documents.DocuBit.test_docubit_map()
 
+    """
     def docubit_fixture(attrs \\ %{}) do
       DocuBit.parse(@valid_docubit)
     end
@@ -17,11 +18,9 @@ defmodule UserDocs.DocumentsTest do
       DocuBit.parse(@row_only)
     end
 
-    """
     test "docubit_test" do
       docubit = docubit_fixture()
     end
-    """
 
     test "docubit_render" do
       docubit = docubit_fixture()
@@ -29,5 +28,6 @@ defmodule UserDocs.DocumentsTest do
         renderer: "Console",
       }
     end
+    """
   end
 end

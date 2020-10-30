@@ -4413,9 +4413,7 @@ function setSize(job, configuration, proceed) {
 function navigate(job, configuration, proceed) {
   var activeTabId = job.activeTabId;
   var step = current_step(job);
-  console.log("-----------Navigating---------");
-  console.log(step);
-  payload = step.page_reference == "url" ? {
+  var payload = step.page_reference == "url" ? {
     url: step.url
   } : {
     url: step.page.url

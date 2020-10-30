@@ -4,6 +4,8 @@
   phx_change: "validate",
   phx_submit: "save" %>
 
+    <%= hidden_input(f, :id, [ value: f.data.id ]) %>
+
   <%= hidden_input(f, :name, [
     id: @field_ids.name || "",
     value: @current_object.name
@@ -26,20 +28,27 @@
 
   </div>
 
-  <%= Layout.select_input(f, :element_id, @select_lists.elements_select, [
-    id: @field_ids.element_id || "",
-    hidden: "element_id" not in @enabled_step_fields
-  ]) %>
-
   <%= if "element_id" in @enabled_step_fields do %>
-    <%= inputs_for f, :element, [id: ID.nested_form(f.data, f.data.element)], fn fe -> %>
+    <%= label f, :element_id, class: "label" %>
+    <div class="field has-addons">
+      <%=
+        Layout.select_input(f, :element_id, @select_lists.elements_select, [
+          selected: f.data.element_id || "",
+          id: @field_ids.element_id,
+          label: false,
+          hidden: "element_id" not in @enabled_step_fields
+        ], "control")
+      %>
+      <%= Layout.new_item_button("new-element", [ button_class: :a, phx_target: @myself.cid ], "control") %>
+    </div>
+    <%= inputs_for f, :element, [id: @form_ids.element], fn fe -> %>
       <section class="card">
         <div class="card-content">
           <div class="content">
             <h4><%= fe.data.name %></h4>
             <%= ElementLive.FormComponent.render_fields(
                 Map.put(assigns, :field_ids, @field_ids.element),
-                fe, ID.prefix(f.data)) %>
+                fe, @form_ids.prefix) %>
           </div>
         </div>
       </section>
@@ -47,18 +56,25 @@
     <div class="level"></div>
   <% end %>
 
-  <%= Layout.select_input(f, :annotation_id, @select_lists.annotations, [
-    selected: f.data.annotation_id || "",
-    id: @field_ids.annotation_id || "",
-    hidden: "annotation_id" not in @enabled_step_fields
-  ]) %>
-
   <%= if "annotation_id" in @enabled_step_fields do %>
-    <%= inputs_for f, :annotation, [id: ID.nested_form(f.data, f.data.annotation)], fn fa -> %>
+    <%= label f, :annotation_id, class: "label" %>
+    <div class="field has-addons">
+      <%=
+        Layout.select_input(f, :annotation_id, @select_lists.annotations, [
+          selected: f.data.annotation_id || "",
+          id: @field_ids.annotation_id,
+          label: false,
+          hidden: "annotation_id" not in @enabled_step_fields
+        ], "control")
+      %>
+      <%= Layout.new_item_button("new-annotation", [ button_class: :a, phx_target: @myself.cid ], "control") %>
+    </div>
+    <%= inputs_for f, :annotation, [id: @form_ids.annotation ], fn fa -> %>
       <section class="card">
         <div class="card-content">
           <div class="content">
-            <%= AnnotationLive.FormComponent.render_fields(assigns, fa, ID.prefix(f.data)) %>
+            <%= AnnotationLive.FormComponent.render_fields(assigns, fa,
+              @form_ids.prefix) %>
           </div>
         </div>
       </section>
@@ -89,30 +105,32 @@
     </div>
   <% end %>
 
-  <%= label f, :page_id, class: "label" %>
-  <div class="field has-addons">
-    <%=
-      Layout.select_input(f, :page_id, @select_lists.pages_select, [
-        selected: f.data.page_id || "",
-        id: @field_ids.page_id,
-        label: false,
-        hidden: not(
-          ("page_id" in @enabled_step_fields) and
-          (@current_object.page_reference == "page")
-        )
-      ], "control")
-    %>
-    <%= Layout.new_item_button("new-page", [ button_class: :a, phx_target: @myself.cid ], "control") %>
-  </div>
+  <% if "page_is" in @enabled_step_fields do %>
+    <%= label f, :page_id, class: "label" %>
+    <div class="field has-addons">
+      <%=
+        Layout.select_input(f, :page_id, @select_lists.pages_select, [
+          selected: f.data.page_id || "",
+          id: @field_ids.page_id,
+          label: false,
+          hidden: not(
+            ("page_id" in @enabled_step_fields) and
+            (@current_object.page_reference == "page")
+          )
+        ], "control")
+      %>
+      <%= Layout.new_item_button("new-page", [ button_class: :a, phx_target: @myself.cid ], "control") %>
+    </div>
+  <% end %>
 
   <%= if "page_id" in @enabled_step_fields and @current_object.page_reference == "page" do %>
-    <%= inputs_for f, :page, [id: ID.nested_form(f.data, f.data.page)], fn fp -> %>
+    <%= inputs_for f, :page, [id: @form_ids.page ], fn fp -> %>
       <section class="card">
         <div class="card-content">
           <div class="content">
             <%= PageLive.FormComponent.render_fields(
               Map.put(assigns, :field_ids, @field_ids.page),
-              fp, [ prefix: ID.prefix(f.data) ]) %>
+              fp, [ prefix: @form_ids.prefix ]) %>
           </div>
         </div>
       </section>

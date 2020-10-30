@@ -6,14 +6,17 @@ defmodule UserDocs.DocumentsTest do
   describe "content" do
     alias UserDocs.Documents.Content
 
-    @valid_attrs %{description: "some description", name: "some name"}
-    @update_attrs %{description: "some updated description", name: "some updated name"}
+    @valid_attrs %{name: "some name"}
+    @update_attrs %{name: "some updated name"}
     @invalid_attrs %{description: nil, name: nil}
 
     def content_fixture(attrs \\ %{}) do
+      team = create_team()
+
       {:ok, content} =
         attrs
         |> Enum.into(@valid_attrs)
+        |> Map.put(:team_id, team.id)
         |> Documents.create_content()
 
       content
@@ -30,8 +33,8 @@ defmodule UserDocs.DocumentsTest do
     end
 
     test "create_content/1 with valid data creates a content" do
-      assert {:ok, %Content{} = content} = Documents.create_content(@valid_attrs)
-      assert content.description == "some description"
+      attrs = Map.put(@valid_attrs, :team_id, Map.get(create_team(), :id))
+      assert {:ok, %Content{} = content} = Documents.create_content(attrs)
       assert content.name == "some name"
     end
 
@@ -42,7 +45,6 @@ defmodule UserDocs.DocumentsTest do
     test "update_content/2 with valid data updates the content" do
       content = content_fixture()
       assert {:ok, %Content{} = content} = Documents.update_content(content, @update_attrs)
-      assert content.description == "some updated description"
       assert content.name == "some updated name"
     end
 
@@ -130,17 +132,77 @@ defmodule UserDocs.DocumentsTest do
   describe "content_versions" do
     alias UserDocs.Documents.ContentVersion
 
-    @valid_attrs %{body: "some body", language_code: "some language_code", name: "some name"}
-    @update_attrs %{body: "some updated body", language_code: "some updated language_code", name: "some updated name"}
-    @invalid_attrs %{body: nil, language_code: nil, name: nil}
+    @valid_attrs %{
+      body: "some body",
+      name: "some name",
+    }
+    @update_attrs %{
+      body: "some updated body",
+      name: "some updated name",
+    }
+    @invalid_attrs %{
+      body: nil,
+      language_code: nil,
+      name: nil,
+      content_id: nil
+    }
+    @language_code_attrs %{ code: "EN-us" }
+    @team_attrs %{name: "team", users: []}
+    @content_attrs %{ name: "cname" }
+    @version_attrs %{name: "some name"}
 
-    def content_version_fixture(attrs \\ %{}) do
+    def content_version_fixture(attrs \\ %{}, lc_attrs \\ @language_code_attrs) do
       {:ok, content_version} =
         attrs
         |> Enum.into(@valid_attrs)
+        |> required_attrs(create_required)
         |> Documents.create_content_version()
 
       content_version
+    end
+
+    def create_required() do
+      {
+        create_language_code(),
+        create_content(create_team()),
+        create_version(),
+      }
+    end
+
+    def create_team() do
+      {:ok, team } =
+        @team_attrs
+        |> UserDocs.Users.create_team()
+      team
+    end
+
+    def create_version() do
+      {:ok, version } =
+        @version_attrs
+        |> UserDocs.Projects.create_version()
+      version
+    end
+
+    def create_content(team) do
+      {:ok, content } =
+        @content_attrs
+        |> Map.put(:team_id, team.id)
+        |> Documents.create_content()
+      content
+    end
+
+    def create_language_code() do
+      {:ok, language_code } =
+        @language_code_attrs
+        |> Documents.create_language_code()
+      language_code
+    end
+
+    def required_attrs(attrs, {language_code, content, version}) do
+      attrs
+      |> Map.put(:language_code_id, language_code.id)
+      |> Map.put(:content_id, content.id)
+      |> Map.put(:version_id, version.id)
     end
 
     test "list_content_versions/0 returns all content_versions" do
@@ -154,9 +216,14 @@ defmodule UserDocs.DocumentsTest do
     end
 
     test "create_content_version/1 with valid data creates a content_version" do
-      assert {:ok, %ContentVersion{} = content_version} = Documents.create_content_version(@valid_attrs)
+      attrs =
+        @valid_attrs
+        |> required_attrs(create_required)
+
+      assert {:ok, %ContentVersion{} = content_version} =
+        Documents.create_content_version(attrs)
+
       assert content_version.body == "some body"
-      assert content_version.language_code == "some language_code"
       assert content_version.name == "some name"
     end
 
@@ -168,7 +235,6 @@ defmodule UserDocs.DocumentsTest do
       content_version = content_version_fixture()
       assert {:ok, %ContentVersion{} = content_version} = Documents.update_content_version(content_version, @update_attrs)
       assert content_version.body == "some updated body"
-      assert content_version.language_code == "some updated language_code"
       assert content_version.name == "some updated name"
     end
 
@@ -186,6 +252,7 @@ defmodule UserDocs.DocumentsTest do
 
     test "change_content_version/1 returns a content_version changeset" do
       content_version = content_version_fixture()
+      IO.inspect(content_version)
       assert %Ecto.Changeset{} = Documents.change_content_version(content_version)
     end
   end

@@ -6,6 +6,7 @@ defmodule ProcessAdministratorWeb.PageLive.FormComponent do
   alias ProcessAdministratorWeb.LiveHelpers
   alias ProcessAdministratorWeb.DomainHelpers
   alias ProcessAdministratorWeb.Layout
+  alias ProcessAdministratorWeb.ID
 
   def render(assigns) do
     ~L"""
@@ -41,13 +42,14 @@ defmodule ProcessAdministratorWeb.PageLive.FormComponent do
         <%= Layout.text_input(form, [
           field_name: :name,
           id: @field_ids.name
-        ], "control") %>
-
-        <%= Layout.text_input(form, [
-          field_name: :url,
-          id: @field_ids.url
         ], "control is-expanded") %>
+
       </div>
+
+      <%= Layout.text_input(form, [
+        field_name: :url,
+        id: @field_ids.url
+      ], "control is-expanded") %>
     """
   end
 
@@ -101,5 +103,20 @@ defmodule ProcessAdministratorWeb.PageLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
+  end
+
+  def field_ids(page = %Web.Page{}) do
+    %{}
+    |> Map.put(:version_id, ID.form_field(page, :version_id))
+    |> Map.put(:order, ID.form_field(page, :order))
+    |> Map.put(:name, ID.form_field(page, :name))
+    |> Map.put(:url, ID.form_field(page, :url))
+  end
+  def field_ids(_) do
+    %{}
+    |> Map.put(:version_id, "")
+    |> Map.put(:order, "")
+    |> Map.put(:name, "")
+    |> Map.put(:url, "")
   end
 end
