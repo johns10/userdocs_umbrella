@@ -82,7 +82,7 @@
     <div class="level"></div>
   <% end %>
 
-  <%= if "page_reference" in @enabled_step_fields do %>
+  <%= if "page_reference" in @enabled_step_fields and @action not in [:new] do %>
     <div class="field">
       <%= label(f, :page_reference, [ class: :label ]) %>
       <div class="control">
@@ -105,7 +105,7 @@
     </div>
   <% end %>
 
-  <% if "page_is" in @enabled_step_fields do %>
+  <% if "page_id" in @enabled_step_fields do %>
     <%= label f, :page_id, class: "label" %>
     <div class="field has-addons">
       <%=
