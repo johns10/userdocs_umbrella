@@ -37,6 +37,13 @@ defmodule UserDocs.WebFixtures do
     annotation
   end
 
+  def annotation_type(name \\ :badge) do
+    {:ok, annotation } =
+      annotation_type_attrs(:valid, name)
+      |> Web.create_annotation_type()
+    annotation
+  end
+
   def page_attrs(:valid) do
     %{
       url: "some url",
@@ -59,8 +66,21 @@ defmodule UserDocs.WebFixtures do
 
   def annotation_attrs(:valid) do
     %{
-      label: "some label",
+      label: UUID.uuid4(),
       name: UUID.uuid4()
+    }
+  end
+
+  def annotation_type_attrs(:valid, :outline) do
+    %{
+      args: ["color", "thickness"],
+      name: "Outline"
+    }
+  end
+  def annotation_type_attrs(:valid, :badge) do
+    %{
+      args: ["x_orientation", "y_orientation", "size", "label", "color", "x_offset", "y_offset", "font_size"],
+      name: "Badge"
     }
   end
 

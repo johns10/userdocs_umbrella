@@ -60,7 +60,7 @@ defmodule ProcessAdministratorWeb.AnnotationLive.FormComponent do
 
         <%=
           Layout.select_input(form, :x_orientation,
-            [{ "Right", "R" }, {"Middle", "M"}, { "Left", "L" }], [
+            [{"None", ""}, { "Right", "R" }, {"Middle", "M"}, { "Left", "L" }], [
               placeholder: form.data.x_orientation || "",
               id: @field_ids.annotation.x_orientation,
               hidden: "x_orientation" not in @enabled_annotation_fields
@@ -69,7 +69,7 @@ defmodule ProcessAdministratorWeb.AnnotationLive.FormComponent do
 
         <%=
           Layout.select_input(form, :y_orientation,
-            [{ "Top", "T" }, {"Middle", "M"}, { "Bottom", "B" }], [
+            [{"None", ""}, { "Top", "T" }, {"Middle", "M"}, { "Bottom", "B" }], [
               placeholder: form.data.y_orientation || "",
               id: @field_ids.annotation.y_orientation,
               hidden: not("y_orientation" in @enabled_annotation_fields),

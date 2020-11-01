@@ -16,6 +16,8 @@ defmodule UserDocs.Automation do
 
   alias UserDocs.Projects
 
+  alias ProcessAdministratorWeb.Endpoint
+
   def details(version_id) do
     Repo.one from version in Projects.Version,
       where: version.id == ^version_id,
@@ -338,12 +340,23 @@ defmodule UserDocs.Automation do
 
   def update_step_with_nested_data(%Step{} = step, attrs, state) do
     with changeset <- Step.change_nested_foreign_keys(step, attrs), # get the changeset with updated foreign keys
-      { :ok, step } <- Repo.update(changeset), # Apply to database and get new step
-      step <- update_step_preloads(step, changeset.changes, state), # Preload data according to changes
-      changeset <- Step.change_remaining(step, changeset.params), # Apply the changeset to the remaining fields
-      { status, step } <- Repo.update(changeset), # Apply the changes to the database
-      step <- update_children(step, changeset),
-      { :ok, step } <- Subscription.broadcast({status, step}, "step", "update")
+      { :ok, step } <-
+        Repo.update(changeset), # Apply to database and get new step
+
+      step <-
+        update_step_preloads(step, changeset.changes, state), # Preload data according to changes
+
+      changeset <-
+        Step.change_remaining(step, changeset.params), # Apply the changeset to the remaining fields
+
+      { status, step } <-
+        Repo.update(changeset), # Apply the changes to the database
+
+      step <-
+        update_children(step, changeset),
+
+      { :ok, step } <-
+        Subscription.broadcast({status, step}, "step", "update")
     do
       { :ok, step }
     else
@@ -351,15 +364,54 @@ defmodule UserDocs.Automation do
     end
   end
 
+  def new_step_element(step, changeset) do
+    new_step_nested_object(step, changeset, :element_id, :element, %Element{})
+  end
+
+  def new_step_annotation(step, changeset) do
+    new_step_nested_object(step, changeset, :annotation_id, :annotation, %Annotation{})
+  end
+
+  def new_step_nested_object(step, changeset, foreign_key, object_key, struct) do
+    step = clear_association(step, foreign_key, object_key)
+    changeset
+    |> put_nested_struct_in_changes(step, object_key, struct)
+    |> Ecto.Changeset.put_change(foreign_key, nil)
+  end
+
+  def clear_association(step, foreign_key, key) do
+    changes = %{ foreign_key => nil }
+    { :ok, new_step } =
+      step
+      |> Step.changeset(%{ foreign_key => nil })
+      |> Repo.update()
+
+    Map.put(new_step, key, nil)
+  end
+
+  def clear_nested_changes(changeset, keys) do
+    Enum.reduce(keys, changeset,
+      fn(change_key, changeset) ->
+        Ecto.Changeset.delete_change(changeset, change_key)
+      end
+    )
+  end
+
+  def put_nested_struct_in_changes(changeset, step, key, struct) do
+    step
+    |> Step.changeset(changeset.params)
+    |> Ecto.Changeset.put_change(key, struct)
+  end
+
   def update_children(object, changeset) do
     Logger.debug("Updating Children")
     Enum.each([ :annotation, :element, :page, :content ], fn(child) ->
-      case Ecto.Changeset.fetch_change(changeset, child) do
-        { :ok, change } ->
-          Logger.debug("Updating a #{child}")
-          broadcast_child(object, child, change.action)
-        :error ->
+      case Ecto.Changeset.get_change(changeset, child, nil) do
+        :nil ->
           Logger.debug("Tried to update a #{child}, but there was no change.")
+        change ->
+          Logger.debug("Updating a #{child}: #{inspect(object)}")
+          broadcast_child(Map.get(object, child), child, change.action)
       end
     end)
     object
@@ -367,7 +419,8 @@ defmodule UserDocs.Automation do
 
   def broadcast_child(object, key, action) do
     type = Atom.to_string(key)
-    Subscription.broadcast({ :ok, Map.get(object, key) }, type, action(action))
+    Logger.debug("Broadcasting #{type}, #{action(action)}")
+    Subscription.broadcast({ :ok, object }, type, action(action))
   end
 
   def action(:insert), do: "create"
@@ -403,15 +456,12 @@ defmodule UserDocs.Automation do
     Step.changeset(step, attrs)
   end
 
-  def change_step_with_nested_data(%Step{} = step, attrs \\ %{}, state \\ %{}) do
+
+  def change_step_with_nested_data(step, attrs \\ %{}, state \\ %{})
+  def change_step_with_nested_data(%Step{ id: nil } = step, attrs, state), do: Step.changeset(step, attrs)
+  def change_step_with_nested_data(%Step{} = step, attrs, state) do
     changeset = Step.change_nested_foreign_keys(step, attrs)
-    IO.inspect(changeset)
-    { :ok, new_step } =
-      if changeset.action == nil do
-        {:ok, Ecto.Changeset.apply_changes(changeset)}
-      else
-        Repo.update(changeset)
-      end
+    { :ok, new_step } = Repo.update(changeset)
     preloaded_new_step = update_step_preloads(new_step, changeset.changes, state)
     Step.change_remaining(preloaded_new_step, changeset.params)
   end
