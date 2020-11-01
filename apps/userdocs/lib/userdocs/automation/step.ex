@@ -126,6 +126,11 @@ defmodule UserDocs.Automation.Step do
     annotation = step.annotation
     element = step.element
 
+    annotation = Ecto.Changeset.get_field(changeset, :annotation)
+    element = Ecto.Changeset.get_field(changeset, :element)
+    IO.inspect(annotation)
+    IO.inspect(annotation)
+
     name =
       UserDocs.Web.Annotation.Name.execute(annotation, element)
 

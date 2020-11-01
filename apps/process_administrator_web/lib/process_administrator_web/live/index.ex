@@ -217,7 +217,17 @@ defmodule ProcessAdministratorWeb.IndexLive do
         socket.assigns.processes)
       |> Enum.sort(&(&1.order <= &2.order))
 
-    assign(socket, :current_processes, current_processes )
+    sorted_steps =
+      socket.assigns.data.steps
+      |> Enum.sort(&(&1.order <= &2.order))
+
+    data =
+      socket.assigns.data
+      |> Map.put(:data, :steps, sorted_steps)
+
+    socket
+    |> assign(:current_processes, current_processes )
+    |> assign(:data, data)
   end
   def update_additional_data(socket, _, _, _) do
     socket

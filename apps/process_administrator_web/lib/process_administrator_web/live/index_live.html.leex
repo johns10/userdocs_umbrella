@@ -105,6 +105,7 @@
                         Enum.filter(@pages, fn(p) -> p.version_id == @current_version.id end), :name, true),
                       annotation_types: DomainHelpers.select_list_temp(@annotation_types, :name, true),
                     },
+                    default_page_id: UserDocs.Automation.Process.RecentPage.get(process, @pages),
                     content: []
                   ]
                 }
@@ -117,7 +118,7 @@
 
       <div id="selector-tester" phx-hook="testSelector"></div>
 
-      <nav class="navbar is-fixed-bottom" role="navigation" aria-label="main navigation">
+      <!--<nav class="navbar is-fixed-bottom" role="navigation" aria-label="main navigation">
 
         <div class="navbar-brand">
           <div class="navbar-item">
@@ -158,7 +159,7 @@
             </div>
           </div>
         </div>
-      </nav>
+      </nav>-->
     <% end %>
   <% else %>
     <%= form_for @changeset, "http://app.davenport.rocks:4001/session", [as: :user], fn f -> %>
