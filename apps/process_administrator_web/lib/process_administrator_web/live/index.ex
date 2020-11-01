@@ -158,6 +158,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
   # TODO: Must implement either updating the state tree/components
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
     Logger.debug("Handling info on topic #{topic}, event #{event}")
+    Logger.debug(inspect(payload))
     {
       :noreply,
       socket
@@ -372,5 +373,15 @@ defmodule ProcessAdministratorWeb.IndexLive do
   def handle_event("login", %{"user" => user_params}, socket) do
     IO.puts("Handling login")
     { :noreply, socket}
+  end
+
+  @impl true
+  def handle_event("update_current_strategy", %{"current_strategy" => %{ "strategy_id" => id }}, socket) do
+    IO.puts("Updating Current Strategy")
+
+    {
+      :noreply,
+      socket
+    }
   end
 end

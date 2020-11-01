@@ -22,6 +22,16 @@ defmodule UserDocs.Web.Element do
     |> foreign_key_constraint(:strategy_id)
     |> foreign_key_constraint(:page_id)
     |> validate_required([:strategy_id, :selector])
+    |> ignore_missing()
+  end
+
+  def ignore_missing(changeset) do
+    case changeset do
+      %{valid?: false, changes: changes} = changeset when changes == %{ } ->
+        %{changeset | action: :ignore}
+      changeset ->
+        changeset
+    end
   end
 
   def safe(element, handlers \\ %{})

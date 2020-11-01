@@ -44,7 +44,6 @@ defmodule UserDocs.Automation.Step do
     |> foreign_key_constraint(:element)
     |> foreign_key_constraint(:annotation)
     |> foreign_key_constraint(:step_type)
-    |> validate_assoc_action()
     |> cast_assoc(:element)
     |> cast_assoc(:annotation)
     |> cast_assoc(:page)
@@ -62,6 +61,14 @@ defmodule UserDocs.Automation.Step do
     |> handle_params()
   end
 
+  def change_to_new_foreign_key(step, attrs) do
+    step
+    |> foreign_key_constraint(:page)
+    |> foreign_key_constraint(:element)
+    |> foreign_key_constraint(:annotation)
+    |> handle_params()
+  end
+
   def change_remaining(step, attrs) do
     step
     |> cast(attrs, [ :process_id, :step_type_id ])
@@ -73,13 +80,12 @@ defmodule UserDocs.Automation.Step do
     |> cast_assoc(:element)
     |> cast_assoc(:annotation)
     |> cast_assoc(:page)
-    |> validate_assoc_action()
+    # |> validate_assoc_action()
     |> put_annotation_name()
     |> put_name()
   end
 
   def inspect_changeset(changeset) do
-    IO.inspect(changeset.changes)
     changeset
   end
 
@@ -91,30 +97,24 @@ defmodule UserDocs.Automation.Step do
     UserDocs.Automation.Step.Action.validate_assoc(changeset)
   end
 
-  # This function adds a new struct if the id changed to nil, mostly to control the change action
-
   # This function removes nested params if the underlying id changed, because
   # we'll replace them with new ones in the data later
   def handle_params(changeset) do
     # Logger.debug("Original Params: #{inspect(changeset.params)}")
-
     updated_params =
-      changeset.params
-      |> maybe_remove_nested_params(changeset.changes, :element_id, "element")
-      |> maybe_remove_nested_params(changeset.changes, :annotation_id, "annotation")
-
-    # Logger.debug("Updated Params: #{inspect(updated_params)}")
+      case changeset.changes do
+        %{ element_id: element_id } ->
+          Logger.debug("Removing element params")
+          Map.delete(changeset.params, "element")
+        %{ annotation_id: annotation_id } ->
+          Logger.debug("Removing annotation params")
+          Map.delete(changeset.params, "annotation")
+        _ ->
+          Logger.debug("not removing params")
+          changeset.params
+      end
 
     Map.put(changeset, :params, updated_params)
-  end
-
-  def maybe_remove_nested_params(params, changes, key, key_to_delete) do
-    Logger.debug("Removing nested params for #{key_to_delete}")
-    if Map.has_key?(changes, key) do
-      Map.delete(params, key_to_delete)
-    else
-      params
-    end
   end
 
   def safe(step, handlers) do

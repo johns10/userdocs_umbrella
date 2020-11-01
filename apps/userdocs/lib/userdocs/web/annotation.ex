@@ -2,6 +2,8 @@ defmodule UserDocs.Web.Annotation do
   use Ecto.Schema
   import Ecto.Changeset
 
+  require Logger
+
   alias UserDocs.Web.AnnotationType
   alias UserDocs.Web.Page
   alias UserDocs.Documents.Content
@@ -11,13 +13,6 @@ defmodule UserDocs.Web.Annotation do
   @derive {Jason.Encoder, only: [:name, :label, :x_orientation, :y_orientation,
     :size, :color, :thickness, :x_offset, :y_offset, :font_size, :font_color, :page,
     :annotation_type, :content, :content_version]}
-
-  @fields [
-    :name, :label, :x_orientation, :y_orientation,
-    :size, :color, :thickness, :x_offset, :y_offset,
-    :font_size, :page_id, :annotation_type_id,
-    :content_id, :content_version_id
-  ]
 
   schema "annotations" do
     field :name, :string
@@ -44,11 +39,27 @@ defmodule UserDocs.Web.Annotation do
   @doc false
   def changeset(annotation, attrs) do
     annotation
-    |> cast(attrs, @fields)
+    |> cast(attrs, [
+        :name, :label, :x_orientation, :y_orientation,
+        :size, :color, :thickness, :x_offset, :y_offset,
+        :font_size, :page_id, :annotation_type_id,
+        :content_id, :content_version_id ])
     |> cast_assoc(:content)
     |> foreign_key_constraint(:page_id)
+    |> foreign_key_constraint(:annotation_type_id)
     |> validate_required([:page_id])
+    |> ignore_missing()
   end
+
+  def ignore_missing(changeset) do
+    case changeset do
+      %{valid?: false, changes: changes} = changeset when changes == %{} ->
+        %{changeset | action: :ignore}
+      changeset ->
+        changeset
+    end
+  end
+
 
   def safe(annotation, handlers \\ %{})
   def safe(annotation = %UserDocs.Web.Annotation{}, handlers) do

@@ -3,6 +3,8 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
 
   require Logger
 
+  alias UserDocsWeb.LiveHelpers
+
   alias ProcessAdministratorWeb.LiveHelpers
   alias ProcessAdministratorWeb.Layout
   alias ProcessAdministratorWeb.AnnotationLive
@@ -93,6 +95,7 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
       |> assign(:nested_annotation_content_expanded, false)
       |> assign(:field_ids, step_field_ids)
       |> assign(:form_ids, form_ids)
+      |> assign(:selected_element_id, "")
     }
   end
 
@@ -102,11 +105,33 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
       Automation.change_step_with_nested_data(
         socket.assigns.step, step_params, socket.assigns)
 
+    step_type_id = Ecto.Changeset.get_field(changeset, :step_type_id)
+    annotation_type_id =
+      case Ecto.Changeset.get_field(changeset, :annotation, nil) do
+        nil -> nil
+        annotation -> annotation.annotation_type_id
+      end
+
+    enabled_step_fields =
+      UserDocsWeb.LiveHelpers.enabled_fields(
+        socket.assigns.data.step_types,
+        step_type_id
+      )
+
+    enabled_annotation_fields =
+      UserDocsWeb.LiveHelpers.enabled_fields(
+        socket.assigns.data.annotation_types,
+        annotation_type_id
+      )
+
     {
       :noreply,
       socket
       |> assign(:changeset, changeset)
       |> assign(:step, changeset.data)
+      |> assign(:enabled_step_fields, enabled_step_fields)
+      |> assign(:enabled_annotation_fields, enabled_annotation_fields)
+      |> assign(:selected_element_id, Ecto.Changeset.get_field(changeset, :element_id))
     }
   end
 
@@ -153,15 +178,15 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
   end
 
   def handle_event("new-element", _, socket) do
-    changeset =
-      Automation.change_step_with_nested_data(
-        socket.assigns.step, %{ element_id: nil }, socket.assigns)
+    changeset = Automation.new_step_element(
+      socket.assigns.step, socket.assigns.changeset)
 
     {
       :noreply,
       socket
       |> assign(:changeset, changeset)
       |> assign(:step, changeset.data)
+      |> assign(:selected_element_id, "")
     }
   end
 
@@ -179,9 +204,8 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
   end
 
   def handle_event("new-annotation", _, socket) do
-    changeset =
-      Automation.change_step_with_nested_data(
-        socket.assigns.step, %{ annotation_id: nil }, socket.assigns)
+    changeset = Automation.new_step_annotation(
+      socket.assigns.step, socket.assigns.changeset)
 
     {
       :noreply,

@@ -12,7 +12,7 @@ defmodule UserDocsWeb.DomainHelpers do
   end
 
   def maybe_select_list(%Ecto.Association.NotLoaded{}) do
-    [{"None", ""}]
+    [{"None", nil}]
   end
   def maybe_select_list(list) do
     select_list(list)
@@ -23,17 +23,17 @@ defmodule UserDocsWeb.DomainHelpers do
     """
   def select_list(items, field \\ :name)
   def select_list({ :ok, items }, field), do: { :ok, select_list(items, field) }
-  def select_list([], _), do: [{"None", ""}]
-  def select_list(nil, _), do: [{"None", ""}]
+  def select_list([], _), do: [{"None", nil}]
+  def select_list(nil, _), do: [{"None", nil}]
   def select_list(items, field) do
     items
     |> Enum.map(&{Map.get(&1, field), &1.id})
-    |> List.insert_at(0, {"None", ""})
+    |> List.insert_at(0, {"None", nil})
   end
 
   def select_list_temp(items, field, true) do
     select_list_temp(items, field, false)
-    |> List.insert_at(0, {"None", ""})
+    |> List.insert_at(0, {"None", nil})
   end
   def select_list_temp(items, field, false) do
     items
