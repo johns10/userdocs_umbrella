@@ -276,9 +276,10 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
   def nested_form_id(_, _), do: ""
 
   def recent_navigated_to_page(process, step, assigns) do
-    process
-    |> RecentPage.get(step, assigns.data.pages)
-    |> Map.get(:id, nil)
+    case RecentPage.get(process, step, assigns.data.pages) do
+      %Page{} = page -> Map.get(page, :id, nil)
+      nil -> ""
+    end
   end
 
   def page_reference(changeset) do
