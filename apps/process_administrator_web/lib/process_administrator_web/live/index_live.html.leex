@@ -70,11 +70,8 @@
                 Enum.filter(@pages || [], fn(p) -> p.version_id == Map.get(@current_version, :id, nil) end), :name, false),
             },
             content:
-              # TODO: Figure out how to base this on the process.steps for an obvious performance improvement
               for step <- process.steps do
-                {
-                  &LiveHelpers.live_collapsible_form/2,
-                  @socket,
+                live_component(@socket, ProcessAdministratorWeb.CollapsableFormComponent,
                   [
                     id: ID.form(step, :edit, Step),
                     title:
@@ -122,13 +119,14 @@
                       pages_select: DomainHelpers.select_list_temp(
                         Enum.filter(@pages, fn(p) -> p.version_id == @current_version.id end), :name, true),
                       annotation_types: DomainHelpers.select_list_temp(@annotation_types, :name, true),
-                    },
-                    content: []
+                    }
                   ]
-                }
+                )
               end
-        ]) %>
-      <% end %>
+
+          ]
+        ) %>
+      <%= end %>
       <%= live_component(@socket, UserDocsWeb.ScreenShotHandler, [ id: "screenshot-handler-component" ]) %>
 
       <%= live_component(@socket, UserDocsWeb.SelectorHandler, [ id: "selector-handler" ]) %>

@@ -31,11 +31,8 @@
     <div class="level"></div>
     <div class="content">
       <%= for c <- @content do %>
-        <%=
-          { f, socket, opts } = c
-          f.(socket, opts)
-        %>
-      <%= end %>
+        <%= c %>
+      <% end %>
     </div>
   </div>
   <div class="card-content <%= is_expanded?(@expanded) %>">
