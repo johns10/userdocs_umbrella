@@ -102,7 +102,8 @@ defmodule ProcessAdministratorWeb.LiveHelpers do
   end
 
   def live_form(socket, form_component, opts) do
-    form_opts = form_opts(socket, Keyword.fetch!(opts, :action), opts)
+    action = Keyword.fetch!(opts, :action)
+    form_opts = form_opts(socket, action, opts)
 
     live_component(socket, form_component, form_opts)
   end
@@ -126,6 +127,7 @@ defmodule ProcessAdministratorWeb.LiveHelpers do
   def base_form_opts(opts) do
     [
       parent_id: parent_id(opts),
+      parent: Keyword.fetch!(opts, :parent),
       id: Keyword.fetch!(opts, :id),
       action: Keyword.fetch!(opts, :action),
       data: Keyword.fetch!(opts, :data),

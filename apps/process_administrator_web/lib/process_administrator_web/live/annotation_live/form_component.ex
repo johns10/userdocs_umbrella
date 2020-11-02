@@ -21,10 +21,6 @@ defmodule ProcessAdministratorWeb.AnnotationLive.FormComponent do
 
         <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
 
-        <div class="field is-grouped is-grouped-multiline">
-          <div class="control">
-          </div>
-        </div>
       </form>
     """
   end
@@ -35,13 +31,13 @@ defmodule ProcessAdministratorWeb.AnnotationLive.FormComponent do
 
       <%= hidden_input(form, :name, [
         id: @field_ids.annotation.name,
-        value: form.data.name
+        value: Ecto.Changeset.get_field(@changeset, :name, "")
       ]) %>
 
       <div class="field is-grouped">
 
         <%= Layout.select_input(form, :page_id, @select_lists.pages_select, [
-          placeholder: @parent_id || "",
+          selected: form.data.page_id || @default_page_id || "",
           id: @field_ids.annotation.page_id,
         ], "control") %>
 
