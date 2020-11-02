@@ -39,6 +39,8 @@ chrome.runtime.onMessage.addListener(
 
 var xhr = new XMLHttpRequest();
 xhr.responseType = 'document';
+console.log("Hooks")
+console.log(Hooks)
 xhr.open('GET', APP_URL, true)
 xhr.onload = function(e) {
   document.documentElement.replaceChild(this.response.head, document.head)

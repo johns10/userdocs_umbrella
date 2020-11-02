@@ -19,7 +19,7 @@ defmodule UserDocs.Automation.Process.RecentPage do
           %UserDocs.Web.Page{}
 
         %UserDocs.Automation.Step{} = step ->
-          Logger.debug("Fetched most recent navigation step, page_id: #{step.page_id}")
+          # Logger.debug("Fetched most recent navigation step, page_id: #{step.page_id}")
           page =
             pages
             |> Enum.filter(fn(page) -> step.page_id == page.id end)

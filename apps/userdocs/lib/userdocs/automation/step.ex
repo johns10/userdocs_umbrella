@@ -132,7 +132,7 @@ defmodule UserDocs.Automation.Step do
     name =
       UserDocs.Web.Annotation.Name.execute(annotation, element)
 
-    Logger.debug("Putting annotation name #{name}")
+    # Logger.debug("Putting annotation name #{name}")
 
     Ecto.Changeset.update_change(changeset, :annotation,
       fn(a) -> Ecto.Changeset.put_change(a, :name, name) end)
@@ -140,7 +140,7 @@ defmodule UserDocs.Automation.Step do
 
   def put_name(changeset) do
     name = Name.execute(changeset)
-    Logger.debug("Changing Step Name to #{name}")
+    # Logger.debug("Changing Step Name to #{name}")
     Ecto.Changeset.put_change(changeset, :name, name)
   end
 

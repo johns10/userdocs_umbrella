@@ -77,7 +77,7 @@ defmodule ProcessAdministratorWeb.LiveHelpers do
     live_component(socket, CollapsableFormComponent, form_opts)
   end
 
-  def live_group(socket, opts) do
+  def live_group(socket, opts, do: block) do
     group_opts = [
       id: Keyword.fetch!(opts, :id),
       parent: Keyword.fetch!(opts, :parent),
@@ -141,7 +141,7 @@ defmodule ProcessAdministratorWeb.LiveHelpers do
     ProcessAdministratorWeb.LevelComponent.render(opts)
   end
 
-  def parent_id(opts) do
+  def parent_id(opts) when is_list(opts) do
     opts
     |> Keyword.fetch!(:parent)
     |> Map.get(:id)

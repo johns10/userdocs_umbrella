@@ -46,7 +46,7 @@ config :process_administrator_web, ProcessAdministratorWeb.Endpoint,
       "--mode",
       "development",
       "--watch-stdin",
-      cd: Path.expand("../apps/userdocs_web/assets", __DIR__)
+      cd: Path.expand("../apps/process_administrator_web/assets", __DIR__)
     ]
   ]
 

@@ -16,18 +16,52 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import NProgress from "nprogress"
 import {LiveSocket} from "phoenix_live_view"
+import {handle_message} from "./commands.js"
+import {Hooks} from "./hooks.js"
 
-let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}})
+let DOMAIN = "app.davenport.rocks"
+let PORT = "4001"
 
-// Show progress bar on live navigation and form submits
-window.addEventListener("phx:page-loading-start", info => NProgress.start())
-window.addEventListener("phx:page-loading-stop", info => NProgress.done())
+let APP_URL = "http://" + DOMAIN + ":" + PORT + "/"
+let WEBSOCKETS_URI = "ws://" + DOMAIN + ":" + PORT + "/live"
+let COOKIE_KEY = "_process_administrator_web_key"
 
-// connect if there are any LiveViews on the page
-liveSocket.connect()
+try {
+  chrome.runtime.onMessage.addListener(
+    function(message, sender, sendResponse) {
+      console.log("Extension received message")
+      console.log(sender.tab ?
+                "from a content script:" + sender.tab.url :
+                "from the extension");
+              
+    console.log("handling message in the listener")
+    handle_message(message, { environment: 'extension' })
+  });
+} catch(e) {
+  console.log("Failed to add listener")
+  console.log(e)
+  console.log(chrome.runtime)
+}
 
-// expose liveSocket on window for web console debug logs and latency simulation:
-// >> liveSocket.enableDebug()
-// >> liveSocket.enableLatencySim(1000)
-window.liveSocket = liveSocket
+var xhr = new XMLHttpRequest();
+xhr.responseType = 'document';
+xhr.open('GET', APP_URL, true)
+xhr.onload = function(e) {
+  document.documentElement.replaceChild(this.response.head, document.head)
+  document.documentElement.replaceChild(this.response.body, document.body)
+  
+  let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+
+  let liveSocket = new LiveSocket(WEBSOCKETS_URI, Socket, {
+    params: { _csrf_token: csrfToken},
+    hooks: Hooks
+  })
+  
+  window.addEventListener("phx:page-loading-start", info => NProgress.start())
+  window.addEventListener("phx:page-loading-stop", info => NProgress.done())
+  
+  liveSocket.connect()
+  
+  window.liveSocket = liveSocket
+}
+xhr.send()
