@@ -48,8 +48,10 @@ defmodule UserDocs.Automation.Step.Name do
   def generate("Navigate" = name, %Ecto.Changeset{} = step_changeset) do
     page = page_or_empty_page(step_changeset)
 
-    order_name(step_changeset) <> " to "
-    <> page.name || ""
+    order = order_name(step_changeset)
+    order
+    <> " to "
+    <> (page.name || "")
   end
   def generate("Navigate" = name, %Step{} = step) do
     Logger.debug("Automatic name generation: #{name}")
@@ -165,6 +167,10 @@ defmodule UserDocs.Automation.Step.Name do
   def order_name(changeset) do
     order = Ecto.Changeset.get_field(changeset, :order, "")
     step_type = Ecto.Changeset.get_field(changeset, :step_type, "")
+    order_name(order, step_type)
+  end
+  def order_name(nil, _), do: "0" <> ". "
+  def order_name(order, step_type) when is_integer(order) do
     ""
     <> Integer.to_string(order) <> ". "
     <> step_type.name <> " "
