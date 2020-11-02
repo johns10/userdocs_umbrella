@@ -3941,6 +3941,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 });
 var xhr = new XMLHttpRequest();
 xhr.responseType = 'document';
+console.log("Hooks");
+console.log(_hooks_js__WEBPACK_IMPORTED_MODULE_6__["Hooks"]);
 xhr.open('GET', APP_URL, true);
 
 xhr.onload = function (e) {
@@ -4413,6 +4415,10 @@ function setSize(job, configuration, proceed) {
 function navigate(job, configuration, proceed) {
   var activeTabId = job.activeTabId;
   var step = current_step(job);
+  console.log("Tryna navigate");
+  console.log(step.page_reference);
+  console.log(step.url);
+  console.log(step.page.url);
   var payload = step.page_reference == "url" ? {
     url: step.url
   } : {

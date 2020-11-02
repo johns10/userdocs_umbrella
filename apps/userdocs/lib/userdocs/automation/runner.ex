@@ -15,7 +15,8 @@ defmodule UserDocs.Automation.Runner do
       element: &Element.safe/2,
       step_type: &StepType.safe/2,
       strategy: &Strategy.safe/2,
-      annotation_type: &AnnotationType.safe/2
+      annotation_type: &AnnotationType.safe/2,
+      page: &Page.safe/2,
     }
 
     Process.safe(process, handlers)

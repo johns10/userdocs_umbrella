@@ -30,9 +30,7 @@
     </div>
     <div class="level"></div>
     <div class="content">
-      <%= for c <- @content do %>
-        <%= c %>
-      <% end %>
+      <%= @inner_content.([]) %>
     </div>
   </div>
   <div class="card-content <%= is_expanded?(@expanded) %>">

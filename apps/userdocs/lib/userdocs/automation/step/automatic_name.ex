@@ -16,7 +16,7 @@ defmodule UserDocs.Automation.Step.Name do
         %StepType{} = step_type -> step_type
         nil -> %StepType{}
       end
-    IO.puts("Generating an automatic name: #{step_type.name}")
+    #Logger.debug("Generating an automatic name: #{step_type.name}")
     generate(step_type.name, step_changeset)
   end
   def execute(%{ step_type: %{ name: name }} = step) when is_bitstring(name) do
