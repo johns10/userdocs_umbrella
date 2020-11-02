@@ -158,7 +158,6 @@ defmodule ProcessAdministratorWeb.IndexLive do
   # TODO: Must implement either updating the state tree/components
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
     Logger.debug("Handling info on topic #{topic}, event #{event}")
-    Logger.debug(inspect(payload))
     {
       :noreply,
       socket
@@ -196,6 +195,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
 
     changes = State.create_object(socket.assigns, type, payload.id, payload)
     socket = State.apply_changes(socket, changes)
+    IO.puts("Made it to the end of update_socket_data")
     socket
   end
   def update_socket_data(socket, topic, "update", payload) do
@@ -211,6 +211,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
   end
 
   def update_additional_data(socket, "process", _, _) do
+    Logger.debug("Updating Additional Data on receipt of process")
     current_processes =
       Version.processes(
         socket.assigns.current_version.id,
@@ -218,16 +219,12 @@ defmodule ProcessAdministratorWeb.IndexLive do
       |> Enum.sort(&(&1.order <= &2.order))
 
     sorted_steps =
-      socket.assigns.data.steps
+      socket.assigns.steps
       |> Enum.sort(&(&1.order <= &2.order))
-
-    data =
-      socket.assigns.data
-      |> Map.put(:data, :steps, sorted_steps)
 
     socket
     |> assign(:current_processes, current_processes )
-    |> assign(:data, data)
+    |> assign(:steps, sorted_steps)
   end
   def update_additional_data(socket, _, _, _) do
     socket

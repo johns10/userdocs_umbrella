@@ -15,6 +15,7 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
 
   alias UserDocs.Automation
   alias UserDocs.Automation.Step.ChangeHandler
+  alias UserDocs.Automation.Process.RecentPage
   alias UserDocs.ChangeTracker
   alias UserDocs.Documents
   alias UserDocs.Documents.ContentVersion
@@ -89,13 +90,13 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
       |> assign(:current_object, step)
       |> assign(:enabled_step_fields, enabled_step_fields)
       |> assign(:enabled_annotation_fields, enabled_annotation_fields)
-      |> assign(:auto_gen_name, "")
       |> assign(:nested_element_expanded, false)
       |> assign(:nested_annotation_expanded, false)
       |> assign(:nested_annotation_content_expanded, false)
       |> assign(:field_ids, step_field_ids)
       |> assign(:form_ids, form_ids)
       |> assign(:selected_element_id, "")
+      |> assign(:default_page_id, recent_navigated_to_page(assigns.parent, step, assigns))
     }
   end
 
@@ -274,4 +275,17 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
   end
   def nested_form_id(_, _), do: ""
 
+  def recent_navigated_to_page(process, step, assigns) do
+    process
+    |> RecentPage.get(step, assigns.data.pages)
+    |> Map.get(:id, nil)
+  end
+
+  def page_reference(changeset) do
+    Ecto.Changeset.get_field(changeset, :page_reference, nil)
+  end
+
+  def name(changeset) do
+    Ecto.Changeset.get_field(changeset, :name, nil)
+  end
 end

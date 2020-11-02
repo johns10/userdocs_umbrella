@@ -7,6 +7,7 @@ defmodule UserDocs.Name do
   end
 
   def maybe_field(name, object, key, seperator) do
+    # Logger.debug("Maybe field name: #{name}, key: #{key}, seperator: #{seperator}")
     safe_value =
       retreive_value(object, key)
       |> safe_string()

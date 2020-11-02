@@ -182,7 +182,7 @@ defmodule UserDocs.Automation do
     |> maybe_preload_file(params[:content_versions])
     |> Repo.all()
   end
-  def list_steps(_params, filters, state) do
+  def list_steps(params, filters, state) do
     UserDocs.State.get(state, :steps, Step)
     |> maybe_filter_by_process(filters[:process_id], state)
   end
@@ -652,12 +652,23 @@ defmodule UserDocs.Automation do
     |> maybe_preload_versions(params[:versions])
     |> Repo.one!()
   end
-  def get_process!(id, _params, state) when is_integer(id) do
+  def get_process!(id, params, _filters, state) when is_integer(id) do
     UserDocs.State.get!(state, id, :processes, Process)
+    |> maybe_preload_steps(params[:steps], state)
   end
 
   defp base_process_query(id) do
     from(process in Process, where: process.id == ^id)
+  end
+
+  defp maybe_preload_steps(object, nil, _), do: object
+  defp maybe_preload_steps(object, _, state) do
+    steps =
+      state.steps
+      |> Enum.filter(fn(s) -> s.process_id == object.id end)
+
+    object
+    |> Map.put(:steps, steps)
   end
 
 #TODO Remove

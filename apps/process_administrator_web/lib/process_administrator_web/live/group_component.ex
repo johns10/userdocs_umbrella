@@ -37,7 +37,9 @@ defmodule ProcessAdministratorWeb.GroupComponent do
                 select_lists: @select_lists
               ])
             %>
-            <div class="level"></div>
+          </div>
+          <div class="level"></div>
+          <div class="content">
             <%= for c <- @content do %>
               <%=
                 { f, socket, opts } = c

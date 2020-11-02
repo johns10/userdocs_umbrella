@@ -25,6 +25,15 @@
     <%= if @current_version do %>
       <%= for process <- @current_processes do %>
         <%=
+          steps =
+            @steps
+            |> Enum.filter(fn(s) -> s.process_id == process.id end)
+            |> Enum.map(fn(s) -> preload_step(s, assigns, process) end)
+
+          process = Map.put(process, :steps, steps)
+          ""
+        %>
+        <%=
           LiveHelpers.live_group(@socket, [
             id: ID.group("process", process.id),
             parent: @current_version,
@@ -40,6 +49,9 @@
             new_form_component: StepLive.FormComponent,
             new_form_object: %Step{},
             data: %{
+              steps: @steps, # Only needed because I have recent navigated page on :new step forms
+              pages: @pages, # Only needed because I have recent navigated page on :new step forms
+              processes: @processes, # Only needed because I have recent navigated page on :new step forms
               step_types: @step_types,
               annotation_types: @annotation_types,
             },
@@ -59,7 +71,7 @@
             },
             content:
               # TODO: Figure out how to base this on the process.steps for an obvious performance improvement
-              for step <- Enum.filter(@steps, fn(s) -> s.process_id == process.id end) do
+              for step <- process.steps do
                 {
                   &LiveHelpers.live_collapsible_form/2,
                   @socket,
@@ -70,10 +82,10 @@
                     runner:
                       live_component(@socket, StepLive.Runner, [
                         id: "step-" <> Integer.to_string(step.id) <> "-runner",
-                        step: preload_step(step, assigns, process),
-                        step_type_name: preload_step(step, assigns, process).step_type.name]),
+                        step: step,
+                        step_type_name: step.step_type.name]),
                     parent: process,
-                    object: preload_step(step, assigns, process),
+                    object: step,
                     object_type: Step,
                     object_form: StepLive.FormComponent,
                     action: :edit,
@@ -94,8 +106,14 @@
                       strategies: DomainHelpers.select_list_temp(@strategies, :name, true),
                       language_codes: DomainHelpers.select_list_temp(@language_codes, :code, false),
                       step_types_select: DomainHelpers.select_list_temp(@step_types, :name, false),
-                      annotations: DomainHelpers.select_list_temp(@annotations, :name, true),
-                      elements_select: DomainHelpers.select_list_temp(@elements, :name, true),
+                      annotations:
+                        DomainHelpers.select_list_temp(
+                          Enum.filter(@annotations, fn(a) -> a.page_id == step.page_id end),
+                          :name, true),
+                      elements_select:
+                        DomainHelpers.select_list_temp(
+                          Enum.filter(@elements, fn(e) -> e.page_id == step.page_id end),
+                          :name, true) ,
                       content: DomainHelpers.select_list_temp(@content, :name, true),
                       content_versions: DomainHelpers.select_list_temp(@content_versions, :name, false),
                       versions: DomainHelpers.select_list_temp(@versions, :name, false),
@@ -105,7 +123,6 @@
                         Enum.filter(@pages, fn(p) -> p.version_id == @current_version.id end), :name, true),
                       annotation_types: DomainHelpers.select_list_temp(@annotation_types, :name, true),
                     },
-                    default_page_id: UserDocs.Automation.Process.RecentPage.get(process, @pages),
                     content: []
                   ]
                 }

@@ -67,7 +67,6 @@ defmodule ProcessAdministratorWeb.CollapsableFormComponent do
 
   @impl true
   def handle_event("expand", _, socket) do
-    IO.inspect("Expanding collapsible formzs")
     socket = assign(socket, :expanded, not socket.assigns.expanded)
     {:noreply, socket}
   end
