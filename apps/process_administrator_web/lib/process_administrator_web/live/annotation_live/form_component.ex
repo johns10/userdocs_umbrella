@@ -134,7 +134,7 @@ defmodule ProcessAdministratorWeb.AnnotationLive.FormComponent do
             </div>
           </section>
         <% end %>
-        <div class="level"></div>
+        <nav class="level"></nav>
       <%= else %>
         no form
       <% end %>

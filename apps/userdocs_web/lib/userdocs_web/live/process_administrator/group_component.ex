@@ -36,7 +36,7 @@ defmodule UserDocsWeb.ProcessAdministratorLive.GroupComponent do
                 select_lists: @select_lists
               ])
             %>
-            <div class="level"></div>
+            <nav class="level"></nav>
             <%= for c <- @content do %>
               <%=
                 { f, socket, opts } = c

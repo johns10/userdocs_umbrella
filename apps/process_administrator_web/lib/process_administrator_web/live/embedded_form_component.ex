@@ -23,7 +23,7 @@ defmodule ProcessAdministratorWeb.EmbeddedFormComponent do
             </div>
           </div>
         </form>
-        <div class="level"></div>
+        <nav class="level"></nav>
         <div class="card" id="<%= @id %>">
           <header class="card-header">
             <p class="card-header-title"  style="margin-bottom:0px;">

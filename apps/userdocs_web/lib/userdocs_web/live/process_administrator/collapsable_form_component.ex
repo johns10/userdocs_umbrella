@@ -38,7 +38,7 @@ defmodule UserDocsWeb.ProcessAdministratorLive.CollapsableFormComponent do
                 select_lists: @select_lists
               ])
             %>
-            <div class="level"></div>
+            <nav class="level"></nav>
           </div>
         </div>
       </div>

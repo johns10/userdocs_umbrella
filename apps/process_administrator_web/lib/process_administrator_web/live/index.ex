@@ -101,7 +101,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
     |> (&(  assign(&1, :annotations,      State.annotations(&1.assigns.current_version.id))                 )).()
     |> (&(  assign(&1, :elements,         State.elements(&1.assigns.current_version.id))                    )).()
     |> (&(  assign(&1, :pages,            State.pages(&1.assigns.current_version.id))                       )).()
-    |> (&(  assign(&1, :current_processes,Version.processes(&1.assigns.current_version.id, &1.assigns.processes))   )).()
+    |> current_processes()
     |> assign(:process_menu, [])
     |> State.report()
   end
@@ -194,9 +194,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
       |> String.to_atom()
 
     changes = State.create_object(socket.assigns, type, payload.id, payload)
-    socket = State.apply_changes(socket, changes)
-    IO.puts("Made it to the end of update_socket_data")
-    socket
+    State.apply_changes(socket, changes)
   end
   def update_socket_data(socket, topic, "update", payload) do
     Logger.debug("Updating State on topic #{topic}, event update")
@@ -210,21 +208,25 @@ defmodule ProcessAdministratorWeb.IndexLive do
     State.apply_changes(socket, changes)
   end
 
-  def update_additional_data(socket, "process", _, _) do
+  def update_additional_data(socket, "step", _, _) do
     Logger.debug("Updating Additional Data on receipt of process")
-    current_processes =
-      Version.processes(
-        socket.assigns.current_version.id,
-        socket.assigns.processes)
-      |> Enum.sort(&(&1.order <= &2.order))
-
     sorted_steps =
       socket.assigns.steps
       |> Enum.sort(&(&1.order <= &2.order))
 
     socket
-    |> assign(:current_processes, current_processes )
     |> assign(:steps, sorted_steps)
+    |> current_processes()
+  end
+  def update_additional_data(socket, "process", _, _) do
+    Logger.debug("Updating Additional Data on receipt of process")
+    sorted_steps =
+      socket.assigns.steps
+      |> Enum.sort(&(&1.order <= &2.order))
+
+    socket
+    |> assign(:steps, sorted_steps)
+    |> current_processes()
   end
   def update_additional_data(socket, _, _, _) do
     socket
@@ -390,5 +392,13 @@ defmodule ProcessAdministratorWeb.IndexLive do
       :noreply,
       socket
     }
+  end
+
+  def current_processes(socket) do
+    processes =
+      Version.processes(socket.assigns.current_version.id, socket.assigns.processes)
+      |> Enum.map(fn(p) -> preload_process(p, socket.assigns) end)
+
+    assign(socket, :current_processes, processes)
   end
 end

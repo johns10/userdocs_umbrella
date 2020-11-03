@@ -10,7 +10,7 @@ defmodule UserDocsWeb.PanelComponent do
       phx-target="<%= @myself.cid %>"
       phx-page-loading>
       <div class="panel-heading panel-header">
-        <div class="level">
+        <nav class="level">
           <div class="level-left">
             <%= @title %>
           </div>
@@ -22,7 +22,7 @@ defmodule UserDocsWeb.PanelComponent do
               <i class="fa fa-angle-down" aria-hidden="true"></i>
             </span>
           </a>
-        </div>
+        </nav>
       </div>
       <div class="<%= maybe_hidden("panel-block", @expanded) %>">
         <div class="control is-expanded">
