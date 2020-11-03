@@ -3,7 +3,7 @@ defmodule UserDocsWeb.ProcessAdministratorLive.LevelComponent do
 
   def render(assigns) do
     ~L"""
-      <div class="level"></div>
+    <nav class="level"></nav>
     """
   end
 end

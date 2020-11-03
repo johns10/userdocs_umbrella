@@ -1,16 +1,8 @@
-<div id="<%= @id %>">
   <%= f = form_for @changeset, "#",
-
+    id: @id,
     phx_target: @myself.cid,
     phx_change: "validate",
     phx_submit: "save" %>
-
-    <%= hidden_input(f, :id, [ value: f.data.id ]) %>
-
-    <%= hidden_input(f, :name, [
-      id: @field_ids.name || "",
-      value: name(@changeset)
-    ]) %>
 
     <div class="field is-grouped">
 
@@ -67,6 +59,21 @@
       <%= error_tag(f, :page_id) %>
     <% end %>
 
+    <%= if "page_id" in @enabled_step_fields and page_reference(@changeset) == "page" do %>
+      <%= inputs_for f, :page, [id: @form_ids.page ], fn fp -> %>
+        <section class="card">
+          <div class="card-content">
+            <div class="content">
+              <%= PageLive.FormComponent.render_fields(
+                Map.put(assigns, :field_ids, @field_ids.page),
+                fp, [ prefix: @form_ids.prefix ]) %>
+            </div>
+          </div>
+        </section>
+      <% end %>
+      <div class="level"></div>
+    <% end %>
+
     <%= if "element_id" in @enabled_step_fields and @action not in [:new] do %>
       <%= label f, :element_id, class: "label" %>
       <div class="field has-addons">
@@ -121,22 +128,6 @@
       <div class="level"></div>
     <% end %>
 
-    <%= if "page_id" in @enabled_step_fields and page_reference(@changeset) == "page" do %>
-      <%= inputs_for f, :page, [id: @form_ids.page ], fn fp -> %>
-        <section class="card">
-          <div class="card-content">
-            <div class="content">
-              <%= PageLive.FormComponent.render_fields(
-                Map.put(assigns, :field_ids, @field_ids.page),
-                fp, [ prefix: @form_ids.prefix ]) %>
-            </div>
-          </div>
-        </section>
-      <% end %>
-      <div class="level"></div>
-    <% end %>
-
-
     <%= Layout.text_input(f, [
       field_name: :url,
       id: @field_ids.url,
@@ -166,4 +157,3 @@
 
     <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
   </form>
-</div>

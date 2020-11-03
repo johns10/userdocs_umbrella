@@ -14,27 +14,15 @@
         projects: @projects,
         teams: @teams,
         versions: @versions,
-      }
-    ]) %>
-
+      }])
+    %>
     <%= LiveHelpers.live_modal_menus(@socket, [
       id: "modal-menus",
-      action: @modal_action,
-    ]) %>
-
+      action: @modal_action])
+    %>
     <%= if @current_version do %>
       <%= for process <- @current_processes do %>
-        <%=
-          steps =
-            @steps
-            |> Enum.filter(fn(s) -> s.process_id == process.id end)
-            |> Enum.map(fn(s) -> preload_step(s, assigns, process) end)
-
-          process = Map.put(process, :steps, steps)
-          ""
-        %>
-        <%=
-          live_component(@socket, ProcessAdministratorWeb.GroupComponent, [
+        <%= live_component(@socket, ProcessAdministratorWeb.GroupComponent, [
             id: ID.group("process", process.id),
             parent: @current_version,
             object: process,
@@ -68,42 +56,40 @@
                 Enum.filter(@processes || [], fn(p) -> p.version_id == Map.get(@current_version, :id, nil) end), :name, false),
               pages_select: DomainHelpers.select_list_temp(
                 Enum.filter(@pages || [], fn(p) -> p.version_id == Map.get(@current_version, :id, nil) end), :name, false),
-            }]) do %>
-
-            <%= for step <- process.steps do %>
-
-              <%= live_component(@socket, ProcessAdministratorWeb.CollapsableFormComponent,
-                [
-                  id: ID.form(step, :edit, Step),
-                  title: step.name,
-                  runner:
-                    live_component(@socket, StepLive.Runner, [
-                      id: "step-" <> Integer.to_string(step.id) <> "-runner",
-                      step: step,
-                      step_type_name: step.step_type.name])
-                ]
-              ) do %>
-
-                <%= live_component(@socket, StepLive.FormComponent, [
-                    action: :edit,
+          }])
+        do %>
+          <%= for step <- process.steps do %>
+            <%= live_component(@socket, ProcessAdministratorWeb.CollapsableFormComponent,
+              [
+                id: ID.form(step, :edit, Step),
+                title: step.name,
+                runner:
+                  live_component(@socket, StepLive.Runner, [
+                    id: "step-" <> Integer.to_string(step.id) <> "-runner",
                     step: step,
-                    id: ID.form(step, :edit, Step),
-                    parent: process,
-                    parent_id: Map.get(process, :id, nil),
-                    type: Step,
-                    data: %{
-                      annotation_types: @annotation_types,
-                      content_versions: @content_versions,
-                      annotations: @annotations,
-                      strategies: @strategies,
-                      step_types: @step_types,
-                      processes: @processes,
-                      elements: @elements,
-                      projects: @projects,
-                      content: @content,
-                      pages: @pages,
-                    },
-                    select_lists: %{
+                    step_type_name: step.step_type.name])])
+            do %>
+
+              <%= live_component(@socket, StepLive.FormComponent, [
+                  action: :edit,
+                  step: step,
+                  id: ID.form(step, :edit, Step),
+                  parent: process,
+                  parent_id: Map.get(process, :id, nil),
+                  type: Step,
+                  data: %{
+                    annotation_types: @annotation_types,
+                    content_versions: @content_versions,
+                    annotations: @annotations,
+                    strategies: @strategies,
+                    step_types: @step_types,
+                    processes: @processes,
+                    elements: @elements,
+                    projects: @projects,
+                    content: @content,
+                    pages: @pages,
+                  },
+                  select_lists: %{
                     teams: DomainHelpers.select_list_temp(@teams, :name, false),
                     strategies: DomainHelpers.select_list_temp(@strategies, :name, true),
                     language_codes: DomainHelpers.select_list_temp(@language_codes, :code, false),
@@ -124,23 +110,16 @@
                     pages_select: DomainHelpers.select_list_temp(
                       Enum.filter(@pages, fn(p) -> p.version_id == @current_version.id end), :name, true),
                     annotation_types: DomainHelpers.select_list_temp(@annotation_types, :name, true),
-                    }
-                  ])
-                %>
-
-              <% end %>
+                  }])
+              %>
 
             <% end %>
-
+          <% end %>
         <%= end %>
-
       <%= end %>
       <%= live_component(@socket, UserDocsWeb.ScreenShotHandler, [ id: "screenshot-handler-component" ]) %>
-
       <%= live_component(@socket, UserDocsWeb.SelectorHandler, [ id: "selector-handler" ]) %>
-
       <div id="selector-tester" phx-hook="testSelector"></div>
-
       <!--<nav class="navbar is-fixed-bottom" role="navigation" aria-label="main navigation">
 
         <div class="navbar-brand">
