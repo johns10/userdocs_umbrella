@@ -49,7 +49,7 @@
       <div class="field has-addons">
         <%=
           Layout.select_input(f, :page_id, @select_lists.pages_select, [
-            value: f.data.page_id || @default_page_id,
+            value: f.data.page_id || @default_page_id || "",
             id: @field_ids.page_id,
             label: false,
           ], "control")
@@ -107,7 +107,7 @@
       <div class="field has-addons">
         <%=
           Layout.select_input(f, :annotation_id, @select_lists.annotations, [
-            selected: f.data.annotation_id || "",
+            value: f.data.annotation_id || "",
             id: @field_ids.annotation_id,
             label: false,
             hidden: "annotation_id" not in @enabled_step_fields

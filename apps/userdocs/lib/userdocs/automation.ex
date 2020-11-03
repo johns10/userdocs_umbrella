@@ -368,6 +368,10 @@ defmodule UserDocs.Automation do
     new_step_nested_object(step, changeset, :element_id, :element, %Element{})
   end
 
+  def new_step_page(step, changeset) do
+    new_step_nested_object(step, changeset, :page_id, :page, %Page{})
+  end
+
   def new_step_annotation(step, changeset) do
     new_step_nested_object(step, changeset, :annotation_id, :annotation, %Annotation{})
   end
@@ -471,6 +475,7 @@ defmodule UserDocs.Automation do
     step
     |> maybe_update_annotation(changes, state)
     |> maybe_update_element(changes, state)
+    |> maybe_update_page(changes, state)
   end
 
   def maybe_update_annotation(step, %{ annotation_id: nil }, _) do
@@ -498,6 +503,17 @@ defmodule UserDocs.Automation do
       Map.put(step, :element, element)
   end
   def maybe_update_element(step, _, _), do: step
+
+  def maybe_update_page(step, %{ page_id: nil }, _) do
+    Map.put(step, :page, nil)
+  end
+  def maybe_update_page(step, %{ page_id: page_id }, state) when is_integer(page_id) do
+    page =
+      UserDocs.Web.get_page!(page_id, %{ }, %{}, state.data)
+
+      Map.put(step, :page, page)
+  end
+  def maybe_update_page(step, _, _), do: step
 
   alias UserDocs.Automation.Job
 

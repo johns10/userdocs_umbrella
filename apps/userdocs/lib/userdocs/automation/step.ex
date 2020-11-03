@@ -72,8 +72,6 @@ defmodule UserDocs.Automation.Step do
   def change_remaining(step, attrs) do
     step
     |> cast(attrs, [ :process_id, :step_type_id ])
-    |> foreign_key_constraint(:process)
-    |> foreign_key_constraint(:step_type)
     |> cast(attrs, [ :name, :order, :url, :text, :width, :height, :page_reference ])
     |> foreign_key_constraint(:process)
     |> foreign_key_constraint(:step_type)
@@ -109,6 +107,9 @@ defmodule UserDocs.Automation.Step do
         %{ annotation_id: annotation_id } ->
           Logger.debug("Removing annotation params")
           Map.delete(changeset.params, "annotation")
+        %{ page_id: page_id } ->
+          Logger.debug("Removing page params")
+          Map.delete(changeset.params, "page")
         _ ->
           Logger.debug("not removing params")
           changeset.params
