@@ -95,7 +95,6 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
       |> assign(:nested_annotation_content_expanded, false)
       |> assign(:field_ids, step_field_ids)
       |> assign(:form_ids, form_ids)
-      |> assign(:selected_element_id, "")
       |> assign(:default_page_id, recent_navigated_to_page(assigns.parent, step, assigns))
     }
   end
@@ -107,6 +106,7 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
         socket.assigns.step, step_params, socket.assigns)
 
     step_type_id = Ecto.Changeset.get_field(changeset, :step_type_id)
+
     annotation_type_id =
       case Ecto.Changeset.get_field(changeset, :annotation, nil) do
         nil -> nil
@@ -132,7 +132,6 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
       |> assign(:step, changeset.data)
       |> assign(:enabled_step_fields, enabled_step_fields)
       |> assign(:enabled_annotation_fields, enabled_annotation_fields)
-      |> assign(:selected_element_id, Ecto.Changeset.get_field(changeset, :element_id))
     }
   end
 
@@ -187,14 +186,12 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
       socket
       |> assign(:changeset, changeset)
       |> assign(:step, changeset.data)
-      |> assign(:selected_element_id, "")
     }
   end
 
   def handle_event("new-page", _, socket) do
-    changeset =
-      Automation.change_step_with_nested_data(
-        socket.assigns.step, %{ page_id: nil }, socket.assigns)
+    changeset = Automation.new_step_page(
+      socket.assigns.step, socket.assigns.changeset)
 
     {
       :noreply,
