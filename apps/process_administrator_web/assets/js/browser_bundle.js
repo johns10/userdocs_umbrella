@@ -1326,10 +1326,10 @@ function main() {
     });
   });
 
-  document.onmouseover = function (event) {
-    var el = event.target;
-    console.log(el);
-    console.log(css_selector_generator__WEBPACK_IMPORTED_MODULE_0___default()(el, getCssSelectorOptions)); // CSSS = getCssSelector(el, getCssSelectorOptions);
+  document.onmouseover = function (event) {// const el =  event.target;
+    // console.log(el)
+    // console.log(getCssSelector(el, getCssSelectorOptions))
+    // CSSS = getCssSelector(el, getCssSelectorOptions);
     // XPATH = getPathTo(event.target);
   };
 

@@ -1,7 +1,7 @@
-defmodule UserDocs.DocubitsTest do
+defmodule UserDocs.DocumentBodyTest do
   use UserDocs.DataCase
 
-  describe "docubits" do
+  describe "document_body" do
     alias UserDocs.Documents.NewDocubit, as: Docubit
 
     alias UserDocs.DocubitFixtures
@@ -11,12 +11,38 @@ defmodule UserDocs.DocubitsTest do
     alias UserDocs.DocumentFixtures
     alias UserDocs.MediaFixtures
 
+    alias UserDocs.Documents
+    alias UserDocs.Documents.Body
     alias UserDocs.Documents.Docubit.Type
 
     def docubit_fixture() do
+      { :ok, document } =
+        Documents.create_document(%{ name: "test", title: "Test" })
+
+      columns = [
+        DocubitFixtures.column(),
+        DocubitFixtures.column(),
+        DocubitFixtures.column()
+      ]
+
+      rows = [
+        DocubitFixtures.row(),
+        Map.put(DocubitFixtures.row(), :docubits, columns),
+        DocubitFixtures.row()
+      ]
+
+      body =
+        document.body
+        |> Map.put(:docubits, rows)
+
+      document = Map.put(document, :body, body)
+
       team = UsersFixtures.team()
+      container = DocubitFixtures.container()
       row = DocubitFixtures.row()
+      column = DocubitFixtures.column()
       ol = DocubitFixtures.ol()
+
       ol_type =
         Type.types()
         |> Enum.filter(fn(t) -> t.id == "ol" end)
@@ -85,9 +111,12 @@ defmodule UserDocs.DocubitsTest do
         |> Map.put(:annotation, annotation_one)
 
       %{
+        document: document,
+        container: container,
         ol: ol,
         ol_type: ol_type,
         row: row,
+        column: column,
         state: %{
           data: %{
             files: [ file_one, file_two, file_three, file_four ],
@@ -102,72 +131,49 @@ defmodule UserDocs.DocubitsTest do
       }
     end
 
-    test "apply_context applies a context to the docubit" do
-      f = docubit_fixture()
-      ol = f.ol
-      ol_type = f.ol_type
-      contexts = %{ settings: [ li_value: "test_value"] }
-      docubit = Docubit.apply_contexts(ol, contexts)
-      assert docubit.settings[:li_value] == "test_value"
-      assert docubit.settings[:name_prefix] == ol_type.contexts.settings[:name_prefix]
+    """
+    """
+    test "document body's children is an empty container" do
+      attrs = %{ name: "test", title: "Test" }
+      container =
+        DocubitFixtures.container()
+        |> Map.put(:type, Type.container())
+
+      { :ok, document } = Documents.create_document(attrs)
+      assert document.body == container
     end
 
-    test "apply_context respects the heirarchy of parent over type" do
+    test "put ([0]) raises an error" do
       f = docubit_fixture()
-      ol = f.ol
-      contexts = %{ settings: [ name_prefix: True] }
-      docubit = Docubit.apply_contexts(ol, contexts)
-      assert docubit.settings[:name_prefix] == contexts.settings[:name_prefix]
+      document = f.document
+      assert_raise(RuntimeError, "Can't replace the document body directly",
+        fn -> Docubit.insert(document.body, [0], f.row) end)
     end
 
-    test "apply_context respects the heirarchy of object over parent" do
+    test "get ([0]) retreives the body docubit" do
       f = docubit_fixture()
-      ol = f.ol
-      attrs = %{ settings: [ name_prefix: True] }
-      contexts = %{ settings: [ name_prefix: False] }
-      changeset = Docubit.changeset(ol, attrs)
-      { :ok, docubit } = Ecto.Changeset.apply_action(changeset, :updateq)
-      docubit = Docubit.apply_contexts(docubit, contexts)
-      assert docubit.settings[:name_prefix] == attrs.settings[:name_prefix]
+      document = f.document
+      assert Docubit.get(document.body, [0]) == document.body
     end
 
-    alias UserDocs.Documents.Content
-
-    test "Docubit.preload preloads a content" do
+    test "get ([0, 0]) retreives a row docubit" do
       f = docubit_fixture()
-      ol = f.ol
-      content = Enum.at(f.state.data.content, 0)
-      docubit = Map.put(ol, :content_id, content.id)
-      docubit = Docubit.preload(docubit, f.state)
-      assert docubit.content == content
+      document = f.document
+      assert Docubit.get(document.body, [0, 0]) == f.row
     end
 
-    test "Docubit.preload preloads a file" do
+    test "get ([0, 1, 0]) retreives a column docubit" do
       f = docubit_fixture()
-      ol = f.ol
-      file = Enum.at(f.state.data.files, 0)
-      docubit = Map.put(ol, :file_id, file.id)
-      docubit = Docubit.preload(docubit, f.state)
-      assert docubit.file == file
+      document = f.document
+      assert Docubit.get(document.body, [0, 1, 0]) == f.column
     end
 
-    test "Docubit.preload preloads an annotation" do
+    test "insert([0, 1, 1]) puts an ol docubit in the body" do
       f = docubit_fixture()
-      ol = f.ol
-      annotation = Enum.at(f.state.data.annotations, 0)
-      docubit = Map.put(ol, :through_annotation_id, annotation.id)
-      docubit = Docubit.preload(docubit, f.state)
-      assert docubit.through_annotation == annotation
-    end
-
-    test "Docubit.fetch_renderer fetches the correct renderer" do
-      f = docubit_fixture()
-      docubit =
-        f.row
-        |> Docubit.apply_contexts(%{})
-        |> Docubit.renderer()
-
-      assert docubit.renderer == :"Elixir.UserDocs.Documents.DocuBit.Renderers.Row"
+      document = f.document
+      body = Docubit.insert(document.body, [ 0, 1, 1 ], f.ol)
+      IO.puts(Docubit.print(body))
+      assert Docubit.get(body, [ 0, 1, 1 ]) == f.ol
     end
   end
 end
