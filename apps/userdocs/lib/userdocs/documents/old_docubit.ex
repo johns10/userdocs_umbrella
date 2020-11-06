@@ -1,9 +1,8 @@
-defmodule UserDocs.Documents.OldDocuBit do
+defmodule UserDocs.Documents.DocuBit do
   @hard_coded_path_hack "http://localhost:4000/images/"
 
   require Logger
 
-  alias UserDocs.Media.Screenshot
   alias UserDocs.Automation.Step
   alias UserDocs.Automation.StepType
   alias UserDocs.Web.Annotation
@@ -113,13 +112,6 @@ defmodule UserDocs.Documents.OldDocuBit do
     }
   end
   def parse(%{children: children, data: data, type: type}, socket) do
-    %UserDocs.Documents.DocuBit{
-      type: type,
-      data: data,
-      children: Enum.map(children, &parse(&1, socket))
-    }
-  end
-  def parse(%{children: children, data: data, type: type}, socket) do
     Logger.warn("Parsing an uncaught #{type} docubit")
 
     %UserDocs.Documents.DocuBit{
@@ -130,7 +122,7 @@ defmodule UserDocs.Documents.OldDocuBit do
   end
 
   defp update_step_docubit_type(%Step{
-    step_type: %StepType{ name: "Apply Annotation" }}, type
+    step_type: %StepType{ name: "Apply Annotation" }}, _type
   ) do
     "annotation"
   end
@@ -144,7 +136,7 @@ defmodule UserDocs.Documents.OldDocuBit do
     Logger.debug("Preparing a step that applies an annotation")
     prepare(data, annotation)
   end
-  def prepare(data, %Annotation{ id: id,
+  def prepare(_data, %Annotation{ id: id,
     annotation_type: %AnnotationType{ name: annotation_type_name },
     content: nil
   }) do
@@ -219,7 +211,7 @@ defmodule UserDocs.Documents.OldDocuBit do
     |> Map.put(:type, "image")
     |> Map.put(:image_url, "https://www.iconfinder.com/data/icons/image-1/64/Image-12-512.png")
   end
-  def prepare(data, name, screenshot) do
+  def prepare(data, _name, screenshot) do
     Logger.debug("Preparing a step with a screenshot")
 
     data
@@ -227,11 +219,11 @@ defmodule UserDocs.Documents.OldDocuBit do
     |> Map.put(:image_url, @hard_coded_path_hack <> screenshot.file.filename)
 
   end
-  def prepare(data, nil) do
+  def prepare(_data, nil) do
     Logger.warn("Preparing a nil docubit")
     %{type: "nil", id: "", body: "Failed to fetch body"}
   end
-  def prepare(data, payload) do
+  def prepare(_data, _payload) do
     Logger.warn("Preparing an unhandled docubit")
     %{type: "nil", id: "", body: "Failed to handle docubit"}
   end

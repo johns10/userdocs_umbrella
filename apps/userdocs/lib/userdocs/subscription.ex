@@ -12,7 +12,7 @@ defmodule UserDocs.Subscription do
           Endpoint.broadcast(type, operation, result)
         rescue
           UndefinedFunctionError ->
-            Logger.error("UndefinedFunctionError, Endpoint Unavailable.")
+            Logger.debug("UndefinedFunctionError, Endpoint Unavailable.")
             { status, result }
           e -> raise(e)
         end

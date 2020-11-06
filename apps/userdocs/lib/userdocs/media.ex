@@ -43,9 +43,10 @@ defmodule UserDocs.Media do
 
   """
   def get_file!(id), do: Repo.get!(File, id)
+  def get_file!(id, _params, _filters, state) do
+    UserDocs.State.get!(state, id, :files, File)
+  end
 
-  @spec create_file(:invalid | %{optional(:__struct__) => none, optional(atom | binary) => any}) ::
-          any
   @doc """
   Creates a file.
 

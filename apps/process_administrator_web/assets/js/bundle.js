@@ -4415,10 +4415,6 @@ function setSize(job, configuration, proceed) {
 function navigate(job, configuration, proceed) {
   var activeTabId = job.activeTabId;
   var step = current_step(job);
-  console.log("Tryna navigate");
-  console.log(step.page_reference);
-  console.log(step.url);
-  console.log(step.page.url);
   var payload = step.page_reference == "url" ? {
     url: step.url
   } : {

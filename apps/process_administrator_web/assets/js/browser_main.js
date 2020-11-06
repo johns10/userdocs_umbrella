@@ -23,10 +23,10 @@ function main() {
   });
   
   document.onmouseover = function(event) {
-    const el =  event.target;
+    // const el =  event.target;
   
-    console.log(el)
-    console.log(getCssSelector(el, getCssSelectorOptions))
+    // console.log(el)
+    // console.log(getCssSelector(el, getCssSelectorOptions))
     // CSSS = getCssSelector(el, getCssSelectorOptions);
     // XPATH = getPathTo(event.target);
   }

@@ -197,10 +197,12 @@ defmodule UserDocs.Documents do
 
   """
   def create_document(attrs \\ %{})
+  """
   def create_document(attrs = %{ "body" => ""}) do
     IO.puts("Creating a document with an empty body")
     create_document(Map.put(attrs, "body", UserDocs.Documents.Document.default_body))
   end
+  """
   def create_document(attrs) do
     %Document{}
     |> Document.changeset(attrs)

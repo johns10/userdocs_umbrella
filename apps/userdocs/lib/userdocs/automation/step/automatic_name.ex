@@ -156,7 +156,7 @@ defmodule UserDocs.Automation.Step.Name do
   end
 
   def generate(name, _step) do
-    Logger.warn("Unhandled automatic name generation: #{name}")
+    Logger.debug("Unhandled automatic name generation: #{name}") #TODO: Change back to error
     name
   end
   def generate(_, _) do
