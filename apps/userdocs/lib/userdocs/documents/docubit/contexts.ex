@@ -1,5 +1,7 @@
 defmodule UserDocs.Documents.Docubit.Context do
 
+  require Logger
+
   alias UserDocs.Documents.NewDocubit, as: Docubit
   alias UserDocs.Documents.Docubit.Type
 
@@ -16,14 +18,14 @@ defmodule UserDocs.Documents.Docubit.Context do
   # contexts, fetched from the appropriate place.  Controls the
   # Hierarchy of contexts
   defp add_contexts(docubit = %Docubit{}, parent_contexts, :type) do
-    IO.puts("Adding Contexts to docubit with parent_contexts: #{inspect(parent_contexts)}")
+    Logger.debug("Adding Contexts to docubit with parent_contexts: #{inspect(parent_contexts)}")
     docubit
     |> add_contexts(parent_contexts)
     |> add_contexts(docubit.type.contexts)
   end
   # Converts the kw list of
   defp add_contexts(docubit = %Docubit{}, contexts) when is_map(contexts) do
-    IO.puts("Adding contexts #{inspect(contexts)} to Docubit")
+    Logger.debug("Adding contexts #{inspect(contexts)} to Docubit")
 
     changeset = Docubit.changeset(docubit, contexts)
 

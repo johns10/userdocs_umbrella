@@ -8,9 +8,8 @@ defmodule UserDocs.Documents.Docubit.Type do
     field :name, :string
     field :contexts, {:map, {:array, EctoKW}}
     field :allowed_children, {:array, :string}
+    field :allowed_data, {:array, :string}
   end
-
-
 
   def types() do
     Enum.map(types_attrs(), fn(attrs) -> Kernel.struct(Type, attrs) end)
@@ -65,7 +64,7 @@ defmodule UserDocs.Documents.Docubit.Type do
       name: "Paragraph",
       id: "p",
       contexts: %{},
-      allowed_children: [ ]
+      allowed_data: [ "step", "content", "annotation" ]
     }
   end
 
@@ -75,7 +74,8 @@ defmodule UserDocs.Documents.Docubit.Type do
     name: "Column",
     id: "column",
     contexts: %{},
-    allowed_children: [ "ol", "ul", "p" ]
+    allowed_children: [ "ol", "ul", "p" ],
+    allowed_data: []
   }
   end
 
@@ -85,7 +85,8 @@ defmodule UserDocs.Documents.Docubit.Type do
       name: "Row",
       id: "row",
       contexts: %{},
-      allowed_children: [ "column" ]
+      allowed_children: [ "column" ],
+      allowed_data: []
     }
   end
 
@@ -95,7 +96,8 @@ defmodule UserDocs.Documents.Docubit.Type do
       name: "Container",
       id: "container",
       contexts: %{},
-      allowed_children: [ "row" ]
+      allowed_children: [ "row" ],
+      allowed_data: []
     }
   end
 

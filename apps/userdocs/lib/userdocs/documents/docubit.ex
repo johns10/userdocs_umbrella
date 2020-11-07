@@ -147,5 +147,4 @@ defmodule UserDocs.Documents.NewDocubit do
   def insert(docubit = %Docubit{}, address, new_docubit = %Docubit{}), do: Access.insert(docubit, address, new_docubit)
   def update(docubit = %Docubit{}, address, new_docubit = %Docubit{}), do: Access.update(docubit, address, new_docubit)
 
-  def hydrate
 end
