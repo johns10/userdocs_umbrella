@@ -19,17 +19,9 @@ defmodule UserDocs.Documents.Docubit.Type do
   def types_attrs() do
     [
       container_attrs(),
-      %{
-        name: "Row",
-        id: "row",
-
-        contexts: %{}
-      },
-      %{
-        name: "Column",
-        id: "column",
-        contexts: %{}
-      },
+      row_attrs(),
+      column_attrs(),
+      p_attrs(),
       %{
         name: "Ordered List",
         id: "ol",
@@ -61,10 +53,40 @@ defmodule UserDocs.Documents.Docubit.Type do
       },
       %{
         name: "Image Content",
-        id: "image_content",
+        id: "img",
         contexts: %{}
       }
     ]
+  end
+
+  def p(), do: Kernel.struct(Type, p_attrs())
+  def p_attrs() do
+    %{
+      name: "Paragraph",
+      id: "p",
+      contexts: %{},
+      allowed_children: [ ]
+    }
+  end
+
+  def column(), do: Kernel.struct(Type, column_attrs())
+  def column_attrs() do
+  %{
+    name: "Column",
+    id: "column",
+    contexts: %{},
+    allowed_children: [ "ol", "ul", "p" ]
+  }
+  end
+
+  def row(), do: Kernel.struct(Type, row_attrs())
+  def row_attrs() do
+    %{
+      name: "Row",
+      id: "row",
+      contexts: %{},
+      allowed_children: [ "column" ]
+    }
   end
 
   def container(), do: Kernel.struct(Type, container_attrs())
