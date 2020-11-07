@@ -12,24 +12,34 @@ defmodule UserDocs.DocumentBodyTest do
     alias UserDocs.MediaFixtures
 
     alias UserDocs.Documents
-    alias UserDocs.Documents.Body
     alias UserDocs.Documents.Docubit.Type
 
     def docubit_fixture() do
       { :ok, document } =
         Documents.create_document(%{ name: "test", title: "Test" })
 
-      columns = [
-        DocubitFixtures.column(),
-        DocubitFixtures.column(),
-        DocubitFixtures.column()
-      ]
+      ol_type =
+        Type.types()
+        |> Enum.filter(fn(t) -> t.id == "ol" end)
+        |> Enum.at(0)
 
-      rows = [
-        DocubitFixtures.row(),
-        Map.put(DocubitFixtures.row(), :docubits, columns),
+      ol = DocubitFixtures.ol()
+
+      p = DocubitFixtures.p()
+
+      row =
         DocubitFixtures.row()
-      ]
+        |> Map.put(:type, Type.row())
+
+      column =
+        DocubitFixtures.column()
+        |> Map.put(:type, Type.column())
+
+      columns = [ Map.put(column, :docubits, [ p ]), column, column]
+
+      rows = [ row, Map.put(row, :docubits, columns), row ]
+
+      empty_body = Map.put(document.body, :type, Type.container())
 
       body =
         document.body
@@ -39,14 +49,8 @@ defmodule UserDocs.DocumentBodyTest do
 
       team = UsersFixtures.team()
       container = DocubitFixtures.container()
-      row = DocubitFixtures.row()
-      column = DocubitFixtures.column()
-      ol = DocubitFixtures.ol()
-
-      ol_type =
-        Type.types()
-        |> Enum.filter(fn(t) -> t.id == "ol" end)
-        |> Enum.at(0)
+      row = row
+      column = column
 
       page = WebFixtures.page()
       badge_annotation_type = WebFixtures.annotation_type(:badge)
@@ -117,6 +121,7 @@ defmodule UserDocs.DocumentBodyTest do
         ol_type: ol_type,
         row: row,
         column: column,
+        empty_body: empty_body,
         state: %{
           data: %{
             files: [ file_one, file_two, file_three, file_four ],
@@ -130,9 +135,7 @@ defmodule UserDocs.DocumentBodyTest do
         }
       }
     end
-
-    """
-    """
+"""
     test "document body's children is an empty container" do
       attrs = %{ name: "test", title: "Test" }
       container =
@@ -141,13 +144,6 @@ defmodule UserDocs.DocumentBodyTest do
 
       { :ok, document } = Documents.create_document(attrs)
       assert document.body == container
-    end
-
-    test "put ([0]) raises an error" do
-      f = docubit_fixture()
-      document = f.document
-      assert_raise(RuntimeError, "Can't replace the document body directly",
-        fn -> Docubit.insert(document.body, [0], f.row) end)
     end
 
     test "get ([0]) retreives the body docubit" do
@@ -162,18 +158,61 @@ defmodule UserDocs.DocumentBodyTest do
       assert Docubit.get(document.body, [0, 0]) == f.row
     end
 
-    test "get ([0, 1, 0]) retreives a column docubit" do
+    test "get ([0, 1, 1]) retreives a column docubit" do
       f = docubit_fixture()
       document = f.document
-      assert Docubit.get(document.body, [0, 1, 0]) == f.column
+      assert Docubit.get(document.body, [0, 1, 1]) == f.column
     end
 
-    test "insert([0, 1, 1]) puts an ol docubit in the body" do
+    test "put ([0]) raises an error" do
       f = docubit_fixture()
       document = f.document
-      body = Docubit.insert(document.body, [ 0, 1, 1 ], f.ol)
-      IO.puts(Docubit.print(body))
-      assert Docubit.get(body, [ 0, 1, 1 ]) == f.ol
+      assert_raise(RuntimeError, "Can't replace the document body directly",
+        fn -> Docubit.insert(document.body, [0], f.row) end)
     end
+
+    test "insert([0,0]) tries to put a column in a body and raises an error" do
+      f = docubit_fixture()
+      body = f.empty_body
+      address = [ 0, 0 ]
+      { :error, _changeset, error } = Docubit.insert(body, address, f.column)
+      assert error == [docubits: {"This type may not be inserted into this docubit.", []}]
+    end
+
+    test "insert([0,0]) puts a row in an empty body" do
+      f = docubit_fixture()
+      body = f.empty_body
+      address = [ 0, 0 ]
+      { status, docubit, _errors } = Docubit.insert(body, address, f.row)
+      assert status == :ok
+      assert Docubit.get(docubit, address) == f.row
+    end
+
+    test "insert([0, 1, 1, 1]) puts an ol docubit in a column" do
+      f = docubit_fixture()
+      document = f.document
+      address = [ 0, 1, 1, 0 ]
+      { status, docubit, _errors } = Docubit.insert(document.body, address, f.ol)
+      assert status == :ok
+      assert Docubit.get(docubit, address) == f.ol
+    end
+
+    test "update([0, 1, 1]) fails to update an ol docubit in the body because it's not an allowed type" do
+      f = docubit_fixture()
+      document = f.document
+      address = [ 0, 1, 1 ]
+      { :error, _updated_body, errors } = Docubit.update(document.body, address, f.ol)
+      assert errors == [docubits: {"This type may not be inserted into this docubit.", []}]
+    end
+"""
+    test "update([ 0, 1, 0, 0 ]) updates an ol docubit in the body" do
+      f = docubit_fixture()
+      document = f.document
+      address = [ 0, 1, 0, 0 ]
+      { status, updated_body, _errors } = Docubit.update(document.body, address, f.ol)
+      assert status == :ok
+      assert Docubit.get(updated_body, address) == f.ol
+    end
+
   end
 end

@@ -21,7 +21,7 @@ defmodule UserDocs.Documents.Document do
     document
     |> cast(attrs, [:name, :title, :version_id])
     |> body_is_container_docubit_if_empty()
-    |> cast_embed(:body, with: &Docubit.test/2)
+    |> cast_embed(:body)
     |> foreign_key_constraint(:version_id)
     |> validate_required([:name, :title])
   end

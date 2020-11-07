@@ -340,23 +340,12 @@ defmodule UserDocs.Automation do
 
   def update_step_with_nested_data(%Step{} = step, attrs, state) do
     with changeset <- Step.change_nested_foreign_keys(step, attrs), # get the changeset with updated foreign keys
-      { :ok, step } <-
-        Repo.update(changeset), # Apply to database and get new step
-
-      step <-
-        update_step_preloads(step, changeset.changes, state), # Preload data according to changes
-
-      changeset <-
-        Step.change_remaining(step, changeset.params), # Apply the changeset to the remaining fields
-
-      { status, step } <-
-        Repo.update(changeset), # Apply the changes to the database
-
-      step <-
-        update_children(step, changeset),
-
-      { :ok, step } <-
-        Subscription.broadcast({status, step}, "step", "update")
+      { :ok, step } <- Repo.update(changeset), # Apply to database and get new step
+      step <- update_step_preloads(step, changeset.changes, state), # Preload data according to changes
+      changeset <- Step.change_remaining(step, changeset.params), # Apply the changeset to the remaining fields
+      { status, step } <- Repo.update(changeset), # Apply the changes to the database
+      step <- update_children(step, changeset),
+      { :ok, step } <- Subscription.broadcast({status, step}, "step", "update")
     do
       { :ok, step }
     else

@@ -10,6 +10,13 @@ defmodule UserDocs.DocubitFixtures do
   def row(), do: Kernel.struct(Docubit, docubit_attrs(:row))
   def ol(), do: Kernel.struct(Docubit, docubit_attrs(:ol))
   def container(), do: Kernel.struct(Docubit, docubit_attrs(:container))
+  def p(), do: Kernel.struct(Docubit, docubit_attrs(:p))
+
+  def docubit_attrs(:p) do
+    %{
+      type_id: "p",
+    }
+  end
 
   def docubit_attrs(:ol) do
     %{
