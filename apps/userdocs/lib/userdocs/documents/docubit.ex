@@ -9,6 +9,7 @@ defmodule UserDocs.Documents.NewDocubit do
   alias UserDocs.Documents.Docubit.Context
   alias UserDocs.Documents.Docubit.Preload
   alias UserDocs.Documents.Docubit.Renderer
+  alias UserDocs.Documents.Docubit.Access
 
   alias UserDocs.Documents.Content
   alias UserDocs.Media.File
@@ -45,7 +46,7 @@ defmodule UserDocs.Documents.NewDocubit do
       docubit.docubits
       |> Enum.reduce("", fn(d, acc) -> acc <> print(d, padding <> "--") end)
 
-    "#{padding}#{type}\n#{children}"
+    "#{padding}#{type}: #{inspect(docubit.address)}\n#{children}"
   end
 
   def print_changeset(changeset) do
@@ -61,23 +62,17 @@ defmodule UserDocs.Documents.NewDocubit do
   end
 
   def change_docubits(docubit, attrs) do
-    IO.puts("changing Docubit")
     docubit
     |> change(attrs)
     |> validate_change(:docubits,
       fn(:docubits, docubits) ->
         validate_allowed_docubits(docubit, docubits)
       end)
-    |> validate_change(:address,
-      fn(:address, address) ->
-        IO.puts("validating address")
-        IO.inspect(address)
-      end
-    )
+    |> address_docubits(docubit.address)
   end
 
   def validate_allowed_docubits(docubit, docubits) do
-    # Logger.debug("Validating docubits are allowed for #{inspect(docubit.type.allowed_children)}")
+    Logger.debug("Validating docubits are allowed for #{inspect(docubit.type.allowed_children)}")
     Enum.reduce(docubits, [],
       fn(d, errors) ->
         case d.data.type_id in docubit.type.allowed_children do
@@ -86,6 +81,34 @@ defmodule UserDocs.Documents.NewDocubit do
         end
       end
     )
+  end
+
+  def address_docubits(changeset, parent_address) do
+    case get_change(changeset, :docubits) do
+      nil -> changeset
+      "" -> changeset
+      docubits ->
+        docubits = update_docubits_addresses(docubits, parent_address)
+        Ecto.Changeset.put_change(changeset, :docubits, docubits)
+    end
+  end
+
+  def update_docubits_addresses(docubits, parent_address) do
+    { updated_docubits, _ } =
+      Enum.map_reduce(docubits, 0,
+      fn(docubit, new_address) ->
+        case docubit.action do
+          :replace -> { docubit, new_address }
+          :insert ->
+            address = List.insert_at(parent_address, -1, new_address)
+            {
+              Ecto.Changeset.put_change(docubit, :address, address),
+              new_address + 1
+            }
+        end
+      end)
+
+    updated_docubits
   end
 
   def cast_settings(%{changes: %{ settings: settings }} = changeset) do
@@ -107,9 +130,9 @@ defmodule UserDocs.Documents.NewDocubit do
     case get_change(changeset, :type_id) do
       nil -> changeset
       "" -> changeset
-        type_id ->
-          type = Enum.filter(Type.types_attrs(), fn(t) -> t.id == type_id end)
-          put_change(changeset, :type, type)
+      type_id ->
+        type = Enum.filter(Type.types_attrs(), fn(t) -> t.id == type_id end)
+        put_change(changeset, :type, type)
     end
   end
 
@@ -119,105 +142,10 @@ defmodule UserDocs.Documents.NewDocubit do
   def apply_contexts(docubit, parent_contexts), do: Context.apply(docubit, parent_contexts)
   def preload(docubit, state), do: Preload.apply(docubit, state)
   def renderer(docubit = %Docubit{}), do: Renderer.apply(docubit)
+  def get(docubit = %Docubit{}, address), do: Access.get(docubit, address)
+  def delete(docubit = %Docubit{}, address, old_docubit = %Docubit{}), do: Access.delete(docubit, address, old_docubit)
+  def insert(docubit = %Docubit{}, address, new_docubit = %Docubit{}), do: Access.insert(docubit, address, new_docubit)
+  def update(docubit = %Docubit{}, address, new_docubit = %Docubit{}), do: Access.update(docubit, address, new_docubit)
 
-  def update(_, [0], _docubit) do
-    raise(RuntimeError, "Can't update the document body")
-  end
-  def update(
-    %Docubit{ address: [0], type: %Type{ id: "container" }} = body,
-    [ 0 | address ], docubit
-  ) do
-    Logger.debug("Updating docubit #{docubit.type_id} at address #{inspect(address)}")
-    fetch_and_replace(body, address, docubit, &final_update/3)
-  end
-
-  def insert(_, [0], _docubit) do
-    raise(RuntimeError, "Can't replace the document body directly")
-  end
-  def insert(
-    %Docubit{ address: [0], type: %Type{ id: "container" }} = body,
-    [ 0 | address ], docubit
-  ) do
-    Logger.debug("Putting docubit #{docubit.type_id} at address #{inspect(address)}")
-    fetch_and_replace(body, address, docubit, &temp_insert/3)
-  end
-
-  def get(%Docubit{ address: [0], type: %Type{ id: "container" }} = body, [0]), do: body
-  def get(%Docubit{ address: [0], type: %Type{ id: "container" }} = body, [0 | address]) do
-    fetch(body, address)
-  end
-
-  def temp_insert([ %Docubit{} | _ ] = docubits, index, new_docubit) do
-    final_insert(docubits, index, new_docubit)
-  end
-  def temp_insert([] = docubits, index, new_docubit) do
-    final_insert(docubits, index, new_docubit)
-  end
-  def final_insert(docubits, index, new_docubit) do
-    docubits
-    |> List.insert_at(index, new_docubit)
-  end
-
-  def temp_update([ %Docubit{} | _ ] = docubits, index, new_docubit) do
-    final_insert(docubits, index, new_docubit)
-  end
-  def temp_update([] = docubits, index, new_docubit) do
-    final_insert(docubits, index, new_docubit)
-  end
-  def final_update(docubits, index, new_docubit) do
-    docubits
-    |> List.update_at(index, fn(_) -> new_docubit end)
-  end
-
-  def fetch_and_replace(docubit, [ index | [] ], new_docubit, final_op) do
-    Logger.debug("Fetching Single Element from #{docubit.type_id} at index #{index}")
-
-    with docubits <- Map.get(docubit, :docubits),
-      docubits <- final_op.(docubits, index, new_docubit),
-      changeset <- Docubit.change_docubits(docubit, %{ docubits: docubits }),
-      { status, updated_docubit } <- Ecto.Changeset.apply_action(changeset, :update)
-    do
-      case status do
-        :error -> { status, docubit, updated_docubit.errors }
-        :ok -> { status, updated_docubit, [] }
-      end
-    else
-      _ -> raise(RuntimeError, "Docubit.fetch_and_replace (single) failed")
-    end
-
-  end
-  def fetch_and_replace(docubit, [ index | address ], new_docubit, final_op) do
-    Logger.debug("Fetching Multi Element List from #{docubit.type_id} at address #{inspect(address)}")
-
-    with docubits <- Map.get(docubit, :docubits),
-      docubit_to_update <- fetch(docubit, index),
-      { status, updated_docubit, errors }
-        <- fetch_and_replace(docubit_to_update, address, new_docubit, final_op),
-
-      updated_docubits
-        <- List.update_at(docubits, index, fn(_) -> updated_docubit end)
-    do
-      case status do
-        :ok -> { :ok, Map.put(docubit, :docubits, updated_docubits), errors }
-        :error -> { :error, docubit, errors }
-      end
-    else
-      _ -> raise(RuntimeError, "Docubit.fetch_and_replace (multiple) failed")
-    end
-  end
-
-  def fetch(docubit, [ index | [] ]), do: fetch(docubit, index)
-  def fetch(docubit, [ index | address ]) do
-    Logger.debug("Multi Element List: #{docubit.type_id}")
-    docubit
-    |> fetch(index)
-    |> fetch(address)
-  end
-  def fetch(docubit, index) when is_integer(index) do
-    Logger.debug("Single Element List: #{docubit.type_id}")
-    docubit
-    |> Map.get(:docubits)
-    |> Enum.at(index)
-  end
-
+  def hydrate
 end
