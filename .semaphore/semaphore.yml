@@ -1,16 +1,15 @@
 version: v1.0
-name: "Test MyApp"
+name: Test MyApp
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
-
 blocks:
   - name: Test
     task:
       env_vars:
         - name: DATABASE_URL
-          value: "ecto://postgres:@0.0.0.0:5432/myapp_test"
+          value: 'ecto://postgres:@0.0.0.0:5432/myapp_test'
         - name: MIX_ENV
           value: test
       jobs:
@@ -25,4 +24,5 @@ blocks:
             - mix compile
             - mix ecto.create
             - mix ecto.migrate
+            - mix local.rebar --force
             - mix test
