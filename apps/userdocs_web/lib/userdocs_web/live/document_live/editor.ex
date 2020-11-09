@@ -249,8 +249,8 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   end
   defp body(socket) do
     socket.assigns.document.body
-    |> UserDocs.Documents.DocuBit.parse(socket)
-    |> UserDocs.Documents.DocuBit.render_editor(%{renderer: "Editor", prefix: ""})
+    |> UserDocs.Documents.OldDocuBit.parse(socket)
+    |> UserDocs.Documents.OldDocuBit.render_editor(%{renderer: "Editor", prefix: ""})
   end
 
   defp page_title(:show), do: "Show Document"

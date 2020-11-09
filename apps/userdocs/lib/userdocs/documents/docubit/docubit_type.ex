@@ -58,13 +58,30 @@ defmodule UserDocs.Documents.Docubit.Type do
     ]
   end
 
+  def img(), do: Kernel.struct(Type, img_attrs())
+  def img_attrs() do
+    %{
+      name: "Image",
+      id: "img",
+      contexts: %{},
+      allowed_data: [
+        UserDocs.Automation.Step,
+        UserDocs.Media.File
+      ]
+    }
+  end
+
   def p(), do: Kernel.struct(Type, p_attrs())
   def p_attrs() do
     %{
       name: "Paragraph",
       id: "p",
       contexts: %{},
-      allowed_data: [ "step", "content", "annotation" ]
+      allowed_data: [
+        UserDocs.Automation.Step,
+        UserDocs.Documents.Content,
+        UserDocs.Web.Annotation
+      ]
     }
   end
 
@@ -74,7 +91,7 @@ defmodule UserDocs.Documents.Docubit.Type do
     name: "Column",
     id: "column",
     contexts: %{},
-    allowed_children: [ "ol", "ul", "p" ],
+    allowed_children: [ "ol", "ul", "p", "img" ],
     allowed_data: []
   }
   end

@@ -1,4 +1,4 @@
-defmodule UserDocs.Documents.DocuBit.Renderers.Console do
+defmodule UserDocs.Documents.OldDocuBit.Renderers.Console do
 
   def row(_, content) do
     "s_r" <> content <> "e_r\n"

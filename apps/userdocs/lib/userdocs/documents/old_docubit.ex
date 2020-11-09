@@ -1,4 +1,4 @@
-defmodule UserDocs.Documents.DocuBit do
+defmodule UserDocs.Documents.OldDocuBit do
   @hard_coded_path_hack "http://localhost:4000/images/"
 
   require Logger
@@ -21,7 +21,7 @@ defmodule UserDocs.Documents.DocuBit do
   Docubits.
   """
   def parse(nil, _socket) do
-    raise(ArgumentError, "UserDocs.Documents.DocuBit.parse/2 was passed a nil docubit.")
+    raise(ArgumentError, "UserDocs.Documents.OldDocuBit.parse/2 was passed a nil docubit.")
   end
   def parse(%{"children" => children, "data" => data, "type" => type}, socket) do
     parse(%{
@@ -43,7 +43,7 @@ defmodule UserDocs.Documents.DocuBit do
       |> Map.put(:current_language_code_id, socket.assigns.current_language_code.id)
       |> prepare(annotation)
 
-    %UserDocs.Documents.DocuBit{
+    %UserDocs.Documents.OldDocuBit{
       type: type,
       data: prepared_data,
       children: Enum.map(children, &parse(&1, socket))
@@ -62,7 +62,7 @@ defmodule UserDocs.Documents.DocuBit do
       |> Map.put(:current_language_code_id, socket.assigns.current_language_code.id)
       |> prepare(step)
 
-    %UserDocs.Documents.DocuBit{
+    %UserDocs.Documents.OldDocuBit{
       type: update_step_docubit_type(step, type),
       data: prepared_data,
       children: Enum.map(children, &parse(&1, socket))
@@ -81,7 +81,7 @@ defmodule UserDocs.Documents.DocuBit do
       |> Map.put(:current_language_code_id, socket.assigns.current_language_code.id)
       |> prepare(content)
 
-    %UserDocs.Documents.DocuBit{
+    %UserDocs.Documents.OldDocuBit{
       type: type,
       data: prepared_data,
       children: Enum.map(children, &parse(&1, socket))
@@ -89,7 +89,7 @@ defmodule UserDocs.Documents.DocuBit do
   end
   def parse(%{children: children, data: data, type: type = "column"}, socket) do
     # Logger.debug("Parsing a #{type} docubit")
-    %UserDocs.Documents.DocuBit{
+    %UserDocs.Documents.OldDocuBit{
       type: type,
       data: data,
       children: Enum.map(children, &parse(&1, socket))
@@ -97,7 +97,7 @@ defmodule UserDocs.Documents.DocuBit do
   end
   def parse(%{children: children, data: data, type: type = "add_column"}, socket) do
     # Logger.debug("Parsing a #{type} docubit")
-    %UserDocs.Documents.DocuBit{
+    %UserDocs.Documents.OldDocuBit{
       type: type,
       data: data,
       children: Enum.map(children, &parse(&1, socket))
@@ -105,7 +105,7 @@ defmodule UserDocs.Documents.DocuBit do
   end
   def parse(%{children: children, data: data, type: type = "row"}, socket) do
     # Logger.debug("Parsing a #{type} docubit")
-    %UserDocs.Documents.DocuBit{
+    %UserDocs.Documents.OldDocuBit{
       type: type,
       data: data,
       children: Enum.map(children, &parse(&1, socket))
@@ -114,7 +114,7 @@ defmodule UserDocs.Documents.DocuBit do
   def parse(%{children: children, data: data, type: type}, socket) do
     Logger.warn("Parsing an uncaught #{type} docubit")
 
-    %UserDocs.Documents.DocuBit{
+    %UserDocs.Documents.OldDocuBit{
       type: type,
       data: data,
       children: Enum.map(children, &parse(&1, socket))
@@ -235,10 +235,10 @@ defmodule UserDocs.Documents.DocuBit do
   The render function takes a nested map of Docubits and renders it, and
   it's children recursively.
   """
-  def render_editor(docubit = %UserDocs.Documents.DocuBit{children: []}, opts) do
+  def render_editor(docubit = %UserDocs.Documents.OldDocuBit{children: []}, opts) do
     execute_render(docubit, opts, "")
   end
-  def render_editor(docubit = %UserDocs.Documents.DocuBit{children: children}, opts) when is_list(children) do
+  def render_editor(docubit = %UserDocs.Documents.OldDocuBit{children: children}, opts) when is_list(children) do
     { content, _ } =
       Enum.reduce(docubit.children, { "", 0 },
         fn(c, { acc, id } ) ->
@@ -252,17 +252,17 @@ defmodule UserDocs.Documents.DocuBit do
     execute_render(docubit, opts, content)
   end
 
-  def render(docubit = %UserDocs.Documents.DocuBit{children: []}, opts) do
+  def render(docubit = %UserDocs.Documents.OldDocuBit{children: []}, opts) do
     execute_render(docubit, opts, "")
   end
-  def render(docubit = %UserDocs.Documents.DocuBit{children: children}, opts) when is_list(children) do
+  def render(docubit = %UserDocs.Documents.OldDocuBit{children: children}, opts) when is_list(children) do
     content = Enum.reduce(docubit.children, "",
       fn(c, acc) -> acc <> render(c, opts)  end)
     execute_render(docubit, opts, content)
   end
 
   def execute_render(docubit, opts, content) do
-    "Elixir.UserDocs.Documents.DocuBit.Renderers." <> opts.renderer
+    "Elixir.UserDocs.Documents.OldDocuBit.Renderers." <> opts.renderer
     |> String.to_existing_atom()
     |> apply(String.to_atom(docubit.type), [docubit, content])
   end

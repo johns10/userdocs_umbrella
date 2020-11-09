@@ -2,7 +2,7 @@ defmodule UserDocs.Documents.Docubit.Access do
 
   require Logger
 
-  alias UserDocs.Documents.NewDocubit, as: Docubit
+  alias UserDocs.Documents.Docubit, as: Docubit
   alias UserDocs.Documents.Docubit.Type
 
   def get({ :error, docubit, errors}, _), do: { :error, docubit, errors}

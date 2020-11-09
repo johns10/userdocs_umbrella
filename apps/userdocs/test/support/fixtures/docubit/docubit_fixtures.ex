@@ -4,17 +4,24 @@ defmodule UserDocs.DocubitFixtures do
   entities via the `UserDocs.Auth` context.
   """
 
-  alias UserDocs.Documents.NewDocubit, as: Docubit
+  alias UserDocs.Documents.Docubit, as: Docubit
 
   def column(), do: Kernel.struct(Docubit, docubit_attrs(:column))
   def row(), do: Kernel.struct(Docubit, docubit_attrs(:row))
   def ol(), do: Kernel.struct(Docubit, docubit_attrs(:ol))
   def container(), do: Kernel.struct(Docubit, docubit_attrs(:container))
   def p(), do: Kernel.struct(Docubit, docubit_attrs(:p))
+  def img(), do: Kernel.struct(Docubit, docubit_attrs(:img))
 
   def docubit_attrs(:p) do
     %{
       type_id: "p",
+    }
+  end
+
+  def docubit_attrs(:img) do
+    %{
+      type_id: "img",
     }
   end
 

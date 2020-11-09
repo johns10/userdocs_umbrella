@@ -2,7 +2,7 @@ defmodule UserDocs.Documents.Docubit.Context do
 
   require Logger
 
-  alias UserDocs.Documents.NewDocubit, as: Docubit
+  alias UserDocs.Documents.Docubit, as: Docubit
   alias UserDocs.Documents.Docubit.Type
 
   # Applies all Contexts to a docubit.  Takes a docubit, returns a

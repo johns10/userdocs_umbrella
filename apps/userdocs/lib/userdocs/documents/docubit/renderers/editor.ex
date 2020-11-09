@@ -1,12 +1,12 @@
-defmodule UserDocs.Documents.DocuBit.Renderers.Editor do
+defmodule UserDocs.Documents.OldDocuBit.Renderers.Editor do
 
   require Logger
 
   use Phoenix.HTML
 
-  alias UserDocs.Documents.DocuBit
+  alias UserDocs.Documents.OldDocuBit
 
-  def annotation(docubit = %DocuBit{ data: %{ id: id,
+  def annotation(docubit = %OldDocuBit{ data: %{ id: id,
     error_code: error_code, error_message: error_message}}, _content
   ) do
     [
@@ -15,12 +15,12 @@ defmodule UserDocs.Documents.DocuBit.Renderers.Editor do
       delete(docubit.body_element_id)
     ]
   end
-  def annotation(%DocuBit{ data: %{type: "nil"}}, _content) do
+  def annotation(%OldDocuBit{ data: %{type: "nil"}}, _content) do
     content_tag(:div, [  ]) do
       [ "Rendering failed" ]
     end
   end
-  def annotation(docubit = %DocuBit{ data: %{ type: "Badge" }}, _content) do
+  def annotation(docubit = %OldDocuBit{ data: %{ type: "Badge" }}, _content) do
     Logger.debug("Rendering #{docubit.data.type} Annotation #{docubit.data.id}")
 
     content_tag(:div, [  ]) do
@@ -31,7 +31,7 @@ defmodule UserDocs.Documents.DocuBit.Renderers.Editor do
       ]
     end
   end
-  def annotation(docubit = %DocuBit{ data: %{ type: "Outline" }}, _content) do
+  def annotation(docubit = %OldDocuBit{ data: %{ type: "Outline" }}, _content) do
     Logger.debug("Rendering #{docubit.data.type} Annotation #{docubit.data.id}")
 
     content_tag(:div, [  ]) do
@@ -39,7 +39,7 @@ defmodule UserDocs.Documents.DocuBit.Renderers.Editor do
     end
   end
 
-  def step(docubit = %DocuBit{ data: %{ id: id, type: "image" }}, _content) do
+  def step(docubit = %OldDocuBit{ data: %{ id: id, type: "image" }}, _content) do
     Logger.debug("Rendering Image Step")
     [
       content_tag(:p, [ "image #{id}\n" ]),
