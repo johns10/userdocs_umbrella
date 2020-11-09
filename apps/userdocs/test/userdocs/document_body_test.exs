@@ -2,7 +2,7 @@ defmodule UserDocs.DocumentBodyTest do
   use UserDocs.DataCase
 
   describe "document_body" do
-    alias UserDocs.Documents.NewDocubit, as: Docubit
+    alias UserDocs.Documents.Docubit, as: Docubit
 
     alias UserDocs.DocubitFixtures
     alias UserDocs.WebFixtures

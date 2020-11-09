@@ -1,15 +1,17 @@
-defmodule UserDocs.Documents.NewDocubit do
+defmodule UserDocs.Documents.Docubit do
   use Ecto.Schema
   import Ecto.Changeset
 
   require Logger
+  require Kernel
 
-  alias UserDocs.Documents.NewDocubit, as: Docubit
+  alias UserDocs.Documents.Docubit, as: Docubit
   alias UserDocs.Documents.Docubit.Type
   alias UserDocs.Documents.Docubit.Context
   alias UserDocs.Documents.Docubit.Preload
   alias UserDocs.Documents.Docubit.Renderer
   alias UserDocs.Documents.Docubit.Access
+  alias UserDocs.Documents.Docubit.Hydrate
 
   alias UserDocs.Documents.Content
   alias UserDocs.Media.File
@@ -25,7 +27,7 @@ defmodule UserDocs.Documents.NewDocubit do
 
     field :type_id, :string
     embeds_one :type, Type
-    embeds_many :docubits, UserDocs.Documents.NewDocubit, on_replace: :delete
+    embeds_many :docubits, UserDocs.Documents.Docubit, on_replace: :delete
 
     belongs_to :content, Content
     belongs_to :file, File
@@ -56,7 +58,10 @@ defmodule UserDocs.Documents.NewDocubit do
 
   def changeset(docubit, attrs \\ %{}) do
     docubit
-    |> cast(attrs, [ :settings, :address ])
+    |> cast(attrs, [ :settings, :address, :content_id, :through_annotation_id, :through_step_id ])
+    |> put_assoc(:content, Map.get(attrs, :content, nil))
+    |> put_assoc(:through_annotation, Map.get(attrs, :through_annotation, nil))
+    |> put_assoc(:through_step, Map.get(attrs, :through_step, nil))
     |> cast_settings()
     |> embed_type()
   end
@@ -143,8 +148,15 @@ defmodule UserDocs.Documents.NewDocubit do
   def preload(docubit, state), do: Preload.apply(docubit, state)
   def renderer(docubit = %Docubit{}), do: Renderer.apply(docubit)
   def get(docubit = %Docubit{}, address), do: Access.get(docubit, address)
-  def delete(docubit = %Docubit{}, address, old_docubit = %Docubit{}), do: Access.delete(docubit, address, old_docubit)
-  def insert(docubit = %Docubit{}, address, new_docubit = %Docubit{}), do: Access.insert(docubit, address, new_docubit)
-  def update(docubit = %Docubit{}, address, new_docubit = %Docubit{}), do: Access.update(docubit, address, new_docubit)
+  def delete(docubit = %Docubit{}, address, old_docubit = %Docubit{}) do
+    Access.delete(docubit, address, old_docubit)
+  end
+  def insert(docubit = %Docubit{}, address, new_docubit = %Docubit{}) do
+    Access.insert(docubit, address, new_docubit)
+  end
+  def update(docubit = %Docubit{}, address, new_docubit = %Docubit{}) do
+    Access.update(docubit, address, new_docubit)
+  end
+  def hydrate(body, address, data), do: Hydrate.apply(body, address, data)
 
 end

@@ -13,7 +13,20 @@ defmodule UserDocs.MediaFixtures do
     object
   end
 
+  def screenshot(file_id, step_id) do
+    { :ok, object } =
+      screenshot_attrs(:valid, file_id, step_id)
+      |> Media.create_screenshot()
+    object
+  end
 
+  def screenshot_attrs(:valid, file_id, step_id) do
+    %{
+      name: UUID.uuid4(),
+      file_id: file_id,
+      step_id: step_id
+    }
+  end
   def file_attrs(:valid) do
     %{
       content_type: ".png",

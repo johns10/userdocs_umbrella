@@ -2,7 +2,7 @@ defmodule UserDocs.DocubitsTest do
   use UserDocs.DataCase
 
   describe "docubits" do
-    alias UserDocs.Documents.NewDocubit, as: Docubit
+    alias UserDocs.Documents.Docubit, as: Docubit
 
     alias UserDocs.DocubitFixtures
     alias UserDocs.WebFixtures
@@ -167,7 +167,7 @@ defmodule UserDocs.DocubitsTest do
         |> Docubit.apply_contexts(%{})
         |> Docubit.renderer()
 
-      assert docubit.renderer == :"Elixir.UserDocs.Documents.DocuBit.Renderers.Row"
+      assert docubit.renderer == :"Elixir.UserDocs.Documents.OldDocuBit.Renderers.Row"
     end
   end
 end

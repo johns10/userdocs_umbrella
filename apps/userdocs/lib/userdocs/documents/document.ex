@@ -4,10 +4,10 @@ defmodule UserDocs.Documents.Document do
 
   alias UserDocs.Projects.Version
   alias UserDocs.Documents.Docubit.Type
-  alias UserDocs.Documents.NewDocubit, as: Docubit
+  alias UserDocs.Documents.Docubit, as: Docubit
 
   schema "documents" do
-    embeds_one :body, Docubit
+    embeds_one :body, Docubit, on_replace: :delete
     field :name, :string
     field :title, :string
 
@@ -35,6 +35,10 @@ defmodule UserDocs.Documents.Document do
       "" -> put_embed(changeset, :body, attrs)
         _ -> changeset
     end
+  end
+
+  def load(document) do
+
   end
 
   def default_body() do

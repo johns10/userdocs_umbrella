@@ -2,7 +2,7 @@ defmodule UserDocs.Documents.Body do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias UserDocs.Documents.NewDocubit, as: Docubit
+  alias UserDocs.Documents.Docubit, as: Docubit
 
   schema "docubits" do
     embeds_one :container, Docubit
