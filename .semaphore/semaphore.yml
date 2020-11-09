@@ -19,10 +19,10 @@ blocks:
             - sem-service start postgres 11
             - sem-version elixir 1.9.1
             - cache restore
+            - mix local.rebar --force
             - mix deps.get
             - cache store
             - mix compile
             - mix ecto.create
             - mix ecto.migrate
-            - mix local.rebar --force
             - mix test
