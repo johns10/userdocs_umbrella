@@ -3930,7 +3930,7 @@ var DOMAIN = "app.davenport.rocks";
 var PORT = "4001";
 var APP_URL = "http://" + DOMAIN + ":" + PORT + "/";
 var WEBSOCKETS_URI = "ws://" + DOMAIN + ":" + PORT + "/live";
-var COOKIE_KEY = "_process_administrator_web_key";
+var COOKIE_KEY = "_userdocs_web_key";
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   console.log("Extension received message");
   console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");

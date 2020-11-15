@@ -6,7 +6,7 @@ defmodule ProcessAdministratorWeb.Endpoint do
   # Set :encryption_salt if you would also like to encrypt it.
   @session_options [
     store: :cookie,
-    key: "_process_administrator_key",
+    key: "_userdocs_web_key",
     signing_salt: "z4tHDkXT",
     http_only: false,
     same_site: "None",

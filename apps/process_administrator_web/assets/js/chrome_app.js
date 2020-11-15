@@ -24,7 +24,7 @@ let PORT = "4001"
 
 let APP_URL = "http://" + DOMAIN + ":" + PORT + "/"
 let WEBSOCKETS_URI = "ws://" + DOMAIN + ":" + PORT + "/live"
-let COOKIE_KEY = "_process_administrator_web_key"
+let COOKIE_KEY = "_userdocs_web_key"
 
 chrome.runtime.onMessage.addListener(
 	function(message, sender, sendResponse) {
