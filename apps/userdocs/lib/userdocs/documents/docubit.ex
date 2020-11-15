@@ -29,6 +29,7 @@ defmodule UserDocs.Documents.Docubit do
     field :address, { :array, :integer }
 
     has_many :docubits, Docubit
+    has_one :context, Context
 
     belongs_to :docubit, Docubit
     belongs_to :document, Document
@@ -139,18 +140,6 @@ defmodule UserDocs.Documents.Docubit do
     IO.inspect(changeset.changes)
     changeset
   end
-"""
-
-  defp embed_type(changeset) do
-    case get_change(changeset, :type_id) do
-      nil -> changeset
-      "" -> changeset
-      type_id ->
-        type = Enum.filter(Type.types_attrs(), fn(t) -> t.id == type_id end)
-        put_change(changeset, :type, type)
-    end
-  end
-  """
 
   def cast_settings(%{changes: %{ settings: settings }} = changeset) do
     settings =
