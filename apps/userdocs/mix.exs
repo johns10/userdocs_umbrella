@@ -36,6 +36,7 @@ defmodule UserDocs.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:state, in_umbrella: true},
       {:phoenix_pubsub, "~> 2.0"},
       {:ecto_sql, "~> 3.5"},
       {:postgrex, ">= 0.0.0"},

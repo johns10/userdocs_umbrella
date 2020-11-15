@@ -4,7 +4,7 @@ defmodule UserDocs.Documents.Docubit.Type do
   alias UserDocs.Documents.Docubit.Type
 
   @primary_key {:id, :binary_id, autogenerate: false}
-  schema "docubit_types" do
+  embedded_schema do
     field :name, :string
     field :contexts, {:map, {:array, EctoKW}}
     field :allowed_children, {:array, :string}
@@ -21,15 +21,7 @@ defmodule UserDocs.Documents.Docubit.Type do
       row_attrs(),
       column_attrs(),
       p_attrs(),
-      %{
-        name: "Ordered List",
-        id: "ol",
-        contexts: %{
-          settings: [
-            name_prefix: False
-          ]
-        }
-      },
+      ol_attrs(),
       %{
         name: "List Item",
         id: "li",
@@ -56,6 +48,19 @@ defmodule UserDocs.Documents.Docubit.Type do
         contexts: %{}
       }
     ]
+  end
+
+  def ol(), do: Kernel.struct(Type, ol_attrs())
+  def ol_attrs() do
+    %{
+      name: "Ordered List",
+      id: "ol",
+      contexts: %{
+        settings: [
+          name_prefix: False
+        ]
+      }
+    }
   end
 
   def img(), do: Kernel.struct(Type, img_attrs())

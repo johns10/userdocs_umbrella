@@ -2,7 +2,10 @@ defmodule UserDocs.DocubitsTest do
   use UserDocs.DataCase
 
   describe "docubits" do
+    alias UserDocs.Documents
     alias UserDocs.Documents.Docubit, as: Docubit
+    alias UserDocs.Documents.Docubit.Context
+
 
     alias UserDocs.DocubitFixtures
     alias UserDocs.WebFixtures
@@ -14,9 +17,12 @@ defmodule UserDocs.DocubitsTest do
     alias UserDocs.Documents.Docubit.Type
 
     def docubit_fixture() do
+      document_attrs = %{ name: "test", title: "Test" }
+      { :ok, document } = Documents.create_document(document_attrs)
+
       team = UsersFixtures.team()
-      row = DocubitFixtures.row()
-      ol = DocubitFixtures.ol()
+      row = DocubitFixtures.row(document.id)
+      ol = DocubitFixtures.ol(document.id)
       ol_type =
         Type.types()
         |> Enum.filter(fn(t) -> t.id == "ol" end)
@@ -85,6 +91,7 @@ defmodule UserDocs.DocubitsTest do
         |> Map.put(:annotation, annotation_one)
 
       %{
+        document: document,
         ol: ol,
         ol_type: ol_type,
         row: row,
@@ -168,6 +175,50 @@ defmodule UserDocs.DocubitsTest do
         |> Docubit.renderer()
 
       assert docubit.renderer == :"Elixir.UserDocs.Documents.OldDocuBit.Renderers.Row"
+    end
+
+    test "context gets the parent context and overwrites a nil settings context" do
+      f = docubit_fixture()
+      ol = f.ol
+      ol_type = f.ol_type
+      context = %Context{ settings: [ li_value: "test_value"] }
+      { :ok, context } = Docubit.context(ol, context)
+      assert context.settings[:li_value] == "test_value"
+    end
+
+    test "update_context changes a context" do
+      context = %Context{}
+      context_changes = %{ settings: [ li_value: "test_value"] }
+      { :ok, context } = Context.update_context(context, context_changes)
+      assert context.settings[:li_value] == "test_value"
+    end
+
+    test "context applies context correctly" do
+      f = docubit_fixture()
+      ol = f.ol
+      context = %Context{ settings: [ li_value: "test_value"] }
+      { :ok, context } = Docubit.context(ol, context)
+      context.settings[:li_value] == "test_value"
+      context.settings[:name_prefix] == False
+    end
+
+    test "context respects the heirarchy of parent over type" do
+      f = docubit_fixture()
+      ol = f.ol
+      context = %Context{ settings: [ name_prefix: True] }
+      { :ok, context } = Docubit.context(ol, context)
+      assert context.settings[:name_prefix] == context.settings[:name_prefix]
+    end
+
+    test "context respects the heirarchy of object over parent" do
+      f = docubit_fixture()
+      ol = f.ol
+      attrs = %{ settings: [ name_prefix: True] }
+      contexts = %Context{ settings: [ name_prefix: False] }
+      changeset = Docubit.changeset(ol, attrs)
+      { :ok, docubit } = Ecto.Changeset.apply_action(changeset, :update)
+      { :ok, context } = Docubit.context(docubit, contexts)
+      assert context.settings[:name_prefix] == attrs.settings[:name_prefix]
     end
   end
 end
