@@ -117,9 +117,7 @@ defmodule UserDocs.DocumentLoadTest do
       { :ok, body } = Documents.update_docubit(body, attrs)
 
       document = Documents.get_document!(document.id, %{ docubits: true })
-      Document.load(document, state)
-
-
+      object = Document.load(document, state)
     end
 
   end
