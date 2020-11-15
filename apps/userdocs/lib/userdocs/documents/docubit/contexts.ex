@@ -8,8 +8,7 @@ defmodule UserDocs.Documents.Docubit.Context do
   alias UserDocs.Documents.Docubit.Type
   alias UserDocs.Documents.Docubit.Context
 
-  @primary_key false
-  schema "context" do
+  embedded_schema do
     field :settings, { :array, EctoKW }
   end
 

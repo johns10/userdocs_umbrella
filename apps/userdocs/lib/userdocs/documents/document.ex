@@ -6,6 +6,7 @@ defmodule UserDocs.Documents.Document do
   alias UserDocs.Documents.Docubit
   alias UserDocs.Documents.Document
   alias UserDocs.Documents.Document.MapDocubits
+  alias UserDocs.Documents.Docubit.Context
 
   @state_opts %{ data_type: :map, strategy: :by_key, location: :root }
 
@@ -50,24 +51,33 @@ defmodule UserDocs.Documents.Document do
   def load(%Document{ docubits: docubits } = document, state) do
     docubits = Enum.map(docubits, fn(d) -> Docubit.preload(d, state) end)
     state = State.load(state, docubits, @state_opts)
-    map = Document.map_docubits(document)
-    IO.inspect(traverse_docubit_map(map, state))
+    map =
+      document
+      |> Document.map_docubits()
+
+    web_object = traverse_docubit_map(map, state)
+    IO.puts("Result")
+    IO.inspect(map)
   end
 
   def traverse_docubit_map(map, state) do
-    Enum.each(map,
-    fn(i) ->
-      docubit_map_item(i, state)
-    end)
+    Map.put(map, 0,
+      docubit_map_item({ 0, Map.get(map, 0) }, state, %Context{})
+    )
   end
-  def docubit_map_item({ key, map }, state) do
-    IO.puts("The item is #{map.id}")
-    IO.puts("It's children are:")
+  def docubit_map_item({ _key, map }, state, parent_context) do
+    IO.puts("The item is #{inspect(map)}")
     opts = Map.put(@state_opts, :type, "docubit")
-    docubit = State.get(state, map.id, opts)
-    Docubit.context(docubit, %{})
-    Enum.each(Map.delete(map, :id) , fn(i) ->
-      docubit_map_item(i, state)
-    end)
+    docubit = State.get(state, map.docubit.id, opts)
+    { :ok, context } = Docubit.context(docubit, parent_context)
+    map = Map.put(map, :context, context)
+    Enum.reduce(map.docubit.docubits, map,
+      fn({ address, item }, map) ->
+        Kernel.put_in(map,
+          [ :docubit, :docubits, address ],
+          docubit_map_item({ address, item }, state, context)
+        )
+      end
+    )
   end
 end
