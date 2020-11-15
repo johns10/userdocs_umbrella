@@ -142,6 +142,7 @@ defmodule UserDocs.Documents do
   end
 
   alias UserDocs.Documents.Document
+  alias UserDocs.Documents.Docubit
 
   @doc """
   Returns the list of documents.
@@ -173,11 +174,16 @@ defmodule UserDocs.Documents do
   def get_document!(id, params \\ %{}, _filters \\ %{}) do
     base_document_query(id)
     |> maybe_preload_version(params[:version])
+    |> maybe_preload_docubit(params[:body])
+    |> maybe_preload_docubits(params[:docubits])
     |> Repo.one!()
   end
 
   defp maybe_preload_version(query, nil), do: query
   defp maybe_preload_version(query, _), do: from(document in query, preload: [:version])
+
+  defp maybe_preload_docubit(query, nil), do: query
+  defp maybe_preload_docubit(query, _), do: from(document in query, preload: [:body])
 
 
   defp base_document_query(id) do
@@ -197,17 +203,18 @@ defmodule UserDocs.Documents do
 
   """
   def create_document(attrs \\ %{})
-  """
-  def create_document(attrs = %{ "body" => ""}) do
-    IO.puts("Creating a document with an empty body")
-    create_document(Map.put(attrs, "body", UserDocs.Documents.Document.default_body))
-  end
-  """
   def create_document(attrs) do
     %Document{}
     |> Document.changeset(attrs)
     |> Repo.insert()
+    |> check_default_body()
   end
+
+  def check_default_body({ :ok, %Document{ body: %Docubit{ document_id: nil } = docubit } = document }) do
+    { :ok, docubit } = update_docubit(docubit, %{ document_id: document.id })
+    { :ok, Map.put(document, :body, docubit ) }
+  end
+  def check_default_body(state), do: state
 
   @doc """
   Updates a document.
@@ -490,4 +497,41 @@ defmodule UserDocs.Documents do
   def change_language_code(%LanguageCode{} = language_code, attrs \\ %{}) do
     LanguageCode.changeset(language_code, attrs)
   end
+
+  alias UserDocs.Documents.Docubit
+
+  def get_language_code!(id), do: Repo.get!(LanguageCode, id)
+
+
+  def get_docubit!(id, params \\ %{}, filters \\ %{})
+  def get_docubit!(id, params, _filters) when is_integer(id) do
+    base_docubit_query(id)
+    |> maybe_preload_docubits(params[:docubits])
+    |> Repo.one!()
+  end
+
+  defp maybe_preload_docubits(query, nil), do: query
+  defp maybe_preload_docubits(query, _), do: from(docubit in query, preload: [:docubits])
+
+  defp base_docubit_query(id) do
+    from(docubit in Docubit, where: docubit.id == ^id)
+  end
+
+  def create_docubit(attrs \\ %{}) do
+    %Docubit{}
+    |> Docubit.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def change_docubit(%Docubit{} = docubit, attrs \\ %{}) do
+    Docubit.changeset(docubit, attrs)
+  end
+
+  def update_docubit(%Docubit{} = docubit, attrs) do
+    docubit
+    |> Docubit.changeset(attrs)
+    |> Repo.update()
+  end
+
+
 end

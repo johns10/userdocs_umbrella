@@ -2,18 +2,10 @@ defmodule UserDocs.Documents.Docubit.Access do
 
   require Logger
 
-  alias UserDocs.Documents.Docubit, as: Docubit
+  alias UserDocs.Documents.Docubit
+  alias UserDocs.Documents.Document
   alias UserDocs.Documents.Docubit.Type
-
-  def get({ :error, docubit, errors}, _), do: { :error, docubit, errors}
-  def get(%Docubit{ address: [0], type: %Type{ id: "container" }} = body, [0]), do: body
-  def get(%Docubit{ address: [0], type: %Type{ id: "container" }} = body, [0 | address]) do
-    Logger.debug("Getting Docubit at address #{inspect(address)}")
-    body
-    |> fetch(address)
-    |> handle_fetch_response()
-  end
-
+"""
   def delete({ :error, docubit, errors}, _), do: { :error, docubit, errors}
   def delete(_, [0], _docubit) do
     raise(RuntimeError, "Can't delete the document body")
@@ -22,7 +14,7 @@ defmodule UserDocs.Documents.Docubit.Access do
     %Docubit{ address: [0], type: %Type{ id: "container" }} = body,
     [ 0 | address ], docubit
   ) do
-    Logger.debug("deleting docubit at address #{inspect(address)}")
+    Logger.debug("deleting docubit at address {inspect(address)}")
     body
     |> fetch_and_replace(address, docubit, &apply_delete/3)
     |> handle_fetch_response()
@@ -36,7 +28,7 @@ defmodule UserDocs.Documents.Docubit.Access do
     %Docubit{ address: [0], type: %Type{ id: "container" }} = body,
     [ 0 | address ], docubit
   ) do
-    Logger.debug("Updating docubit #{docubit.type_id} at address #{inspect(address)}")
+    Logger.debug("Updating docubit {docubit.type_id} at address {inspect(address)}")
     body
     |> fetch_and_replace(address, docubit, &apply_update/3)
     |> handle_fetch_response()
@@ -50,7 +42,7 @@ defmodule UserDocs.Documents.Docubit.Access do
     %Docubit{ address: [0], type: %Type{ id: "container" }} = body,
     [ 0 | inner_address ] = address, docubit
   ) do
-    Logger.debug("Putting docubit #{docubit.type_id} at address #{inspect(address)}")
+    Logger.debug("Putting docubit {docubit.type_id} at address {inspect(address)}")
     body
     |> fetch_and_replace(inner_address, docubit, &apply_insert/3)
     |> handle_fetch_response()
@@ -90,7 +82,7 @@ defmodule UserDocs.Documents.Docubit.Access do
   end
 
   defp fetch_and_replace(docubit, [ index | [] ], new_docubit, final_op) do
-    Logger.debug("Fetching Single Element from #{docubit.type_id} at index #{index}")
+    Logger.debug("Fetching Single Element from {docubit.type_id} at index {index}")
 
     address = List.insert_at(docubit.address, -1, index)
 
@@ -109,7 +101,7 @@ defmodule UserDocs.Documents.Docubit.Access do
 
   end
   defp fetch_and_replace(docubit, [ index | address ], new_docubit, final_op) do
-    Logger.debug("Fetching Multi Element List from #{docubit.type_id} at address #{inspect(address)}")
+    Logger.debug("Fetching Multi Element List from {docubit.type_id} at address {inspect(address)}")
 
     with docubits <- Map.get(docubit, :docubits),
       { :ok, located_docubit, [] } <- fetch(docubit, index),
@@ -131,7 +123,7 @@ defmodule UserDocs.Documents.Docubit.Access do
 
   defp fetch(docubit, [ index | [] ]), do: fetch(docubit, index)
   defp fetch(docubit, [ index | address ]) do
-    Logger.debug("Multi Element List: #{docubit.type_id}")
+    Logger.debug("Multi Element List: {docubit.type_id}")
     with { :ok, located_docubit, [] } <- fetch(docubit, index),
       { :ok, located_docubit, [] } <- fetch(located_docubit, address)
     do
@@ -141,13 +133,13 @@ defmodule UserDocs.Documents.Docubit.Access do
     end
   end
   defp fetch(docubit, index) when is_integer(index) do
-    Logger.debug("Single Element List: #{docubit.type_id}")
+    Logger.debug("Single Element List: {docubit.type_id}")
     with docubits <- Map.get(docubit, :docubits),
          located_docubit = %Docubit{} <- Enum.at(docubits, index, :error)
     do
       { :ok, located_docubit, [] }
     else
-      :error -> { :error, docubit, [docubit: "Docubit not found at address #{index} on docubit #{inspect(docubit.address)}"] }
+      :error -> { :error, docubit, [docubit: "Docubit not found at address {index} on docubit {inspect(docubit.address)}"] }
     end
   end
 
@@ -157,4 +149,15 @@ defmodule UserDocs.Documents.Docubit.Access do
       :ok -> docubit
     end
   end
+  """
+
+  def get({ :error, docubit, errors}, _), do: { :error, docubit, errors}
+  def get(%Document{} = document, []), do: document.docubit
+  def get(%Document{} = document, address) do
+    Logger.debug("Getting Docubit")
+    document
+    |> fetch(address)
+  end
+
+  defp fetch(docubit, [ index | [] ]), do: IO.inspect("Not Implemented")
 end

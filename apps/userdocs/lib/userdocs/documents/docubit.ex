@@ -5,13 +5,15 @@ defmodule UserDocs.Documents.Docubit do
   require Logger
   require Kernel
 
-  alias UserDocs.Documents.Docubit, as: Docubit
+  alias UserDocs.Documents.Docubit
   alias UserDocs.Documents.Docubit.Type
   alias UserDocs.Documents.Docubit.Context
   alias UserDocs.Documents.Docubit.Preload
   alias UserDocs.Documents.Docubit.Renderer
   alias UserDocs.Documents.Docubit.Access
   alias UserDocs.Documents.Docubit.Hydrate
+
+  alias UserDocs.Documents.Document
 
   alias UserDocs.Documents.Content
   alias UserDocs.Media.File
@@ -20,20 +22,102 @@ defmodule UserDocs.Documents.Docubit do
 
   @valid_settings [ :li_value, :name_prefix ]
 
-  @primary_key :false
   schema "docubits" do
-    field :settings, {:array, EctoKW}
-    field :address, {:array, :integer}
-
     field :type_id, :string
-    embeds_one :type, Type
-    embeds_many :docubits, UserDocs.Documents.Docubit, on_replace: :delete
+    field :order, :integer
+    field :settings, { :array, EctoKW }
+    field :address, { :array, :integer }
 
+    has_many :docubits, Docubit
+
+    belongs_to :docubit, Docubit
+    belongs_to :document, Document
     belongs_to :content, Content
     belongs_to :file, File
-
     belongs_to :through_annotation, Annotation
     belongs_to :through_step, Step
+
+    timestamps()
+  end
+
+  def internal_changeset(docubit, attrs \\ %{}) do
+    docubit
+    |> put_assoc(:content, Map.get(attrs, :content, nil))
+    |> put_assoc(:through_annotation, Map.get(attrs, :through_annotation, nil))
+    |> put_assoc(:through_step, Map.get(attrs, :through_step, nil))
+  end
+
+  def changeset(docubit, attrs \\ %{}) do
+    docubit
+    |> cast(attrs, [ :type_id, :settings, :address, :document_id, :content_id, :through_annotation_id, :through_step_id, :docubit_id ])
+    |> cast_assoc(:docubits)
+    |> (&(validate_change(&1, :docubits,
+      fn(:docubits, docubits) ->
+        validate_allowed_docubits(&1, docubits)
+      end))).()
+    |> cast_settings()
+    |> order_docubits()
+    |> address_docubits()
+    |> validate_required([ :document_id, :type_id ])
+  end
+
+  def order_docubits(changeset) do
+    case get_change(changeset, :docubits) do
+      nil -> changeset
+      "" -> changeset
+      docubits ->
+        { docubits, order } =
+          Enum.map_reduce(docubits, 0,
+            fn(d, o) ->
+              { put_change(d, :order, o), o + 1}
+            end)
+
+        Ecto.Changeset.put_change(changeset, :docubits, docubits)
+    end
+  end
+
+  def address_docubits(changeset) do
+    parent_address = get_field(changeset, :address)
+    case get_change(changeset, :docubits) do
+      nil -> changeset
+      "" -> changeset
+      docubits ->
+        docubits
+        |> update_docubits_addresses(parent_address)
+        |> (&(Ecto.Changeset.put_change(changeset, :docubits, &1))).()
+    end
+  end
+
+  def update_docubits_addresses(docubits, parent_address) do
+    Enum.map(docubits,
+    fn(docubit) ->
+      case docubit.action do
+        :replace -> docubit
+        :insert ->
+          docubit
+          |> get_field(:order)
+          |> (&(List.insert_at(parent_address, -1, &1))).()
+          |> (&(Ecto.Changeset.put_change(docubit, :address, &1))).()
+      end
+    end)
+  end
+
+  def validate_allowed_docubits(changeset, docubits) do
+    Logger.debug("Validating docubits are allowed")
+    type =
+      changeset
+      |> get_field(:type_id)
+      |> String.to_atom()
+      |> (&(Kernel.apply(Type, &1, []))).()
+
+    Enum.reduce(docubits, [],
+      fn(d, errors) ->
+        case get_field(d, :type_id) in type.allowed_children do
+          true -> errors
+          false -> [ docubits: "This type may not be inserted into this docubit."]
+        end
+      end
+    )
   end
 
   def print(%Docubit{} = docubit, padding \\ "") do
@@ -55,66 +139,18 @@ defmodule UserDocs.Documents.Docubit do
     IO.inspect(changeset.changes)
     changeset
   end
+"""
 
-  def changeset(docubit, attrs \\ %{}) do
-    docubit
-    |> cast(attrs, [ :settings, :address, :content_id, :through_annotation_id, :through_step_id ])
-    |> put_assoc(:content, Map.get(attrs, :content, nil))
-    |> put_assoc(:through_annotation, Map.get(attrs, :through_annotation, nil))
-    |> put_assoc(:through_step, Map.get(attrs, :through_step, nil))
-    |> cast_settings()
-    |> embed_type()
-  end
-
-  def change_docubits(docubit, attrs) do
-    docubit
-    |> change(attrs)
-    |> validate_change(:docubits,
-      fn(:docubits, docubits) ->
-        validate_allowed_docubits(docubit, docubits)
-      end)
-    |> address_docubits(docubit.address)
-  end
-
-  def validate_allowed_docubits(docubit, docubits) do
-    Logger.debug("Validating docubits are allowed for #{inspect(docubit.type.allowed_children)}")
-    Enum.reduce(docubits, [],
-      fn(d, errors) ->
-        case d.data.type_id in docubit.type.allowed_children do
-          true -> errors
-          false -> [ docubits: "This type may not be inserted into this docubit."]
-        end
-      end
-    )
-  end
-
-  def address_docubits(changeset, parent_address) do
-    case get_change(changeset, :docubits) do
+  defp embed_type(changeset) do
+    case get_change(changeset, :type_id) do
       nil -> changeset
       "" -> changeset
-      docubits ->
-        docubits = update_docubits_addresses(docubits, parent_address)
-        Ecto.Changeset.put_change(changeset, :docubits, docubits)
+      type_id ->
+        type = Enum.filter(Type.types_attrs(), fn(t) -> t.id == type_id end)
+        put_change(changeset, :type, type)
     end
   end
-
-  def update_docubits_addresses(docubits, parent_address) do
-    { updated_docubits, _ } =
-      Enum.map_reduce(docubits, 0,
-      fn(docubit, new_address) ->
-        case docubit.action do
-          :replace -> { docubit, new_address }
-          :insert ->
-            address = List.insert_at(parent_address, -1, new_address)
-            {
-              Ecto.Changeset.put_change(docubit, :address, address),
-              new_address + 1
-            }
-        end
-      end)
-
-    updated_docubits
-  end
+  """
 
   def cast_settings(%{changes: %{ settings: settings }} = changeset) do
     settings =
@@ -131,32 +167,12 @@ defmodule UserDocs.Documents.Docubit do
   end
   def cast_settings(changeset), do: changeset
 
-  defp embed_type(changeset) do
-    case get_change(changeset, :type_id) do
-      nil -> changeset
-      "" -> changeset
-      type_id ->
-        type = Enum.filter(Type.types_attrs(), fn(t) -> t.id == type_id end)
-        put_change(changeset, :type, type)
-    end
-  end
+  def context(docubit, parent_contexts), do: Context.context(docubit, parent_contexts)
+  # Applies Contexts to the Docubit
+  def apply_contexts(docubit, parent_contexts), do: Context.apply_context_changes(docubit, parent_contexts)
 
-  # Applies all Contexts to a docubit.  Takes a docubit, returns a
-  # Docubit with parent, type, and local contexts applied to the
-  # Docubit
-  def apply_contexts(docubit, parent_contexts), do: Context.apply(docubit, parent_contexts)
   def preload(docubit, state), do: Preload.apply(docubit, state)
   def renderer(docubit = %Docubit{}), do: Renderer.apply(docubit)
-  def get(docubit = %Docubit{}, address), do: Access.get(docubit, address)
-  def delete(docubit = %Docubit{}, address, old_docubit = %Docubit{}) do
-    Access.delete(docubit, address, old_docubit)
-  end
-  def insert(docubit = %Docubit{}, address, new_docubit = %Docubit{}) do
-    Access.insert(docubit, address, new_docubit)
-  end
-  def update(docubit = %Docubit{}, address, new_docubit = %Docubit{}) do
-    Access.update(docubit, address, new_docubit)
-  end
   def hydrate(body, address, data), do: Hydrate.apply(body, address, data)
 
 end
