@@ -62,7 +62,6 @@ defmodule UserDocs.Documents.Document do
     docubit_map_item({ 0, Map.get(map, 0) }, state, %Context{})
   end
   def docubit_map_item({ _key, map }, state, parent_context) do
-    IO.puts("The item is #{inspect(map)}")
     opts = Map.put(@state_opts, :type, "docubit")
     docubit = State.get(state, map.docubit.id, opts)
     { :ok, context } = Docubit.context(docubit, parent_context)
