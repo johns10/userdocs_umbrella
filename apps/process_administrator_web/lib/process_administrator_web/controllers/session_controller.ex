@@ -4,7 +4,7 @@ defmodule ProcessAdministratorWeb.SessionController do
   def new(conn, _params) do
     changeset = Pow.Plug.change_user(conn)
 
-    render(conn, "new.html", changeset: changeset)
+    redirect(conn, to: Routes.index_path(conn, :index))
   end
 
   def create(conn, %{"user" => user_params}) do
@@ -21,7 +21,7 @@ defmodule ProcessAdministratorWeb.SessionController do
 
         conn
         |> put_flash(:info, "Invalid email or password")
-        |> render("new.html", changeset: changeset)
+        |> redirect(to: Routes.index_path(conn, :index))
     end
   end
 
