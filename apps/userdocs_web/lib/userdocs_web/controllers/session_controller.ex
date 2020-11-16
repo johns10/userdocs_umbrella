@@ -38,7 +38,7 @@ defmodule UserDocsWeb.SessionController do
 
         conn
         |> put_flash(:info, "Invalid email or password")
-        |> render("new.html", changeset: changeset)
+        |> redirect(to: path)
     end
   end
 
