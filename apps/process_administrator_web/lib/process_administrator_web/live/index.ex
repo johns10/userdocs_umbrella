@@ -6,13 +6,11 @@ defmodule ProcessAdministratorWeb.IndexLive do
   use ProcessAdministratorWeb.LiveViewPowHelper
 
   alias ProcessAdministratorWeb.Endpoint
-  alias ProcessAdministratorWeb.DomainHelpers
   alias ProcessAdministratorWeb.ID
   alias ProcessAdministratorWeb.State
   alias ProcessAdministratorWeb.ProcessLive
   alias ProcessAdministratorWeb.StepLive
   alias ProcessAdministratorWeb.LiveHelpers
-  alias ProcessAdministratorWeb.Layout
 
   alias ProcessAdministratorWeb.ProjectLive.Messages, as: ProjectMessage
   alias ProcessAdministratorWeb.VersionLive.Messages, as: VersionMessage
@@ -21,15 +19,11 @@ defmodule ProcessAdministratorWeb.IndexLive do
   alias UserDocs.Automation.Step
   alias UserDocs.Web
   alias UserDocs.Web.Strategy
-  alias UserDocs.Web.Element
-  alias UserDocs.Web.Annotation
   alias UserDocs.Projects.Version
   alias UserDocs.Automation
   alias UserDocs.Projects.Select
   alias UserDocs.Projects.Version
-  alias UserDocs.Projects.Project
   alias UserDocs.Documents
-  alias UserDocs.Documents.Content
   alias UserDocs.Projects.Select
 
   alias ProcessAdministratorWeb.State
