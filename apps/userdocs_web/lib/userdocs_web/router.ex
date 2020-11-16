@@ -18,7 +18,13 @@ defmodule UserDocsWeb.Router do
 
   scope "/" do
     pipe_through :browser
-    pow_routes()
+    get "/session/new", Pow.Phoenix.SessionController, :new
+    get "/registration/edit", Pow.Phoenix.RegistrationController, :edit
+    get "/registration/new", Pow.Phoenix.RegistrationController, :new
+    post "/registration", Pow.Phoenix.RegistrationController, :create
+    patch "/registration", Pow.Phoenix.RegistrationController, :update
+    put "/registration", Pow.Phoenix.RegistrationController, :update
+    delete "/registration", Pow.Phoenix.RegistrationController, :delete
   end
 
   pipeline :protected do
