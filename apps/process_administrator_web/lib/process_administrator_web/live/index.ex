@@ -105,11 +105,6 @@ defmodule ProcessAdministratorWeb.IndexLive do
     socket
   end
 
-  def handle_info({:close_modal}, socket) do
-    IO.puts("Close modal info")
-    { :noreply, close_modal(socket) }
-  end
-
   def close_modal(socket) do
     IO.puts("Close modal function")
     Phoenix.LiveView.send_update(
@@ -136,6 +131,10 @@ defmodule ProcessAdministratorWeb.IndexLive do
     socket
   end
 
+  def handle_info({:close_modal}, socket) do
+    IO.puts("Close modal info")
+    { :noreply, close_modal(socket) }
+  end
   def handle_info({:update_current_version, changes}, socket) do
     current_processes =
       UserDocs.Automation.list_processes(%{},
@@ -148,7 +147,6 @@ defmodule ProcessAdministratorWeb.IndexLive do
       |> State.apply_changes(changes)
     }
   end
-
   # TODO: Must implement either updating the state tree/components
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
     Logger.debug("Handling info on topic #{topic}, event #{event}")
@@ -160,6 +158,35 @@ defmodule ProcessAdministratorWeb.IndexLive do
       |> update_socket_data(topic, event, payload)
       |> update_additional_data(topic, event, payload)
     }
+  end
+  # TODO: Must implement either updating the state tree/components
+  def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
+    Logger.debug("Handling a subscription on topic #{topic}, event #{event} old")
+    args = String.split(topic, "::")
+    type =
+      args
+      |> Enum.at(0)
+      |> State.plural()
+      |> String.to_atom
+
+    field =
+      try do
+        args
+        |> Enum.at(1)
+        |> String.replace("-", "_")
+        |> String.to_atom
+      rescue
+        _ -> "none"
+      end
+
+      Logger.debug("Updating type #{type}, field #{field}")
+    socket =
+      State.apply_changes(
+        socket,
+        State.update_object_field(socket.assigns, type, payload.id, field, Map.get(payload, field))
+      )
+
+    {:noreply, socket}
   end
 
   def update_components(socket, "process", _, _) do
@@ -225,35 +252,6 @@ defmodule ProcessAdministratorWeb.IndexLive do
   def update_additional_data(socket, _, _, _) do
     socket
   end
-  # TODO: Must implement either updating the state tree/components
-  def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
-    Logger.debug("Handling a subscription on topic #{topic}, event #{event} old")
-    args = String.split(topic, "::")
-    type =
-      args
-      |> Enum.at(0)
-      |> State.plural()
-      |> String.to_atom
-
-    field =
-      try do
-        args
-        |> Enum.at(1)
-        |> String.replace("-", "_")
-        |> String.to_atom
-      rescue
-        _ -> "none"
-      end
-
-      Logger.debug("Updating type #{type}, field #{field}")
-    socket =
-      State.apply_changes(
-        socket,
-        State.update_object_field(socket.assigns, type, payload.id, field, Map.get(payload, field))
-      )
-
-    {:noreply, socket}
-  end
 
   def filter(socket, data_key, { filter_key, value }) do
     socket.assigns
@@ -277,7 +275,6 @@ defmodule ProcessAdministratorWeb.IndexLive do
       |> call_menu(socket)
     }
   end
-
   @impl true
   def handle_event("edit-project", _, socket) do
     IO.puts("Edit Project")
@@ -287,7 +284,6 @@ defmodule ProcessAdministratorWeb.IndexLive do
       |> call_menu(socket)
     }
   end
-
   @impl true
   def handle_event("new-project", _, socket) do
     IO.puts("New Project")
@@ -297,7 +293,6 @@ defmodule ProcessAdministratorWeb.IndexLive do
       |> call_menu(socket)
     }
   end
-
   @impl true
   def handle_event("edit-version", _, socket) do
     IO.puts("Edit Versions")
@@ -307,7 +302,6 @@ defmodule ProcessAdministratorWeb.IndexLive do
       |> call_menu(socket)
     }
   end
-
   @impl true
   def handle_event("new-version", _, socket) do
     IO.puts("New Versions")
@@ -317,30 +311,36 @@ defmodule ProcessAdministratorWeb.IndexLive do
       |> call_menu(socket)
     }
   end
-
   @impl true
   def handle_event("select_team", %{ "team" => %{"id" => id} }, socket) do
     changes = Select.handle_team_selection(socket.assigns, String.to_integer(id))
     {:noreply, State.apply_changes(socket, changes)}
   end
-
   @impl true
   def handle_event("select_project", %{ "project" => %{"id" => id} }, socket) do
     changes = Select.handle_project_selection(socket.assigns, String.to_integer(id))
     {:noreply, State.apply_changes(socket, changes)}
   end
-
   @impl true
   def handle_event("select_version", %{ "version" => %{"id" => id} }, socket) do
     changes = Select.handle_version_selection(socket.assigns, String.to_integer(id))
     send(socket.root_pid, {:update_current_version, changes})
     {:noreply, State.apply_changes(socket, changes)}
   end
+  @impl true
+  def handle_event("update_current_strategy", %{"current_strategy" => %{ "strategy_id" => _id }}, socket) do
+    IO.puts("Updating Current Strategy")
+
+    {
+      :noreply,
+      socket
+    }
+  end
 
   def preload_step(step, state, process) do
     element =
       if step.element_id do
-        element = Web.get_element!(step.element_id, %{ strategy: true }, %{}, state)
+        Web.get_element!(step.element_id, %{ strategy: true }, %{}, state)
       end
 
     annotation =
@@ -370,22 +370,6 @@ defmodule ProcessAdministratorWeb.IndexLive do
     preloaded_steps = Enum.map(raw_steps, &preload_step(&1, state, process))
     process
     |> Map.put(:steps, preloaded_steps)
-  end
-
-  @impl true
-  def handle_event("login", %{"user" => user_params}, socket) do
-    IO.puts("Handling login")
-    { :noreply, socket}
-  end
-
-  @impl true
-  def handle_event("update_current_strategy", %{"current_strategy" => %{ "strategy_id" => id }}, socket) do
-    IO.puts("Updating Current Strategy")
-
-    {
-      :noreply,
-      socket
-    }
   end
 
   def current_processes(socket) do
