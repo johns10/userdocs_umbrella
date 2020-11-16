@@ -1,5 +1,6 @@
 defmodule UserDocsWeb.DocumentLive.Index do
   use UserDocsWeb, :live_view
+  use UserdocsWeb.LiveViewPowHelper
 
   alias UserDocs.Documents
   alias UserDocs.Documents.Document
@@ -11,7 +12,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
       :ok,
       socket
       |> UserLive.Helpers.validate_logged_in(session)
-      |> assign(:documents, list_documents())
+      |> (&(assign(&1, :documents, list_documents(&1.assigns.current_user.default_team_id)))).()
     }
   end
 
@@ -43,10 +44,13 @@ defmodule UserDocsWeb.DocumentLive.Index do
     document = Documents.get_document!(id)
     {:ok, _} = Documents.delete_document(document)
 
-    {:noreply, assign(socket, :documents, list_documents())}
+    team_id = socket.assigns.current_user.default_team_id
+
+    {:noreply, assign(socket, :documents, list_documents(team_id))}
   end
 
-  defp list_documents do
-    Documents.list_documents()
+  # TODO: Probably set the current team ID somewhere in the app
+  defp list_documents(team_id) do
+    Documents.list_documents(%{}, %{team_id: team_id})
   end
 end
