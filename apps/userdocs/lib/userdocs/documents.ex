@@ -153,9 +153,21 @@ defmodule UserDocs.Documents do
       [%Document{}, ...]
 
   """
-  def list_documents do
-    Repo.all(Document)
+  def list_documents(_params \\ %{}, filters \\ %{}) do
+    base_documents_query()
+    |> Repo.all()
   end
+
+  defp maybe_filter_documents_by_team(query, nil), do: query
+  defp maybe_filter_documents_by_team(query, team_id) do
+    from(document in query,
+      left_join: version in assoc(document, :version),
+      left_join: project in assoc(version, :project),
+      where: project.team_id == ^team_id
+    )
+  end
+
+  defp base_documents_query(), do: from(documents in Document)
 
   @doc """
   Gets a single document.
