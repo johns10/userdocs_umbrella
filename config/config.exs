@@ -40,19 +40,6 @@ config :process_administrator_web, ProcessAdministratorWeb.Endpoint,
   pubsub_server: UserDocs.PubSub,
   live_view: [signing_salt: "EkPV4O8j"]
 
-config :document_editor_web,
-  namespace: DocumentEditorWeb,
-  ecto_repos: [UserDocs.Repo],
-  generators: [context_app: :userdocs]
-
-# Configures the endpoint
-config :document_editor_web, DocumentEditorWeb.Endpoint,
-  url: [host: "localhost"],
-  secret_key_base: "uYNO0z5S7TuzLxe//ihPPyhDY+9/juUgfW4fFJkw+nKlP/omZmmVMmcIWuBolrzY",
-  render_errors: [view: DocumentEditorWeb.ErrorView, accepts: ~w(html json), layout: false],
-  pubsub_server: UserDocs.PubSub,
-  live_view: [signing_salt: "EkPV4O8j"]
-
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
@@ -76,12 +63,6 @@ config :process_administrator_web, :pow,
   repo: UserDocs.Repo,
   cache_store_backend: Pow.Store.Backend.MnesiaCache,
   routes_backend: ProcessAdministratorWeb.Pow.Routes
-
-config :document_editor_web, :pow,
-  user: UserDocs.Users.User,
-  repo: UserDocs.Repo,
-  cache_store_backend: Pow.Store.Backend.MnesiaCache,
-  routes_backend: DocumentEditorWeb.Pow.Routes
 
 config :cors_plug,
   origin: [

@@ -53,25 +53,6 @@ config :process_administrator_web, ProcessAdministratorWeb.Endpoint,
 config :process_administrator_web,
   uploads_directory: "/media"
 
-config :document_editor_web, DocumentEditorWeb.Endpoint,
-  http: [port: 4002],
-  debug_errors: true,
-  code_reloader: true,
-  check_origin: false,
-  watchers: [
-    node: [
-      "node_modules/webpack/bin/webpack.js",
-      "--mode",
-      "development",
-      "--watch-stdin",
-      cd: Path.expand("../apps/document_editor_web/assets", __DIR__)
-    ]
-  ]
-
-config :document_editor_web,
-  uploads_directory: "/media"
-
-
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed

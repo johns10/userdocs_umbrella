@@ -25,6 +25,8 @@ defmodule ProcessAdministratorWeb.IndexLive do
   alias UserDocs.Projects.Version
   alias UserDocs.Documents
   alias UserDocs.Projects.Select
+  alias UserDocs.Users
+  alias UserDocs.Users.User
 
   alias ProcessAdministratorWeb.State
 
@@ -55,12 +57,12 @@ defmodule ProcessAdministratorWeb.IndexLive do
         %{ assigns: %{ current_user: nil }} ->
           socket
           |> assign(:auth_state, :not_logged_in)
-          |> assign(:changeset, UserDocs.Users.change_user(%UserDocs.Users.User{}))
+          |> assign(:changeset, Users.change_user(%User{}))
         %{ assigns: %{ current_user: _ }} ->
           socket
           |> maybe_assign_current_user(session)
           |> assign(:auth_state, :logged_in)
-          |> (&(assign(&1, :changeset, UserDocs.Users.change_user(&1.assigns.current_user)))).()
+          |> (&(assign(&1, :changeset, Users.change_user(&1.assigns.current_user)))).()
         error ->
           Logger.error(error)
           socket
@@ -69,7 +71,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
       FunctionClauseError ->
         socket
         |> assign(:auth_state, :not_logged_in)
-        |> assign(:changeset, UserDocs.Users.change_user(%UserDocs.Users.User{}))
+        |> assign(:changeset, Users.change_user(%User{}))
     end
   end
 
