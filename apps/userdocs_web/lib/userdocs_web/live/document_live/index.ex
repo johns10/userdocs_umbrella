@@ -44,9 +44,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
     document = Documents.get_document!(id)
     {:ok, _} = Documents.delete_document(document)
 
-    team_id = socket.assigns.current_user.default_team_id
-
-    {:noreply, assign(socket, :documents, list_documents(team_id))}
+    {:noreply, assign(socket, :documents, list_documents(socket.assigns.current_user.default_team_id))}
   end
 
   # TODO: Probably set the current team ID somewhere in the app
