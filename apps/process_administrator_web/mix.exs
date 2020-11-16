@@ -47,7 +47,6 @@ defmodule ProcessAdministratorWeb.MixProject do
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 0.4"},
       {:gettext, "~> 0.11"},
-      {:userdocs, in_umbrella: true},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:pow, "~> 1.0.21"},
@@ -55,6 +54,7 @@ defmodule ProcessAdministratorWeb.MixProject do
       {:dialyxir, "~> 0.5.0", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:cors_plug, "~> 2.0"},
+      {:userdocs, in_umbrella: true}
     ]
   end
 
