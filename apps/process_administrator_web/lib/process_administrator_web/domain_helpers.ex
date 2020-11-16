@@ -46,34 +46,6 @@ defmodule ProcessAdministratorWeb.DomainHelpers do
   end
   def selected(_items), do: []
 
-  @doc """
-  Attempts to get the parent id from the assigns.  If it doesn't exist, it gets
-  the id of the relation.  For example:
-
-    DomainHelpers.maybe_parent_id(assigns, :page_id)
-
-  Would return the parent ID, if the element has a parent.  It would return the
-  page ID if it didn't.  This is used to populate the foreign key of a relationship
-  on a form.  It will be the parent id if it's a new record, or the existing id
-  if you're editing the record.
-  """
-  def maybe_parent_id(assigns, field) do
-    try do
-      assigns.parent.id
-    rescue
-      ArgumentError -> Map.get(assigns.changeset.data, field)
-      KeyError -> Map.get(assigns.changeset.data, field)
-    end
-  end
-  def maybe_parent_id(assigns, changeset = %Ecto.Changeset{}, field) do
-    try do
-      assigns.parent.id
-    rescue
-      ArgumentError -> Map.get(changeset.data, field)
-      KeyError -> Map.get(changeset.data, field)
-    end
-  end
-
   def most_recent_navigated_to_page(assigns, pages) do
     page_id =
       case step = recent_navigation_step(assigns) do
