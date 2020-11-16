@@ -45,16 +45,16 @@
             },
             # TODO: Add last_page_navigated to logic here.
             select_lists: %{
-              step_types_select: DomainHelpers.select_list_temp(@step_types, :name, false),
-              elements_select: DomainHelpers.select_list_temp(@elements, :name, false),
-              annotations: DomainHelpers.select_list_temp(@annotations, :name, false),
-              versions: DomainHelpers.select_list_temp(@versions, :name, false),
-              strategies: DomainHelpers.select_list_temp(@strategies, :name, true),
-              annotation_types: DomainHelpers.select_list_temp(@annotation_types, :name, true),
-              content: DomainHelpers.select_list_temp(@content, :name, true),
-              processes_select: DomainHelpers.select_list_temp(
+              step_types_select: UserDocs.Helpers.select_list(@step_types, :name, false),
+              elements_select: UserDocs.Helpers.select_list(@elements, :name, false),
+              annotations: UserDocs.Helpers.select_list(@annotations, :name, false),
+              versions: UserDocs.Helpers.select_list(@versions, :name, false),
+              strategies: UserDocs.Helpers.select_list(@strategies, :name, true),
+              annotation_types: UserDocs.Helpers.select_list(@annotation_types, :name, true),
+              content: UserDocs.Helpers.select_list(@content, :name, true),
+              processes_select: UserDocs.Helpers.select_list(
                 Enum.filter(@processes || [], fn(p) -> p.version_id == Map.get(@current_version, :id, nil) end), :name, false),
-              pages_select: DomainHelpers.select_list_temp(
+              pages_select: UserDocs.Helpers.select_list(
                 Enum.filter(@pages || [], fn(p) -> p.version_id == Map.get(@current_version, :id, nil) end), :name, false),
           }])
         do %>
@@ -90,26 +90,26 @@
                     pages: @pages,
                   },
                   select_lists: %{
-                    teams: DomainHelpers.select_list_temp(@teams, :name, false),
-                    strategies: DomainHelpers.select_list_temp(@strategies, :name, true),
-                    language_codes: DomainHelpers.select_list_temp(@language_codes, :code, false),
-                    step_types_select: DomainHelpers.select_list_temp(@step_types, :name, false),
+                    teams: UserDocs.Helpers.select_list(@teams, :name, false),
+                    strategies: UserDocs.Helpers.select_list(@strategies, :name, true),
+                    language_codes: UserDocs.Helpers.select_list(@language_codes, :code, false),
+                    step_types_select: UserDocs.Helpers.select_list(@step_types, :name, false),
                     annotations:
-                      DomainHelpers.select_list_temp(
+                      UserDocs.Helpers.select_list(
                         Enum.filter(@annotations, fn(a) -> a.page_id == step.page_id end),
                         :name, true),
                     elements_select:
-                      DomainHelpers.select_list_temp(
+                      UserDocs.Helpers.select_list(
                         Enum.filter(@elements, fn(e) -> e.page_id == step.page_id end),
                         :name, true) ,
-                    content: DomainHelpers.select_list_temp(@content, :name, true),
-                    content_versions: DomainHelpers.select_list_temp(@content_versions, :name, false),
-                    versions: DomainHelpers.select_list_temp(@versions, :name, false),
-                    processes_select: DomainHelpers.select_list_temp(
+                    content: UserDocs.Helpers.select_list(@content, :name, true),
+                    content_versions: UserDocs.Helpers.select_list(@content_versions, :name, false),
+                    versions: UserDocs.Helpers.select_list(@versions, :name, false),
+                    processes_select: UserDocs.Helpers.select_list(
                       Enum.filter(@processes, fn(p) -> p.version_id == @current_version.id end), :name, false),
-                    pages_select: DomainHelpers.select_list_temp(
+                    pages_select: UserDocs.Helpers.select_list(
                       Enum.filter(@pages, fn(p) -> p.version_id == @current_version.id end), :name, true),
-                    annotation_types: DomainHelpers.select_list_temp(@annotation_types, :name, true),
+                    annotation_types: UserDocs.Helpers.select_list(@annotation_types, :name, true),
                   }])
               %>
 
@@ -129,7 +129,7 @@
                 <div class="control">
                   <div class="select">
                     <%= select f, :strategy_id,
-                      DomainHelpers.select_list_temp(@strategies, :name, false),
+                      UserDocs.Helpers.select_list(@strategies, :name, false),
                       value: Enum.filter(@strategies, fn(s) -> s.id == @current_version.strategy_id end) |> Enum.at(0) |> Map.get(:id),
                       id: "current-strategy",
                       phx_hook: "configure"
@@ -141,7 +141,7 @@
                 <div>
                   <div class="select">
                     <%= select f, :strategy_transfer_field,
-                      DomainHelpers.select_list_temp(@strategies, :name, false),
+                      UserDocs.Helpers.select_list(@strategies, :name, false),
                       value: @transferred_strategy.id,
                       id: "strategy-transfer-field",
                       disabled: true
