@@ -500,9 +500,6 @@ defmodule UserDocs.Documents do
 
   alias UserDocs.Documents.Docubit
 
-  def get_language_code!(id), do: Repo.get!(LanguageCode, id)
-
-
   def get_docubit!(id, params \\ %{}, filters \\ %{})
   def get_docubit!(id, params, _filters) when is_integer(id) do
     base_docubit_query(id)

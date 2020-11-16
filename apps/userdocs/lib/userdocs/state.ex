@@ -16,7 +16,7 @@ defmodule UserDocs.State do
     get!(Map.get(state, key), id)
   end
   # def get!(_, nil), do: nil  Should go in
-  def get!(nil, id), do: raise(RuntimeError, "Couldn't find the datatype in the state.")
+  def get!(nil, _id), do: raise(RuntimeError, "Couldn't find the datatype in the state.")
   # Here's the actual work
   def get!(objects, id) when is_list(objects) do
     objects
