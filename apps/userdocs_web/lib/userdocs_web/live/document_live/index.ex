@@ -3,10 +3,16 @@ defmodule UserDocsWeb.DocumentLive.Index do
 
   alias UserDocs.Documents
   alias UserDocs.Documents.Document
+  alias UserDocsWeb.UserLive
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, :documents, list_documents())}
+  def mount(_params, session, socket) do
+    {
+      :ok,
+      socket
+      |> UserLive.Helpers.validate_logged_in(session)
+      |> assign(:documents, list_documents())
+    }
   end
 
   @impl true

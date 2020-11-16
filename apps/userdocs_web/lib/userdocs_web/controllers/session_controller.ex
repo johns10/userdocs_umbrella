@@ -8,13 +8,30 @@ defmodule UserDocsWeb.SessionController do
   end
 
   def create(conn, %{"user" => user_params}) do
+    IO.puts("CREAETE")
+    IO.inspect(conn)
+
+    { "referer", url} =
+      conn
+      |> Map.get(:req_headers)
+      |> Enum.filter(fn({k,v}) -> k == "referer" end)
+      |> Enum.at(0)
+
+    { "origin", origin} =
+      conn
+      |> Map.get(:req_headers)
+      |> Enum.filter(fn({k,v}) -> k == "origin" end)
+      |> Enum.at(0)
+
+    path = String.replace(url, origin, "")
+
     conn
     |> Pow.Plug.authenticate_user(user_params)
     |> case do
       {:ok, conn} ->
         conn
         |> put_flash(:info, "Welcome back!")
-        |> redirect(to: Routes.page_path(conn, :index))
+        |> redirect(to: path)
 
       {:error, conn} ->
         changeset = Pow.Plug.change_user(conn, conn.params["user"])
