@@ -6,10 +6,10 @@ defmodule UserDocs.DocumentFixtures do
 
   alias UserDocs.Documents
 
-  def empty_document() do
-    document_attrs = %{ name: "test", title: "Test" }
-    { :ok, empty_document } = Documents.create_document(document_attrs)
-    empty_document
+  def empty_document_version() do
+    document_version_attrs = %{ name: "test", title: "Test" }
+    { :ok, empty_document_version } = Documents.create_document_version(document_version_attrs)
+    empty_document_version
   end
 
   def content(team) do
@@ -27,7 +27,7 @@ defmodule UserDocs.DocumentFixtures do
     }
   end
 
-  def document_attrs(:valid) do
+  def document_version_attrs(:valid) do
     %{ name: "test", title: "Test" }
   end
 end

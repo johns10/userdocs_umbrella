@@ -1,11 +1,11 @@
-defmodule UserDocs.Repo.Migrations.AddDocumentRelation do
+defmodule UserDocs.Repo.Migrations.AddDocumentVersionRelation do
   use Ecto.Migration
 
   def change do
     alter table(:docubits) do
-      add :document_id, references(:documents, on_delete: :nothing)
+      add :document_version_id, references(:document_versions, on_delete: :nothing)
     end
 
-    create index(:docubits, [:document_id])
+    create index(:docubits, [:document_version_id])
   end
 end

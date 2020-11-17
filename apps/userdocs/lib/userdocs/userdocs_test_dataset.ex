@@ -10,7 +10,7 @@ defmodule UserDocs.TestDataset do
   alias UserDocs.Projects.Version
 
   alias UserDocs.Documents
-  alias UserDocs.Documents.Document
+  alias UserDocs.Documents.DocumentVersion
   alias UserDocs.Documents.Content
   alias UserDocs.Documents.ContentVersion
   alias UserDocs.Documents.LanguageCode
@@ -38,7 +38,7 @@ defmodule UserDocs.TestDataset do
     Repo.delete_all(ContentVersion)
     Enum.each(Automation.list_steps, fn(s) -> Automation.delete_step(s) end)
     Enum.each(Automation.list_processes, fn(p) -> Automation.delete_process(p) end)
-    Enum.each(Documents.list_documents, fn(d) -> Documents.delete_document(d) end)
+    Enum.each(Documents.list_document_versions, fn(d) -> Documents.delete__document_version(d) end)
     Enum.each(Web.list_annotations, fn(a) -> Web.delete_annotation(a) end)
     Enum.each(Web.list_elements, fn(e) -> Web.delete_element(e) end)
     Enum.each(Web.list_pages, fn(p) -> Web.delete_page(p) end)
@@ -921,7 +921,7 @@ defmodule UserDocs.TestDataset do
       end
     )
 
-    document = %{
+    document_version = %{
       body: %{
         "children" => [
           %{
@@ -955,9 +955,9 @@ defmodule UserDocs.TestDataset do
       version_id: version_2020_1_id
     }
 
-    {:ok, %Document{id: document_id}} =
-    %Document{}
-    |> Document.changeset(document)
+    {:ok, %DocumentVersion{id: document_version_id}} =
+    %DocumentVersion{}
+    |> DocumentVersion.changeset(document_version)
     |> Repo.insert()
 
   ""

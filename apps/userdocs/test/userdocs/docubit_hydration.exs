@@ -1,7 +1,7 @@
 defmodule UserDocs.DocumentHydrationTest do
   use UserDocs.DataCase
 
-  describe "document_body" do
+  describe "document_version_body" do
     alias UserDocs.Documents.Docubit, as: Docubit
 
     alias UserDocs.DocubitFixtures
@@ -15,11 +15,11 @@ defmodule UserDocs.DocumentHydrationTest do
     alias UserDocs.Documents.Docubit.Type
 
     def docubit_fixture() do
-      { :ok, document } =
-        Documents.create_document(%{ name: "test", title: "Test" })
+      { :ok, document_version } =
+        Documents.create_document_version(%{ name: "test", title: "Test" })
 
-      empty_document = document
-      empty_body = document.body
+      empty_document_version = document_version
+      empty_body = document_version.body
 
       ol_type =
         Type.types()
@@ -47,7 +47,7 @@ defmodule UserDocs.DocumentHydrationTest do
         |> Map.put(:type, Type.column())
 
       body =
-        document.body
+        document_version.body
         |> Docubit.insert([ 0, 0 ], row)
         |> Docubit.insert([ 0, 1 ], row)
         |> Docubit.insert([ 0, 2 ], row)
@@ -57,7 +57,7 @@ defmodule UserDocs.DocumentHydrationTest do
         |> Docubit.insert([ 0, 0, 0, 0 ], p)
         |> Docubit.insert([ 0, 0, 1, 0 ], img)
 
-      document = Map.put(document, :body, body)
+      document_version = Map.put(document_version, :body, body)
 
       team = UsersFixtures.team()
       container = DocubitFixtures.container()
@@ -140,8 +140,8 @@ defmodule UserDocs.DocumentHydrationTest do
         |> Map.put(:screenshot, screenshot)
 
       %{
-        document: document,
-        empty_document: empty_document,
+        document_version: document_version,
+        empty_ddocument_version: empty_document_version,
         container: container,
         ol: ol,
         ol_type: ol_type,
@@ -165,20 +165,20 @@ defmodule UserDocs.DocumentHydrationTest do
 
     test "hydrate adds content and content id on a docubit" do
       f = docubit_fixture()
-      document = f.document
+      document_versions = f.document_versions
       content = Enum.at(f.state.data.content, 0)
       address = [ 0, 0, 0, 0 ]
-      updated_body = Docubit.hydrate(document.body, address, content)
+      updated_body = Docubit.hydrate(document_versions.body, address, content)
       updated_docubit = Docubit.get(updated_body, address)
       assert updated_docubit.content == content
     end
 
     test "hydrate adds content and through_annotation on a docubit" do
       f = docubit_fixture()
-      document = f.document
+      document_versions = f.document_versions
       annotation = Enum.at(f.state.data.annotations, 0)
       address = [ 0, 0, 0, 0 ]
-      updated_body = Docubit.hydrate(document.body, address, annotation)
+      updated_body = Docubit.hydrate(document_versions.body, address, annotation)
       updated_docubit = Docubit.get(updated_body, address)
       assert updated_docubit.through_annotation == annotation
       assert updated_docubit.through_annotation_id == annotation.id
@@ -188,10 +188,10 @@ defmodule UserDocs.DocumentHydrationTest do
 
     test "hydrate adds content, through_annotation, and through_step on a p docubit when a step is added" do
       f = docubit_fixture()
-      document = f.document
+      document_versions = f.document_versions
       step = Enum.at(f.state.data.steps, 1)
       address = [ 0, 0, 0, 0 ]
-      updated_body = Docubit.hydrate(document.body, address, step)
+      updated_body = Docubit.hydrate(document_versions.body, address, step)
       updated_docubit = Docubit.get(updated_body, address)
       assert updated_docubit.through_step == step
       assert updated_docubit.through_step_id == step.id
@@ -203,10 +203,10 @@ defmodule UserDocs.DocumentHydrationTest do
 
     test "hydrate adds file and through_step on a img docubit when a step is added" do
       f = docubit_fixture()
-      document = f.document
+      document_versions = f.document_versions
       step = f.step_with_screenshot
       address = [ 0, 0, 1, 0 ]
-      updated_body = Docubit.hydrate(document.body, address, step)
+      updated_body = Docubit.hydrate(document_versions.body, address, step)
       updated_docubit = Docubit.get(updated_body, address)
       assert updated_docubit.through_step.screenshot == step.screenshot
       assert updated_docubit.through_step.screenshot.file == step.screenshot.file

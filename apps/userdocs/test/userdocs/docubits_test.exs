@@ -17,12 +17,12 @@ defmodule UserDocs.DocubitsTest do
     alias UserDocs.Documents.Docubit.Type
 
     def docubit_fixture() do
-      document_attrs = %{ name: "test", title: "Test" }
-      { :ok, document } = Documents.create_document(document_attrs)
+      document_version_attrs = %{ name: "test", title: "Test" }
+      { :ok, document_version } = Documents.create_document_version(document_version_attrs)
 
       team = UsersFixtures.team()
-      row = DocubitFixtures.row(document.id)
-      ol = DocubitFixtures.ol(document.id)
+      row = DocubitFixtures.row(document_version.id)
+      ol = DocubitFixtures.ol(document_version.id)
       ol_type =
         Type.types()
         |> Enum.filter(fn(t) -> t.id == "ol" end)
@@ -91,7 +91,7 @@ defmodule UserDocs.DocubitsTest do
         |> Map.put(:annotation, annotation_one)
 
       %{
-        document: document,
+        document_version: document_version,
         ol: ol,
         ol_type: ol_type,
         row: row,

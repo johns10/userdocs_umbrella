@@ -14,10 +14,10 @@ defmodule UserDocs.Documents.Docubit.Address do
 
 
   @doc false
-  def changeset(document, attrs) do
+  def changeset(document_version, attrs) do
     IO.inspect("Address changeset")
     IO.inspect(attrs)
-    document
+    document_version
     |> cast(attrs, [ :body, :docubit_id ])
     |> IO.inspect()
     |> foreign_key_constraint(:docubit)

@@ -1,16 +1,16 @@
-defmodule UserDocs.Documents.Document do
+defmodule UserDocs.Documents.DocumentVersion do
   use Ecto.Schema
   import Ecto.Changeset
 
   alias UserDocs.Projects.Version
   alias UserDocs.Documents.Docubit
-  alias UserDocs.Documents.Document
+  alias UserDocs.Documents.DocumentVersion
   alias UserDocs.Documents.Document.MapDocubits
   alias UserDocs.Documents.Docubit.Context
 
   @state_opts %{ data_type: :map, strategy: :by_key, location: :root }
 
-  schema "documents" do
+  schema "document_versions" do
     field :name, :string
     field :title, :string
     field :map, { :map, :integer }
@@ -24,8 +24,8 @@ defmodule UserDocs.Documents.Document do
   end
 
   @doc false
-  def changeset(document, attrs) do
-    document
+  def changeset(document_version, attrs) do
+    document_version
     |> cast(attrs, [ :name, :title, :version_id, :docubit_id ])
     |> body_is_container_docubit_if_empty()
     |> cast_assoc(:body, with: &Docubit.changeset/2)
@@ -44,16 +44,16 @@ defmodule UserDocs.Documents.Document do
     end
   end
 
-  def map_docubits(%Document{ docubits: _ } = document), do: MapDocubits.apply(document)
+  def map_docubits(%DocumentVersion{ docubits: _ } = document_version), do: MapDocubits.apply(document_version)
 
   alias UserDocs.Documents.Docubit
 
-  def load(%Document{ docubits: docubits } = document, state) do
+  def load(%DocumentVersion{ docubits: docubits } = document_version, state) do
     docubits = Enum.map(docubits, fn(d) -> Docubit.preload(d, state) end)
     state = State.load(state, docubits, @state_opts)
     map =
-      document
-      |> Document.map_docubits()
+      document_version
+      |> MapDocubits.apply()
 
     traverse_docubit_map(map, state)
   end

@@ -3,10 +3,10 @@
 
   <%= if @live_action in [:new, :edit] do %>
     <%= live_modal @socket, UserDocsWeb.DocumentLive.FormComponent,
-      id: @document.id || :new,
+      id: @document_version.id || :new,
       title: @page_title,
       action: @live_action,
-      document: @document,
+      document_version: @document_version,
       return_to: Routes.document_index_path(@socket, :index) %>
   <% end %>
 
@@ -19,16 +19,16 @@
         <th></th>
       </tr>
     </thead>
-    <tbody id="documents">
-      <%= for document <- @documents do %>
-        <tr id="document-<%= document.id %>">
-          <td><%= document.name %></td>
-          <td><%= document.title %></td>
+    <tbody id="document_versions">
+      <%= for document_version <- @document_versions do %>
+        <tr id="document_version-<%= document_version.id %>">
+          <td><%= document_version.name %></td>
+          <td><%= document_version.title %></td>
 
           <td>
-            <span><%= live_redirect "Show", to: Routes.document_show_path(@socket, :show, document) %></span>
-            <span><%= live_patch "Edit", to: Routes.document_index_path(@socket, :edit, document) %></span>
-            <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: document.id, data: [confirm: "Are you sure?"] %></span>
+            <span><%= live_redirect "Show", to: Routes.document_show_path(@socket, :show, document_version) %></span>
+            <span><%= live_patch "Edit", to: Routes.document_index_path(@socket, :edit, document_version) %></span>
+            <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: document_version.id, data: [confirm: "Are you sure?"] %></span>
           </td>
         </tr>
       <% end %>

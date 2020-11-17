@@ -2,20 +2,20 @@ defmodule UserDocs.Documents.Editor do
 
   require Logger
 
-  alias UserDocs.Documents.Document
+  alias UserDocs.Documents.DocumentVersion
 
-  def add_new_column_to_body(document, %{ row_count: row_count, column_count: _}
+  def add_new_column_to_body(document_version, %{ row_count: row_count, column_count: _}
   ) when is_integer(row_count) do
-    document
-    |> document_body()
+    document_version
+    |> document_version_body()
     |> row(row_count)
     |> add_column_to_row()
-    |> document_replace_row()
+    |> document_version_replace_row()
   end
 
-  def add_new_row_to_body(document, %{"row-count" => _}) do
-    document
-    |> document_body()
+  def add_new_row_to_body(document_version, %{"row-count" => _}) do
+    document_version
+    |> document_version_body()
     |> rows()
     |> reverse_rows()
     |> add_new_row()
@@ -23,21 +23,21 @@ defmodule UserDocs.Documents.Editor do
     |> add_rows_to_body()
   end
 
-  @spec add_item_to_document_column(Document.t(), Integer, Integer, map, atom) :: Document.t()
-  def add_item_to_document_column(document, row_count, column_count, type, id) do
+  @spec add_item_to_document_version_column(DocumentVersion.t(), Integer, Integer, map, atom) :: DocumentVersion.t()
+  def add_item_to_document_version_column(document_version, row_count, column_count, type, id) do
     IO.puts("Adding item to columns")
-    document
-    |> document_body()
+    document_version
+    |> document_version_body()
     |> row(row_count)
-    |> document_column(column_count)
-    |> document_add_item_to_column(type, id)
-    |> document_replace_column_in_row(row_count, column_count)
-    |> document_replace_row()
+    |> document_version_column(column_count)
+    |> document_version_add_item_to_column(type, id)
+    |> document_version_replace_column_in_row(row_count, column_count)
+    |> document_version_replace_row()
   end
 
-  @spec document_column({Document.t, map}, Integer) :: {Document.t(), map()}
-  defp document_column({ document, row = %{ "type" => "row" } }, column_count) do
-    { document, column(row, column_count) }
+  @spec document_version_column({DocumentVersion.t, map}, Integer) :: {DocumentVersion.t(), map()}
+  defp document_version_column({ document_version, row = %{ "type" => "row" } }, column_count) do
+    { document_version, column(row, column_count) }
   end
   @spec column(map(), Integer) :: map()
   defp column(row = %{ "type" => "row" }, column_count) do
@@ -46,19 +46,19 @@ defmodule UserDocs.Documents.Editor do
     |> Enum.at(0)
   end
 
-  @spec document_add_item_to_column({Document.t, map}, map, atom) :: {Document.t, map}
-  defp document_add_item_to_column({ document, column }, type, id) do
-    { document, add_item_to_column(column, type, id) }
+  @spec document_version_add_item_to_column({DocumentVersion.t, map}, map, atom) :: {DocumentVersion.t, map}
+  defp document_version_add_item_to_column({ document_version, column }, type, id) do
+    { document_version, add_item_to_column(column, type, id) }
   end
 
-  @spec document_replace_column_in_row({Document.t, map}, Integer, Integer) :: {Document.t, map}
-  defp document_replace_column_in_row({ document, column}, row_count, column_count) do
-    { document, row } =
-      document
-      |> document_body()
+  @spec document_version_replace_column_in_row({DocumentVersion.t, map}, Integer, Integer) :: {DocumentVersion.t, map}
+  defp document_version_replace_column_in_row({ document_version, column}, row_count, column_count) do
+    { document_version, row } =
+      document_version
+      |> document_version_body()
       |> row(row_count)
 
-    { document, replace_column_in_row(row, column, column_count)}
+    { document_version, replace_column_in_row(row, column, column_count)}
   end
   defp replace_column_in_row(row, new_column, column_count) do
     IO.puts("Replace Column in row")
@@ -93,12 +93,12 @@ defmodule UserDocs.Documents.Editor do
     Map.put(column, "children", items)
   end
 
-  defp document_body(document = %Document{}) do
-    { document, document.body }
+  defp document_version_body(document_version = %DocumentVersion{}) do
+    { document_version, document_version.body }
   end
 
-  defp row({ document, body }, row_count) do
-    { document, row(body, row_count) }
+  defp row({ document_version, body }, row_count) do
+    { document_version, row(body, row_count) }
   end
   defp row(%{ "type" => "container", "children" => children}, row_count) do
     children
@@ -106,9 +106,9 @@ defmodule UserDocs.Documents.Editor do
     |> Enum.at(0)
   end
 
-  defp add_column_to_row({ document, row = %{ "children" => children} }) do
+  defp add_column_to_row({ document_version, row = %{ "children" => children} }) do
     reversed_children = Enum.reverse(children)
-    { document, Map.put(row, "children", add_column(reversed_children)) }
+    { document_version, Map.put(row, "children", add_column(reversed_children)) }
   end
   defp add_column_to_row({ body, nil }) do
     Logger.warn("Add column to row got nil row")
@@ -135,33 +135,33 @@ defmodule UserDocs.Documents.Editor do
     Enum.reverse([ new_add_column, new_column | columns ])
   end
 
-  defp document_replace_row({ document, row = %{"data" => %{ "row_count" => row_count}}}) do
+  defp document_version_replace_row({ document_version, row = %{"data" => %{ "row_count" => row_count}}}) do
     rows =
-      document.body
+      document_version.body
       |> rows()
       |> replace_specified_row(row, row_count)
 
-    body = Map.put(document.body, "children", rows)
-    Map.put(document, :body, body)
+    body = Map.put(document_version.body, "children", rows)
+    Map.put(document_version, :body, body)
   end
-  defp document_replace_row({ document, nil }) do
+  defp document_version_replace_row({ document_version, nil }) do
     Logger.warn("Replace row got a nil row")
-    document
+    document_version
   end
 
-  def rows({ document, body }) do
-    { document, rows(body) }
+  def rows({ document_version, body }) do
+    { document_version, rows(body) }
   end
   def rows(%{ "type" => "container", "children" => children}) do
     children
   end
 
-  def reverse_rows({ document, rows }) do
-    { document, Enum.reverse(rows)}
+  def reverse_rows({ document_version, rows }) do
+    { document_version, Enum.reverse(rows)}
   end
 
-  def add_new_row({document, rows}) do
-    { document, add_new_row(rows) }
+  def add_new_row({document_version, rows}) do
+    { document_version, add_new_row(rows) }
   end
   def add_new_row([ add_row = %{ "data" => %{"row_count" => current_row_count}} | rows ]) do
 
@@ -187,9 +187,9 @@ defmodule UserDocs.Documents.Editor do
     [ new_add_row, new_row | rows ]
   end
 
-  def add_rows_to_body({ document, rows }) do
-    body = Map.put(document.body, "children", rows)
-    Map.put(document, :body, body)
+  def add_rows_to_body({ document_version, rows }) do
+    body = Map.put(document_version.body, "children", rows)
+    Map.put(document_version, :body, body)
   end
 
   def replace_specified_row(rows, new_row, count) do
