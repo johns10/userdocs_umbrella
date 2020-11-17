@@ -8,9 +8,6 @@ defmodule UserDocsWeb.SessionController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    IO.puts("CREAETE")
-    IO.inspect(conn)
-
     { "referer", url} =
       conn
       |> Map.get(:req_headers)
@@ -31,20 +28,36 @@ defmodule UserDocsWeb.SessionController do
       {:ok, conn} ->
         conn
         |> put_flash(:info, "Welcome back!")
-        |> redirect(to: path)
+        |> redirect(to: referer_path(conn))
 
       {:error, conn} ->
         changeset = Pow.Plug.change_user(conn, conn.params["user"])
 
         conn
         |> put_flash(:info, "Invalid email or password")
-        |> redirect(to: path)
+        |> redirect(to: referer_path(conn))
     end
   end
 
   def delete(conn, _params) do
     conn
     |> Pow.Plug.delete()
-    |> redirect(to: Routes.page_path(conn, :index))
+    |> redirect(to: referer_path(conn))
+  end
+
+  def referer_path(conn) do
+    { "referer", url} =
+      conn
+      |> Map.get(:req_headers)
+      |> Enum.filter(fn({k,_}) -> k == "referer" end)
+      |> Enum.at(0)
+
+    { "origin", origin} =
+      conn
+      |> Map.get(:req_headers)
+      |> Enum.filter(fn({k,_}) -> k == "origin" end)
+      |> Enum.at(0)
+
+    String.replace(url, origin, "")
   end
 end
