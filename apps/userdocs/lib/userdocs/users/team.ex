@@ -9,6 +9,8 @@ defmodule UserDocs.Users.Team do
     field :name, :string
 
     field :default_project_id, :integer
+    has_many :projects, Project
+
     many_to_many :users,
       Users.User,
       join_through: Users.TeamUser,

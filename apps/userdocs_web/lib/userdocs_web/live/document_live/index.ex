@@ -12,9 +12,15 @@ defmodule UserDocsWeb.DocumentLive.Index do
       :ok,
       socket
       |> UserLive.Helpers.validate_logged_in(session)
-      |> (&(assign(&1, :documents, list_documents(&1.assigns.current_user.default_team_id)))).()
+      |> initialize()
     }
   end
+
+  def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
+    socket
+    |> (&(assign(&1, :documents, list_documents(&1.assigns.current_user.default_team_id)))).()
+  end
+  def initialize(socket), do: socket
 
   @impl true
   def handle_params(params, _url, socket) do

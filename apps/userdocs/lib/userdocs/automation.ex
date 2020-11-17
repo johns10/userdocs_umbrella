@@ -9,14 +9,13 @@ defmodule UserDocs.Automation do
   alias UserDocs.Repo
   alias UserDocs.Subscription
 
-  alias UserDocs.Web
   alias UserDocs.Web.Page
   alias UserDocs.Web.Annotation
   alias UserDocs.Web.Element
 
-  alias UserDocs.Projects
+  alias UserDocs.Users.User
 
-  alias ProcessAdministratorWeb.Endpoint
+  alias UserDocs.Projects
 
   def details(version_id) do
     Repo.one from version in Projects.Version,
@@ -47,6 +46,18 @@ defmodule UserDocs.Automation do
         processes: {processes, steps: {steps, annotation: {annotation, :annotation_type}}},
         processes: {processes, steps: {steps, annotation: {annotation, :content}}},
         processes: {processes, steps: {steps, annotation: {annotation, content: {content, :content_versions}}}}
+      ]
+  end
+
+  def project_details(user_id) do
+    Repo.one from user in User,
+      where: user.id == ^user_id,
+      left_join: teams in assoc(user, :teams),
+      left_join: projects in assoc(teams, :projects),
+      preload: [
+        :teams,
+        teams: :projects,
+        teams: {teams, projects: {projects, :versions}}
       ]
   end
 
