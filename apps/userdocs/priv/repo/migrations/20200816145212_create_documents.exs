@@ -1,8 +1,8 @@
-defmodule UserDocs.Repo.Migrations.CreateDocuments do
+defmodule UserDocs.Repo.Migrations.CreateDocumentVersions do
   use Ecto.Migration
 
   def change do
-    create table(:documents) do
+    create table(:document_versions) do
       add :name, :string
       add :title, :string
       add :docubit_id, references(:docubits, on_delete: :nothing)
@@ -12,7 +12,7 @@ defmodule UserDocs.Repo.Migrations.CreateDocuments do
       timestamps()
     end
 
-    create index(:documents, [:docubit_id])
-    create index(:documents, [:version_id])
+    create index(:document_versions, [:docubit_id])
+    create index(:document_versions, [:version_id])
   end
 end

@@ -13,7 +13,7 @@ defmodule UserDocsWeb.DocumentLive.Show do
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:document, Documents.get_document!(id))}
+     |> assign(:document_version, Documents.get_document_version!(id))}
   end
 
   defp page_title(:show), do: "Show Document"

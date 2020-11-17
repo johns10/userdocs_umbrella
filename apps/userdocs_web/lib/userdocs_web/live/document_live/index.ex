@@ -3,7 +3,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
   use UserdocsWeb.LiveViewPowHelper
 
   alias UserDocs.Documents
-  alias UserDocs.Documents.Document
+  alias UserDocs.Documents.DocumentVersion
   alias UserDocsWeb.UserLive
 
   @impl true
@@ -18,7 +18,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
 
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
     socket
-    |> (&(assign(&1, :documents, list_documents(&1.assigns.current_user.default_team_id)))).()
+    |> (&(assign(&1, :document_versions, list_document_versions(&1.assigns.current_user.default_team_id)))).()
   end
   def initialize(socket), do: socket
 
@@ -30,31 +30,31 @@ defmodule UserDocsWeb.DocumentLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Document")
-    |> assign(:document, Documents.get_document!(id))
+    |> assign(:document_version, Documents.get_document_version!(id))
   end
 
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Document")
-    |> assign(:document, %Document{})
+    |> assign(:document_version, %DocumentVersion{})
   end
 
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Listing Documents")
-    |> assign(:document, nil)
+    |> assign(:document_version, nil)
   end
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    document = Documents.get_document!(id)
-    {:ok, _} = Documents.delete_document(document)
+    document_version = Documents.get_document_version!(id)
+    {:ok, _} = Documents.delete_document_version(document_version)
 
-    {:noreply, assign(socket, :documents, list_documents(socket.assigns.current_user.default_team_id))}
+    {:noreply, assign(socket, :document_versions, list_document_versions(socket.assigns.current_user.default_team_id))}
   end
 
   # TODO: Probably set the current team ID somewhere in the app
-  defp list_documents(team_id) do
-    Documents.list_documents(%{}, %{team_id: team_id})
+  defp list_document_versions(team_id) do
+    Documents.list_document_versions(%{}, %{team_id: team_id})
   end
 end

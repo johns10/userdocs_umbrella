@@ -1,12 +1,12 @@
-defmodule UserDocs.DocumentLoadTest do
+defmodule UserDocs.DocumentVersionLoadTest do
   use UserDocs.DataCase
 
   alias UserDocs.Documents
 
 
-  describe "document load" do
+  describe "document_version load" do
 
-    alias UserDocs.DocumentFixtures
+    alias UserDocs.DocumentVersionFixtures
     alias UserDocs.UsersFixtures
     alias UserDocs.MediaFixtures
     alias UserDocs.WebFixtures
@@ -14,21 +14,21 @@ defmodule UserDocs.DocumentLoadTest do
 
     alias UserDocs.Documents
     alias UserDocs.Documents.Docubit
-    alias UserDocs.Documents.Document
+    alias UserDocs.Documents.DocumentVersion
     alias UserDocs.DocubitFixtures
     alias UserDocs.Documents.Docubit.Type
 
-    def empty_document(), do: DocumentFixtures.empty_document
+    def empty_document_version(), do: DocumentVersionFixtures.empty_document_version
 
-    def document_with_one_row() do
-      document = empty_document()
+    def document_version_with_one_row() do
+      document_version = empty_document_version()
     end
 
     def state() do
       team = UsersFixtures.team()
-      content_one =  DocumentFixtures.content(team)
-      content_two = DocumentFixtures.content(team)
-      content_three = DocumentFixtures.content(team)
+      content_one =  DocumentVersionFixtures.content(team)
+      content_two = DocumentVersionFixtures.content(team)
+      content_three = DocumentVersionFixtures.content(team)
       file_one = MediaFixtures.file()
       file_two = MediaFixtures.file()
       file_three = MediaFixtures.file()
@@ -95,29 +95,29 @@ defmodule UserDocs.DocumentLoadTest do
       }
     end
 
-    test "stored document is the same as the retreived document" do
+    test "stored document_version is the same as the retreived document_version" do
       attrs = %{ name: "test", title: "Test" }
-      { :ok, document } = Documents.create_document(attrs)
-      retreived_document = Documents.get_document!(document.id)
+      { :ok, document_version } = Documents.create_document_version(attrs)
+      retreived_document_version = Documents.get_document_version!(document_version.id)
       # TODO: Remove later.  Shouldn't be necessary.  Should take the preloads out of the changeset
-      created = Map.delete(document, :body)
-      result = Map.delete(retreived_document, :body)
+      created = Map.delete(document_version, :body)
+      result = Map.delete(retreived_document_version, :body)
       assert created == result
     end
 
-    test "loading the document does the things" do
+    test "loading the document_version does the things" do
       state = state()
-      document = empty_document()
-      body = document.body
+      document_version = empty_document_version()
+      body = document_version.body
       body = Documents.get_docubit!(body.id, %{ docubits: true } )
       attrs = %{ docubits: [
-        DocubitFixtures.docubit_attrs(:row, document.id)
+        DocubitFixtures.docubit_attrs(:row, document_version.id)
         |> Map.put(:content_id, state.content_one.id)
       ] }
       { :ok, body } = Documents.update_docubit(body, attrs)
 
-      document = Documents.get_document!(document.id, %{ docubits: true })
-      object = Document.load(document, state)
+      document_version = Documents.get_document_version!(document_version.id, %{ docubits: true })
+      object = DocumentVersion.load(document_version, state)
     end
 
   end

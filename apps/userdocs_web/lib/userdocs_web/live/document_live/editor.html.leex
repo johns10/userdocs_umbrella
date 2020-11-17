@@ -69,8 +69,8 @@
 
     <div class="column is-9">
       <h1 class="title">
-        <%= @document.title %>
-        <%= @document.version.name %>,
+        <%= @document_version.title %>
+        <%= @document_version.version.name %>,
         <div class="control is-expanded is-inline">
           <div class="select">
             <%= f = form_for :language, "#", phx_change: "change-language" %>

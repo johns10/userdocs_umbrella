@@ -141,50 +141,50 @@ defmodule UserDocs.Documents do
     Content.changeset(content, attrs)
   end
 
-  alias UserDocs.Documents.Document
+  alias UserDocs.Documents.DocumentVersion
   alias UserDocs.Documents.Docubit
 
   @doc """
-  Returns the list of documents.
+  Returns the list of document_versions.
 
   ## Examples
 
-      iex> list_documents()
-      [%Document{}, ...]
+      iex> list_document_versions()
+      [%DocumentVersion{}, ...]
 
   """
-  def list_documents(_params \\ %{}, filters \\ %{}) do
-    base_documents_query()
+  def list_document_versions(_params \\ %{}, filters \\ %{}) do
+    base_document_versions_query()
     |> Repo.all()
   end
 
-  defp maybe_filter_documents_by_team(query, nil), do: query
-  defp maybe_filter_documents_by_team(query, team_id) do
-    from(document in query,
-      left_join: version in assoc(document, :version),
+  defp maybe_filter_document_versions_by_team(query, nil), do: query
+  defp maybe_filter_document_versions_by_team(query, team_id) do
+    from(document_version in query,
+      left_join: version in assoc(document_version, :version),
       left_join: project in assoc(version, :project),
       where: project.team_id == ^team_id
     )
   end
 
-  defp base_documents_query(), do: from(documents in Document)
+  defp base_document_versions_query(), do: from(document_versions in DocumentVersion)
 
   @doc """
-  Gets a single document.
+  Gets a single document_version.
 
   Raises `Ecto.NoResultsError` if the Document does not exist.
 
   ## Examples
 
-      iex> get_document!(123)
-      %Document{}
+      iex> get_document_version!(123)
+      %DocumentVersion{}
 
-      iex> get_document!(456)
+      iex> get_document_version!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_document!(id, params \\ %{}, _filters \\ %{}) do
-    base_document_query(id)
+  def get_document_version!(id, params \\ %{}, _filters \\ %{}) do
+    base_document_version_query(id)
     |> maybe_preload_version(params[:version])
     |> maybe_preload_docubit(params[:body])
     |> maybe_preload_docubits(params[:docubits])
@@ -192,87 +192,87 @@ defmodule UserDocs.Documents do
   end
 
   defp maybe_preload_version(query, nil), do: query
-  defp maybe_preload_version(query, _), do: from(document in query, preload: [:version])
+  defp maybe_preload_version(query, _), do: from(document_version in query, preload: [:version])
 
   defp maybe_preload_docubit(query, nil), do: query
-  defp maybe_preload_docubit(query, _), do: from(document in query, preload: [:body])
+  defp maybe_preload_docubit(query, _), do: from(document_version in query, preload: [:body])
 
 
-  defp base_document_query(id) do
-    from(document in Document, where: document.id == ^id)
+  defp base_document_version_query(id) do
+    from(document_version in DocumentVersion, where: document_version.id == ^id)
   end
 
   @doc """
-  Creates a document.
+  Creates a document_version.
 
   ## Examples
 
-      iex> create_document(%{field: value})
-      {:ok, %Document{}}
+      iex> create_document_version(%{field: value})
+      {:ok, %DocumentVersion{}}
 
-      iex> create_document(%{field: bad_value})
+      iex> create_document_version(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_document(attrs \\ %{})
-  def create_document(attrs) do
-    %Document{}
+  def create_document_version(attrs \\ %{})
+  def create_document_version(attrs) do
+    %DocumentVersion{}
     |> Document.changeset(attrs)
     |> Repo.insert()
     |> check_default_body()
   end
 
-  def check_default_body({ :ok, %Document{ body: %Docubit{ document_id: nil } = docubit } = document }) do
-    { :ok, docubit } = update_docubit(docubit, %{ document_id: document.id })
-    { :ok, Map.put(document, :body, docubit ) }
+  def check_default_body({ :ok, %DocumentVersion{ body: %Docubit{ document_version_id: nil } = docubit } = document_version }) do
+    { :ok, docubit } = update_docubit(docubit, %{ document_version_id: document_version.id })
+    { :ok, Map.put(document_version, :body, docubit ) }
   end
   def check_default_body(state), do: state
 
   @doc """
-  Updates a document.
+  Updates a document_version.
 
   ## Examples
 
-      iex> update_document(document, %{field: new_value})
-      {:ok, %Document{}}
+      iex> update_document_version(document_version, %{field: new_value})
+      {:ok, %DocumentVersion{}}
 
-      iex> update_document(document, %{field: bad_value})
+      iex> update_document_version(document_version, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_document(%Document{} = document, attrs) do
-    document
-    |> Document.changeset(attrs)
+  def update_document_version(%DocumentVersion{} = document_version, attrs) do
+    document_version
+    |> DocumentVersion.changeset(attrs)
     |> Repo.update()
   end
 
   @doc """
-  Deletes a document.
+  Deletes a document_version.
 
   ## Examples
 
-      iex> delete_document(document)
-      {:ok, %Document{}}
+      iex> delete_document_version(document_version)
+      {:ok, %DocumentVersion{}}
 
-      iex> delete_document(document)
+      iex> delete_document_version(document_version)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_document(%Document{} = document) do
-    Repo.delete(document)
+  def delete_document_version(%DocumentVersion{} = document_version) do
+    Repo.delete(document_version)
   end
 
   @doc """
-  Returns an `%Ecto.Changeset{}` for tracking document changes.
+  Returns an `%Ecto.Changeset{}` for tracking document version changes.
 
   ## Examples
 
-      iex> change_document(document)
-      %Ecto.Changeset{data: %Document{}}
+      iex> change_document_version(document_version)
+      %Ecto.Changeset{data: %DocumentVersion{}}
 
   """
-  def change_document(%Document{} = document, attrs \\ %{}) do
-    Document.changeset(document, attrs)
+  def change_document_version(%DocumentVersion{} = document_version, attrs \\ %{}) do
+    Document.changeset(document_version, attrs)
   end
 
   alias UserDocs.Documents.ContentVersion

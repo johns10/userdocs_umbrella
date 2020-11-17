@@ -30,17 +30,17 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     IO.puts("Opening editor")
-    document = Documents.get_document!(id, %{version: true})
+    document_version = Documents.get_document_version!(id, %{version: true})
 
-    changeset = Documents.change_document(document)
+    changeset = Documents.change_document_version(document_version)
 
-    team = team(document.version_id)
+    team = team(document_version.version_id)
 
-    pages = pages(document.version_id)
+    pages = pages(document_version.version_id)
     page_select_list =
       DomainHelpers.select_list_temp(pages, :name, false)
 
-    processes = processes(document.version_id)
+    processes = processes(document_version.version_id)
     process_select_list =
       DomainHelpers.select_list_temp(processes, :name, false)
 
@@ -60,7 +60,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       :noreply,
       socket
       |> assign(:page_title, page_title(socket.assigns.live_action))
-      |> assign(:document, document)
+      |> assign(:document_version, document_version)
       |> assign(:changeset, changeset)
       |> assign(:page, pages)
       |> assign(:process, processes)
@@ -92,7 +92,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   @impl true
   def handle_event("add_column",
     %{"row-count" => row_count, "column-count" => column_count},
-    socket = %{ assigns: %{ document: document }}
+    socket = %{ assigns: %{ document_version: document_version }}
   ) when is_binary(row_count) and is_binary(column_count) do
 
     payload = %{
@@ -100,35 +100,35 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       column_count: String.to_integer(column_count)
     }
 
-    document =
-      Editor.add_new_column_to_body(document, payload)
+    document_version =
+      Editor.add_new_column_to_body(document_version, payload)
 
-    { _status, document } =
-      Documents.update_document(socket.assigns.document,
-        %{body: document.body})
+    { _status, document_version } =
+      Documents.update_document_version(socket.assigns.document_version,
+        %{body: document_version.body})
 
     {
       :noreply,
       socket
-      |> assign(:document, document)
-      |> assign(:changeset, Documents.change_document(document))
+      |> assign(:document_version, document_version)
+      |> assign(:changeset, Documents.change_document_version(document_version))
       |> assign_body()
     }
   end
 
   @impl true
-  def handle_event("add_row", payload = %{"row-count" =>  _}, socket = %{ assigns: %{ document: document }}) do
-    document = Editor.add_new_row_to_body(document, payload)
+  def handle_event("add_row", payload = %{"row-count" =>  _}, socket = %{ assigns: %{ document_version: document_version }}) do
+    document_version = Editor.add_new_row_to_body(document_version, payload)
 
-    { status, document } =
-      Documents.update_document(socket.assigns.document,
-        %{body: document.body})
+    { status, document_version } =
+      Documents.update_document_version(socket.assigns.document_version,
+        %{body: document_version.body})
 
     {
       :noreply,
       socket
-      |> assign(:document, document)
-      |> assign(:changeset, Documents.change_document(document))
+      |> assign(:document_version, document_version)
+      |> assign(:changeset, Documents.change_document_version(document_version))
       |> assign_body()
     }
   end
@@ -143,22 +143,22 @@ defmodule UserDocsWeb.DocumentLive.Editor do
     Logger.debug(type)
     Logger.debug(id)
 
-    document = Editor.add_item_to_document_column(
-      socket.assigns.document,
+    document_version = Editor.add_item_to_document_version_column(
+      socket.assigns.document_version,
       String.to_integer(row_count),
       String.to_integer(column_count),
       type,
       id
     )
 
-    { _status, document } =
-      Documents.update_document(socket.assigns.document,
-        %{body: document.body})
+    { _status, document_version } =
+      Documents.update_document_version(socket.assigns.document_version,
+        %{body: document_version.body})
 
     {
       :noreply,
       socket
-      |> assign(:document, document)
+      |> assign(:document_version, document_version)
       |> assign_body()
     }
   end
@@ -186,16 +186,16 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   @impl true
   def handle_event("delete_body_item", %{ "body-element-id" => address }, socket) do
     IO.puts("Handling a delete item event")
-    new_body = delete_body_item(address, socket.assigns.document.body)
+    new_body = delete_body_item(address, socket.assigns.document_version.body)
 
-    { _status, new_document } =
-      Documents.update_document(socket.assigns.document,
+    { _status, new_document_version } =
+      Documents.update_document_version(socket.assigns.document_version,
         %{body: new_body})
 
     {
       :noreply,
       socket
-      |> assign(:document, new_document)
+      |> assign(:document_version, new_document_version)
       |> assign_body()
     }
   end
@@ -242,13 +242,13 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   end
 
   defp assign_body(socket) do
-    case socket.assigns.document.body do
+    case socket.assigns.document_version.body do
       nil -> raise(ArgumentError, "UserDocsWeb.DocumentLive.Editor.body/1 can't parse a null body")
       _ -> assign(socket, :body, body(socket))
     end
   end
   defp body(socket) do
-    socket.assigns.document.body
+    socket.assigns.document_version.body
     |> UserDocs.Documents.OldDocuBit.parse(socket)
     |> UserDocs.Documents.OldDocuBit.render_editor(%{renderer: "Editor", prefix: ""})
   end

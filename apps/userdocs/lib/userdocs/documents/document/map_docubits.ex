@@ -1,8 +1,8 @@
 defmodule UserDocs.Documents.Document.MapDocubits do
 
-  alias UserDocs.Documents.Document
+  alias UserDocs.Documents.DocumentVersion
 
-  def apply(%Document{ docubits: docubits }) do
+  def apply(%DocumentVersion{ docubits: docubits }) do
     Enum.reduce(docubits, %{},
       fn(d, m) -> add_address_item(m, d, d.address) end)
   end

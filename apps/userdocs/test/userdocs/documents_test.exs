@@ -66,66 +66,66 @@ defmodule UserDocs.DocumentsTest do
     end
   end
 
-  describe "documents" do
+  describe "document_versions" do
     alias UserDocs.Documents.Document
 
     @valid_attrs %{body: %{}, name: "some name", title: "some title"}
     @update_attrs %{body: %{}, name: "some updated name", title: "some updated title"}
     @invalid_attrs %{body: nil, name: nil, title: nil}
 
-    def document_fixture(attrs \\ %{}) do
-      {:ok, document} =
+    def document_version_fixture(attrs \\ %{}) do
+      {:ok, document_version} =
         attrs
         |> Enum.into(@valid_attrs)
-        |> Documents.create_document()
+        |> Documents.create_document_version()
 
-      document
+      document_version
     end
 
-    test "list_documents/0 returns all documents" do
-      document = document_fixture()
-      assert Documents.list_documents() == [document]
+    test "list_document_versions/0 returns all document_versions" do
+      document_version = document_version_fixture()
+      assert Documents.list_document_versions() == [document_version]
     end
 
-    test "get_document!/1 returns the document with given id" do
-      document = document_fixture()
-      assert Documents.get_document!(document.id) == document
+    test "get_document_version!/1 returns the document_version with given id" do
+      document_version = document_version_fixture()
+      assert Documents.get_document_version!(document_version.id) == document_version
     end
 
-    test "create_document/1 with valid data creates a document" do
-      assert {:ok, %Document{} = document} = Documents.create_document(@valid_attrs)
-      assert document.body == %{}
-      assert document.name == "some name"
-      assert document.title == "some title"
+    test "create_document_version/1 with valid data creates a document_version" do
+      assert {:ok, %DocumentVersion{} = document_version} = Documents.create_document_version(@valid_attrs)
+      assert document_version.body == %{}
+      assert document_version.name == "some name"
+      assert document_version.title == "some title"
     end
 
-    test "create_document/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Documents.create_document(@invalid_attrs)
+    test "create_document_version/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Documents.create_document_version(@invalid_attrs)
     end
 
-    test "update_document/2 with valid data updates the document" do
-      document = document_fixture()
-      assert {:ok, %Document{} = document} = Documents.update_document(document, @update_attrs)
-      assert document.body == %{}
-      assert document.name == "some updated name"
-      assert document.title == "some updated title"
+    test "update_document_version/2 with valid data updates the document_version" do
+      document_version = document_version_fixture()
+      assert {:ok, %DocumentVersion{} = document_version} = Documents.update_document_version(document_version, @update_attrs)
+      assert document_version.body == %{}
+      assert document_version.name == "some updated name"
+      assert document_version.title == "some updated title"
     end
 
-    test "update_document/2 with invalid data returns error changeset" do
-      document = document_fixture()
-      assert {:error, %Ecto.Changeset{}} = Documents.update_document(document, @invalid_attrs)
-      assert document == Documents.get_document!(document.id)
+    test "update_document_version/2 with invalid data returns error changeset" do
+      document_version = document_version_fixture()
+      assert {:error, %Ecto.Changeset{}} = Documents.update_document_version(document_version, @invalid_attrs)
+      assert document_version == Documents.get_document_version!(document_version.id)
     end
 
-    test "delete_document/1 deletes the document" do
-      document = document_fixture()
-      assert {:ok, %Document{}} = Documents.delete_document(document)
-      assert_raise Ecto.NoResultsError, fn -> Documents.get_document!(document.id) end
+    test "delete_document_version/1 deletes the document_version" do
+      document_version = document_version_fixture()
+      assert {:ok, %DocumentVersion{}} = Documents.delete_document_version(document_version)
+      assert_raise Ecto.NoResultsError, fn -> Documents.get_document_version!(document_version.id) end
     end
 
-    test "change_document/1 returns a document changeset" do
-      document = document_fixture()
-      assert %Ecto.Changeset{} = Documents.change_document(document)
+    test "change_document_version/1 returns a document_version changeset" do
+      document_version = document_version_fixture()
+      assert %Ecto.Changeset{} = Documents.change_document_version(document_version)
     end
   end
 

@@ -3,7 +3,7 @@ defmodule UserDocs.Documents.Docubit.Access do
   require Logger
 
   alias UserDocs.Documents.Docubit
-  alias UserDocs.Documents.Document
+  alias UserDocs.Documents.DocumentVersion
   alias UserDocs.Documents.Docubit.Type
 """
   def delete({ :error, docubit, errors}, _), do: { :error, docubit, errors}
@@ -152,10 +152,10 @@ defmodule UserDocs.Documents.Docubit.Access do
   """
 
   def get({ :error, docubit, errors}, _), do: { :error, docubit, errors}
-  def get(%Document{} = document, []), do: document.docubit
-  def get(%Document{} = document, address) do
+  def get(%DocumentVersion{} = document_version, []), do: document_version.docubit
+  def get(%DocumentVersion{} = document_version, address) do
     Logger.debug("Getting Docubit")
-    document
+    document_version
     |> fetch(address)
   end
 

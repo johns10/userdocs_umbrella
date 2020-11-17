@@ -13,7 +13,7 @@ defmodule UserDocs.Documents.Docubit do
   alias UserDocs.Documents.Docubit.Access
   alias UserDocs.Documents.Docubit.Hydrate
 
-  alias UserDocs.Documents.Document
+  alias UserDocs.Documents.DocumentVersion
 
   alias UserDocs.Documents.Content
   alias UserDocs.Media.File
@@ -32,7 +32,7 @@ defmodule UserDocs.Documents.Docubit do
     has_one :context, Context
 
     belongs_to :docubit, Docubit
-    belongs_to :document, Document
+    belongs_to :document_version, DocumentVersion
     belongs_to :content, Content
     belongs_to :file, File
     belongs_to :through_annotation, Annotation
@@ -50,7 +50,7 @@ defmodule UserDocs.Documents.Docubit do
 
   def changeset(docubit, attrs \\ %{}) do
     docubit
-    |> cast(attrs, [ :type_id, :settings, :address, :document_id, :content_id, :through_annotation_id, :through_step_id, :docubit_id ])
+    |> cast(attrs, [ :type_id, :settings, :address, :document_version_id, :content_id, :through_annotation_id, :through_step_id, :docubit_id ])
     |> cast_assoc(:docubits)
     |> (&(validate_change(&1, :docubits,
       fn(:docubits, docubits) ->
@@ -59,7 +59,7 @@ defmodule UserDocs.Documents.Docubit do
     |> cast_settings()
     |> order_docubits()
     |> address_docubits()
-    |> validate_required([ :document_id, :type_id ])
+    |> validate_required([ :document_version_id, :type_id ])
   end
 
   def order_docubits(changeset) do

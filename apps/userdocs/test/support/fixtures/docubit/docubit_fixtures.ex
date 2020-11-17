@@ -13,45 +13,45 @@ defmodule UserDocs.DocubitFixtures do
   def p(doc_id), do: Kernel.struct(Docubit, docubit_attrs(:p, doc_id))
   def img(doc_id), do: Kernel.struct(Docubit, docubit_attrs(:img, doc_id))
 
-  def docubit_attrs(:p, document_id) do
+  def docubit_attrs(:p, document_version_id) do
     %{
       type_id: "p",
-      document_id: document_id
+      document_version_id: document_version_id
     }
   end
 
-  def docubit_attrs(:img, document_id) do
+  def docubit_attrs(:img, document_version_id) do
     %{
       type_id: "img",
-      document_id: document_id
+      document_version_id: document_version_id
     }
   end
 
-  def docubit_attrs(:ol, document_id) do
+  def docubit_attrs(:ol, document_version_id) do
     %{
       type_id: "ol",
-      document_id: document_id
+      document_version_id: document_version_id
     }
   end
 
-  def docubit_attrs(:row, document_id) do
+  def docubit_attrs(:row, document_version_id) do
     %{
       type_id: "row",
-      document_id: document_id
+      document_version_id: document_version_id
     }
   end
 
-  def docubit_attrs(:column, document_id) do
+  def docubit_attrs(:column, document_version_id) do
     %{
       type_id: "column",
-      document_id: document_id
+      document_version_id: document_version_id
     }
   end
 
-  def docubit_attrs(:container, document_id) do
+  def docubit_attrs(:container, document_version_id) do
     %{
       type_id: "container",
-      document_id: document_id
+      document_version_id: document_version_id
     }
   end
 
