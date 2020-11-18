@@ -153,8 +153,9 @@ defmodule UserDocs.Documents do
       [%DocumentVersion{}, ...]
 
   """
-  def list_document_versions(_params \\ %{}, filters \\ %{}) do
+  def list_document_versions(params \\ %{}, _filters \\ %{}) do
     base_document_versions_query()
+    |> maybe_preload_docubit(params[:body])
     |> Repo.all()
   end
 
@@ -217,7 +218,7 @@ defmodule UserDocs.Documents do
   def create_document_version(attrs \\ %{})
   def create_document_version(attrs) do
     %DocumentVersion{}
-    |> Document.changeset(attrs)
+    |> DocumentVersion.changeset(attrs)
     |> Repo.insert()
     |> check_default_body()
   end
@@ -272,7 +273,7 @@ defmodule UserDocs.Documents do
 
   """
   def change_document_version(%DocumentVersion{} = document_version, attrs \\ %{}) do
-    Document.changeset(document_version, attrs)
+    DocumentVersion.changeset(document_version, attrs)
   end
 
   alias UserDocs.Documents.ContentVersion

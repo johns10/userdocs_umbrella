@@ -1,17 +1,19 @@
 defmodule UserDocsWeb.DocumentLive.Index do
   use UserDocsWeb, :live_view
-  use UserdocsWeb.LiveViewPowHelper
 
   alias UserDocs.Documents
   alias UserDocs.Documents.DocumentVersion
-  alias UserDocsWeb.UserLive
+
+  alias UserDocsWeb.Root
+  alias UserDocsWeb.UserLive.LoginFormComponent
 
   @impl true
-  def mount(_params, session, socket) do
+  def mount(params, session, socket) do
     {
       :ok,
       socket
-      |> UserLive.Helpers.validate_logged_in(session)
+      |> Root.authorize(session)
+      |> Root.initialize()
       |> initialize()
     }
   end
@@ -52,6 +54,9 @@ defmodule UserDocsWeb.DocumentLive.Index do
 
     {:noreply, assign(socket, :document_versions, list_document_versions(socket.assigns.current_user.default_team_id))}
   end
+  def handle_event(n, p, s), do: Root.handle_event(n, p, s)
+
+  def handle_info(n, s), do: Root.handle_info(n, s)
 
   # TODO: Probably set the current team ID somewhere in the app
   defp list_document_versions(team_id) do

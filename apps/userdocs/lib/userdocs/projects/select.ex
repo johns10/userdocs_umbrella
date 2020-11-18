@@ -53,6 +53,10 @@ defmodule UserDocs.Projects.Select do
     |> convert_to_select_list()
   end
 
+  def assign_default_team_id(%{ assigns: %{ current_user: %{ default_team_id: team_id}}} = state, loader) do
+    loader.(state, :current_team_id, team_id)
+  end
+
   defp current_team_id(changes = %{}, %{ current_user: %{ default_team_id: team_id} }), do: Map.put(changes, :current_team_id, team_id )
   defp current_team_id(_, _), do: raise(ArgumentError, "Select.current_team_id failed to find a team id")
 

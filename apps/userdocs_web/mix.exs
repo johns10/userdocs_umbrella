@@ -48,7 +48,6 @@ defmodule UserDocsWeb.MixProject do
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 0.4"},
       {:gettext, "~> 0.11"},
-      {:userdocs, in_umbrella: true},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:pow, "~> 1.0.21"},
@@ -58,6 +57,7 @@ defmodule UserDocsWeb.MixProject do
       {:cors_plug, "~> 2.0"},
       {:phx_gen_auth, "~> 0.5", only: [:dev], runtime: false},
       {:pbkdf2_elixir, "~> 1.0"},
+      {:userdocs, in_umbrella: true},
     ]
   end
 

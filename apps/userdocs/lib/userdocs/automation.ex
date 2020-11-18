@@ -60,6 +60,12 @@ defmodule UserDocs.Automation do
         teams: {teams, projects: {projects, :versions}}
       ]
   end
+  def project_details(user, state) do
+    user
+    |> User.preload_teams(state)
+    |> User.preload_projects(state)
+    |> User.preload_versions(state)
+  end
 
   alias UserDocs.Automation.StepType
 
@@ -323,7 +329,7 @@ defmodule UserDocs.Automation do
 
   """
   def create_step(attrs \\ %{}) do
-    %Step{}
+    %Step{  }
     |> Step.changeset(attrs)
     |> Repo.insert()
     |> Subscription.broadcast("step", "create")

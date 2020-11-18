@@ -23,35 +23,33 @@ defmodule UserDocsWeb.VersionPicker do
 
   @impl true
   def render(assigns) do
-    IO.inspect(assigns.current_user)
     ~L"""
     <div class="navbar-item has-dropdown is-hoverable">
       <a class="navbar-link">Version</a>
       <div class="navbar-dropdown">
-          <%= for team <- @current_user.teams do %>
-            <%= dropdown_trigger(assigns, team.name) do %>
-              <div class="dropdown-menu" role="menu">
-                <div class="dropdown-content">
-                  <%= for project <- team.projects do %>
-                    <%= dropdown_trigger(assigns, project.name) do %>
-                      <div class="dropdown-menu" role="menu">
-                        <div class="dropdown-content">
-                          <%= for version <- project.versions do %>
-                            <a href="#"
-                              class="dropdown-item"
-                              phx-click="select_version"
-                              phx-value-select-version="<%= version.id %>"
-                            ><%= version.name %></a>
-                          <% end %>
-                        </div>
+        <%= for team <- @current_user.teams do %>
+          <%= dropdown_trigger(assigns, team.name) do %>
+            <div class="dropdown-menu" role="menu">
+              <div class="dropdown-content">
+                <%= for project <- team.projects do %>
+                  <%= dropdown_trigger(assigns, project.name) do %>
+                    <div class="dropdown-menu" role="menu">
+                      <div class="dropdown-content">
+                        <%= for version <- project.versions do %>
+                          <a href="#"
+                            class="dropdown-item"
+                            phx-click="select_version"
+                            phx-value-select-version="<%= version.id %>"
+                          ><%= version.name %></a>
+                        <% end %>
                       </div>
-                    <% end %>
+                    </div>
                   <% end %>
-                </div>
+                <% end %>
               </div>
-            <% end %>
+            </div>
           <% end %>
-        <a class="navbar-item">Jobs</a>
+        <% end %>
       </div>
     </div>
 
@@ -72,7 +70,7 @@ defmodule UserDocsWeb.VersionPicker do
       :ok,
       socket
       |> assign(assigns)
-      |> assign(:current_user, Automation.project_details(assigns.current_user.id))
+      |> assign(:current_user, Automation.project_details(assigns.current_user, assigns))
     }
   end
 end

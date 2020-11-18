@@ -47,7 +47,7 @@ defmodule UserDocsWeb.Router do
   scope "/", UserDocsWeb do
     pipe_through [:browser, :protected]
 
-    delete "/logout", SessionController, :delete, as: :logout
+    delete "/session", SessionController, :delete, as: :logout
   end
 
   scope "/", UserDocsWeb do

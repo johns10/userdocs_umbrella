@@ -67,11 +67,11 @@ defmodule UserDocs.DocumentsTest do
   end
 
   describe "document_versions" do
-    alias UserDocs.Documents.Document
+    alias UserDocs.Documents.DocumentVersion
 
-    @valid_attrs %{body: %{}, name: "some name", title: "some title"}
-    @update_attrs %{body: %{}, name: "some updated name", title: "some updated title"}
-    @invalid_attrs %{body: nil, name: nil, title: nil}
+    @valid_attrs %{name: "some name", title: "some title"}
+    @update_attrs %{name: "some updated name", title: "some updated title"}
+    @invalid_attrs %{name: "", title: ""}
 
     def document_version_fixture(attrs \\ %{}) do
       {:ok, document_version} =
@@ -84,17 +84,16 @@ defmodule UserDocs.DocumentsTest do
 
     test "list_document_versions/0 returns all document_versions" do
       document_version = document_version_fixture()
-      assert Documents.list_document_versions() == [document_version]
+      assert Documents.list_document_versions(%{ body: true }) == [document_version]
     end
 
     test "get_document_version!/1 returns the document_version with given id" do
       document_version = document_version_fixture()
-      assert Documents.get_document_version!(document_version.id) == document_version
+      assert Documents.get_document_version!(document_version.id, %{ body: true }) == document_version
     end
 
     test "create_document_version/1 with valid data creates a document_version" do
       assert {:ok, %DocumentVersion{} = document_version} = Documents.create_document_version(@valid_attrs)
-      assert document_version.body == %{}
       assert document_version.name == "some name"
       assert document_version.title == "some title"
     end
@@ -106,7 +105,6 @@ defmodule UserDocs.DocumentsTest do
     test "update_document_version/2 with valid data updates the document_version" do
       document_version = document_version_fixture()
       assert {:ok, %DocumentVersion{} = document_version} = Documents.update_document_version(document_version, @update_attrs)
-      assert document_version.body == %{}
       assert document_version.name == "some updated name"
       assert document_version.title == "some updated title"
     end
@@ -114,7 +112,7 @@ defmodule UserDocs.DocumentsTest do
     test "update_document_version/2 with invalid data returns error changeset" do
       document_version = document_version_fixture()
       assert {:error, %Ecto.Changeset{}} = Documents.update_document_version(document_version, @invalid_attrs)
-      assert document_version == Documents.get_document_version!(document_version.id)
+      assert document_version == Documents.get_document_version!(document_version.id, %{ body: true })
     end
 
     test "delete_document_version/1 deletes the document_version" do

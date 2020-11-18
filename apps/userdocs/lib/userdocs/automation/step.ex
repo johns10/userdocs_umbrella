@@ -122,23 +122,31 @@ defmodule UserDocs.Automation.Step do
     UserDocs.Automation.Step.Safe.apply(step, handlers)
   end
 
+  def put_annotation_name(%{ data: %{ annotation: %Ecto.Association.NotLoaded{} }} = changeset) do
+    changeset
+  end
+  def put_annotation_name(%{ data: %{ element: %Ecto.Association.NotLoaded{} }} = changeset) do
+    changeset
+  end
   def put_annotation_name(changeset) do
-    step = apply_changes(changeset)
-    annotation = step.annotation
-    element = step.element
-
-    annotation = Ecto.Changeset.get_field(changeset, :annotation)
-    element = Ecto.Changeset.get_field(changeset, :element)
-
-    name =
-      UserDocs.Web.Annotation.Name.execute(annotation, element)
-
-    # Logger.debug("Putting annotation name #{name}")
-
-    Ecto.Changeset.update_change(changeset, :annotation,
-      fn(a) -> Ecto.Changeset.put_change(a, :name, name) end)
+    case get_field(changeset, :annotation, nil) do
+      nil -> changeset
+      "" -> changeset
+      annotation ->
+        case get_field(changeset, :element, nil) do
+          nil -> changeset
+          "" -> changeset
+          element ->
+            name = UserDocs.Web.Annotation.Name.execute(annotation, element)
+            Ecto.Changeset.update_change(changeset, :annotation,
+              fn(a) -> Ecto.Changeset.put_change(a, :name, name) end)
+        end
+    end
   end
 
+  def put_name(%{ data: %{ step_type: %Ecto.Association.NotLoaded{} }} = changeset) do
+    changeset
+  end
   def put_name(changeset) do
     name = Name.execute(changeset)
     # Logger.debug("Changing Step Name to #{name}")

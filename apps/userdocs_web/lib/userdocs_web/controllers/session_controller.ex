@@ -8,20 +8,6 @@ defmodule UserDocsWeb.SessionController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    { "referer", url} =
-      conn
-      |> Map.get(:req_headers)
-      |> Enum.filter(fn({k,v}) -> k == "referer" end)
-      |> Enum.at(0)
-
-    { "origin", origin} =
-      conn
-      |> Map.get(:req_headers)
-      |> Enum.filter(fn({k,v}) -> k == "origin" end)
-      |> Enum.at(0)
-
-    path = String.replace(url, origin, "")
-
     conn
     |> Pow.Plug.authenticate_user(user_params)
     |> case do
@@ -40,6 +26,7 @@ defmodule UserDocsWeb.SessionController do
   end
 
   def delete(conn, _params) do
+    IO.inspect("Deleting")
     conn
     |> Pow.Plug.delete()
     |> redirect(to: referer_path(conn))

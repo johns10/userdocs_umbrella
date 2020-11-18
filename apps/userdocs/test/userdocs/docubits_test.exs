@@ -11,7 +11,7 @@ defmodule UserDocs.DocubitsTest do
     alias UserDocs.WebFixtures
     alias UserDocs.UsersFixtures
     alias UserDocs.AutomationFixtures
-    alias UserDocs.DocumentFixtures
+    alias UserDocs.DocumentVersionFixtures
     alias UserDocs.MediaFixtures
 
     alias UserDocs.Documents.Docubit.Type
@@ -33,13 +33,13 @@ defmodule UserDocs.DocubitsTest do
       outline_annotation_type = WebFixtures.annotation_type(:outline)
 
       content_one =
-        DocumentFixtures.content(team)
+        DocumentVersionFixtures.content(team)
 
       content_two =
-        DocumentFixtures.content(team)
+        DocumentVersionFixtures.content(team)
 
       content_three =
-        DocumentFixtures.content(team)
+        DocumentVersionFixtures.content(team)
 
       file_one = MediaFixtures.file()
       file_two = MediaFixtures.file()
