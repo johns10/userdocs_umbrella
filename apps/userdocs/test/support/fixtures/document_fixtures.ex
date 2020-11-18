@@ -1,4 +1,4 @@
-defmodule UserDocs.DocumentFixtures do
+defmodule UserDocs.DocumentVersionFixtures do
   @moduledoc """
   This module defines test helpers for creating
   entities via the `UserDocs.Auth` context.

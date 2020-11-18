@@ -59,7 +59,7 @@ defmodule UserDocs.Documents.Docubit do
     |> cast_settings()
     |> order_docubits()
     |> address_docubits()
-    |> validate_required([ :document_version_id, :type_id ])
+    |> validate_required([ :type_id ])
   end
 
   def order_docubits(changeset) do

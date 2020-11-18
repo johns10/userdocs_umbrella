@@ -20,6 +20,7 @@ defmodule UserDocs.Users do
   def list_users(params \\ %{}, _filters \\ %{}) do
     base_users_query()
     |> maybe_filter_by_team(params[:team_id])
+    |> maybe_preload_user_teams(params[:team])
     |> Repo.all()
   end
 
@@ -48,7 +49,30 @@ defmodule UserDocs.Users do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(id, params \\ %{}, _filters \\ %{}) do
+    base_user_query(id)
+    |> maybe_preload_user_teams(params[:teams])
+    |> Repo.one!()
+  end
+
+  def get_user!(id, params, _filters, state) do
+    StateHandlers.get(state, id, User, %{})
+    |> maybe_preload_user_teams(params[:teams], state)
+  end
+
+  defp maybe_preload_user_teams(query, nil), do: query
+  defp maybe_preload_user_teams(query, _) do
+    from(users in query, preload: [:teams])
+  end
+
+  defp maybe_preload_user_teams(users, nil, _), do: users
+  defp maybe_preload_user_teams(users, preloads, state) do
+    StateHandlers.preload(state, users, preloads, %{})
+  end
+
+  defp base_user_query(id) do
+    from(user in User, where: user.id == ^id)
+  end
 
   @doc """
   Creates a user.

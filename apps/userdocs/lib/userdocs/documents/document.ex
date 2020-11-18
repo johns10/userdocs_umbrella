@@ -37,7 +37,7 @@ defmodule UserDocs.Documents.DocumentVersion do
   defp body_is_container_docubit_if_empty(changeset) do
     attrs = %{ type_id: "container", address: [0] }
 
-    case get_change(changeset, :docubit_id) do
+    case get_field(changeset, :docubit_id) do
       nil -> put_change(changeset, :body, attrs)
       "" -> put_change(changeset, :body, attrs)
       _ -> changeset
@@ -50,7 +50,7 @@ defmodule UserDocs.Documents.DocumentVersion do
 
   def load(%DocumentVersion{ docubits: docubits } = document_version, state) do
     docubits = Enum.map(docubits, fn(d) -> Docubit.preload(d, state) end)
-    state = State.load(state, docubits, @state_opts)
+    state = StateHandlers.load(state, docubits, @state_opts)
     map =
       document_version
       |> MapDocubits.apply()
@@ -63,7 +63,7 @@ defmodule UserDocs.Documents.DocumentVersion do
   end
   def docubit_map_item({ _key, map }, state, parent_context) do
     opts = Map.put(@state_opts, :type, "docubit")
-    docubit = State.get(state, map.docubit.id, opts)
+    docubit = StateHandlers.get(state, map.docubit.id, opts)
     { :ok, context } = Docubit.context(docubit, parent_context)
     docubits =
       Enum.map(map.docubit.docubits,

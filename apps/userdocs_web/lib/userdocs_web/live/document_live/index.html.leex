@@ -37,5 +37,5 @@
 
   <span><%= live_patch "New Document", to: Routes.document_index_path(@socket, :new) %></span>
 <% else %>
-  <%= UserLive.LoginFormComponent.render(assigns) %>
+  <%= LoginFormComponent.render(assigns) %>
 <% end %>

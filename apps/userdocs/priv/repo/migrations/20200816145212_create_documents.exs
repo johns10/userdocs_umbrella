@@ -5,7 +5,7 @@ defmodule UserDocs.Repo.Migrations.CreateDocumentVersions do
     create table(:document_versions) do
       add :name, :string
       add :title, :string
-      add :docubit_id, references(:docubits, on_delete: :nothing)
+      add :docubit_id, references(:docubits, on_delete: :delete_all)
       add :version_id, references(:versions, on_delete: :nothing)
       add :map, :map
 

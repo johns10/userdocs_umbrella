@@ -66,9 +66,10 @@ defmodule UserDocs.AutomationTest do
 
   describe "steps" do
     alias UserDocs.Automation.Step
+    alias UserDocs.AutomationFixtures
 
-    @valid_attrs %{order: 42}
-    @update_attrs %{order: 43}
+    @valid_attrs %{order: 42, annotation_id: nil }
+    @update_attrs %{order: 43, annotation_id: nil }
     @invalid_attrs %{order: nil}
 
     def step_fixture(attrs \\ %{}) do
@@ -81,12 +82,12 @@ defmodule UserDocs.AutomationTest do
     end
 
     test "list_steps/0 returns all steps" do
-      step = step_fixture()
+      step = AutomationFixtures.step()
       assert Automation.list_steps() == [step]
     end
 
     test "get_step!/1 returns the step with given id" do
-      step = step_fixture()
+      step = AutomationFixtures.step()
       assert Automation.get_step!(step.id) == step
     end
 

@@ -7,10 +7,12 @@ defmodule UserDocsWeb.DocumentLive.FormComponent do
   def update(%{document_version: document_version} = assigns, socket) do
     changeset = Documents.change_document_version(document_version)
 
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign(:changeset, changeset)}
+    {
+      :ok,
+      socket
+      |> assign(assigns)
+      |> assign(:changeset, changeset)
+    }
   end
 
   @impl true
