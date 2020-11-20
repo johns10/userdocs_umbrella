@@ -1,0 +1,52 @@
+defmodule StateHandlers.List do
+
+  def apply(state, schema, opts) do
+    state
+    |> maybe_access_location(opts[:location])
+    |> maybe_access_type(opts[:strategy], schema)
+    |> maybe_filter_by_ids(opts[:ids], opts[:data_type])
+    |> maybe_filter_by_field(opts[:filter], opts[:data_type])
+    |> cast_by_type(opts[:data_type])
+  end
+
+  defp maybe_access_location(state, nil), do: state
+  defp maybe_access_location(state, location) do
+    Map.get(state, location)
+  end
+
+  defp maybe_access_type(state, :by_key, _), do: state
+  defp maybe_access_type(state, nil, schema), do: access_type(state, schema)
+  defp maybe_access_type(state, :by_type, schema), do: access_type(state, schema)
+
+  defp access_type(state, schema) do
+    type = schema.__schema__(:source) |> String.to_atom()
+    Map.get(state, type)
+  end
+
+  defp maybe_filter_by_ids(data, nil, _), do: data
+  defp maybe_filter_by_ids(data, ids, :map), do: filter_map_by_ids(data, ids)
+  defp maybe_filter_by_ids(data, ids, :list), do: filter_list_by_ids(data, ids)
+  defp maybe_filter_by_ids(data, ids, nil), do: filter_list_by_ids(data, ids)
+
+  def filter_map_by_ids(data, ids), do: Map.take(data, ids)
+  def filter_list_by_ids(data, ids), do: Enum.filter(data, fn(d) -> d.id in ids end)
+
+  defp maybe_filter_by_field(data, nil, _), do: data
+  defp maybe_filter_by_field(data, { field, value }, nil), do: filter_list_by_field(data, { field, value})
+  defp maybe_filter_by_field(data, { field, value }, :map), do: filter_map_by_field(data, { field, value})
+  defp maybe_filter_by_field(data, { field, value }, :list), do: filter_list_by_field(data, { field, value})
+
+  def filter_map_by_field(data, { field, value}) do
+    Enum.filter(data, fn({_, o}) -> Map.get(o, field) == value end)
+  end
+
+  def filter_list_by_field(data, { field, value}) do
+    Enum.filter(data, fn(d) -> Map.get(d, field) == value end)
+  end
+
+  def cast_by_type(data, :list), do: data
+  def cast_by_type(data, nil), do: data
+  def cast_by_type(data, :map), do: Enum.map(data, fn({_, v}) -> v end)
+
+  def apply(_, _, _), do: raise(RuntimeError, "State.Get failed to find a matching clause")
+end
