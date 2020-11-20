@@ -3,6 +3,134 @@ defmodule UserDocs.UsersTest do
 
   alias UserDocs.Users
 
+  describe "users" do
+    alias UserDocs.Users.User
+    alias UserDocs.UsersFixtures
+    alias UserDocs.ProjectsFixtures
+
+    test "list_users/0 returns all teams" do
+      user = UsersFixtures.user()
+      result =
+        Users.list_users()
+        |> Enum.at(0)
+        |> Map.delete(:password)
+      assert result == Map.delete(user, :password)
+    end
+
+    test "get_user!/1 returns the team with given id" do
+      user = UsersFixtures.user()
+      result =
+        Users.get_user!(user.id)
+        |> Map.delete(:password)
+      assert result == Map.delete(user, :password)
+    end
+
+    test "create_user/1 with valid data creates a user" do
+      attrs = UsersFixtures.user_attrs(:valid)
+      assert {:ok, %User{} = user} = Users.create_user(attrs)
+      assert user.email == attrs.email
+    end
+
+    test "create_user/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Users.create_user(UsersFixtures.user_attrs(:invalid))
+    end
+
+    test "update_user/2 with valid data updates the user" do
+      user = UsersFixtures.user()
+      attrs = UsersFixtures.user_attrs(:valid)
+      attrs =
+        attrs
+        |> Map.put(:current_password, user.password)
+      assert {:ok, %User{} = user} = Users.update_user(user, attrs)
+      assert user.email == attrs.email
+    end
+
+    test "update_user/2 with invalid data returns error changeset" do
+      user = UsersFixtures.user()
+      attrs = UsersFixtures.user_attrs(:invalid)
+      assert {:error, %Ecto.Changeset{}} = Users.update_user(user, attrs)
+      result =
+        Users.get_user!(user.id)
+        |> Map.delete(:password)
+      assert result == Map.delete(user, :password)
+    end
+
+    test "delete_user/1 deletes the user" do
+      user = UsersFixtures.user()
+      assert {:ok, %User{}} = Users.delete_user(user)
+      assert_raise Ecto.NoResultsError, fn -> Users.get_user!(user.id) end
+    end
+
+    test "change_team/1 returns a team changeset" do
+      team = UsersFixtures.team()
+      assert %Ecto.Changeset{} = Users.change_team(team)
+    end
+
+    test "get_user/2 with preload teams and state returns preloaded user" do
+      user = UsersFixtures.user()
+      team = UsersFixtures.team()
+      team_user = UsersFixtures.team_user(user.id, team.id)
+      preloads = [ user: :teams ]
+      team_one = UsersFixtures.team_user(user.id, team.id)
+      state = %{ teams: [team], users: [user], team_users: [team_user]}
+      result = Users.get_user!(user.id, preloads, [], state)
+      assert result.teams == [team]
+    end
+
+    test "get_user/2 with preload list: teams and state returns preloaded user" do
+      user = UsersFixtures.user()
+      team_one = UsersFixtures.team()
+      team_two = UsersFixtures.team()
+      preloads = [ user: [ :teams ] ]
+      team_user_one = UsersFixtures.team_user(user.id, team_one.id)
+      team_user_two = UsersFixtures.team_user(user.id, team_two.id)
+      state = %{ teams: [team_one, team_two], users: [user], team_users: [team_user_one, team_user_two]}
+      result = Users.get_user!(user.id, preloads, [], state)
+      assert result.teams == [team_one, team_two]
+    end
+
+    test "get_user/2 with preload teams + projects and state returns preloaded user" do
+      user = UsersFixtures.user()
+      team = UsersFixtures.team()
+      team_user = UsersFixtures.team_user(user.id, team.id)
+      project = ProjectsFixtures.project(team.id)
+      preloads = [ user: [ :teams, [ teams: :projects ] ] ]
+      state = %{ teams: [team], users: [user], team_users: [team_user], projects: [project]}
+      result = Users.get_user!(user.id, preloads, [], state)
+      assert project == result.teams |> Enum.at(0) |> Map.get(:projects) |> Enum.at(0)
+    end
+
+    test "get_user/2 with preload teams, projects and versions and state returns preloaded user" do
+      user = UsersFixtures.user()
+      team = UsersFixtures.team()
+      team_user = UsersFixtures.team_user(user.id, team.id)
+      project = ProjectsFixtures.project(team.id)
+      version = ProjectsFixtures.version(project.id)
+      preloads = [ user: [ :teams, [ teams: :projects ], [ teams: [ projects: :versions]] ] ]
+      state = %{ teams: [team], users: [user], team_users: [team_user],
+        projects: [project], versions: [version]}
+      result = Users.get_user!(user.id, preloads, [], state)
+      assert version == result.teams |> Enum.at(0) |> Map.get(:projects)
+      |> Enum.at(0) |> Map.get(:versions) |> Enum.at(0)
+    end
+
+    alias StateHandlers
+
+    test "StateHandlers.List" do
+      user = UsersFixtures.user()
+      team = UsersFixtures.team()
+      team_user = UsersFixtures.team_user(user.id, team.id)
+      project = ProjectsFixtures.project(team.id)
+      version = ProjectsFixtures.version(project.id)
+      preloads = [ user: [ :teams, [ teams: :projects ], [ teams: [ projects: :versions]] ] ]
+      state = %{ teams: [team], users: [user], team_users: [team_user],
+        projects: [project], versions: [version]}
+      result = StateHandlers.list(state, User, [])
+      assert result = [user]
+    end
+
+  end
+  """
   describe "teams" do
     alias UserDocs.Users.Team
 
@@ -63,4 +191,5 @@ defmodule UserDocs.UsersTest do
       assert %Ecto.Changeset{} = Users.change_team(team)
     end
   end
+  """
 end

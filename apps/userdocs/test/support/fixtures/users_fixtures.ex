@@ -5,9 +5,32 @@ defmodule UserDocs.UsersFixtures do
   """
   alias UserDocs.Users
 
+  def user_attrs(:valid) do
+    password = UUID.uuid4()
+    %{
+      email: UUID.uuid4() <> "@gmail.com",
+      password: password,
+      password_confirmation: password
+    }
+  end
+  def user_attrs(:invalid) do
+    %{
+      email: UUID.uuid4(),
+      password: "",
+      password_confirmation: ""
+    }
+  end
+
+  def user() do
+    { :ok, user } =
+      user_attrs(:valid)
+      |> Users.create_user()
+    user
+  end
+
   def team_attrs(:valid) do
     %{
-      name: "team",
+      name: UUID.uuid4(),
       users: []
     }
   end
@@ -17,6 +40,20 @@ defmodule UserDocs.UsersFixtures do
       team_attrs(:valid)
       |> Users.create_team()
     team
+  end
+
+  def team_user(user_id, team_id) do
+    { :ok, team_user } =
+      team_user_attrs(:valid, user_id, team_id)
+      |> Users.create_team_user()
+      team_user
+  end
+
+  def team_user_attrs(:valid, user_id, team_id) do
+    %{
+      team_id: team_id,
+      user_id: user_id
+    }
   end
 
 end

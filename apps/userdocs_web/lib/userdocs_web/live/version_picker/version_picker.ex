@@ -66,11 +66,14 @@ defmodule UserDocsWeb.VersionPicker do
 
   @impl true
   def update(assigns, socket) do
+    IO.inspect(
+      UserDocs.Users.get_user!(assigns.current_user.id)
+    )
     {
       :ok,
       socket
       |> assign(assigns)
-      |> assign(:current_user, Automation.project_details(assigns.current_user, assigns))
+      |> assign(:current_user, Automation.project_details(assigns.current_user, assigns, %{}))
     }
   end
 end
