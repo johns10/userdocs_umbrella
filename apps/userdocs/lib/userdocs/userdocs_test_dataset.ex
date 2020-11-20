@@ -215,7 +215,7 @@ defmodule UserDocs.TestDataset do
 
     # User Data
 
-    default_password = "password"
+    default_password = "A7B!2#x2y"
 
     user_1 =
       %{

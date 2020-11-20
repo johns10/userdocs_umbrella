@@ -60,11 +60,14 @@ defmodule UserDocs.Automation do
         teams: {teams, projects: {projects, :versions}}
       ]
   end
-  def project_details(user, state) do
-    user
-    |> User.preload_teams(state)
-    |> User.preload_projects(state)
-    |> User.preload_versions(state)
+  def project_details(user, state, opts) do
+    preloads = [
+      user: :teams,
+      user: {:teams, :projects},
+      user: {:teams, {:projects, {:projects, :versions}}}
+    ]
+    state
+    |> StateHandlers.preload(user, preloads, opts)
   end
 
   alias UserDocs.Automation.StepType
@@ -199,7 +202,7 @@ defmodule UserDocs.Automation do
     |> maybe_preload_file(params[:content_versions])
     |> Repo.all()
   end
-  def list_steps(params, filters, state) do
+  def list_steps(_params, filters, state) do
     UserDocs.State.get(state, :steps, Step)
     |> maybe_filter_by_process(filters[:process_id], state)
   end
@@ -390,7 +393,6 @@ defmodule UserDocs.Automation do
   end
 
   def clear_association(step, foreign_key, key) do
-    changes = %{ foreign_key => nil }
     { :ok, new_step } =
       step
       |> Step.changeset(%{ foreign_key => nil })
@@ -468,7 +470,7 @@ defmodule UserDocs.Automation do
 
 
   def change_step_with_nested_data(step, attrs \\ %{}, state \\ %{})
-  def change_step_with_nested_data(%Step{ id: nil } = step, attrs, state), do: Step.changeset(step, attrs)
+  def change_step_with_nested_data(%Step{ id: nil } = step, attrs, _state), do: Step.changeset(step, attrs)
   def change_step_with_nested_data(%Step{} = step, attrs, state) do
     changeset = Step.change_nested_foreign_keys(step, attrs)
     { :ok, new_step } = Repo.update(changeset)

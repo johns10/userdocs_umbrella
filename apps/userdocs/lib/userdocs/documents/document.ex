@@ -8,7 +8,7 @@ defmodule UserDocs.Documents.DocumentVersion do
   alias UserDocs.Documents.Document.MapDocubits
   alias UserDocs.Documents.Docubit.Context
 
-  @state_opts %{ data_type: :map, strategy: :by_key, location: :root }
+  @state_opts [ data_type: :map, strategy: :by_key, location: :root ]
 
   schema "document_versions" do
     field :name, :string
@@ -62,7 +62,7 @@ defmodule UserDocs.Documents.DocumentVersion do
     docubit_map_item({ 0, Map.get(map, 0) }, state, %Context{})
   end
   def docubit_map_item({ _key, map }, state, parent_context) do
-    opts = Map.put(@state_opts, :type, "docubit")
+    opts = Keyword.put(@state_opts, :type, "docubit")
     docubit = StateHandlers.get(state, map.docubit.id, opts)
     { :ok, context } = Docubit.context(docubit, parent_context)
     docubits =
@@ -74,7 +74,6 @@ defmodule UserDocs.Documents.DocumentVersion do
     docubit
     |> Map.put(:context, context)
     |> Map.put(:docubits, docubits)
-    |> IO.inspect()
   end
 
   def update_docubit_item(map, state, context) do

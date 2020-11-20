@@ -6,15 +6,12 @@ defmodule UserDocsWeb.Root do
 
   alias UserDocs.Users
   alias UserDocs.Users.User
-  alias UserDocs.Documents
-  alias UserDocs.Automation
   alias UserDocs.Projects
   alias UserDocs.Projects.Select
-  alias UserDocs.Web
 
   alias StateHandlers
 
-  @state_opts %{ data_type: :list, strategy: :by_type, loader: &Phoenix.LiveView.assign/3 }
+  @state_opts [ data_type: :list, strategy: :by_type, loader: &Phoenix.LiveView.assign/3 ]
 
   def render(assigns) do
     ~L"""
@@ -30,7 +27,6 @@ defmodule UserDocsWeb.Root do
     socket
     |> team_users()
     |> teams()
-    |> IO.inspect()
     |> Select.assign_default_team_id(&assign/3)
     |> projects()
     |> versions()
@@ -44,19 +40,19 @@ defmodule UserDocsWeb.Root do
   end
 
   def teams(%{ assigns: %{ current_user: %{ id: user_id }}} = socket) do
-    opts = Map.put(@state_opts, :type, :teams)
+    opts = Keyword.put(@state_opts, :type, :teams)
     teams = Users.list_teams(%{}, %{ user_id: user_id })
     StateHandlers.load(socket, teams, opts)
   end
 
   def projects(%{ assigns: %{ current_user: %{ id: user_id }}} = socket) do
-    opts = Map.put(@state_opts, :type, :projects)
+    opts = Keyword.put(@state_opts, :type, :projects)
     projects = Projects.list_projects(%{}, %{ user_id: user_id })
     StateHandlers.load(socket, projects, opts)
   end
 
   def versions(%{ assigns: %{ current_user: %{ id: user_id }}} = socket) do
-    opts = Map.put(@state_opts, :type, :versions)
+    opts = Keyword.put(@state_opts, :type, :versions)
     versions = Projects.list_versions(%{}, %{ user_id: user_id })
     StateHandlers.load(socket, versions, opts)
   end
