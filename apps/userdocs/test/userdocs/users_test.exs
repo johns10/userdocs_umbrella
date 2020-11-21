@@ -3,6 +3,8 @@ defmodule UserDocs.UsersTest do
 
   alias UserDocs.Users
 
+  @opts [ data_type: :list, strategy: :by_type, loader: &Phoenix.LiveView.assign/3 ]
+
   describe "users" do
     alias UserDocs.Users.User
     alias UserDocs.UsersFixtures
@@ -73,7 +75,7 @@ defmodule UserDocs.UsersTest do
       preloads = [ teams: :teams ]
       team_one = UsersFixtures.team_user(user.id, team.id)
       state = %{ teams: [team], users: [user], team_users: [team_user]}
-      result = Users.get_user!(user.id, preloads, [], state)
+      result = Users.get_user!(user.id, preloads, [], state, @opts)
       assert result.teams == [team]
     end
 
@@ -85,7 +87,7 @@ defmodule UserDocs.UsersTest do
       team_user_one = UsersFixtures.team_user(user.id, team_one.id)
       team_user_two = UsersFixtures.team_user(user.id, team_two.id)
       state = %{ teams: [team_one, team_two], users: [user], team_users: [team_user_one, team_user_two]}
-      result = Users.get_user!(user.id, preloads, [], state)
+      result = Users.get_user!(user.id, preloads, [], state, @opts)
       assert result.teams == [team_one, team_two]
     end
 
@@ -96,7 +98,7 @@ defmodule UserDocs.UsersTest do
       project = ProjectsFixtures.project(team.id)
       preloads = [ teams: [ :teams, [ teams: :projects ] ] ]
       state = %{ teams: [team], users: [user], team_users: [team_user], projects: [project]}
-      result = Users.get_user!(user.id, preloads, [], state)
+      result = Users.get_user!(user.id, preloads, [], state, @opts)
       assert project == result.teams |> Enum.at(0) |> Map.get(:projects) |> Enum.at(0)
     end
 
@@ -109,7 +111,7 @@ defmodule UserDocs.UsersTest do
       preloads = [ teams: [ :teams, [ teams: :projects ], [ teams: [ projects: :versions]] ] ]
       state = %{ teams: [team], users: [user], team_users: [team_user],
         projects: [project], versions: [version]}
-      result = Users.get_user!(user.id, preloads, [], state)
+      result = Users.get_user!(user.id, preloads, [], state, @opts)
       assert version == result.teams |> Enum.at(0) |> Map.get(:projects)
       |> Enum.at(0) |> Map.get(:versions) |> Enum.at(0)
     end

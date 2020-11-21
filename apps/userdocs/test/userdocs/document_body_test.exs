@@ -70,7 +70,7 @@ defmodule UserDocs.DocumentVersionBodyTest do
     end
 
     test "new docubit gets a container docubit by default" do
-      document_version_attrs = %{ name: "test", title: "Test" }
+      document_version_attrs = DocumentVersionFixtures.document_version_attrs(:valid)
       { :ok, document_version } = Documents.create_document_version(document_version_attrs)
       assert document_version.body.type_id == "container"
     end
