@@ -144,6 +144,10 @@ defmodule UserDocs.Documents do
   alias UserDocs.Documents.DocumentVersion
   alias UserDocs.Documents.Docubit
 
+  def load_document_versions(state, params, filters, opts) do
+    StateHandlers.load(state, list_document_versions(params, filters), DocumentVersion, opts)
+  end
+
   @doc """
   Returns the list of document_versions.
 

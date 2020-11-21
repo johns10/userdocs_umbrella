@@ -922,34 +922,6 @@ defmodule UserDocs.TestDataset do
     )
 
     document_version = %{
-      body: %{
-        "children" => [
-          %{
-            "children" => [
-              %{
-                "children" => [],
-                "data" => %{"column_count" => 1, "row_count" => 1},
-                "type" => "column"
-              },
-              %{
-                "children" => [],
-                "data" => %{"column_count" => 2, "row_count" => 1},
-                "type" => "column"
-              },
-              %{
-                "children" => [],
-                "data" => %{"column_count" => 3, "row_count" => 1},
-                "type" => "add_column"
-              }
-            ],
-            "data" => %{"row_count" => 1},
-            "type" => "row"
-          },
-          %{"children" => [], "data" => %{"row_count" => 2}, "type" => "add_row"}
-        ],
-        "data" => %{},
-        "type" => "container"
-      },
       name: "test",
       title: "test",
       version_id: version_2020_1_id

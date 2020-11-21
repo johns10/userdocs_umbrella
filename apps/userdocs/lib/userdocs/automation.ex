@@ -292,7 +292,6 @@ defmodule UserDocs.Automation do
   defp base_steps_query(), do: from(steps in Step)
 
 
-  @spec get_step!(any, nil | maybe_improper_list | map) :: any
   @doc """
   Gets a single step.
 

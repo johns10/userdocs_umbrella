@@ -1,26 +1,14 @@
 defmodule StateHandlers.List do
 
+  alias StateHandlers.Helpers
+
   def apply(state, schema, opts) do
     state
-    |> maybe_access_location(opts[:location])
-    |> maybe_access_type(opts[:strategy], schema)
+    |> Helpers.maybe_access_location(opts[:location])
+    |> Helpers.maybe_access_type(opts[:strategy], schema)
     |> maybe_filter_by_ids(opts[:ids], opts[:data_type])
     |> maybe_filter_by_field(opts[:filter], opts[:data_type])
     |> cast_by_type(opts[:data_type])
-  end
-
-  defp maybe_access_location(state, nil), do: state
-  defp maybe_access_location(state, location) do
-    Map.get(state, location)
-  end
-
-  defp maybe_access_type(state, :by_key, _), do: state
-  defp maybe_access_type(state, nil, schema), do: access_type(state, schema)
-  defp maybe_access_type(state, :by_type, schema), do: access_type(state, schema)
-
-  defp access_type(state, schema) do
-    type = schema.__schema__(:source) |> String.to_atom()
-    Map.get(state, type)
   end
 
   defp maybe_filter_by_ids(data, nil, _), do: data

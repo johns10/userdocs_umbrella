@@ -55,9 +55,9 @@ defmodule UserDocs.Users do
     |> Repo.one!()
   end
 
-  def get_user!(id, params, _filters, state) do
-    StateHandlers.get(state, id, User, [])
-    |> preload_user(params[:user], state)
+  def get_user!(id, params, _filters, state, opts) do
+    StateHandlers.get(state, id, User, opts)
+    |> maybe_preload_user_teams(params[:teams], state)
   end
 
   defp maybe_preload_user_teams(query, nil), do: query
@@ -65,8 +65,8 @@ defmodule UserDocs.Users do
     from(users in query, preload: [:teams])
   end
 
-  defp preload_user(user, nil, _), do: user
-  defp preload_user(user, preloads, state) do
+  defp maybe_preload_user_teams(user, nil, _), do: user
+  defp maybe_preload_user_teams(user, preloads, state) do
     StateHandlers.preload(state, user, preloads, [])
   end
 
@@ -319,6 +319,9 @@ defmodule UserDocs.Users do
       Ecto.NoResultsError -> nil
       e -> e
     end
+  end
+  def get_team!(id, state, opts) when is_integer(id) and is_list(opts) do
+    StateHandlers.get(state, id, Team, opts)
   end
 
   defp maybe_preload_team_users(query, nil), do: query
