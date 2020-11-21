@@ -8,6 +8,7 @@ defmodule StateHandlers.Helpers do
     Map.get(state, location)
   end
 
+  def maybe_access_type(state, :by_item, _), do: state
   def maybe_access_type(state, :by_key, _), do: state
   def maybe_access_type(state, nil, schema), do: access_type(state, schema)
   def maybe_access_type(state, :by_type, schema), do: access_type(state, schema)

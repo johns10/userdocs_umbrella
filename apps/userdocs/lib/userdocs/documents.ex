@@ -141,11 +141,45 @@ defmodule UserDocs.Documents do
     Content.changeset(content, attrs)
   end
 
+
+  alias UserDocs.Documents.Document
+
+  def load_documents(state, opts) do
+    StateHandlers.load(state, list_documents(opts), Document, opts)
+  end
+
+  def list_documents(opts) do
+    base_documents_query()
+    |> Repo.all()
+  end
+
+  def list_documents(state, opts) do
+    StateHandlers.list(state, Document, opts)
+    |> maybe_preload_document(opts[:preloads], state, opts)
+  end
+
+  defp maybe_preload_document(documents, nil, _, _), do: documents
+  defp maybe_preload_document(documents, preloads, state, opts) do
+    StateHandlers.preload(state, documents, preloads,opts)
+  end
+
+  defp base_documents_query(), do: from(documents in Document)
+
+  def create_document(attrs) do
+    %Document{}
+    |> Document.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def change_document(%Document{} = document, attrs \\ %{}) do
+    Document.changeset(document, attrs)
+  end
+
   alias UserDocs.Documents.DocumentVersion
   alias UserDocs.Documents.Docubit
 
-  def load_document_versions(state, params, filters, opts) do
-    StateHandlers.load(state, list_document_versions(params, filters), DocumentVersion, opts)
+  def load_document_versions(state, opts) do
+    StateHandlers.load(state, list_document_versions(%{}, opts[:filters]), DocumentVersion, opts)
   end
 
   @doc """
@@ -157,6 +191,10 @@ defmodule UserDocs.Documents do
       [%DocumentVersion{}, ...]
 
   """
+  def list_document_versions(state, opts) do
+    StateHandlers.list(state, DocumentVersion, opts)
+  end
+
   def list_document_versions(params \\ %{}, _filters \\ %{}) do
     base_document_versions_query()
     |> maybe_preload_docubit(params[:body])

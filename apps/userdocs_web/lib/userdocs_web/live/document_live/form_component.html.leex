@@ -14,9 +14,9 @@
   <%= text_input f, :title %>
   <%= error_tag f, :title %>
 
-  <%= label f, :version_id %>
-  <%= number_input f, :version_id %>
-  <%= error_tag f, :version_id %>
+  <%= label f, :project_id %>
+  <%= select f, :project_id, @projects_select %>
+  <%= error_tag f, :project_id %>
 
   <%= submit "Save", phx_disable_with: "Saving..." %>
 </form>

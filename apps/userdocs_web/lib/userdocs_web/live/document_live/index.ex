@@ -2,6 +2,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
   use UserDocsWeb, :live_view
 
   alias UserDocs.Documents
+  alias UserDocs.Documents.Document
   alias UserDocs.Documents.DocumentVersion
 
   alias UserDocsWeb.Root
@@ -22,6 +23,9 @@ defmodule UserDocsWeb.DocumentLive.Index do
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
     socket
     |> load_document_versions()
+    |> load_documents()
+    |> prepare_documents()
+    |> projects_select_list()
   end
   def initialize(socket), do: socket
 
@@ -33,19 +37,19 @@ defmodule UserDocsWeb.DocumentLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Document")
-    |> assign(:document_version, Documents.get_document_version!(id))
+    |> assign(:document, Documents.get_document!(id))
   end
 
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Document")
-    |> assign(:document_version, %DocumentVersion{})
+    |> assign(:document, %Document{})
   end
 
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Listing Documents")
-    |> assign(:document_version, nil)
+    |> assign(:document, nil)
   end
 
   @impl true
@@ -59,8 +63,34 @@ defmodule UserDocsWeb.DocumentLive.Index do
 
   def handle_info(n, s), do: Root.handle_info(n, s)
 
+  defp document_versions(document, document_versions) do
+    opts = [ data_type: :list, strategy: :by_item ]
+    StateHandlers.list(document_versions, DocumentVersion, opts)
+  end
+
+  defp load_documents(socket) do
+    Documents.load_documents(socket, state_opts())
+  end
+
   defp load_document_versions(socket) do
-    filters = %{team_id: socket.assigns.current_user.default_team_id}
-    Documents.load_document_versions(socket, %{}, filters, Defaults.state_opts())
+    opts =
+      state_opts()
+      |> Keyword.put(:filters, %{team_id: socket.assigns.current_user.default_team_id})
+
+    Documents.load_document_versions(socket, opts)
+  end
+
+  defp prepare_documents(socket) do
+    assign(socket, :documents, Documents.list_documents(socket, state_opts()))
+  end
+
+  defp projects_select_list(socket) do
+    projects = socket.assigns.data.projects
+    assign(socket, :projects_select, UserDocs.Helpers.select_list(projects, :name, false))
+  end
+
+  defp state_opts() do
+    Defaults.state_opts()
+    |> Keyword.put(:location, :data)
   end
 end

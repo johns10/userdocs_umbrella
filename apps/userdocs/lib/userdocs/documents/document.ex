@@ -5,7 +5,7 @@ defmodule UserDocs.Documents.Document do
   alias  UserDocs.Documents.DocumentVersion
   alias  UserDocs.Projects.Project
 
-  schema "document_versions" do
+  schema "documents" do
     field :name, :string
     field :title, :string
     belongs_to :project, Project

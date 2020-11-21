@@ -58,7 +58,7 @@ defmodule UserDocsWeb.Router do
 
     live "/automation", AutomationLive.Index, :index
     live "/process_administrator", ProcessAdministratorLive.Index, :index
-    live "/document_version", DocumentLive.Index, :index
+    live "/documents", DocumentLive.Index, :index
     live "/process_administrator_extension.html", ProcessAdministratorLive.Index, :index
 
     # These routes are basically not part of the application:
@@ -145,13 +145,13 @@ defmodule UserDocsWeb.Router do
     live "/screenshots/:id", ScreenshotLive.Show, :show
     live "/screenshots/:id/show/edit", ScreenshotLive.Show, :edit
 
-    live "/document_versions", DocumentLive.Index, :index
-    live "/document_versions/new", DocumentLive.Index, :new
-    live "/document_versions/:id/edit", DocumentLive.Index, :edit
-    live "/document_versions/:id", DocumentLive.Show, :show
-    live "/document_versions/:id/show/edit", DocumentLive.Show, :edit
+    live "/documents", DocumentLive.Index, :index
+    live "/documents/new", DocumentLive.Index, :new
+    live "/documents/:id/edit", DocumentLive.Index, :edit
+    live "/documents/:id", DocumentLive.Show, :show
+    live "/documents/:id/show/edit", DocumentLive.Show, :edit
 
-    live "/document_versions/:id/editor", DocumentLive.Editor, :edit
+    live "/documents/:id/editor", DocumentLive.Editor, :edit
 
     live "/content_versions", ContentVersionLive.Index, :index
     live "/content_versions/new", ContentVersionLive.Index, :new
