@@ -3,33 +3,28 @@
 
   <%= if @live_action in [:new, :edit] do %>
     <%= live_modal @socket, UserDocsWeb.DocumentLive.FormComponent,
-      id: @document_version.id || :new,
+      id: @document.id || :new,
       title: @page_title,
       action: @live_action,
-      document_version: @document_version,
-      return_to: Routes.document_index_path(@socket, :index) %>
+      document: @document,
+      return_to: Routes.document_index_path(@socket, :index),
+      projects_select: @projects_select %>
   <% end %>
 
   <table>
     <thead>
       <tr>
         <th>Name</th>
-        <th>Title</th>
 
         <th></th>
       </tr>
     </thead>
-    <tbody id="document_versions">
-      <%= for document_version <- @document_versions do %>
-        <tr id="document_version-<%= document_version.id %>">
-          <td><%= document_version.name %></td>
-          <td><%= document_version.title %></td>
-
-          <td>
-            <span><%= live_redirect "Show", to: Routes.document_show_path(@socket, :show, document_version) %></span>
-            <span><%= live_patch "Edit", to: Routes.document_index_path(@socket, :edit, document_version) %></span>
-            <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: document_version.id, data: [confirm: "Are you sure?"] %></span>
-          </td>
+    <tbody id="documents">
+      <%= for document <- @documents do %>
+        <tr id="document-<%= document.id %>">
+          <td><%= document.name %></td>
+          <%= for document <- @documents do %>
+          <% end %>
         </tr>
       <% end %>
     </tbody>

@@ -4,6 +4,7 @@ defmodule StateHandlers.List do
 
   def apply(state, schema, opts) do
     state
+    |> Helpers.maybe_access_assigns()
     |> Helpers.maybe_access_location(opts[:location])
     |> Helpers.maybe_access_type(opts[:strategy], schema)
     |> maybe_filter_by_ids(opts[:ids], opts[:data_type])

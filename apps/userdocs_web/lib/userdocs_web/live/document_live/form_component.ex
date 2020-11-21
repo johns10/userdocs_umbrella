@@ -4,8 +4,8 @@ defmodule UserDocsWeb.DocumentLive.FormComponent do
   alias UserDocs.Documents
 
   @impl true
-  def update(%{document_version: document_version} = assigns, socket) do
-    changeset = Documents.change_document_version(document_version)
+  def update(%{document: document} = assigns, socket) do
+    changeset = Documents.change_document(document)
 
     {
       :ok,
@@ -16,22 +16,22 @@ defmodule UserDocsWeb.DocumentLive.FormComponent do
   end
 
   @impl true
-  def handle_event("validate", %{"document_version" => document_version_params}, socket) do
+  def handle_event("validate", %{"document" => document_params}, socket) do
     changeset =
-      socket.assigns.document_version
-      |> Documents.change_document_version(document_version_params)
+      socket.assigns.document
+      |> Documents.change_document(document_params)
       |> Map.put(:action, :validate)
 
     {:noreply, assign(socket, :changeset, changeset)}
   end
 
-  def handle_event("save", %{"document_version" => document_version_params}, socket) do
-    save_document_version(socket, socket.assigns.action, document_version_params)
+  def handle_event("save", %{"document" => document_params}, socket) do
+    save_document(socket, socket.assigns.action, document_params)
   end
 
-  defp save_document_version(socket, :edit, document_version_params) do
-    case Documents.update_document_version(socket.assigns.document_version, document_version_params) do
-      {:ok, _document_version} ->
+  defp save_document(socket, :edit, document_params) do
+    case Documents.update_document(socket.assigns.document, document_params) do
+      {:ok, _document} ->
         {:noreply,
          socket
          |> put_flash(:info, "Document updated successfully")
@@ -42,15 +42,9 @@ defmodule UserDocsWeb.DocumentLive.FormComponent do
     end
   end
 
-  # This clause adds the default empty document_version body when creating a new document_version
-  # with an empty body
-  defp save_document_version(socket, :new, document_version_params = %{ "body" => ""}) do
-    save_document_version(socket, :new,
-      Map.put(document_version_params, "body", Documents.Document.default_body))
-  end
-  defp save_document_version(socket, :new, document_version_params) do
-    case Documents.create_document_version(document_version_params) do
-      {:ok, _document_version} ->
+  defp save_document(socket, :new, document_params) do
+    case Documents.create_document(document_params) do
+      {:ok, _document} ->
         {:noreply,
          socket
          |> put_flash(:info, "Document created successfully")

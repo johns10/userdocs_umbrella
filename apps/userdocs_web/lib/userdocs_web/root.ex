@@ -38,7 +38,6 @@ defmodule UserDocsWeb.Root do
     |> teams()
     |> projects()
     |> versions()
-    |> socket_inspector()
     |> Select.assign_default_team_id(&assign/3)
     |> Select.assign_default_project_id(&assign/3, state_opts())
     |> Select.assign_default_version_id(&assign/3, state_opts())
