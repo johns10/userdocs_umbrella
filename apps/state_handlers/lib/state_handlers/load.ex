@@ -3,6 +3,7 @@ defmodule StateHandlers.Load do
   alias StateHandlers.Helpers
 
   def apply(state, data, schema, opts) do
+    # IO.inspect("Loading #{Helpers.type(schema)} data into #{opts[:location]}")
     reload_opts = %{
       type: opts[:type], location: opts[:location], schema: schema,
       strategy: opts[:strategy], loader: opts[:loader]

@@ -20,6 +20,11 @@ defmodule UserDocsWeb.Root do
     """
   end
 
+  def state_opts() do
+    Defaults.state_opts()
+    |> Keyword.put(:location, :data)
+  end
+
   def authorize(socket, session) do
     socket
     |> validate_logged_in(session)
@@ -27,44 +32,51 @@ defmodule UserDocsWeb.Root do
 
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
     socket
+    |> assign(:data, %{})
     |> users()
     |> team_users()
     |> teams()
     |> projects()
     |> versions()
+    |> socket_inspector()
     |> Select.assign_default_team_id(&assign/3)
-    |> Select.assign_default_project_id(&assign/3, Defaults.state_opts())
-    |> Select.assign_default_version_id(&assign/3, Defaults.state_opts())
+    |> Select.assign_default_project_id(&assign/3, state_opts())
+    |> Select.assign_default_version_id(&assign/3, state_opts())
   end
   def initialize(socket), do: socket
 
   def users(%{ assigns: %{ current_user: current_user }} = socket) do
-    assign(socket, :users, [ current_user ])
+    data =
+      socket.assigns
+      |> Map.get(:data)
+      |> Map.put(:users, [ current_user ])
+
+    assign(socket, :data, data)
   end
 
   @spec team_users(Phoenix.LiveView.Socket.t()) :: Phoenix.LiveView.Socket.t()
   def team_users(%{ assigns: %{ current_user: %{ id: user_id }}} = socket) do
-    team_users = Users.list_team_users(%{}, %{ user_id: user_id })
-    assign(socket, :team_users, team_users)
+    opts = state_opts() |> Keyword.put(:filters, %{ user_id: user_id })
+    Users.load_team_users(socket, opts)
   end
 
   def teams(%{ assigns: %{ current_user: %{ id: user_id }}} = socket) do
-    teams = Users.list_teams(%{}, %{ user_id: user_id })
-    StateHandlers.load(socket, teams, Team, Defaults.state_opts(:teams))
+    opts = state_opts() |> Keyword.put(:filters, %{ user_id: user_id })
+    Users.load_teams(socket, opts)
   end
 
   def projects(%{ assigns: %{ current_user: %{ id: user_id }}} = socket) do
-    projects = Projects.list_projects(%{}, %{ user_id: user_id })
-    StateHandlers.load(socket, projects, Project, Defaults.state_opts(:projects))
+    opts = state_opts() |> Keyword.put(:filters, %{ user_id: user_id })
+    Projects.load_projects(socket, opts)
   end
 
   def versions(%{ assigns: %{ current_user: %{ id: user_id }}} = socket) do
-    versions = Projects.list_versions(%{}, %{ user_id: user_id })
-    StateHandlers.load(socket, versions, Version, Defaults.state_opts(:versions))
+    opts = state_opts() |> Keyword.put(:filters, %{ user_id: user_id })
+    Projects.load_versions(socket, opts)
   end
 
   def socket_inspector(socket) do
-    IO.inspect(socket.assigns)
+    IO.inspect(socket.assigns.data)
     socket
   end
 
@@ -95,7 +107,7 @@ defmodule UserDocsWeb.Root do
 
 
   def handle_event("select_version", %{"select-version" => version_id_param} = _payload, socket) do
-    opts = Defaults.state_opts()
+    opts = state_opts()
     with  version_id <- String.to_integer(version_id_param),
       version <- UserDocs.Projects.get_version!(version_id, socket, opts),
       project <- UserDocs.Projects.get_project!(version.project_id, socket, opts),
