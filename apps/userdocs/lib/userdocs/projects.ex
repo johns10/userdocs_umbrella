@@ -9,6 +9,9 @@ defmodule UserDocs.Projects do
 
   alias UserDocs.Projects.Project
 
+  def load_projects(state, opts) do
+    StateHandlers.load(state, list_projects(%{}, opts[:filters]), Project, opts)
+  end
   @doc """
   Returns the list of projects.
 
@@ -134,6 +137,10 @@ defmodule UserDocs.Projects do
   end
 
   alias UserDocs.Projects.Version
+
+  def load_versions(state, opts) do
+    StateHandlers.load(state, list_versions(%{}, opts[:filters]), Version, opts)
+  end
 
   @doc """
   Returns the list of versions.

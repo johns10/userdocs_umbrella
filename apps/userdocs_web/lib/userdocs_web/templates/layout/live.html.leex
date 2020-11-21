@@ -19,11 +19,11 @@
         <%= if @auth_state == :logged_in do %>
           <%= live_component(@socket, UserDocsWeb.VersionPicker, [
             current_user: @current_user,
-            users: @users,
-            teams: @teams,
-            team_users: @team_users,
-            projects: @projects,
-            versions: @versions
+            users: @data.users,
+            teams: @data.teams,
+            team_users: @data.team_users,
+            projects: @data.projects,
+            versions: @data.versions
           ]) %>
         <% end %>
       </div>

@@ -141,6 +141,9 @@ defmodule UserDocs.Users do
 
   alias UserDocs.Users.TeamUser
 
+  def load_team_users(state, opts) do
+    StateHandlers.load(state, list_team_users(%{}, opts[:filters]), TeamUser, opts)
+  end
   @doc """
   Returns the list of team_users.
 
@@ -253,6 +256,10 @@ defmodule UserDocs.Users do
   end
 
   alias UserDocs.Users.Team
+
+  def load_teams(state, opts) do
+    StateHandlers.load(state, list_teams(%{}, opts[:filters]), Team, opts)
+  end
 
   @doc """
   Returns the list of teams.
