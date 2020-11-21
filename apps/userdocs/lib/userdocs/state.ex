@@ -1,5 +1,24 @@
 defmodule UserDocs.State do
   require Logger
+  use Agent
+
+  def start_link(state, name) do
+    Agent.start_link(fn -> state end, name: name)
+  end
+
+  def load(name, data, opts) do
+    Agent.get(name,
+      fn(state) -> StateHandlers.load(state, data, opts) end
+    )
+  end
+
+  def get(name, id, opts) do
+    Agent.get(name,
+      fn(state) -> StateHandlers.get(state, id, opts) end
+    )
+  end
+
+
 
   #You can pass in a list (IE socket.assigns.data.projects)
   def get!(state, id, _key, _module) when is_list(state) do

@@ -3,7 +3,9 @@ defmodule UserDocsWeb.VersionPicker do
   use Phoenix.HTML
   use UserdocsWeb.LiveViewPowHelper
 
-  alias UserDocs.Automation
+  alias UserDocsWeb.Defaults
+
+  alias UserDocs.Users
 
   def dropdown_trigger(assigns, name, do: block) do
     ~L"""
@@ -66,14 +68,13 @@ defmodule UserDocsWeb.VersionPicker do
 
   @impl true
   def update(assigns, socket) do
-    IO.inspect(
-      UserDocs.Users.get_user!(assigns.current_user.id)
-    )
+    preloads = %{ teams: [ :teams, [ teams: :projects ], [ teams: [ projects: :versions]]] }
+    user = Users.get_user!(assigns.current_user.id, preloads, %{}, assigns, Defaults.state_opts())
     {
       :ok,
       socket
       |> assign(assigns)
-      |> assign(:current_user, Automation.project_details(assigns.current_user, assigns, %{}))
+      |> assign(:current_user, user)
     }
   end
 end

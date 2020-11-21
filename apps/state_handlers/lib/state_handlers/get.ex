@@ -1,29 +1,30 @@
 defmodule StateHandlers.Get do
 
   alias StateHandlers.Helpers
-  alias StateHandlers.Get
 
-  def apply(state, id, schema, []) do
-    type = schema.__schema__(:source) |> String.to_atom()
-    Get.apply(state, id, [ type: type, location: :root, data_type: :map, strategy: :by_type ])
+  def apply(state, id, schema, opts) do
+    state
+    |> Helpers.maybe_access_assigns()
+    |> Helpers.maybe_access_location(opts[:location])
+    |> Helpers.maybe_access_type(opts[:strategy], schema)
+    |> get(id, opts[:data_type], opts[:type])
   end
 
-  def apply(state, id, [ type: type, location: :root, data_type: :map, strategy: :by_type ]) do
+  def get(state, id, :list, _) do
     state
-    |> Map.get(type)
     |> Enum.filter(fn(o) -> o.id == id end)
     |> Enum.at(0)
   end
 
-  def apply(state, id, [ type: type, location: :root, data_type: :map, strategy: :by_key ]) do
+  def get(state, id, :map, _) do
+    Map.get(state, id)
+  end
+
+  def get(state, id, :by_key, type) do
     Map.get(state, Helpers.id_key(type, id))
   end
 
-  def apply(state, id, opts = [ location: location ]) do
-    state
-    |> Map.get(location)
-    |> StateHandlers.Get.apply(id, Map.put(opts, :location, :root))
-  end
+  def get(_, _, _, opts), do: raise(RuntimeError, "State.Get failed to find a matching clause with options #{inspect(opts)}")
 
-  def apply(_, _, _), do: raise(RuntimeError, "State.Get failed to find a matching clause")
+  def apply(_, _, opts), do: raise(RuntimeError, "State.Get.apply failed to find a matching clause with options #{inspect(opts)}")
 end

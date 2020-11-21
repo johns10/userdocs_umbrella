@@ -5,6 +5,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
   alias UserDocs.Documents.DocumentVersion
 
   alias UserDocsWeb.Root
+  alias UserDocsWeb.Defaults
   alias UserDocsWeb.UserLive.LoginFormComponent
 
   @impl true
@@ -20,7 +21,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
 
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
     socket
-    |> (&(assign(&1, :document_versions, list_document_versions(&1.assigns.current_user.default_team_id)))).()
+    |> load_document_versions()
   end
   def initialize(socket), do: socket
 
@@ -52,14 +53,14 @@ defmodule UserDocsWeb.DocumentLive.Index do
     document_version = Documents.get_document_version!(id)
     {:ok, _} = Documents.delete_document_version(document_version)
 
-    {:noreply, assign(socket, :document_versions, list_document_versions(socket.assigns.current_user.default_team_id))}
+    {:noreply, socket}
   end
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   def handle_info(n, s), do: Root.handle_info(n, s)
 
-  # TODO: Probably set the current team ID somewhere in the app
-  defp list_document_versions(team_id) do
-    Documents.list_document_versions(%{}, %{team_id: team_id})
+  defp load_document_versions(socket) do
+    filters = %{team_id: socket.assigns.current_user.default_team_id}
+    Documents.load_document_versions(socket, %{}, filters, Defaults.state_opts())
   end
 end

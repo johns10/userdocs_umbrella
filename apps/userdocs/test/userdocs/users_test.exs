@@ -70,7 +70,7 @@ defmodule UserDocs.UsersTest do
       user = UsersFixtures.user()
       team = UsersFixtures.team()
       team_user = UsersFixtures.team_user(user.id, team.id)
-      preloads = [ user: :teams ]
+      preloads = [ teams: :teams ]
       team_one = UsersFixtures.team_user(user.id, team.id)
       state = %{ teams: [team], users: [user], team_users: [team_user]}
       result = Users.get_user!(user.id, preloads, [], state)
@@ -81,7 +81,7 @@ defmodule UserDocs.UsersTest do
       user = UsersFixtures.user()
       team_one = UsersFixtures.team()
       team_two = UsersFixtures.team()
-      preloads = [ user: [ :teams ] ]
+      preloads = [ teams: [ :teams ] ]
       team_user_one = UsersFixtures.team_user(user.id, team_one.id)
       team_user_two = UsersFixtures.team_user(user.id, team_two.id)
       state = %{ teams: [team_one, team_two], users: [user], team_users: [team_user_one, team_user_two]}
@@ -94,7 +94,7 @@ defmodule UserDocs.UsersTest do
       team = UsersFixtures.team()
       team_user = UsersFixtures.team_user(user.id, team.id)
       project = ProjectsFixtures.project(team.id)
-      preloads = [ user: [ :teams, [ teams: :projects ] ] ]
+      preloads = [ teams: [ :teams, [ teams: :projects ] ] ]
       state = %{ teams: [team], users: [user], team_users: [team_user], projects: [project]}
       result = Users.get_user!(user.id, preloads, [], state)
       assert project == result.teams |> Enum.at(0) |> Map.get(:projects) |> Enum.at(0)
@@ -106,27 +106,12 @@ defmodule UserDocs.UsersTest do
       team_user = UsersFixtures.team_user(user.id, team.id)
       project = ProjectsFixtures.project(team.id)
       version = ProjectsFixtures.version(project.id)
-      preloads = [ user: [ :teams, [ teams: :projects ], [ teams: [ projects: :versions]] ] ]
+      preloads = [ teams: [ :teams, [ teams: :projects ], [ teams: [ projects: :versions]] ] ]
       state = %{ teams: [team], users: [user], team_users: [team_user],
         projects: [project], versions: [version]}
       result = Users.get_user!(user.id, preloads, [], state)
       assert version == result.teams |> Enum.at(0) |> Map.get(:projects)
       |> Enum.at(0) |> Map.get(:versions) |> Enum.at(0)
-    end
-
-    alias StateHandlers
-
-    test "StateHandlers.List" do
-      user = UsersFixtures.user()
-      team = UsersFixtures.team()
-      team_user = UsersFixtures.team_user(user.id, team.id)
-      project = ProjectsFixtures.project(team.id)
-      version = ProjectsFixtures.version(project.id)
-      preloads = [ user: [ :teams, [ teams: :projects ], [ teams: [ projects: :versions]] ] ]
-      state = %{ teams: [team], users: [user], team_users: [team_user],
-        projects: [project], versions: [version]}
-      result = StateHandlers.list(state, User, [])
-      assert result = [user]
     end
 
   end

@@ -73,7 +73,6 @@ defmodule UserDocs.Projects.Select do
     |> Enum.at(0)
   end
 
-
   defp projects_select_options(changes = %{ current_team_id: team_id }, %{ projects: projects }) do
     Map.put(changes, :projects_select_options, projects_select_options(projects, team_id))
   end
@@ -87,6 +86,11 @@ defmodule UserDocs.Projects.Select do
     projects
     |> Enum.filter(fn(p) -> p.team_id == team_id end)
     |> convert_to_select_list()
+  end
+
+  def assign_default_project_id(%{ assigns: %{ current_team_id: id }} = state, loader, opts) do
+    team = StateHandlers.get(state, id, UserDocs.Users.Team, opts)
+    loader.(state, :current_project_id, team.default_project_id)
   end
 
   defp current_project_id(changes = %{ current_team: %{ default_project_id: nil } }, _) do
@@ -125,6 +129,11 @@ defmodule UserDocs.Projects.Select do
     versions
     |> Enum.filter(fn(v) -> v.project_id == project_id end)
     |> convert_to_select_list()
+  end
+
+  def assign_default_version_id(%{ assigns: %{ current_project_id: id }} = state, loader, opts) do
+    project = StateHandlers.get(state, id, UserDocs.Projects.Project, opts)
+    loader.(state, :current_version_id, project.default_version_id)
   end
 
   defp current_version_id(changes = %{ current_project: nil}, _) do
