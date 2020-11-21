@@ -7,7 +7,7 @@ defmodule UserDocs.DocumentVersionFixtures do
   alias UserDocs.Documents
 
   def empty_document_version() do
-    document_version_attrs = %{ name: "test", title: "Test" }
+    document_version_attrs = document_version_attrs(:valid)
     { :ok, empty_document_version } = Documents.create_document_version(document_version_attrs)
     empty_document_version
   end
@@ -28,6 +28,6 @@ defmodule UserDocs.DocumentVersionFixtures do
   end
 
   def document_version_attrs(:valid) do
-    %{ name: "test", title: "Test" }
+    %{ name: UUID.uuid4() }
   end
 end

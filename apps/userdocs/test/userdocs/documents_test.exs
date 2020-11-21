@@ -71,7 +71,7 @@ defmodule UserDocs.DocumentsTest do
 
     @valid_attrs %{name: "some name", title: "some title"}
     @update_attrs %{name: "some updated name", title: "some updated title"}
-    @invalid_attrs %{name: "", title: ""}
+    @invalid_attrs %{name: "", title: "", version_id: 01933234508 }
 
     def document_version_fixture(attrs \\ %{}) do
       {:ok, document_version} =
@@ -95,7 +95,6 @@ defmodule UserDocs.DocumentsTest do
     test "create_document_version/1 with valid data creates a document_version" do
       assert {:ok, %DocumentVersion{} = document_version} = Documents.create_document_version(@valid_attrs)
       assert document_version.name == "some name"
-      assert document_version.title == "some title"
     end
 
     test "create_document_version/1 with invalid data returns error changeset" do
@@ -106,7 +105,6 @@ defmodule UserDocs.DocumentsTest do
       document_version = document_version_fixture()
       assert {:ok, %DocumentVersion{} = document_version} = Documents.update_document_version(document_version, @update_attrs)
       assert document_version.name == "some updated name"
-      assert document_version.title == "some updated title"
     end
 
     test "update_document_version/2 with invalid data returns error changeset" do
@@ -259,7 +257,7 @@ defmodule UserDocs.DocumentsTest do
 
     @valid_attrs %{code: "some code"}
     @update_attrs %{code: "some updated code"}
-    @invalid_attrs %{code: nil}
+    @invalid_attrs %{code: nil }
 
     def language_code_fixture(attrs \\ %{}) do
       {:ok, language_code} =
