@@ -1,9 +1,9 @@
-defmodule ProcessAdministratorWeb.Layout do
-  use ProcessAdministratorWeb, :view
+defmodule UserDocsWeb.Layout do
+  use UserDocsWeb, :view
   alias Phoenix.HTML.Form
-  alias ProcessAdministratorWeb.ErrorHelpers
+  alias UserDocsWeb.ErrorHelpers
 
-  alias ProcessAdministratorWeb.Layout
+  alias UserDocsWeb.Layout
 
   def checkbox(form,
     name \\ :default,

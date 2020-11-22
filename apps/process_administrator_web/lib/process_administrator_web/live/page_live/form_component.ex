@@ -5,7 +5,7 @@ defmodule ProcessAdministratorWeb.PageLive.FormComponent do
 
   alias ProcessAdministratorWeb.LiveHelpers
   alias ProcessAdministratorWeb.DomainHelpers
-  alias ProcessAdministratorWeb.Layout
+  alias UserDocsWeb.Layout
   alias ProcessAdministratorWeb.ID
 
   def render(assigns) do

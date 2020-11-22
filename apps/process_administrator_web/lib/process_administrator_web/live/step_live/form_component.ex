@@ -6,13 +6,13 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
   alias UserDocsWeb.LiveHelpers
 
   alias ProcessAdministratorWeb.LiveHelpers
-  alias ProcessAdministratorWeb.Layout
   alias ProcessAdministratorWeb.AnnotationLive
   alias ProcessAdministratorWeb.ElementLive
   alias ProcessAdministratorWeb.PageLive
   alias ProcessAdministratorWeb.State
   alias ProcessAdministratorWeb.ID
 
+  alias UserDocsWeb.Layout
   alias UserDocs.Automation
   alias UserDocs.Automation.Step.ChangeHandler
   alias UserDocs.Automation.Process.RecentPage

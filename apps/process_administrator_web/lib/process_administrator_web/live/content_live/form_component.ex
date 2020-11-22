@@ -1,7 +1,7 @@
 defmodule ProcessAdministratorWeb.ContentLive.FormComponent do
   use ProcessAdministratorWeb, :live_component
 
-  alias ProcessAdministratorWeb.Layout
+  alias UserDocsWeb.Layout
   alias ProcessAdministratorWeb.ID
   alias UserDocs.Documents
 
