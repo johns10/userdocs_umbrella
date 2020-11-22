@@ -3,7 +3,7 @@ defmodule ProcessAdministratorWeb.AnnotationLive.FormComponent do
 
   require Logger
 
-  alias ProcessAdministratorWeb.Layout
+  alias UserDocsWeb.Layout
   alias ProcessAdministratorWeb.ContentLive
   alias ProcessAdministratorWeb.ID
 

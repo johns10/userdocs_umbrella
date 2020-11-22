@@ -5,7 +5,7 @@ defmodule ProcessAdministratorWeb.VersionPicker do
   alias ProcessAdministratorWeb.State
 
   alias UserDocs.Projects.Select
-  alias ProcessAdministratorWeb.Layout
+  alias UserDocsWeb.Layout
 
   @impl true
   def render(assigns) do

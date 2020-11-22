@@ -6,7 +6,7 @@ defmodule ProcessAdministratorWeb.ContentVersionLive.FormComponent do
   alias UserDocs.Documents
 
   alias ProcessAdministratorWeb.ID
-  alias ProcessAdministratorWeb.Layout
+  alias UserDocsWeb.Layout
 
   def render_fields(assigns) do
     ~L"""
