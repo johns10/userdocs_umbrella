@@ -54,7 +54,8 @@ defmodule ProcessAdministratorWeb.MixProject do
       {:dialyxir, "~> 0.5.0", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:cors_plug, "~> 2.0"},
-      {:userdocs, in_umbrella: true}
+      {:userdocs, in_umbrella: true},
+      {:userdocs_web, in_umbrella: true},
     ]
   end
 
