@@ -6,17 +6,14 @@
   phx_change: "validate",
   phx_submit: "save" %>
 
-  <%= label f, :name %>
-  <%= text_input f, :name %>
-  <%= error_tag f, :name %>
+  <%= Layout.text_input(f, :name, [ phx_debounce: "blur" ], "control is-expanded") %>
 
-  <%= label f, :title %>
-  <%= text_input f, :title %>
-  <%= error_tag f, :title %>
+  <%= Layout.text_input(f, :title, [ phx_debounce: "blur" ], "control is-expanded") %>
 
-  <%= label f, :project_id %>
-  <%= select f, :project_id, @select_lists.projects %>
-  <%= error_tag f, :project_id %>
+  <%= Layout.select_input(f, :project_id,
+    @select_lists.projects, [
+      selected: @parent_id || "",
+    ], "control") %>
 
   <%= submit "Save", phx_disable_with: "Saving..." %>
 </form>

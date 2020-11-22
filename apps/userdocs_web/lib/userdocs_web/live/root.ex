@@ -125,10 +125,11 @@ defmodule UserDocsWeb.Root do
     end
   end
   def handle_event(name, _payload, _socket) do
-    raise(FunctionClauseError, "Event #{name} not implemented by Root")
+    raise(FunctionClauseError, "Event #{inspect(name)} not implemented by Root")
   end
 
+  def handle_info({:close_modal}, socket), do: { :noreply, ModalMenus.close(socket) }
   def handle_info(name, _socket) do
-    raise(FunctionClauseError, "Subscription #{name} not implemented by Root")
+    raise(FunctionClauseError, "Subscription #{inspect(name)} not implemented by Root")
   end
 end

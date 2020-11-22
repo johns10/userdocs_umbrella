@@ -2,6 +2,7 @@ defmodule UserDocsWeb.DocumentLive.FormComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocs.Documents
+  alias UserDocsWeb.Layout
 
   @impl true
   def update(%{document: document} = assigns, socket) do
