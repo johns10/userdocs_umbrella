@@ -14,6 +14,7 @@ defmodule UserDocsWeb.Root do
 
   alias StateHandlers
   alias UserDocsWeb.Defaults
+  alias UserDocsWeb.ModalMenus
 
   def render(assigns) do
     ~L"""
@@ -32,6 +33,7 @@ defmodule UserDocsWeb.Root do
 
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
     socket
+    |> assign(:modal_action, :show)
     |> assign(:data, %{})
     |> users()
     |> team_users()
@@ -103,8 +105,9 @@ defmodule UserDocsWeb.Root do
     end
   end
 
-
-
+  def handle_event("new-document", params, socket) do
+    ModalMenus.new_document(socket, params.parent, params.projects)
+  end
   def handle_event("select_version", %{"select-version" => version_id_param} = _payload, socket) do
     opts = state_opts()
     with  version_id <- String.to_integer(version_id_param),
