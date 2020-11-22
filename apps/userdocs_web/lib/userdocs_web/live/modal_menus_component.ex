@@ -8,6 +8,7 @@ defmodule UserDocsWeb.ModalMenus do
   alias ProcessAdministratorWeb.VersionLive.FormComponent, as: VersionForm
   alias ProcessAdministratorWeb.ProjectLive.FormComponent, as: ProjectForm
   alias ProcessAdministratorWeb.ProcessLive.FormComponent, as: ProcessForm
+  alias UserDocsWeb.DocumentLive.FormComponent, as: DocumentForm
   alias UserDocs.Project.Messages, as: ProjectMessage
   alias UserDocs.Version.Messages, as: VersionMessage
   alias UserDocs.Process.Messages, as: ProcessMessage
@@ -49,6 +50,16 @@ defmodule UserDocsWeb.ModalMenus do
                   parent_id: @parent.id,
                   select_lists: %{
                     versions: @select_lists.versions,
+                  }
+              :document ->
+                LiveHelpers.live_modal @socket, DocumentForm,
+                  id: @object.id || :new,
+                  title: @title,
+                  action: @action,
+                  document: @object,
+                  parent_id: @parent.id,
+                  select_lists: %{
+                    projects: @select_lists.projects,
                   }
             end
           %>
@@ -110,6 +121,14 @@ defmodule UserDocsWeb.ModalMenus do
     {
       :noreply,
       VersionMessage.new_modal_menu(socket)
+      |> call_menu(socket)
+    }
+  end
+
+  def new_document(socket, parent, projects) do
+    {
+      :noreply,
+      UserDocs.Document.Messages.new_modal_menu(socket, parent, projects)
       |> call_menu(socket)
     }
   end
