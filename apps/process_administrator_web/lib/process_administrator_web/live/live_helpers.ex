@@ -6,7 +6,7 @@ defmodule ProcessAdministratorWeb.LiveHelpers do
   alias ProcessAdministratorWeb.EmbeddedFormComponent
   alias ProcessAdministratorWeb.NestedFormComponent
   alias ProcessAdministratorWeb.VersionPicker
-  alias ProcessAdministratorWeb.ModalMenus
+  alias UserDocsWeb.ModalMenus
   alias ProcessAdministratorWeb.ModalComponent
 
   import Phoenix.LiveView.Helpers

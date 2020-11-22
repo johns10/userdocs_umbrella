@@ -1,8 +1,7 @@
-defmodule ProcessAdministratorWeb.ProjectLive.Messages do
+defmodule UserDocs.Project.Messages do
 
-  alias UserDocs.Projects.Project, as: Project
-
-  alias ProcessAdministratorWeb.DomainHelpers, as: Helpers
+  alias UserDocs.Projects.Project
+  alias UserDocs.Helpers
 
   def new_modal_menu(socket) do
     %{ target: "ModalMenus" }
@@ -23,7 +22,7 @@ defmodule ProcessAdministratorWeb.ProjectLive.Messages do
     |> Map.put(:title, "Edit Project")
   end
 
-  defp new(message, socket) do
+  defp new(message, _socket) do
     message
     |> Map.put(:object, %Project{})
     |> Map.put(:action, :new)
@@ -33,7 +32,7 @@ defmodule ProcessAdministratorWeb.ProjectLive.Messages do
   defp init(message, socket) do
     select_lists = %{
       teams:
-        Helpers.select_list_temp(socket.assigns.teams, :name, false)
+        Helpers.select_list(socket.assigns.teams, :name, false)
     }
 
     message

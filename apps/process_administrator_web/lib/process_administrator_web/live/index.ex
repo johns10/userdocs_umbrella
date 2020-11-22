@@ -12,9 +12,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
   alias ProcessAdministratorWeb.StepLive
   alias ProcessAdministratorWeb.LiveHelpers
 
-  alias ProcessAdministratorWeb.ProjectLive.Messages, as: ProjectMessage
-  alias ProcessAdministratorWeb.VersionLive.Messages, as: VersionMessage
-  alias ProcessAdministratorWeb.ProcessLive.Messages, as: ProcessMessage
+  alias UserDocsWeb.ModalMenus, as: ModalMenus
 
   alias UserDocs.Automation.Step
   alias UserDocs.Web
@@ -107,36 +105,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
     socket
   end
 
-  def close_modal(socket) do
-    IO.puts("Close modal function")
-    Phoenix.LiveView.send_update(
-      ProcessAdministratorWeb.ModalMenus,
-      id: "modal-menus",
-      action: :show)
-    socket
-  end
-
-  def call_menu(message, socket) do
-    {_, message} = Map.pop(message, :target)
-
-    Phoenix.LiveView.send_update(
-      ProcessAdministratorWeb.ModalMenus,
-      id: "modal-menus",
-      title: message.title,
-      object: message.object,
-      action: message.action,
-      parent: message.parent,
-      type: message.type,
-      select_lists: message.select_lists
-    )
-
-    socket
-  end
-
-  def handle_info({:close_modal}, socket) do
-    IO.puts("Close modal info")
-    { :noreply, close_modal(socket) }
-  end
+  def handle_info({:close_modal}, socket), do: { :noreply, ModalMenus.close(socket) }
   def handle_info({:update_current_version, changes}, socket) do
     current_processes =
       UserDocs.Automation.list_processes(%{},
@@ -191,15 +160,9 @@ defmodule ProcessAdministratorWeb.IndexLive do
     {:noreply, socket}
   end
 
-  def update_components(socket, "process", _, _) do
-    close_modal(socket)
-  end
-  def update_components(socket, "version", _, _) do
-    close_modal(socket)
-  end
-  def update_components(socket, "project", _, _) do
-    close_modal(socket)
-  end
+  def update_components(socket, "process", _, _), do: ModalMenus.close(socket)
+  def update_components(socket, "version", _, _), do: ModalMenus.close(socket)
+  def update_components(socket, "project", _, _), do: ModalMenus.close(socket)
   def update_components(socket, _, _, _), do: socket
 
   def execute_preloads(socket, "process", "create", payload) do
@@ -269,50 +232,11 @@ defmodule ProcessAdministratorWeb.IndexLive do
   def content_class(_), do: "content"
 
   @impl true
-  def handle_event("new-process", _, socket) do
-    IO.puts("New Process")
-    {
-      :noreply,
-      ProcessMessage.new_modal_menu(socket)
-      |> call_menu(socket)
-    }
-  end
-  @impl true
-  def handle_event("edit-project", _, socket) do
-    IO.puts("Edit Project")
-    {
-      :noreply,
-      ProjectMessage.edit_modal_menu(socket)
-      |> call_menu(socket)
-    }
-  end
-  @impl true
-  def handle_event("new-project", _, socket) do
-    IO.puts("New Project")
-    {
-      :noreply,
-      ProjectMessage.new_modal_menu(socket)
-      |> call_menu(socket)
-    }
-  end
-  @impl true
-  def handle_event("edit-version", _, socket) do
-    IO.puts("Edit Versions")
-    {
-      :noreply,
-      VersionMessage.edit_modal_menu(socket)
-      |> call_menu(socket)
-    }
-  end
-  @impl true
-  def handle_event("new-version", _, socket) do
-    IO.puts("New Versions")
-    {
-      :noreply,
-      VersionMessage.new_modal_menu(socket)
-      |> call_menu(socket)
-    }
-  end
+  def handle_event("new-process", _, socket), do: ModalMenus.new_process(socket)
+  def handle_event("edit-project", _, socket), do: ModalMenus.edit_project(socket)
+  def handle_event("new-project", _, socket), do: ModalMenus.new_project(socket)
+  def handle_event("edit-version", _, socket), do: ModalMenus.edit_version(socket)
+  def handle_event("new-version", _, socket), do: ModalMenus.new_version(socket)
   @impl true
   def handle_event("select_team", %{ "team" => %{"id" => id} }, socket) do
     changes = Select.handle_team_selection(socket.assigns, String.to_integer(id))

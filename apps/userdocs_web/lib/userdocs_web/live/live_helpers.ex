@@ -4,6 +4,7 @@ defmodule UserDocsWeb.LiveHelpers do
   require Logger
 
   alias Phoenix.LiveView
+  alias UserDocsWeb.ModalMenus
 
   @doc """
   Renders a component inside the `UserDocsWeb.ModalComponent` component.
@@ -20,16 +21,23 @@ defmodule UserDocsWeb.LiveHelpers do
         return_to: Routes.team_user_index_path(@socket, :index) %>
   """
   def live_modal(socket, component, opts) do
-    path = Keyword.fetch!(opts, :return_to)
-
     modal_opts = [
       id: :modal,
-      return_to: path,
+      # return_to: Keyword.fetch!(opts, :return_to),
       component: component,
       opts: opts
     ]
 
     live_component(socket, UserDocsWeb.ModalComponent, modal_opts)
+  end
+
+  def live_modal_menus(socket, opts) do
+    picker_opts = [
+      id: Keyword.fetch!(opts, :id),
+      action: Keyword.fetch!(opts, :action),
+    ]
+
+    live_component(socket, ModalMenus, picker_opts)
   end
 
   @spec live_footer(Phoenix.LiveView.Socket.t(), any, any) :: Phoenix.LiveView.Component.t()

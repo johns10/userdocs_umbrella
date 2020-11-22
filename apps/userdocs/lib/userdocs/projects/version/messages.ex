@@ -1,8 +1,7 @@
-defmodule ProcessAdministratorWeb.VersionLive.Messages do
+defmodule UserDocs.Version.Messages do
 
-  alias UserDocs.Projects.Version, as: Version
-
-  alias ProcessAdministratorWeb.DomainHelpers, as: Helpers
+  alias UserDocs.Projects.Version
+  alias UserDocs.Helpers
 
   def new_modal_menu(socket) do
     %{ target: "ModalMenus" }
@@ -23,7 +22,7 @@ defmodule ProcessAdministratorWeb.VersionLive.Messages do
     |> Map.put(:title, "Edit Version")
   end
 
-  defp new(message, socket) do
+  defp new(message, _socket) do
     message
     |> Map.put(:object, %Version{})
     |> Map.put(:action, :new)
@@ -35,10 +34,10 @@ defmodule ProcessAdministratorWeb.VersionLive.Messages do
       projects:
         socket.assigns.projects
         |> Enum.filter(fn(p) -> p.team_id == socket.assigns.current_team.id end)
-        |> Helpers.select_list_temp(:name, false),
+        |> Helpers.select_list(:name, false),
 
       strategies:
-        Helpers.select_list_temp(socket.assigns.strategies, :name, false)
+        Helpers.select_list(socket.assigns.strategies, :name, false)
     }
 
     message
