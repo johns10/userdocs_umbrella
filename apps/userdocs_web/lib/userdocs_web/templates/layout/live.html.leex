@@ -28,7 +28,6 @@
         <% end %>
       </div>
 
-
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
@@ -54,4 +53,12 @@
     phx-click="lv:clear-flash"
     phx-value-key="error"><%= live_flash(@flash, :error) %></p>
   <%= @inner_content %>
+
+
+  <%= if @auth_state == :logged_in do %>
+    <%= UserDocsWeb.LiveHelpers.live_modal_menus(@socket, [
+      id: "modal-menus",
+      action: @modal_action])
+    %>
+  <% end %>
 <!--</main>-->
