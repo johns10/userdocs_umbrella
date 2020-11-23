@@ -43,8 +43,15 @@ defmodule UserDocsWeb.Root do
     |> Select.assign_default_team_id(&assign/3)
     |> Select.assign_default_project_id(&assign/3, state_opts())
     |> Select.assign_default_version_id(&assign/3, state_opts())
+    |> subscribe()
   end
   def initialize(socket), do: socket
+
+  def subscribe(socket) do
+    UserDocsWeb.Endpoint.subscribe(channel(socket))
+    socket
+  end
+
 
   def users(%{ assigns: %{ current_user: current_user }} = socket) do
     data =
@@ -106,7 +113,7 @@ defmodule UserDocsWeb.Root do
   end
 
   def handle_event("new-document", params, socket) do
-    ModalMenus.new_document(socket, params.parent, params.projects)
+    ModalMenus.new_document(socket, params.parent, params.projects, channel(socket))
   end
   def handle_event("select_version", %{"select-version" => version_id_param} = _payload, socket) do
     opts = state_opts()
@@ -128,8 +135,19 @@ defmodule UserDocsWeb.Root do
     raise(FunctionClauseError, "Event #{inspect(name)} not implemented by Root")
   end
 
-  def handle_info({:close_modal}, socket), do: { :noreply, ModalMenus.close(socket) }
+  def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
+    Logger.debug("Root handling info on topic #{topic}, event #{event}")
+    {
+      :noreply,
+      UserDocs.Subscription.handle_event(socket, event, payload, state_opts())
+    }
+  end
+  def handle_info(:close_modal, socket), do: { :noreply, ModalMenus.close(socket) }
   def handle_info(name, _socket) do
     raise(FunctionClauseError, "Subscription #{inspect(name)} not implemented by Root")
+  end
+
+  def channel(socket) do
+    "team-" <> Integer.to_string(socket.assigns.current_team_id)
   end
 end
