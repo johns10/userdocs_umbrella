@@ -17,4 +17,5 @@ defmodule StateHandlers do
   def get(state, id, schema, opts), do: StateHandlers.Get.apply(state, id, schema, opts)
   def preload(state, data, preloads, opts), do: StateHandlers.Preload.apply(state, data, preloads, opts)
   def list(state, schema, opts), do: StateHandlers.List.apply(state, schema, opts)
+  def create(state, data, opts), do: StateHandlers.Create.apply(state, data, opts)
 end
