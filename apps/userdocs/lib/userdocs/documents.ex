@@ -160,7 +160,7 @@ defmodule UserDocs.Documents do
 
   defp maybe_preload_document(documents, nil, _, _), do: documents
   defp maybe_preload_document(documents, preloads, state, opts) do
-    StateHandlers.preload(state, documents, preloads,opts)
+    StateHandlers.preload(state, documents, preloads, opts)
   end
 
   defp base_documents_query(), do: from(documents in Document)
@@ -169,6 +169,16 @@ defmodule UserDocs.Documents do
     %Document{}
     |> Document.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def create_document(%Document{} = document, state, opts) do
+
+  end
+
+  def update_document(%Document{} = document, attrs) do
+    document
+    |> Document.changeset(attrs)
+    |> Repo.update()
   end
 
   def change_document(%Document{} = document, attrs \\ %{}) do
