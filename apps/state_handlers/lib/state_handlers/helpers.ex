@@ -39,4 +39,21 @@ defmodule StateHandlers.Helpers do
     |> Enum.at(-1)
     |> String.downcase()
   end
+
+  def reassign(state, _location_data, data, %{ schema: schema, location: nil, loader: loader }) do
+    loader.(state, type(schema), data)
+  end
+  def reassign(state, _location_data, data, %{ schema: schema, location: nil, loader: nil }) do
+    Map.put(state, type(schema), data)
+  end
+  def reassign(state, location_data, data, %{ schema: schema, location: location, loader: loader })
+  when is_atom(location) do
+    location_data = Map.put(location_data, type(schema), data)
+    loader.(state, location, location_data)
+  end
+  def reassign(state, location_data, data, %{ schema: schema, location: location, loader: nil })
+  when is_atom(location) do
+    location_data = Map.put(location_data, type(schema), data)
+    Map.put(state, location, location_data)
+  end
 end
