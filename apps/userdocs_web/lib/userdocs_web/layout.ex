@@ -233,6 +233,39 @@ defmodule UserDocsWeb.Layout do
     |> maybe_opt(opts, :phx_debounce)
   end
 
+  # SOMe old shit I brought in
+
+  def is_hidden?(%{expanded: false}), do: " is-hidden"
+  def is_hidden?(%{expanded: true}), do: ""
+  def is_hidden?(%{action: :new}), do: ""
+  def is_hidden?(%{action: :show}), do: " is-hidden"
+  def is_hidden?(false, :new), do: ""
+  def is_hidden?(_, _), do: " is-hidden"
+
+
+  def form_field_id(action, f, field, parent_type, parent_id) do
+    parent_id = Integer.to_string(parent_id || 0)
+    field = Atom.to_string(field)
+
+    parent_type <> "_"
+    <> parent_id <> "_"
+    <> field_name(f)
+    <> id_or_new(action, f) <> "_"
+    <> field
+  end
+
+  defp field_name(f) do
+    f.data.__meta__.schema
+    |> Atom.to_string()
+    |> String.split(".")
+    |> Enum.reverse()
+    |> Enum.at(0)
+    |> String.downcase(:default)
+  end
+
+  defp id_or_new(:edit, f), do: "_" <> Integer.to_string(f.data.id)
+  defp id_or_new(:new, f), do: "_new"
+
   """
   def card_header(name, target, expand_event) do
     content_tag(:header, [ class: "card-header" ]) do
