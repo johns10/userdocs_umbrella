@@ -23,7 +23,6 @@ defmodule UserDocsWeb.LiveHelpers do
   def live_modal(socket, component, opts) do
     modal_opts = [
       id: :modal,
-      # return_to: Keyword.fetch!(opts, :return_to),
       component: component,
       opts: opts
     ]
