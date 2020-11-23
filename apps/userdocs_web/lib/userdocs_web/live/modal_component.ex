@@ -33,7 +33,7 @@ defmodule UserDocsWeb.ModalComponent do
 
   @impl true
   def handle_event("close", _, socket) do
-    send(self(), {:close_modal})
+    send(self(), :close_modal)
     {:noreply, socket}
   end
 end
