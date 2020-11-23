@@ -1,4 +1,3 @@
-<!--<main role="main" class="container">-->
   <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
       <a class="navbar-item" href="https://user-docs.com">
@@ -44,21 +43,20 @@
       </div>
     </div>
   </nav>
+  <main role="main" class="container">
+    <p class="alert alert-info" role="alert"
+      phx-click="lv:clear-flash"
+      phx-value-key="info"><%= live_flash(@flash, :info) %></p>
 
-  <p class="alert alert-info" role="alert"
-    phx-click="lv:clear-flash"
-    phx-value-key="info"><%= live_flash(@flash, :info) %></p>
-
-  <p class="alert alert-danger" role="alert"
-    phx-click="lv:clear-flash"
-    phx-value-key="error"><%= live_flash(@flash, :error) %></p>
-  <%= @inner_content %>
+    <p class="alert alert-danger" role="alert"
+      phx-click="lv:clear-flash"
+      phx-value-key="error"><%= live_flash(@flash, :error) %></p>
+    <%= @inner_content %>
 
 
-  <%= if @auth_state == :logged_in do %>
-    <%= UserDocsWeb.LiveHelpers.live_modal_menus(@socket, [
-      id: "modal-menus",
-      action: @modal_action])
-    %>
-  <% end %>
-<!--</main>-->
+    <%= if @auth_state == :logged_in do %>
+      <%= UserDocsWeb.LiveHelpers.live_modal_menus(@socket, [
+        id: "modal-menus",
+        action: @modal_action]) %>
+    <% end %>
+  </main>
