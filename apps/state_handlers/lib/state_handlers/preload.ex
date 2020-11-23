@@ -10,6 +10,13 @@ defmodule StateHandlers.Preload do
     handle_preload(state, data, preloads, opts)
   end
 
+  def apply(_state, nil, _preloads, _opts) do
+    raise(RuntimeError, "State.Preload called with nil data")
+  end
+  def apply(_state, data, _preloads, _opts) do
+    raise(RuntimeError, "State.Preload failed to find a matching clause")
+  end
+
   defp handle_preload(state, data, preloads, opts) when is_list(preloads) do
     # IO.puts("handle_preload List #{inspect(preloads)}")
     Enum.reduce(preloads, data, fn(preload, d) -> handle_preload(state, d, preload, opts) end)
@@ -20,7 +27,7 @@ defmodule StateHandlers.Preload do
 
     atom:  This typically means that We're "at the end" and are loading the data from the state.
 
-    tuple: This means there's a nested preloa so we just call the original preload function and
+    tuple: This means there's a nested preload so we just call the original preload function and
     apply the preloads to the data.
   """
   defp handle_preload(state, data, preload, opts) when is_atom(preload) do
@@ -30,6 +37,7 @@ defmodule StateHandlers.Preload do
     Map.put(data, preload, preload_data)
   end
   defp handle_preload(state, data, { key, value } = preload, opts) when is_tuple(preload) do
+    # IO.puts("handle_preload tuple, #{inspect(key)}, #{inspect(value)}")
     data_to_preload = Map.get(data, key)
     preloads = value
     Map.put(data, key, apply(state, data_to_preload, preloads, opts))
@@ -40,20 +48,20 @@ defmodule StateHandlers.Preload do
       %Ecto.Association.ManyToMany{} -> preload_many_to_many(state, association, source_id, opts)
       %Ecto.Association.Has{} ->
         case association.cardinality do
-          :many -> preload_has_many(state, source_id, association)
+          :many -> preload_has_many(state, source_id, association, opts)
           _ -> raise("Cardinality not implemented")
         end
       _ -> raise("This association type not implemented")
     end
   end
 
-  defp preload_has_many(state, source_id, association) do
+  defp preload_has_many(state, source_id, association, opts) do
+    #  IO.puts("preload_has_many")
     owner = schema_atom(association.owner)
-    queryable_source = association.queryable.__schema__(:source) |> String.to_atom()
     owner_key = association.queryable.__schema__(:association, owner).owner_key
 
     state
-    |> Map.get(queryable_source)
+    |> StateHandlers.list(association.owner, opts)
     |> Enum.filter(fn(o) -> Map.get(o, owner_key) == source_id end)
   end
 
@@ -85,6 +93,4 @@ defmodule StateHandlers.Preload do
     |> String.downcase()
     |> String.to_atom()
   end
-
-  def apply(_, _, _), do: raise(RuntimeError, "State.Get failed to find a matching clause")
 end
