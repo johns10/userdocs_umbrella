@@ -2,6 +2,7 @@ defmodule UserDocsWeb.DocumentLive.FormComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocs.Documents
+  alias UserDocs.Documents.Document
   alias UserDocsWeb.Layout
 
   @impl true
@@ -43,8 +44,9 @@ defmodule UserDocsWeb.DocumentLive.FormComponent do
 
   defp save_document(socket, :new, document_params) do
     case Documents.create_document(document_params) do
-      {:ok, _document} ->
+      {:ok, document} ->
         send(self(), :close_modal)
+        UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "create", document)
         {:noreply, put_flash(socket, :info, "Document created successfully")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
