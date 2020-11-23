@@ -58,6 +58,7 @@ defmodule UserDocsWeb.ModalMenus do
                   action: @action,
                   document: @object,
                   parent_id: @parent.id,
+                  channel: @channel,
                   select_lists: %{
                     projects: @select_lists.projects,
                   }
@@ -66,6 +67,24 @@ defmodule UserDocsWeb.ModalMenus do
         <% end %>
       </div>
     """
+  end
+
+  def call_menu(message, socket) do
+    {_, message} = Map.pop(message, :target)
+
+    Phoenix.LiveView.send_update(
+      ModalMenus,
+      id: "modal-menus",
+      title: message.title,
+      object: message.object,
+      action: message.action,
+      parent: message.parent,
+      type: message.type,
+      select_lists: message.select_lists,
+      channel: Map.get(message, :channel, nil)
+    )
+
+    socket
   end
 
   @impl true
@@ -125,10 +144,10 @@ defmodule UserDocsWeb.ModalMenus do
     }
   end
 
-  def new_document(socket, parent, projects) do
+  def new_document(socket, parent, projects, channel) do
     {
       :noreply,
-      UserDocs.Document.Messages.new_modal_menu(socket, parent, projects)
+      UserDocs.Document.Messages.new_modal_menu(socket, parent, projects, channel)
       |> call_menu(socket)
     }
   end
@@ -141,20 +160,4 @@ defmodule UserDocsWeb.ModalMenus do
     socket
   end
 
-  def call_menu(message, socket) do
-    {_, message} = Map.pop(message, :target)
-
-    Phoenix.LiveView.send_update(
-      ModalMenus,
-      id: "modal-menus",
-      title: message.title,
-      object: message.object,
-      action: message.action,
-      parent: message.parent,
-      type: message.type,
-      select_lists: message.select_lists
-    )
-
-    socket
-  end
 end
