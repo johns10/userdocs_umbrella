@@ -21,4 +21,9 @@ defmodule UserDocs.Subscription do
         { status, result }
     end
   end
+
+  def handle_event(socket, "create" = event, payload, opts) do
+    IO.puts("Handling Event")
+    StateHandlers.create(socket, payload, opts)
+  end
 end
