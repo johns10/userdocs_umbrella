@@ -67,23 +67,25 @@ defmodule UserDocsWeb.DocumentLive.Index do
   def handle_event("new-document" = n, params, socket) do
     params =
       params
-      |> Map.put(:parent, UserDocs.Users.get_team!(socket.assigns.current_team_id, socket, state_opts))
+      |> Map.put(:parent, UserDocs.Users.get_team!(socket.assigns.current_team_id, socket, state_opts()))
       |> Map.put(:projects, socket.assigns.data.projects)
 
     Root.handle_event(n, params, socket)
   end
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
-  def handle_info(:close_modal, socket) do
-    IO.inspect("close modal")
-    socket =
-      socket
-      |> assign(:live_action, :show)
-    { :noreply, socket}
+  @impl true
+  def handle_info(%{topic: _, event: _, payload: %DocumentVersion{}} = sub_data, socket) do
+    { :noreply, socket } = Root.handle_info(sub_data, socket)
+    { :noreply, prepare_documents(socket) }
+  end
+  def handle_info(%{topic: _, event: _, payload: %Document{}} = sub_data, socket) do
+    { :noreply, socket } = Root.handle_info(sub_data, socket)
+    { :noreply, prepare_documents(socket) }
   end
   def handle_info(n, s), do: Root.handle_info(n, s)
 
-  defp document_versions(document, document_versions) do
+  defp document_versions(_document, document_versions) do
     opts = [ data_type: :list, strategy: :by_item ]
     StateHandlers.list(document_versions, DocumentVersion, opts)
   end
@@ -104,6 +106,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
     opts =
       state_opts()
       |> Keyword.put(:filter, { :project_id, socket.assigns.current_project_id })
+      |> Keyword.put(:preloads, [ :document_versions ])
 
     assign(socket, :documents, Documents.list_documents(socket, opts))
   end
