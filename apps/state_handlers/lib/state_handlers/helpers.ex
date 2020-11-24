@@ -1,5 +1,7 @@
 defmodule StateHandlers.Helpers do
 
+  require Logger
+
   def maybe_access_assigns(%Phoenix.LiveView.Socket{} = state), do: state.assigns
   def maybe_access_assigns(state), do: state
 
@@ -8,13 +10,17 @@ defmodule StateHandlers.Helpers do
     Map.get(state, location)
   end
 
+  def maybe_access_type(nil, _, schema), do: raise(RuntimeError, "maybe_access_type got nil data from location")
   def maybe_access_type(state, :by_item, _), do: state
   def maybe_access_type(state, :by_key, _), do: state
   def maybe_access_type(state, nil, schema), do: access_type(state, schema)
   def maybe_access_type(state, :by_type, schema), do: access_type(state, schema)
 
   def access_type(state, schema) do
-    Map.get(state, type(schema))
+    case Map.get(state, type(schema)) do
+      nil -> raise(RuntimeError, "access_type failed because it retreived a nil value from #{type(schema)}")
+      result -> result
+    end
   end
 
   def type(schema) do
