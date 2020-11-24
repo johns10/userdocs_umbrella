@@ -34,7 +34,7 @@ defmodule UserDocsWeb.Root do
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
     socket
     |> assign(:modal_action, :show)
-    |> assign(:data, %{})
+    |> assign(:data, %{ users: [], team_users: [], teams: [], projects: [], versions: [] })
     |> users()
     |> team_users()
     |> teams()
