@@ -72,6 +72,16 @@ defmodule UserDocsWeb.DocumentLive.Index do
 
     Root.handle_event(n, params, socket)
   end
+  def handle_event("new-document-version" = n, %{ "document-id" => id }, socket) do
+    params =
+      %{}
+      |> Map.put(:document_id, String.to_integer(id))
+      |> Map.put(:version_id, socket.assigns.current_version_id)
+      |> Map.put(:documents, socket.assigns.data.documents)
+      |> Map.put(:versions, socket.assigns.data.versions)
+
+    Root.handle_event(n, params, socket)
+  end
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   @impl true
@@ -95,11 +105,13 @@ defmodule UserDocsWeb.DocumentLive.Index do
   end
 
   defp load_document_versions(socket) do
+    IO.inspect("Loading document versions")
     opts =
       state_opts()
       |> Keyword.put(:filters, %{team_id: socket.assigns.current_user.default_team_id})
 
     Documents.load_document_versions(socket, opts)
+    |> IO.inspect()
   end
 
   defp prepare_documents(socket) do
