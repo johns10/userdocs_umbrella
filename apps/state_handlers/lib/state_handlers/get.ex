@@ -11,7 +11,6 @@ defmodule StateHandlers.Get do
   end
 
   def get(state, id, :list, _) when is_list(state) do
-    IO.inspect(state)
     state
     |> Enum.filter(fn(o) -> o.id == id end)
     |> Enum.at(0)
