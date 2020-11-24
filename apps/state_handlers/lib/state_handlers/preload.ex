@@ -56,12 +56,12 @@ defmodule StateHandlers.Preload do
   end
 
   defp preload_has_many(state, source_id, association, opts) do
-    #  IO.puts("preload_has_many")
+    # IO.puts("preload_has_many")
     owner = schema_atom(association.owner)
     owner_key = association.queryable.__schema__(:association, owner).owner_key
 
     state
-    |> StateHandlers.list(association.owner, opts)
+    |> StateHandlers.list(association.queryable, opts)
     |> Enum.filter(fn(o) -> Map.get(o, owner_key) == source_id end)
   end
 
@@ -72,7 +72,7 @@ defmodule StateHandlers.Preload do
     queryable = schema_atom(association.queryable)
     queryable_key = association.join_through.__schema__(:association, queryable).owner_key
 
-    # IO.puts("Handling Many to Many Association.  Owner is #{owner}.  Joining through #{join_source}.  Queryable is #{queryable}")
+    # IO.puts("Handling Many to Many Association.  Owner is #{owner}.  Joining through #{}.  Queryable is #{queryable}")
     join_opts = Keyword.put(opts, :filter, { owner_key, source_id })
 
     queryable_ids =
