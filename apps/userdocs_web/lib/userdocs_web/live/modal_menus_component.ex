@@ -9,9 +9,12 @@ defmodule UserDocsWeb.ModalMenus do
   alias ProcessAdministratorWeb.ProjectLive.FormComponent, as: ProjectForm
   alias ProcessAdministratorWeb.ProcessLive.FormComponent, as: ProcessForm
   alias UserDocsWeb.DocumentLive.FormComponent, as: DocumentForm
+  alias UserDocsWeb.DocumentVersionLive.FormComponent, as: DocumentVersionForm
   alias UserDocs.Project.Messages, as: ProjectMessage
   alias UserDocs.Version.Messages, as: VersionMessage
   alias UserDocs.Process.Messages, as: ProcessMessage
+  alias UserDocs.Document.Messages, as: DocumentMessage
+  alias UserDocs.DocumentVersion.Messages, as: DocumentVersionMessage
 
   @impl true
   def render(assigns) do
@@ -62,6 +65,18 @@ defmodule UserDocsWeb.ModalMenus do
                   select_lists: %{
                     projects: @select_lists.projects,
                   }
+              :document_version ->
+                LiveHelpers.live_modal @socket, DocumentVersionForm,
+                  id: @object.id || :new,
+                  title: @title,
+                  action: @action,
+                  document_version: @object,
+                  parent_id: @parent_id,
+                  channel: @channel,
+                  select_lists: %{
+                    documents: @select_lists.documents,
+                    versions: @select_lists.versions
+                  }
             end
           %>
         <% end %>
@@ -70,15 +85,14 @@ defmodule UserDocsWeb.ModalMenus do
   end
 
   def call_menu(message, socket) do
-    {_, message} = Map.pop(message, :target)
-
     Phoenix.LiveView.send_update(
       ModalMenus,
       id: "modal-menus",
       title: message.title,
       object: message.object,
       action: message.action,
-      parent: message.parent,
+      parent: Map.get(message, :parent, nil),
+      parent_id: Map.get(message, :parent_id, nil),
       type: message.type,
       select_lists: message.select_lists,
       channel: Map.get(message, :channel, nil)
@@ -147,7 +161,15 @@ defmodule UserDocsWeb.ModalMenus do
   def new_document(socket, parent, projects, channel) do
     {
       :noreply,
-      UserDocs.Document.Messages.new_modal_menu(socket, parent, projects, channel)
+      DocumentMessage.new_modal_menu(socket, parent, projects, channel)
+      |> call_menu(socket)
+    }
+  end
+
+  def new_document_version(socket, params) do
+    {
+      :noreply,
+      DocumentVersionMessage.new_modal_menu(socket, params)
       |> call_menu(socket)
     }
   end

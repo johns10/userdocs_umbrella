@@ -112,6 +112,9 @@ defmodule UserDocsWeb.Root do
     end
   end
 
+  def handle_event("new-document-version", params, socket) do
+    ModalMenus.new_document_version(socket, Map.put(params, :channel, channel(socket)))
+  end
   def handle_event("new-document", params, socket) do
     ModalMenus.new_document(socket, params.parent, params.projects, channel(socket))
   end
