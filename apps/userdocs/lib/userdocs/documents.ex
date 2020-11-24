@@ -201,14 +201,16 @@ defmodule UserDocs.Documents do
       [%DocumentVersion{}, ...]
 
   """
-  def list_document_versions(state, opts) do
-    StateHandlers.list(state, DocumentVersion, opts)
-  end
 
-  def list_document_versions(params \\ %{}, _filters \\ %{}) do
+  def list_document_versions(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_document_versions_query()
     |> maybe_preload_docubit(params[:body])
     |> Repo.all()
+  end
+
+  #TODO: Refactor
+  def list_document_versions(state, opts) do
+    StateHandlers.list(state, DocumentVersion, opts)
   end
 
   defp maybe_filter_document_versions_by_team(query, nil), do: query
