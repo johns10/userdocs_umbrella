@@ -57,7 +57,7 @@ defmodule UserDocs.Users do
 
   def get_user!(id, params, _filters, state, opts) do
     StateHandlers.get(state, id, User, opts)
-    |> maybe_preload_user_teams(params[:teams], state)
+    |> maybe_preload_user_teams(params[:teams], state, opts)
   end
 
   defp maybe_preload_user_teams(query, nil), do: query
@@ -65,9 +65,9 @@ defmodule UserDocs.Users do
     from(users in query, preload: [:teams])
   end
 
-  defp maybe_preload_user_teams(user, nil, _), do: user
-  defp maybe_preload_user_teams(user, preloads, state) do
-    StateHandlers.preload(state, user, preloads, [])
+  defp maybe_preload_user_teams(user, nil, _, _), do: user
+  defp maybe_preload_user_teams(user, preloads, state, opts) do
+    StateHandlers.preload(state, user, preloads, opts)
   end
 
   defp base_user_query(id) do
