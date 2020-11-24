@@ -23,6 +23,8 @@ defmodule UserDocsWeb.DocumentLive.Index do
 
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
     socket
+    |> (&(assign(&1, :data, Map.put(&1.assigns.data, :documents, [])))).()
+    |> (&(assign(&1, :data, Map.put(&1.assigns.data, :document_versions, [])))).()
     |> load_document_versions()
     |> load_documents()
     |> prepare_documents()
