@@ -27,7 +27,7 @@ defmodule UserDocs.Documents.DocumentVersion do
   @doc false
   def changeset(document_version, attrs) do
     document_version
-    |> cast(attrs, [ :name, :version_id, :docubit_id ])
+    |> cast(attrs, [ :name, :document_id, :version_id, :docubit_id ])
     |> body_is_container_docubit_if_empty()
     |> cast_assoc(:body, with: &Docubit.changeset/2)
     |> foreign_key_constraint(:version_id)
