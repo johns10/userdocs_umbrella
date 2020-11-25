@@ -5,9 +5,32 @@ defmodule UserDocs.DocumentVersionFixtures do
   """
 
   alias UserDocs.Documents
+  alias UserDocs.StateFixtures
 
-  def empty_document_version() do
-    document_version_attrs = document_version_attrs(:valid)
+  def state() do
+    state = StateFixtures.base_state()
+    v = Enum.at(state.versions, 0)
+    d = document()
+    dv = document_version(d.id, v.id)
+    state
+    |> Map.put(:document, d)
+    |> Map.put(:document_version, dv)
+    |> Map.put(:documents, [ d ])
+    |> Map.put(:document_versions, [ dv ])
+  end
+
+  def document() do
+    document_attrs = document_attrs(:valid)
+    { :ok, document } = Documents.create_document(document_attrs)
+    document
+  end
+
+  def document_version(document_id \\ nil, version_id \\ nil) do
+    empty_document_version(document_id, version_id)
+  end
+
+  def empty_document_version(document_id \\ nil, version_id \\ nil) do
+    document_version_attrs = document_version_attrs(:valid, document_id, version_id)
     { :ok, empty_document_version } = Documents.create_document_version(document_version_attrs)
     empty_document_version
   end
@@ -19,6 +42,19 @@ defmodule UserDocs.DocumentVersionFixtures do
     object
   end
 
+  def document_attrs(:valid) do
+    %{
+      name: UUID.uuid4(),
+      title: UUID.uuid4()
+    }
+  end
+
+  def document_attrs(:invalid) do
+    %{
+      name: "",
+      title: ""
+    }
+  end
 
   def content_attrs(team_id, :valid) do
     %{
@@ -27,7 +63,11 @@ defmodule UserDocs.DocumentVersionFixtures do
     }
   end
 
-  def document_version_attrs(:valid) do
-    %{ name: UUID.uuid4() }
+  def document_version_attrs(:valid, document_id \\ nil, version_id \\ nil) do
+    %{
+      name: UUID.uuid4(),
+      document_id: document_id,
+      version_id: version_id
+    }
   end
 end
