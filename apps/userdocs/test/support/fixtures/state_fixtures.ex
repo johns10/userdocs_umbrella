@@ -9,6 +9,27 @@ defmodule UserDocs.StateFixtures do
   alias UserDocs.MediaFixtures
   alias UserDocs.WebFixtures
   alias UserDocs.AutomationFixtures
+  alias UserDocs.ProjectsFixtures
+
+  def base_state() do
+    user = UsersFixtures.user()
+    team = UsersFixtures.team()
+    team_user = UsersFixtures.team_user(user.id, team.id)
+    p = ProjectsFixtures.project(team.id)
+    v = ProjectsFixtures.version(p.id)
+    %{
+      user: user,
+      team: team,
+      team_user: team_user,
+      project: p,
+      version: v,
+      users: [user],
+      teams: [team],
+      team_users: [team_user],
+      projects: [p],
+      versions: [v]
+    }
+  end
 
   def state() do
     user = UsersFixtures.user()
