@@ -144,11 +144,20 @@ defmodule UserDocs.Documents do
 
   alias UserDocs.Documents.Document
 
-  def load_documents(state, opts) do
-    StateHandlers.load(state, list_documents(opts), Document, opts)
+  def get_document!(id, _params \\ %{}, _filters \\ %{}) do
+    base_document_query(id)
+    |> Repo.one!()
   end
 
-  def list_documents(opts) do
+  defp base_document_query(id) do
+    from(document in Document, where: document.id == ^id)
+  end
+
+  def load_documents(state, opts) do
+    StateHandlers.load(state, list_documents(state, opts), Document, opts)
+  end
+
+  def list_documents() do
     base_documents_query()
     |> Repo.all()
   end
@@ -179,6 +188,10 @@ defmodule UserDocs.Documents do
     document
     |> Document.changeset(attrs)
     |> Repo.update()
+  end
+
+  def delete_document(%Document{} = document) do
+    Repo.delete(document)
   end
 
   def change_document(%Document{} = document, attrs \\ %{}) do

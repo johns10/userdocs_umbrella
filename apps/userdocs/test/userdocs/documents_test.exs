@@ -66,8 +66,74 @@ defmodule UserDocs.DocumentsTest do
     end
   end
 
+  describe "document" do
+    alias UserDocs.Documents.Document
+    alias UserDocs.DocumentVersionFixtures, as: DocumentFixtures
+
+    test "list_documents/0 returns all documents" do
+      document = DocumentFixtures.document()
+      assert Documents.list_documents() == [document]
+    end
+
+    test "list_documents/2 returns all documents" do
+      opts = [ data_type: :list, strategy: :by_type ]
+      state = DocumentFixtures.state()
+      document = DocumentFixtures.document()
+      assert Documents.list_documents(state, opts) == state.documents
+    end
+
+    test "list_documents/2 returns all documents with document_versions preloaded" do
+      opts = [ data_type: :list, strategy: :by_type, preloads: [ :document_versions ] ]
+      state = DocumentFixtures.state()
+      document = Enum.at(Documents.list_documents(state, opts), 0)
+      assert document.document_versions == state.document_versions
+    end
+
+    test "get_document!/1 returns the document with given id" do
+      document = DocumentFixtures.document()
+      assert Documents.get_document!(document.id) == document
+    end
+
+    test "create_document/1 with valid data creates a document" do
+      attrs = DocumentFixtures.document_attrs(:valid)
+      assert {:ok, %Document{} = document} = Documents.create_document(attrs)
+      assert document.name == attrs.name
+    end
+
+    test "create_document/1 with invalid data returns error changeset" do
+      attrs = DocumentFixtures.document_attrs(:invalid)
+      assert {:error, %Ecto.Changeset{}} = Documents.create_document(attrs)
+    end
+
+    test "update_document/2 with valid data updates the document" do
+      document = DocumentFixtures.document()
+      attrs = DocumentFixtures.document_attrs(:valid)
+      assert {:ok, %Document{} = document} = Documents.update_document(document, attrs)
+      assert document.name == attrs.name
+    end
+
+    test "update_document/2 with invalid data returns error changeset" do
+      document = DocumentFixtures.document()
+      attrs = DocumentFixtures.document_attrs(:invalid)
+      assert {:error, %Ecto.Changeset{}} = Documents.update_document(document, attrs)
+      assert document == Documents.get_document!(document.id)
+    end
+
+    test "delete_document/1 deletes the document" do
+      document = DocumentFixtures.document()
+      assert {:ok, %Document{}} = Documents.delete_document(document)
+      assert_raise Ecto.NoResultsError, fn -> Documents.get_document!(document.id) end
+    end
+
+    test "change_document/1 returns a document changeset" do
+      document = DocumentFixtures.document()
+      assert %Ecto.Changeset{} = Documents.change_document(document)
+    end
+  end
+
   describe "document_versions" do
     alias UserDocs.Documents.DocumentVersion
+    alias UserDocs.DocumentVersionFixtures, as: DocumentFixtures
 
     @valid_attrs %{name: "some name", title: "some title"}
     @update_attrs %{name: "some updated name", title: "some updated title"}
@@ -93,8 +159,12 @@ defmodule UserDocs.DocumentsTest do
     end
 
     test "create_document_version/1 with valid data creates a document_version" do
-      assert {:ok, %DocumentVersion{} = document_version} = Documents.create_document_version(@valid_attrs)
-      assert document_version.name == "some name"
+      state = DocumentFixtures.state()
+      attrs = DocumentFixtures.document_version_attrs(:valid, state.document.id, state.version.id)
+      assert {:ok, %DocumentVersion{} = document_version} = Documents.create_document_version(attrs)
+      assert document_version.name == attrs.name
+      assert document_version.version_id == state.version.id
+      assert document_version.document_id == state.document.id
     end
 
     test "create_document_version/1 with invalid data returns error changeset" do
