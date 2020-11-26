@@ -3,22 +3,20 @@ defmodule StateHandlers.Create do
   alias StateHandlers.Helpers
 
   def apply(state, data, opts) when is_struct(data) do
-    reload_opts = %{
-      type: opts[:type], location: opts[:location],
-      schema: data.__meta__.schema, strategy: opts[:strategy],
-      loader: opts[:loader]
-    }
-    with schema <- data.__meta__.schema,
-      assigns <- Helpers.maybe_access_assigns(state),
-      location_data <- Helpers.maybe_access_location(assigns, opts[:location]),
-      type <- Helpers.maybe_access_type(location_data, opts[:strategy], schema),
-      data <- create(type, data, opts[:data_type]),
-      state <- Helpers.reassign(state, location_data, data, reload_opts)
-    do
-      state
-    end
+    loader = opts[:loader] || &Map.put/3
+    schema = data.__meta__.schema
+    { state, nil, nil }
+    |> Helpers.maybe_access_assigns()
+    |> Helpers.maybe_access_location(opts[:location])
+    |> Helpers.maybe_access_type(opts[:strategy], schema)
+    |> create(data, opts[:data_type])
+    |> Helpers.maybe_put_in_location(schema, opts[:strategy], opts[:location])
+    |> Helpers.reload(schema, loader, opts[:strategy], opts[:location])
   end
 
+  def create({ state, location_data, target }, data, data_type) do
+    { state, location_data, create(target, data, data_type) }
+  end
   def create(state, data, :list) do
     [ data | state ]
   end
