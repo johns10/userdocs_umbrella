@@ -4,20 +4,19 @@ defmodule StateHandlers.Load do
 
   def apply(state, data, schema, opts) do
     # IO.inspect("Loading #{Helpers.type(schema)} data into #{opts[:location]}")
-    reload_opts = %{
-      type: opts[:type], location: opts[:location], schema: schema,
-      strategy: opts[:strategy], loader: opts[:loader]
-    }
-    with assigns <- Helpers.maybe_access_assigns(state),
-      location_data <- Helpers.maybe_access_location(assigns, opts[:location]),
-      type <- Helpers.maybe_access_type(location_data, opts[:strategy], schema),
-      data <- load_data(type, data, opts[:data_type], opts[:strategy]),
-      state <- Helpers.reassign(state, location_data, data, reload_opts)
-    do
-      state
-    end
+    loader = opts[:loader] || &Map.put/3
+    { state, nil, nil }
+    |> Helpers.maybe_access_assigns()
+    |> Helpers.maybe_access_location(opts[:location])
+    |> Helpers.maybe_access_type(opts[:strategy], schema)
+    |> load_data(data, opts[:data_type], opts[:strategy])
+    |> Helpers.maybe_put_in_location(schema, opts[:strategy], opts[:location])
+    |> Helpers.reload(schema, loader, opts[:strategy], opts[:location])
   end
 
+  def load_data({ state, location_data, target }, data, data_type, strategy) do
+    { state, location_data, load_data(target, data, data_type, strategy) }
+  end
   def load_data(state, data, :map, :by_key) do
     Enum.reduce(data, state,
       fn(d, s) ->
