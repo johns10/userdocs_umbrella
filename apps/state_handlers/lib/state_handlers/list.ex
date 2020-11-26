@@ -3,6 +3,8 @@ defmodule StateHandlers.List do
   alias StateHandlers.Helpers
 
   def apply(state, schema, opts) do
+    log_string = "StateHandlers.List in location #{opts[:location]} on #{Helpers.type(schema)} with opts #{inspect(opts)}"
+    if opts[:debug], do: IO.puts(log_string)
     state
     |> Helpers.maybe_access_assigns()
     |> Helpers.maybe_access_location(opts[:location])
