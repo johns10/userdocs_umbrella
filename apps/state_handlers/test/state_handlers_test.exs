@@ -53,6 +53,9 @@ defmodule StateHandlersTest do
     alias UserDocs.UsersFixtures
     alias UserDocs.ProjectsFixtures
     alias UserDocs.DocumentVersionFixtures, as: DocumentFixtures
+    alias StateHandlers.StateFixtures
+    alias UserDocs.Documents.Document
+    alias UserDocs.Documents.DocumentVersion
 
     test "StateHandlers.Initialize" do
       state_opts = [
@@ -139,15 +142,6 @@ defmodule StateHandlersTest do
       )
     end
 
-    alias StateHandlers.StateFixtures
-    alias UserDocs.Documents.Document
-
-    test "StateHandlers.Preload for documents and document versions" do
-      opts = [ data_type: :list, strategy: :by_type, location: :data, preloads: [ :document_versions ] ]
-      state = StateFixtures.state(opts)
-      data = StateHandlers.list(state, Document, opts)
-      test = StateHandlers.preload(state, data, opts[:preloads], opts)
-    end
 
     test "StateHandlers.delete" do
       list_data = Enum.map(1..3, fn(_) -> UsersFixtures.user() end)
@@ -164,6 +158,22 @@ defmodule StateHandlersTest do
           assert StateHandlers.list(state, User, opts) == expected_result
         end
       )
+    end
+
+    test "StateHandlers.Preload loads has_many relationships" do
+      opts = [ data_type: :list, strategy: :by_type, location: :data, preloads: [ :document_versions ] ]
+      state = StateFixtures.state(opts)
+      data = StateHandlers.list(state, Document, opts)
+      test = StateHandlers.preload(state, data, opts[:preloads], opts)
+    end
+
+    test "StateHandlers.Preload loads BelongsTo has_one relationships" do
+      opts = [ data_type: :list, strategy: :by_type, location: :data, preloads: [ :version ] ]
+      state = StateFixtures.state(opts)
+      data = StateHandlers.list(state, DocumentVersion, opts)
+      result = StateHandlers.preload(state, data, opts[:preloads], opts) |> Enum.at(0) |> Map.get(:version)
+      expected_result = StateHandlers.list(state, Version, opts) |> Enum.at(0)
+      assert expected_result == result
     end
   end
 end
