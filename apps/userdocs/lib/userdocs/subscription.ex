@@ -26,4 +26,8 @@ defmodule UserDocs.Subscription do
     IO.puts("Handling Event")
     StateHandlers.create(socket, payload, opts)
   end
+  def handle_event(socket, "delete" = event, payload, opts) do
+    IO.puts("Handling Event")
+    StateHandlers.delete(socket, payload, opts)
+  end
 end
