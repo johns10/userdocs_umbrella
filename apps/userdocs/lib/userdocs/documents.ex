@@ -154,18 +154,27 @@ defmodule UserDocs.Documents do
   end
 
   def load_documents(state, opts) do
-    StateHandlers.load(state, list_documents(state, opts), Document, opts)
+    StateHandlers.load(state, list_documents(%{}, opts[:filters]), Document, opts)
   end
 
-  def list_documents() do
+  def list_documents(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_documents_query()
+    |> maybe_filter_by_project_id(filters[:project_id])
     |> Repo.all()
   end
-
-  def list_documents(state, opts) do
+  def list_documents(state, opts) when is_list(opts) do
     StateHandlers.list(state, Document, opts)
     |> maybe_preload_document(opts[:preloads], state, opts)
   end
+
+  defp maybe_filter_by_project_id(query, nil), do: query
+  defp maybe_filter_by_project_id(query, project_id) do
+    from(document in query,
+      where: document.project_id == ^project_id,
+      order_by: document.name
+    )
+  end
+
 
   defp maybe_preload_document(documents, nil, _, _), do: documents
   defp maybe_preload_document(documents, preloads, state, opts) do
@@ -251,12 +260,16 @@ defmodule UserDocs.Documents do
       ** (Ecto.NoResultsError)
 
   """
-  def get_document_version!(id, params \\ %{}, _filters \\ %{}) do
+  def get_document_version!(id, params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_document_version_query(id)
     |> maybe_preload_version(params[:version])
     |> maybe_preload_docubit(params[:body])
     |> maybe_preload_docubits(params[:docubits])
     |> Repo.one!()
+  end
+
+  def get_document_version!(id, state, opts) when is_list(opts) do
+    StateHandlers.get(state, id, DocumentVersion, opts)
   end
 
   defp maybe_preload_version(query, nil), do: query
