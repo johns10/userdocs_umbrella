@@ -19,8 +19,8 @@ defmodule UserDocs.DocumentVersionFixtures do
     |> Map.put(:document_versions, [ dv ])
   end
 
-  def document() do
-    document_attrs = document_attrs(:valid)
+  def document(project_id \\ nil) do
+    document_attrs = document_attrs(:valid, project_id)
     { :ok, document } = Documents.create_document(document_attrs)
     document
   end
@@ -42,17 +42,19 @@ defmodule UserDocs.DocumentVersionFixtures do
     object
   end
 
-  def document_attrs(:valid) do
+  def document_attrs(type, project_id \\ nil)
+  def document_attrs(:valid, project_id) do
     %{
       name: UUID.uuid4(),
-      title: UUID.uuid4()
+      title: UUID.uuid4(),
+      project_id: project_id
     }
   end
-
-  def document_attrs(:invalid) do
+  def document_attrs(:invalid, project_id) do
     %{
       name: "",
-      title: ""
+      title: "",
+      project_id: project_id
     }
   end
 
