@@ -9,10 +9,12 @@ defmodule StateHandlers.List do
     |> Helpers.maybe_access_assigns()
     |> Helpers.maybe_access_location(opts[:location])
     |> Helpers.maybe_access_type(opts[:strategy], schema)
+    |> Helpers.unpack_state()
     |> maybe_filter_by_ids(opts[:ids], opts[:data_type])
     |> maybe_filter_by_field(opts[:filter], opts[:data_type])
     |> cast_by_type(opts[:data_type])
   end
+
 
   defp maybe_filter_by_ids(nil, _, _), do: raise(RuntimeError, "StateHandlers.List data is nil")
   defp maybe_filter_by_ids(data, nil, _), do: data
