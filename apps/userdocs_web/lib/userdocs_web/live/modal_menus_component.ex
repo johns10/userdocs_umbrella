@@ -174,6 +174,14 @@ defmodule UserDocsWeb.ModalMenus do
     }
   end
 
+  def edit_document_version(socket, params) do
+    {
+      :noreply,
+      DocumentVersionMessage.edit_modal_menu(socket, params)
+      |> call_menu(socket)
+    }
+  end
+
   def close(socket) do
     Phoenix.LiveView.send_update(
       ModalMenus,
