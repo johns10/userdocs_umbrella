@@ -48,7 +48,7 @@ defmodule UserDocsWeb.Root do
   def initialize(socket), do: socket
 
   def subscribe(socket) do
-    UserDocsWeb.Endpoint.subscribe(channel(socket))
+    UserDocsWeb.Endpoint.subscribe(Defaults.channel(socket))
     socket
   end
 
@@ -83,11 +83,6 @@ defmodule UserDocsWeb.Root do
     Projects.load_versions(socket, opts)
   end
 
-  def socket_inspector(socket) do
-    IO.inspect(socket.assigns.data)
-    socket
-  end
-
   def validate_logged_in(socket, session) do
     try do
       case maybe_assign_current_user(socket, session) do
@@ -113,10 +108,13 @@ defmodule UserDocsWeb.Root do
   end
 
   def handle_event("new-document-version", params, socket) do
-    ModalMenus.new_document_version(socket, Map.put(params, :channel, channel(socket)))
+    ModalMenus.new_document_version(socket, Map.put(params, :channel, Defaults.channel(socket)))
+  end
+  def handle_event("edit-document-version", params, socket) do
+    ModalMenus.edit_document_version(socket, Map.put(params, :channel, Defaults.channel(socket)))
   end
   def handle_event("new-document", params, socket) do
-    ModalMenus.new_document(socket, params.parent, params.projects, channel(socket))
+    ModalMenus.new_document(socket, params.parent, params.projects, Defaults.channel(socket))
   end
   def handle_event("select_version", %{"select-version" => version_id_param} = _payload, socket) do
     opts = state_opts()
@@ -140,6 +138,7 @@ defmodule UserDocsWeb.Root do
 
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
     Logger.debug("Root handling info on topic #{topic}, event #{event}")
+    IO.inspect(payload)
     {
       :noreply,
       UserDocs.Subscription.handle_event(socket, event, payload, state_opts())
@@ -148,9 +147,5 @@ defmodule UserDocsWeb.Root do
   def handle_info(:close_modal, socket), do: { :noreply, ModalMenus.close(socket) }
   def handle_info(name, _socket) do
     raise(FunctionClauseError, "Subscription #{inspect(name)} not implemented by Root")
-  end
-
-  def channel(socket) do
-    "team-" <> Integer.to_string(socket.assigns.current_team_id)
   end
 end
