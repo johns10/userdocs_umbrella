@@ -46,13 +46,23 @@ defmodule StateHandlers.Preload do
   defp handle_assoc(state, source_id, association, opts) do
     case association do
       %Ecto.Association.ManyToMany{} -> preload_many_to_many(state, association, source_id, opts)
+      %Ecto.Association.BelongsTo{} ->
+        case association.cardinality do
+          :one -> preload_belongs_to_one(state, source_id, association, opts)
+          _ -> raise("Cardinality not implemented")
+        end
       %Ecto.Association.Has{} ->
         case association.cardinality do
           :many -> preload_has_many(state, source_id, association, opts)
           _ -> raise("Cardinality not implemented")
         end
-      _ -> raise("This association type not implemented")
+      association_type -> raise("Association type #{inspect(association_type)} not implemented")
     end
+  end
+
+  defp preload_belongs_to_one(state, source_id, association, opts) do
+    state
+    |> StateHandlers.get(source_id, association.queryable, opts)
   end
 
   defp preload_has_many(state, source_id, association, opts) do
