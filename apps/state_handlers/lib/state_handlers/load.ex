@@ -2,6 +2,10 @@ defmodule StateHandlers.Load do
 
   alias StateHandlers.Helpers
 
+  def apply(state, data, opts) do
+    schema = data |> Enum.at(0) |> Map.get(:__meta__) |> Map.get(:schema)
+    apply(state, data, schema, opts)
+  end
   def apply(state, data, schema, opts) do
     log_string = "Loading #{Helpers.type(schema)} data into #{opts[:location]}"
     if opts[:debug], do: IO.puts(log_string)
