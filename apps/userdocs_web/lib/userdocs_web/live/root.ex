@@ -120,7 +120,7 @@ defmodule UserDocsWeb.Root do
     ModalMenus.edit_document(socket, params)
   end
   def handle_event("new-document", params, socket) do
-    ModalMenus.new_document(socket, params.parent, params.projects, Defaults.channel(socket))
+    ModalMenus.new_document(socket, params)
   end
   def handle_event("select_version", %{"select-version" => version_id_param} = _payload, socket) do
     opts = state_opts()
