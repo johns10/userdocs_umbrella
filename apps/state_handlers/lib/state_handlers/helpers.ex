@@ -3,20 +3,20 @@ defmodule StateHandlers.Helpers do
   require Logger
 
   def maybe_access_assigns(%Phoenix.LiveView.Socket{} = socket) do
-    #IO.puts("Accessing Assigns")
+   #IO.puts("Accessing Assigns")
     [ { socket.assigns, :assigns, :assigns }, { socket, nil, :socket } ]
   end
   def maybe_access_assigns(state) do
-    #IO.puts("Not accessing Assigns")
+   #IO.puts("Not accessing Assigns")
     [ { state, nil, :state } ]
   end
 
   def maybe_access_location(state, nil) do
-    #IO.puts("Not accessing location")
+   #IO.puts("Not accessing location")
     state
   end
   def maybe_access_location([{data, _, _} | _ ] = state, location) do
-    #IO.puts("Accessing Location")
+   #IO.puts("Accessing Location")
     [ { Map.get(data, location, nil), location, :location } | state ]
   end
 
@@ -67,6 +67,10 @@ defmodule StateHandlers.Helpers do
     state
   end
 
+  def maybe_put_in_location([ { data, location_key, :location }, { next_data, next_key, next_type } ], _location) do
+    #IO.puts("Putting in with location")
+    [ { Map.put(next_data, location_key, data), next_key, next_type } ]
+  end
   def maybe_put_in_location([ { data, location_key, :location }, { next_data, next_key, next_type } | breadcrumb ], _location) do
     #IO.puts("Putting in with location")
     [ { Map.put(next_data, location_key, data), next_key, next_type } | breadcrumb ]
