@@ -6,6 +6,7 @@ defmodule UserDocsWeb.Root do
 
   alias UserDocs.Users
   alias UserDocs.Users.User
+  alias UserDocs.Users.TeamUser
   alias UserDocs.Users.Team
   alias UserDocs.Projects
   alias UserDocs.Projects.Project
@@ -32,9 +33,13 @@ defmodule UserDocsWeb.Root do
   end
 
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
+    opts =
+      state_opts()
+      |> Keyword.put(:types, [ User, TeamUser, Team, Project, Version  ])
+
     socket
+    |> StateHandlers.initialize(opts)
     |> assign(:modal_action, :show)
-    |> assign(:data, %{ users: [], team_users: [], teams: [], projects: [], versions: [] })
     |> users()
     |> team_users()
     |> teams()
