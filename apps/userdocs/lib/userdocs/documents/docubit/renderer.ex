@@ -7,7 +7,7 @@ defmodule UserDocs.Documents.Docubit.Renderer do
   end
 
   defp fetch_renderer(type_id) do
-    "Elixir.UserDocs.Documents.OldDocuBit.Renderers."
+    "Elixir.UserDocs.Documents.Docubit.Renderers."
     <> String.capitalize(type_id)
     |> String.to_existing_atom()
   end
