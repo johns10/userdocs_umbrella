@@ -1,4 +1,4 @@
-defmodule UserDocs.Documents.OldDocuBit.Renderers.Row do
+defmodule UserDocs.Documents.Docubit.Renderers.Row do
   require Logger
   use Phoenix.HTML
 
