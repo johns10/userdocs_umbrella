@@ -10,12 +10,15 @@ defmodule StateHandlers.Initialize do
     |> maybe_create_types(opts[:strategy], opts[:types], opts[:data_type])
     |> Helpers.maybe_put_in_location(opts[:location])
     |> Helpers.socket_or_state(loader)
-    |> IO.inspect()
   end
 
   def maybe_create_location(state, nil), do: state
-  def maybe_create_location([{ _state, _key, _type } | _ ] = breadcrumb, location) do
-    [ { %{}, location, :location } | breadcrumb ]
+  def maybe_create_location([{ state, _key, _type } | _ ] = breadcrumb, location) do
+    case Map.get(state, location, nil) do
+      nil -> [ { %{}, location, :location } | breadcrumb ]
+      result -> [ { result, location, :location } | breadcrumb ]
+    end
+
   end
 
   def maybe_create_types(state, nil, _, _), do: state
