@@ -107,11 +107,17 @@ defmodule UserDocsWeb.Root do
     end
   end
 
+  def handle_event("delete-document-version", p, s) do
+    UserDocsWeb.DocumentVersionLive.EventHandlers.handle_event("delete", p, s)
+  end
   def handle_event("new-document-version", params, socket) do
     ModalMenus.new_document_version(socket, Map.put(params, :channel, Defaults.channel(socket)))
   end
   def handle_event("edit-document-version", params, socket) do
     ModalMenus.edit_document_version(socket, Map.put(params, :channel, Defaults.channel(socket)))
+  end
+  def handle_event("edit-document", params, socket) do
+    ModalMenus.edit_document(socket, params)
   end
   def handle_event("new-document", params, socket) do
     ModalMenus.new_document(socket, params.parent, params.projects, Defaults.channel(socket))
