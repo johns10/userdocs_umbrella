@@ -33,7 +33,7 @@ defmodule StateHandlers.Preload do
   defp handle_preload(state, data, preload, opts) when is_atom(preload) do
     # IO.puts("handle_preload Atom #{inspect(preload)}")
     schema = data.__meta__.schema
-    preload_data = handle_assoc(state, data.id, schema.__schema__(:association, preload), opts)
+    preload_data = handle_assoc(state, data, schema.__schema__(:association, preload), opts)
     Map.put(data, preload, preload_data)
   end
   defp handle_preload(state, data, { key, value } = preload, opts) when is_tuple(preload) do
@@ -43,39 +43,39 @@ defmodule StateHandlers.Preload do
     Map.put(data, key, apply(state, data_to_preload, preloads, opts))
   end
 
-  defp handle_assoc(state, source_id, association, opts) do
+  defp handle_assoc(state, source, association, opts) do
     case association do
-      %Ecto.Association.ManyToMany{} -> preload_many_to_many(state, association, source_id, opts)
+      %Ecto.Association.ManyToMany{} -> preload_many_to_many(state, association, source, opts)
       %Ecto.Association.BelongsTo{} ->
         case association.cardinality do
-          :one -> preload_belongs_to_one(state, source_id, association, opts)
+          :one -> preload_belongs_to_one(state, source, association, opts)
           _ -> raise("Cardinality not implemented")
         end
       %Ecto.Association.Has{} ->
         case association.cardinality do
-          :many -> preload_has_many(state, source_id, association, opts)
+          :many -> preload_has_many(state, source, association, opts)
           _ -> raise("Cardinality not implemented")
         end
       association_type -> raise("Association type #{inspect(association_type)} not implemented")
     end
   end
 
-  defp preload_belongs_to_one(state, source_id, association, opts) do
+  defp preload_belongs_to_one(state, source, association, opts) do
     state
-    |> StateHandlers.get(source_id, association.queryable, opts)
+    |> StateHandlers.get(Map.get(source, association.owner_key), association.queryable, opts)
   end
 
-  defp preload_has_many(state, source_id, association, opts) do
+  defp preload_has_many(state, source, association, opts) do
     # IO.puts("preload_has_many")
     owner = schema_atom(association.owner)
     owner_key = association.queryable.__schema__(:association, owner).owner_key
 
     state
     |> StateHandlers.list(association.queryable, opts)
-    |> Enum.filter(fn(o) -> Map.get(o, owner_key) == source_id end)
+    |> Enum.filter(fn(o) -> Map.get(o, owner_key) == source.id end)
   end
 
-  defp preload_many_to_many(state, association, source_id, opts) do
+  defp preload_many_to_many(state, association, source, opts) do
     owner = schema_atom(association.owner)
     owner_key = association.join_through.__schema__(:association, owner).owner_key
 
@@ -83,7 +83,7 @@ defmodule StateHandlers.Preload do
     queryable_key = association.join_through.__schema__(:association, queryable).owner_key
 
     # IO.puts("Handling Many to Many Association.  Owner is #{owner}.  Joining through #{}.  Queryable is #{queryable}")
-    join_opts = Keyword.put(opts, :filter, { owner_key, source_id })
+    join_opts = Keyword.put(opts, :filter, { owner_key, source.id })
 
     queryable_ids =
       state
