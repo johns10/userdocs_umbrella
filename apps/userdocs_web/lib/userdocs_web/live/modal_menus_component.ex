@@ -60,7 +60,7 @@ defmodule UserDocsWeb.ModalMenus do
                   title: @title,
                   action: @action,
                   document: @object,
-                  parent_id: @parent.id,
+                  team_id: @team_id,
                   channel: @channel,
                   select_lists: %{
                     projects: @select_lists.projects,
@@ -94,6 +94,7 @@ defmodule UserDocsWeb.ModalMenus do
       action: message.action,
       parent: Map.get(message, :parent, nil),
       parent_id: Map.get(message, :parent_id, nil),
+      team_id: Map.get(message, :team_id, nil),
       document_id: Map.get(message, :document_id, nil),
       version_id: Map.get(message, :version_id, nil),
       type: message.type,
@@ -161,10 +162,10 @@ defmodule UserDocsWeb.ModalMenus do
     }
   end
 
-  def new_document(socket, parent, projects, channel) do
+  def new_document(socket, params) do
     {
       :noreply,
-      DocumentMessage.new_modal_menu(socket, parent, projects, channel)
+      DocumentMessage.new_modal_menu(socket, params)
       |> call_menu(socket)
     }
   end
