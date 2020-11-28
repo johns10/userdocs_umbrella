@@ -10,12 +10,12 @@
 
   <%= Layout.select_input(f, :document_id,
     @select_lists.documents, [
-      selected: @parent_id || "",
+      selected: @document_id || "",
     ], "control") %>
 
   <%= Layout.select_input(f, :version_id,
     @select_lists.versions, [
-      selected: @parent_id || "",
+      selected: @version_id || "",
     ], "control") %>
 
   <%= submit "Save", phx_disable_with: "Saving..." %>
