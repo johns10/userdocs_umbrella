@@ -157,14 +157,15 @@ defmodule UserDocs.Documents do
     StateHandlers.load(state, list_documents(%{}, opts[:filters]), Document, opts)
   end
 
+  def list_documents(state, opts) when is_list(opts) do
+    IO.puts("State listing documents")
+    StateHandlers.list(state, Document, opts)
+    |> maybe_preload_document(opts[:preloads], state, opts)
+  end
   def list_documents(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_documents_query()
     |> maybe_filter_by_project_id(filters[:project_id])
     |> Repo.all()
-  end
-  def list_documents(state, opts) when is_list(opts) do
-    StateHandlers.list(state, Document, opts)
-    |> maybe_preload_document(opts[:preloads], state, opts)
   end
 
   defp maybe_filter_by_project_id(query, nil), do: query
@@ -178,6 +179,7 @@ defmodule UserDocs.Documents do
 
   defp maybe_preload_document(documents, nil, _, _), do: documents
   defp maybe_preload_document(documents, preloads, state, opts) do
+    opts = Keyword.delete(opts, :filter)
     StateHandlers.preload(state, documents, preloads, opts)
   end
 
