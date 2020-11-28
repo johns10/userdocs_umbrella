@@ -6,7 +6,7 @@ defmodule UserDocs.DocumentVersion.Messages do
 
   def new_modal_menu(socket, params) do
     required_keys = [ :document_id, :version_id, :documents, :versions, :channel]
-    params = Helpers.validate_params(params, required_keys)
+    params = Helpers.validate_params(params, required_keys, __MODULE__)
 
     %{ target: "ModalMenus" }
     |> init(socket, params.document_id, params.version_id, params.documents, params.versions, params.channel)
@@ -15,7 +15,7 @@ defmodule UserDocs.DocumentVersion.Messages do
 
   def edit_modal_menu(socket, params) do
     required_keys = [ :document_id, :document_version_id, :version_id, :documents, :versions, :document_versions, :channel]
-    params = Helpers.validate_params(params, required_keys)
+    params = Helpers.validate_params(params, required_keys, __MODULE__)
     %{ target: "ModalMenus" }
     |> init(socket, params.document_id, params.version_id, params.documents, params.versions, params.channel)
     |> edit(socket, params.document_version_id, params.opts)
