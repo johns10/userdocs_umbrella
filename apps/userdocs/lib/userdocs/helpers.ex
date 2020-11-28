@@ -7,4 +7,11 @@ defmodule UserDocs.Helpers do
     items
     |> Enum.map(&{Map.get(&1, field), &1.id})
   end
+
+  def validate_params(params, required_keys, module) do
+    case Enum.all?(required_keys, &Map.has_key?(params, &1)) do
+      true -> params
+      false -> raise("#{inspect(module)} doesn't have all required keys.  Missing #{inspect(required_keys -- Map.keys(params))}")
+    end
+  end
 end

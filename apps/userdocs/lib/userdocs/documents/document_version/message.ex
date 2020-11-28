@@ -6,7 +6,7 @@ defmodule UserDocs.DocumentVersion.Messages do
 
   def new_modal_menu(socket, params) do
     required_keys = [ :document_id, :version_id, :documents, :versions, :channel]
-    params = validate_params(params, required_keys)
+    params = Helpers.validate_params(params, required_keys)
 
     %{ target: "ModalMenus" }
     |> init(socket, params.document_id, params.version_id, params.documents, params.versions, params.channel)
@@ -15,7 +15,7 @@ defmodule UserDocs.DocumentVersion.Messages do
 
   def edit_modal_menu(socket, params) do
     required_keys = [ :document_id, :document_version_id, :version_id, :documents, :versions, :document_versions, :channel]
-    params = validate_params(params, required_keys)
+    params = Helpers.validate_params(params, required_keys)
     %{ target: "ModalMenus" }
     |> init(socket, params.document_id, params.version_id, params.documents, params.versions, params.channel)
     |> edit(socket, params.document_version_id, params.opts)
@@ -47,12 +47,5 @@ defmodule UserDocs.DocumentVersion.Messages do
     |> Map.put(:version_id, version_id)
     |> Map.put(:select_lists, select_lists)
     |> Map.put(:channel, channel)
-  end
-
-  def validate_params(params, required_keys) do
-    case Enum.all?(required_keys, &Map.has_key?(params, &1)) do
-      true -> params
-      false -> raise("DocumentVersion.Messages.new_modal_menu doesn't have all required keys.  Missing #{inspect(required_keys -- Map.keys(params))}")
-    end
   end
 end
