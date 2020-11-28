@@ -94,6 +94,7 @@ defmodule UserDocs.Documents.Docubit do
     fn(docubit) ->
       case docubit.action do
         :replace -> docubit
+        :update -> docubit
         :insert ->
           docubit
           |> get_field(:order)
@@ -160,7 +161,7 @@ defmodule UserDocs.Documents.Docubit do
   # Applies Contexts to the Docubit
   def apply_contexts(docubit, parent_contexts), do: Context.apply_context_changes(docubit, parent_contexts)
 
-  def preload(docubit, state), do: Preload.apply(docubit, state)
+  # def preload(docubit, state), do: Preload.apply(docubit, state)
   def renderer(docubit = %Docubit{}), do: Renderer.apply(docubit)
   def hydrate(body, address, data), do: Hydrate.apply(body, address, data)
 
