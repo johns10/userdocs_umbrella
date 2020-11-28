@@ -109,6 +109,10 @@ defmodule UserDocs.DocubitsTest do
       }
     end
 
+    def state_opts() do
+      [ data_type: :list, strategy: :by_type, location: :data ]
+    end
+
     test "apply_context applies a context to the docubit" do
       f = docubit_fixture()
       ol = f.ol
@@ -145,7 +149,7 @@ defmodule UserDocs.DocubitsTest do
       ol = f.ol
       content = Enum.at(f.state.data.content, 0)
       docubit = Map.put(ol, :content_id, content.id)
-      docubit = Docubit.preload(docubit, f.state)
+      docubit = StateHandlers.preload(f.state, docubit, [ :content ], state_opts())
       assert docubit.content == content
     end
 
@@ -154,7 +158,7 @@ defmodule UserDocs.DocubitsTest do
       ol = f.ol
       file = Enum.at(f.state.data.files, 0)
       docubit = Map.put(ol, :file_id, file.id)
-      docubit = Docubit.preload(docubit, f.state)
+      docubit = StateHandlers.preload(f.state, docubit, [ :file ], state_opts())
       assert docubit.file == file
     end
 
@@ -163,7 +167,7 @@ defmodule UserDocs.DocubitsTest do
       ol = f.ol
       annotation = Enum.at(f.state.data.annotations, 0)
       docubit = Map.put(ol, :through_annotation_id, annotation.id)
-      docubit = Docubit.preload(docubit, f.state)
+      docubit = StateHandlers.preload(f.state, docubit, [ :through_annotation ], state_opts())
       assert docubit.through_annotation == annotation
     end
 
@@ -174,7 +178,7 @@ defmodule UserDocs.DocubitsTest do
         |> Docubit.apply_contexts(%{})
         |> Docubit.renderer()
 
-      assert docubit.renderer == :"Elixir.UserDocs.Documents.OldDocuBit.Renderers.Row"
+      assert docubit.renderer == :"Elixir.UserDocs.Documents.Docubit.Renderers.Row"
     end
 
     test "context gets the parent context and overwrites a nil settings context" do
