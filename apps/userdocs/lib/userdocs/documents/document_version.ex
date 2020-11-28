@@ -9,7 +9,7 @@ defmodule UserDocs.Documents.DocumentVersion do
   alias UserDocs.Documents.Document.MapDocubits
   alias UserDocs.Documents.Docubit.Context
 
-  @state_opts [ data_type: :map, strategy: :by_key, location: :root ]
+  @state_opts [ data_type: :list, strategy: :by_type, location: :data ]
 
   schema "document_versions" do
     field :name, :string
@@ -48,14 +48,11 @@ defmodule UserDocs.Documents.DocumentVersion do
 
   alias UserDocs.Documents.Docubit
 
-  def load(%DocumentVersion{ docubits: docubits } = document_version, state) do
-    docubits = Enum.map(docubits, fn(d) -> Docubit.preload(d, state) end)
-    state = StateHandlers.load(state, docubits, @state_opts)
-    map =
-      document_version
-      |> MapDocubits.apply()
+  def load(%DocumentVersion{ docubits: _ } = document_version, state) do
+    # preloads = [ :content, :file, :through_annotation ]
+    map = MapDocubits.apply(document_version)
 
-    traverse_docubit_map(map, state)
+    Map.put(document_version, :body, traverse_docubit_map(map, state))
   end
 
   def traverse_docubit_map(map, state) do
@@ -63,7 +60,7 @@ defmodule UserDocs.Documents.DocumentVersion do
   end
   def docubit_map_item({ _key, map }, state, parent_context) do
     opts = Keyword.put(@state_opts, :type, "docubit")
-    docubit = StateHandlers.get(state, map.docubit.id, opts)
+    docubit = StateHandlers.get(state, map.docubit.id, Docubit, opts)
     { :ok, context } = Docubit.context(docubit, parent_context)
     docubits =
       Enum.map(map.docubit.docubits,
