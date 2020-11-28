@@ -4,8 +4,7 @@ defmodule UserDocs.Documents.Document.MapDocubits do
 
   def apply(%DocumentVersion{ docubits: docubits }) do
     docubits
-    |> Enum.sort(fn(i1, i2) -> i2.id > i1.id end )
-    |> IO.inspect()
+    |> Enum.sort(fn(i1, i2) -> i2.id > i1.id end ) # Unsorted addresses won't work.  This may not be the right sorting method.  Might need to sort by count of address items.
     |> Enum.reduce(%{}, fn(d, m) -> add_address_item(m, d, d.address) end)
   end
 
