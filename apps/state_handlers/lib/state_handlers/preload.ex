@@ -100,7 +100,7 @@ defmodule StateHandlers.Preload do
     |> Atom.to_string()
     |> String.split(".")
     |> Enum.at(-1)
-    |> String.downcase()
+    |> Macro.underscore()
     |> String.to_atom()
   end
 end
