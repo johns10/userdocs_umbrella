@@ -1,36 +1,56 @@
-<%= if @auth_state == :logged_in do %>
-  <h1>Listing Documents</h1>
+<h1>Listing Documents</h1>
 
-  <%= if @live_action in [:new, :edit] do %>
-    <%= live_modal @socket, UserDocsWeb.DocumentLive.FormComponent,
-      id: @document.id || :new,
-      title: @page_title,
-      action: @live_action,
-      document: @document,
-      return_to: Routes.document_index_path(@socket, :index),
-      projects_select: @projects_select %>
-  <% end %>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-
-        <th></th>
-      </tr>
-    </thead>
-    <tbody id="documents">
+  <aside class="menu">
+    <p class="menu-label">Documents</p>
+    <ul class="menu-list">
       <%= for document <- @documents do %>
-        <tr id="document-<%= document.id %>">
-          <td><%= document.name %></td>
-          <%= for document <- @documents do %>
-          <% end %>
-        </tr>
+        <li>
+          <a class="is-flex-direction-row">
+            <%= document.name %>
+            <%= content_tag :div, to: "#", phx_click: "new-document-version",
+              class: "is-pulled-right pl-2 p-0",
+              phx_value_document_id: document.id do %>
+              <i class="fa fa-lg fa-plus-square"> </i>
+            <% end %>
+            <%= content_tag :div, to: "#", phx_click: "delete",
+              class: "is-pulled-right pl-2 p-0",
+              phx_value_id: document.id do %>
+              <i class="fa fa-lg fa-minus-square"></i>
+            <% end %>
+            <%= content_tag :div, to: "#", phx_click: "edit-document",
+              class: "is-pulled-right pl-2 p-0",
+              phx_value_id: document.id do %>
+              <i class="fa fa-lg fa-edit"></i>
+            <% end %>
+          </a>
+          <ul>
+            <%= for document_version <- document.document_versions do %>
+              <li class="columns is-flex-direction-row">
+                <a class="column is-flex-grow-5">
+                  <%= document_version.version.name %>
+                </a>
+                <div class="column is-justify-content-right is-flex-grow-1">
+                  <%= live_patch to: Routes.document_editor_path(@socket, :edit, document_version),
+                    class: "is-pulled-right pl-2 p-0" do %>
+                    <i class="fa fa-lg fa-search"></i>
+                  <% end %>
+                  <%= content_tag :a, phx_click: "delete-document-version",
+                    phx_value_id: document_version.id,
+                    class: "is-pulled-right pl-2 p-0" do %>
+                    <i class="fa fa-lg fa-minus-square"></i>
+                  <% end %>
+                  <%= content_tag :a, phx_click: "edit-document-version",
+                    phx_value_id: document_version.id,
+                    class: "is-pulled-right pl-2 p-0" do %>
+                    <i class="fa fa-lg fa-edit"></i>
+                  <% end %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </li>
       <% end %>
-    </tbody>
-  </table>
-
-  <span phx-click="new-document">New Document</span>
-<% else %>
-  <%= LoginFormComponent.render(assigns) %>
-<% end %>
+    </ul>
+  </aside>
+<span phx-click="new-document">New Document</span>
+<span phx-click="new-document-version">New Document Version</span>
