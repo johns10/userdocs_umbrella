@@ -33,6 +33,18 @@ defmodule UserDocs.DocumentVersionBodyTest do
       Documents.get_document_version!(document_version.id, %{ docubits: true })
     end
 
+    def document_version_with_rows do
+      document_version = empty_document_version()
+      body = Documents.get_docubit!(document_version.body.id, %{docubits: true})
+      row =
+        body
+        |> add_rows(document_version.id)
+        |> Map.get(:docubits)
+        |> Enum.at(0)
+
+      Documents.get_document_version!(document_version.id, %{ docubits: true })
+    end
+
     def add_rows(docubit, document_version_id) do
       attrs = %{ docubits: [
         DocubitFixtures.docubit_attrs(:row, document_version_id),
@@ -122,7 +134,7 @@ defmodule UserDocs.DocumentVersionBodyTest do
       document_version = document_version_with_columns_and_rows()
       assert Enum.count(document_version.docubits) == 7
     end
-"""
+    """
     test "map_docubits maps the docubits" do
       document_version = document_version_with_columns_and_rows()
       docubit_map = DocumentVersion.map_docubits(document_version)
