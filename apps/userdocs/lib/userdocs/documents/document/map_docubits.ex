@@ -3,8 +3,10 @@ defmodule UserDocs.Documents.Document.MapDocubits do
   alias UserDocs.Documents.DocumentVersion
 
   def apply(%DocumentVersion{ docubits: docubits }) do
-    Enum.reduce(docubits, %{},
-      fn(d, m) -> add_address_item(m, d, d.address) end)
+    docubits
+    |> Enum.sort(fn(i1, i2) -> i2.id > i1.id end )
+    |> IO.inspect()
+    |> Enum.reduce(%{}, fn(d, m) -> add_address_item(m, d, d.address) end)
   end
 
   # This is the end item, where we reach the end of the address and put the final item
