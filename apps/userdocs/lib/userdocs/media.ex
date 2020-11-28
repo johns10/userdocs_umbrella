@@ -15,6 +15,10 @@ defmodule UserDocs.Media do
   alias UserDocs.Media.FileHelpers
   alias UserDocs.Media.ScreenshotHelpers
 
+
+  def load_files(state, opts) do
+    StateHandlers.load(state, list_files(), File, opts)
+  end
   @doc """
   Returns the list of files.
 
@@ -25,8 +29,11 @@ defmodule UserDocs.Media do
 
   """
   def list_files do
-    Repo.all(File)
+    base_files_query()
+    |> Repo.all()
   end
+
+  defp base_files_query(), do: from(files in File)
 
   @doc """
   Gets a single file.

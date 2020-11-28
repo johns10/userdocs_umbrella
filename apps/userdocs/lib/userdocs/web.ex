@@ -9,6 +9,14 @@ defmodule UserDocs.Web do
   alias UserDocs.Subscription
   alias UserDocs.Web.Page
 
+  def load_pages(state, opts) do
+    StateHandlers.load(state, list_pages(%{}, opts[:filters]), Page, opts)
+  end
+
+  def list_pages(state, opts) when is_list(opts) do
+    StateHandlers.list(state, Page, opts)
+  end
+
   @doc """
   Returns the list of pages.
 
@@ -18,7 +26,7 @@ defmodule UserDocs.Web do
       [%Page{}, ...]
 
   """
-  def list_pages(params \\ %{}, filters \\ %{}) do
+  def list_pages(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_pages_query()
     |> maybe_preload_elements(params[:elements])
     |> maybe_preload_annotations(params[:annotations])
@@ -388,6 +396,10 @@ defmodule UserDocs.Web do
   end
 
   alias UserDocs.Web.Annotation
+
+  def load_annotations(state, opts) do
+    StateHandlers.load(state, list_annotations(opts[:params], opts[:filters]), Annotation, opts)
+  end
 
   @doc """
   Returns the list of annotations.

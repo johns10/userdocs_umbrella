@@ -178,6 +178,10 @@ defmodule UserDocs.Automation do
 
   alias UserDocs.Automation.Step
 
+  def load_steps(state, opts) do
+    StateHandlers.load(state, list_steps(opts[:params], opts[:filters]), Step, opts)
+  end
+
   @doc """
   Returns the list of steps.
 
@@ -620,6 +624,10 @@ defmodule UserDocs.Automation do
 
   alias UserDocs.Automation.Process
 
+  def load_processes(state, opts) do
+    StateHandlers.load(state, list_processes(%{}, opts[:filters]), Process, opts)
+  end
+
   @doc """
   Returns the list of processes.
 
@@ -629,14 +637,13 @@ defmodule UserDocs.Automation do
       [%Process{}, ...]
 
   """
-  def list_processes(_params \\ %{}, filters \\ %{}) do
+  def list_processes(state, opts) when is_list(opts) do
+    StateHandlers.list(state, Process, opts)
+  end
+  def list_processes(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_processes_query()
     |> maybe_filter_by_version(filters[:version_id])
     |> Repo.all()
-  end
-  def list_processes(_params, filters, state) do
-    UserDocs.State.get(state, :processes, Process)
-    |> maybe_filter_by_version(filters[:version_id], state)
   end
 
   defp maybe_filter_by_version(query, nil), do: query
