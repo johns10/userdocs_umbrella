@@ -4,9 +4,17 @@ defmodule UserDocsWeb.VersionLive.Index do
   alias UserDocs.Projects
   alias UserDocs.Projects.Version
 
+  alias UserDocsWeb.Root
+
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, :versions, list_versions())}
+  def mount(_params, session, socket) do
+    {
+      :ok,
+      socket
+      |> Root.authorize(session)
+      |> Root.initialize()
+      |> assign(:versions, list_versions())
+    }
   end
 
   @impl true
