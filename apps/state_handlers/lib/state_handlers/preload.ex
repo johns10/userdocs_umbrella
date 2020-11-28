@@ -1,5 +1,11 @@
 defmodule StateHandlers.Preload do
 
+  def apply(state, data, opts) do
+    case opts[:preloads] do
+      nil -> raise(RuntimeError, "Preloads not found in opts")
+      preloads -> apply(state, data, preloads, Keyword.delete(opts, :preloads))
+    end
+  end
   def apply(state, data, preloads, opts) when is_list(data) do
     # IO.puts("Apply Preloads List to #{inspect(preloads)}")
     Enum.map(data, fn(d) -> apply(state, d, preloads, opts) end)
