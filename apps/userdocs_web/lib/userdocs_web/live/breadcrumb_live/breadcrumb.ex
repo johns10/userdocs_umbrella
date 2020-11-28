@@ -16,7 +16,13 @@ defmodule UserDocsWeb.BreadCrumb do
         <ul>
           <li><a href="#"><%= @team_name %></a></li>
           <li><a href="#"><%= @project_name %></a></li>
-          <li class="is-active"><a href="#" aria-current="page"><%= @version_name %></a></li>
+          <%= for item <- @additional_items do %>
+            <li><a href=<%= item.to %>><%= item.name %></a></li>
+          <% end %>
+          <li class="is-active">
+            <%= live_patch to: @last_item.to, aria_current: "page" do %>
+              <%= @last_item.name %>
+            <% end %>
         </ul>
       </nav>
     """
@@ -34,14 +40,12 @@ defmodule UserDocsWeb.BreadCrumb do
   def update(assigns, socket) do
     team = Users.get_team!(assigns.current_team_id, assigns, Defaults.state_opts())
     project = Projects.get_project!(assigns.current_project_id, assigns, Defaults.state_opts())
-    version = Projects.get_version!(assigns.current_version_id, assigns, Defaults.state_opts())
     {
       :ok,
       socket
       |> assign(assigns)
       |> assign(:team_name, team.name)
       |> assign(:project_name, project.name)
-      |> assign(:version_name, version.name)
     }
   end
 end
