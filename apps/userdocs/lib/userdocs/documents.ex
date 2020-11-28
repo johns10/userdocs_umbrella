@@ -10,6 +10,10 @@ defmodule UserDocs.Documents do
 
   alias UserDocs.Documents.Content
 
+  def load_content(state, opts) do
+    StateHandlers.load(state, list_content(opts[:params], opts[:filters]), Content, opts)
+  end
+
   @doc """
   Returns the list of content.
 
@@ -19,7 +23,10 @@ defmodule UserDocs.Documents do
       [%Content{}, ...]
 
   """
-  def list_content(params \\ %{}, filters \\ %{}) do
+  def list_content(state, opts) when is_list(opts) do
+    StateHandlers.list(state, Content, opts)
+  end
+  def list_content(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_content_query()
     |> maybe_preload_content_versions(params[:content_versions])
     |> maybe_filter_by_team(filters[:team_id])
@@ -141,11 +148,15 @@ defmodule UserDocs.Documents do
     Content.changeset(content, attrs)
   end
 
-
   alias UserDocs.Documents.Document
 
-  def get_document!(id, _params \\ %{}, _filters \\ %{}) do
+  def get_document!(id, state, opts) when is_integer(id) and is_list(opts) do
+    StateHandlers.get(state, id, Document, opts)
+    |> maybe_preload_document(opts[:preloads], state, opts)
+  end
+  def get_document!(id, params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_document_query(id)
+    |> maybe_preload_document_versions(params[:document_versions])
     |> Repo.one!()
   end
 
@@ -158,7 +169,6 @@ defmodule UserDocs.Documents do
   end
 
   def list_documents(state, opts) when is_list(opts) do
-    IO.puts("State listing documents")
     StateHandlers.list(state, Document, opts)
     |> maybe_preload_document(opts[:preloads], state, opts)
   end
@@ -176,6 +186,8 @@ defmodule UserDocs.Documents do
     )
   end
 
+  defp maybe_preload_document_versions(query, nil), do: query
+  defp maybe_preload_document_versions(query, _), do: from(document in query, preload: [:document_versions])
 
   defp maybe_preload_document(documents, nil, _, _), do: documents
   defp maybe_preload_document(documents, preloads, state, opts) do
@@ -189,10 +201,6 @@ defmodule UserDocs.Documents do
     %Document{}
     |> Document.changeset(attrs)
     |> Repo.insert()
-  end
-
-  def create_document(%Document{} = document, state, opts) do
-
   end
 
   def update_document(%Document{} = document, attrs) do
@@ -226,15 +234,22 @@ defmodule UserDocs.Documents do
 
   """
 
+  #TODO: Refactor
+  def list_document_versions(state, opts) when is_list(opts) do
+    StateHandlers.list(state, DocumentVersion, opts)
+    |> maybe_preload_document_version(opts[:preloads], state, opts)
+  end
   def list_document_versions(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_document_versions_query()
     |> maybe_preload_docubit(params[:body])
     |> Repo.all()
   end
 
-  #TODO: Refactor
-  def list_document_versions(state, opts) do
-    StateHandlers.list(state, DocumentVersion, opts)
+  defp maybe_filter_by_document_id(query, nil), do: query
+  defp maybe_filter_by_document_id(query, document_id) do
+    from(item in query,
+      where: item.document_id == ^document_id
+    )
   end
 
   defp maybe_filter_document_versions_by_team(query, nil), do: query
@@ -247,6 +262,12 @@ defmodule UserDocs.Documents do
   end
 
   defp base_document_versions_query(), do: from(document_versions in DocumentVersion)
+
+  defp maybe_preload_document_version(document_versions, nil, _, _), do: document_versions
+  defp maybe_preload_document_version(document_versions, preloads, state, opts) do
+    opts = Keyword.delete(opts, :filter)
+    StateHandlers.preload(state, document_versions, opts)
+  end
 
   @doc """
   Gets a single document_version.
@@ -262,6 +283,10 @@ defmodule UserDocs.Documents do
       ** (Ecto.NoResultsError)
 
   """
+  def get_document_version!(id, state, opts) when is_list(opts) do
+    StateHandlers.get(state, id, DocumentVersion, opts)
+    |> maybe_preload_document_version(opts[:preloads], state, opts)
+  end
   def get_document_version!(id, params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_document_version_query(id)
     |> maybe_preload_version(params[:version])
@@ -270,8 +295,10 @@ defmodule UserDocs.Documents do
     |> Repo.one!()
   end
 
-  def get_document_version!(id, state, opts) when is_list(opts) do
-    StateHandlers.get(state, id, DocumentVersion, opts)
+  defp maybe_preload_document_version(document_versions, nil, _, _), do: document_versions
+  defp maybe_preload_document_version(document_versions, _preloads, state, opts) do
+    opts = Keyword.delete(opts, :filter)
+    StateHandlers.preload(state, document_versions, opts)
   end
 
   defp maybe_preload_version(query, nil), do: query
@@ -279,7 +306,6 @@ defmodule UserDocs.Documents do
 
   defp maybe_preload_docubit(query, nil), do: query
   defp maybe_preload_docubit(query, _), do: from(document_version in query, preload: [:body])
-
 
   defp base_document_version_query(id) do
     from(document_version in DocumentVersion, where: document_version.id == ^id)
@@ -360,6 +386,10 @@ defmodule UserDocs.Documents do
 
   alias UserDocs.Documents.ContentVersion
 
+  def load_content_version(state, opts) do
+    StateHandlers.load(state, list_content(%{}, %{}), Content, opts)
+  end
+
   @doc """
   Returns the list of content_versions.
 
@@ -381,6 +411,12 @@ defmodule UserDocs.Documents do
   defp maybe_preload_language_code(query, nil), do: query
   defp maybe_preload_language_code(query, _), do: from(version in query, preload: [:language_code])
 
+  defp maybe_filter_by_content_ids(query, nil), do: query
+  defp maybe_filter_by_content_ids(query, content_ids) do
+    from(content in query,
+      where: content.content_id in ^content_ids
+    )
+  end
 
   defp maybe_filter_by_content_id(query, nil), do: query
   defp maybe_filter_by_content_id(query, content_id) do
@@ -499,6 +535,14 @@ defmodule UserDocs.Documents do
 
   alias UserDocs.Documents.LanguageCode
 
+  def load_language_codes(state, opts) do
+    StateHandlers.load(state, list_language_codes(), LanguageCode, opts)
+  end
+
+  def list_language_codes(state, opts) when is_list(opts) do
+    StateHandlers.list(state, LanguageCode, opts)
+  end
+
   @doc """
   Returns the list of language_codes.
 
@@ -595,6 +639,27 @@ defmodule UserDocs.Documents do
 
   alias UserDocs.Documents.Docubit
 
+  def load_docubits(state, opts) do
+    StateHandlers.load(state, list_docubits(%{}, opts[:filters]), opts)
+  end
+
+  def list_docubits(state, opts) when is_list(opts) do
+    StateHandlers.list(state, Docubit, opts)
+  end
+  def list_docubits(params, filters) when is_map(params) and is_map(filters) do
+    base_docubits_query()
+    |> maybe_filter_by_project_id(filters[:document_id])
+    |> Repo.all()
+  end
+
+  defp base_docubits_query(), do: from(docubits in Docubit)
+
+
+  def get_docubit!(id, state, opts) when is_integer(id) and is_list(opts) do
+    StateHandlers.get(state, id, Docubit, opts)
+    |> maybe_preload_docubit(opts[:preloads], state, opts)
+  end
+
   def get_docubit!(id, params \\ %{}, filters \\ %{})
   def get_docubit!(id, params, _filters) when is_integer(id) do
     base_docubit_query(id)
@@ -607,6 +672,12 @@ defmodule UserDocs.Documents do
 
   defp base_docubit_query(id) do
     from(docubit in Docubit, where: docubit.id == ^id)
+  end
+
+  defp maybe_preload_docubit(docubits, nil, _, _), do: docubits
+  defp maybe_preload_docubit(docubits, preloads, state, opts) do
+    opts = Keyword.delete(opts, :filter)
+    StateHandlers.preload(state, docubits, opts)
   end
 
   def create_docubit(attrs \\ %{}) do

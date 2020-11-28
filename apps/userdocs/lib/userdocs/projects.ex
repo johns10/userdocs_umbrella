@@ -21,7 +21,10 @@ defmodule UserDocs.Projects do
       [%Project{}, ...]
 
   """
-  def list_projects(_params \\ %{}, filters \\ %{}) do
+  def list_projects(state, opts) when is_list(opts) do
+    StateHandlers.list(state, Project, opts)
+  end
+  def list_projects(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_projects_query()
     |> maybe_filter_by_team(filters[:team_id])
     |> maybe_filter_projects_by_user(filters[:user_id])
