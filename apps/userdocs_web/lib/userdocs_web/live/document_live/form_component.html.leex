@@ -12,7 +12,7 @@
 
   <%= Layout.select_input(f, :project_id,
     @select_lists.projects, [
-      selected: @parent_id || "",
+      selected: @team_id || "",
     ], "control") %>
 
   <%= submit "Save", phx_disable_with: "Saving..." %>
