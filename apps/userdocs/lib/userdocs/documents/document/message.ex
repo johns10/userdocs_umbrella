@@ -4,9 +4,12 @@ defmodule UserDocs.Document.Messages do
   alias UserDocs.Documents.Document
   alias UserDocs.Helpers
 
-  def new_modal_menu(socket, parent, projects, channel) do
+  def new_modal_menu(socket, params) do
+    required_keys = [ :team, :projects, :channel, :opts]
+    params = Helpers.validate_params(params, required_keys, __MODULE__)
+
     %{ target: "ModalMenus" }
-    |> init(socket, parent, projects, channel)
+    |> init(socket, params.team, params.projects, params.channel)
     |> new(socket)
   end
 
@@ -33,7 +36,7 @@ defmodule UserDocs.Document.Messages do
     |> Map.put(:title, "Edit Document")
   end
 
-  defp init(message, _socket, parent, projects, channel) do
+  defp init(message, _socket, team, projects, channel) do
     select_lists = %{
       projects:
         projects
@@ -42,7 +45,7 @@ defmodule UserDocs.Document.Messages do
 
     message
     |> Map.put(:type, :document)
-    |> Map.put(:parent, parent)
+    |> Map.put(:team_id, team.id)
     |> Map.put(:select_lists, select_lists)
     |> Map.put(:channel, channel)
   end
