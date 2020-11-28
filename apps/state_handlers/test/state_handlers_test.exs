@@ -26,10 +26,11 @@ defmodule StateHandlers.StateFixtures do
     team = UsersFixtures.team()
     team_user = UsersFixtures.team_user(user.id, team.id)
     project = ProjectsFixtures.project(team.id)
-    IO.inspect(project)
-    version = ProjectsFixtures.version(project.id)
+    v1 = ProjectsFixtures.version(project.id)
+    v2 = ProjectsFixtures.version(project.id)
     document = DocumentFixtures.document(project.id)
-    document_version = DocumentFixtures.document_version(project.id, version.id)
+    dv1 = DocumentFixtures.document_version(project.id, v1.id)
+    dv2 = DocumentFixtures.document_version(project.id, v2.id)
 
     %{}
     |> StateHandlers.initialize(opts)
@@ -37,9 +38,9 @@ defmodule StateHandlers.StateFixtures do
     |> StateHandlers.load([team], Team, opts)
     |> StateHandlers.load([team_user], TeamUser, opts)
     |> StateHandlers.load([project], Project, opts)
-    |> StateHandlers.load([version], Version, opts)
+    |> StateHandlers.load([v1, v2], Version, opts)
     |> StateHandlers.load([document], Document, opts)
-    |> StateHandlers.load([document_version], DocumentVersion, opts)
+    |> StateHandlers.load([dv1, dv2], DocumentVersion, opts)
   end
 end
 
@@ -171,9 +172,19 @@ defmodule StateHandlersTest do
       opts = [ data_type: :list, strategy: :by_type, location: :data, preloads: [ :version ] ]
       state = StateFixtures.state(opts)
       data = StateHandlers.list(state, DocumentVersion, opts)
-      result = StateHandlers.preload(state, data, opts[:preloads], opts) |> Enum.at(0) |> Map.get(:version)
+      result = StateHandlers.preload(state, data, opts[:preloads], opts)
       expected_result = StateHandlers.list(state, Version, opts) |> Enum.at(0)
-      assert expected_result == result
+      assert expected_result == result |> Enum.at(0) |> Map.get(:version)
+    end
+
+    test "StateHandlers.Preload loads and filters has_many relationships" do
+      opts = [ data_type: :list, strategy: :by_type, location: :data, preloads: [ :document_versions ] ]
+      state = StateFixtures.state(opts)
+      project_id = StateHandlers.list(state, Project, opts) |> Enum.at(0) |> Map.get(:id)
+      data = StateHandlers.list(state, Document, Keyword.put(opts, :filter, { :project_id, project_id }))
+      expected_result = StateHandlers.list(state, DocumentVersion, opts)
+      result = StateHandlers.preload(state, data, opts[:preloads], opts)
+      assert result |> Enum.at(0) |> Map.get(:document_versions) == expected_result
     end
   end
 end
