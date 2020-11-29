@@ -45,27 +45,27 @@ defmodule UserDocs.Documents.DocumentVersion do
   end
 
   def map_docubits(%DocumentVersion{ docubits: _ } = document_version), do: MapDocubits.apply(document_version)
+  def add_docubit_to_map(map, %Docubit{ address: _ } = docubit), do: MapDocubits.add_to_map(map, docubit)
 
   alias UserDocs.Documents.Docubit
 
-  def load(%DocumentVersion{ docubits: _ } = document_version, state) do
+  def load(%DocumentVersion{ docubits: _ } = document_version, state, opts) do
     # preloads = [ :content, :file, :through_annotation ]
     map = MapDocubits.apply(document_version)
 
-    Map.put(document_version, :body, traverse_docubit_map(map, state))
+    Map.put(document_version, :body, traverse_docubit_map(map, state, opts))
   end
 
-  def traverse_docubit_map(map, state) do
-    docubit_map_item({ 0, Map.get(map, 0) }, state, %Context{})
+  def traverse_docubit_map(map, state, opts) do
+    docubit_map_item({ 0, Map.get(map, 0) }, state, %Context{}, opts)
   end
-  def docubit_map_item({ _key, map }, state, parent_context) do
-    opts = Keyword.put(@state_opts, :type, "docubit")
+  def docubit_map_item({ _key, map }, state, parent_context, opts) do
     docubit = StateHandlers.get(state, map.docubit.id, Docubit, opts)
     { :ok, context } = Docubit.context(docubit, parent_context)
     docubits =
       Enum.map(map.docubit.docubits,
         fn({ address, docubit }) ->
-          docubit_map_item({ address, docubit }, state, context)
+          docubit_map_item({ address, docubit }, state, context, opts)
         end
       )
     docubit
@@ -73,12 +73,12 @@ defmodule UserDocs.Documents.DocumentVersion do
     |> Map.put(:docubits, docubits)
   end
 
-  def update_docubit_item(map, state, context) do
+  def update_docubit_item(map, state, context, opts) do
     Enum.reduce(map.docubit.docubits, map,
       fn({ address, item }, map) ->
         Kernel.put_in(map,
           [ :docubit, :docubits, address ],
-          docubit_map_item({ address, item }, state, context)
+          docubit_map_item({ address, item }, state, context, opts)
         )
       end
     )
