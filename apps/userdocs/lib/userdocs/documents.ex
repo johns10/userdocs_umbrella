@@ -245,13 +245,6 @@ defmodule UserDocs.Documents do
     |> Repo.all()
   end
 
-  defp maybe_filter_by_document_id(query, nil), do: query
-  defp maybe_filter_by_document_id(query, document_id) do
-    from(item in query,
-      where: item.document_id == ^document_id
-    )
-  end
-
   defp maybe_filter_document_versions_by_team(query, nil), do: query
   defp maybe_filter_document_versions_by_team(query, team_id) do
     from(document_version in query,
@@ -648,8 +641,15 @@ defmodule UserDocs.Documents do
   end
   def list_docubits(params, filters) when is_map(params) and is_map(filters) do
     base_docubits_query()
-    |> maybe_filter_by_project_id(filters[:document_id])
+    |> maybe_filter_by_document_id(filters[:project_id])
     |> Repo.all()
+  end
+
+  defp maybe_filter_by_document_id(query, nil), do: query
+  defp maybe_filter_by_document_id(query, document_id) do
+    from(item in query,
+      where: item.document_id == ^document_id
+    )
   end
 
   defp base_docubits_query(), do: from(docubits in Docubit)
