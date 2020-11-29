@@ -8,6 +8,10 @@ defmodule UserDocs.Documents.Document.MapDocubits do
     |> Enum.reduce(%{}, fn(d, m) -> add_address_item(m, d, d.address) end)
   end
 
+  def add_to_map(map, docubit) do
+    add_address_item(map, docubit, docubit.address)
+  end
+
   # This is the end item, where we reach the end of the address and put the final item
   defp add_address_item(map, docubit, [ address_item | [] ]) do
     # IO.puts("At end of address #{inspect(address_item)} on map #{inspect(map)} with docubit #{docubit.id}")
