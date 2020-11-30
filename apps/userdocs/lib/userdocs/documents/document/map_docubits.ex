@@ -12,23 +12,23 @@ defmodule UserDocs.Documents.Document.MapDocubits do
     add_address_item(map, docubit, docubit.address)
   end
 
-  # This is the end item, where we reach the end of the address and put the final item
+  # To add an address item, we'll put an object containing the docubit id, and an empty
+  # Map to hold additional docubits at the address specified
   defp add_address_item(map, docubit, [ address_item | [] ]) do
-    # IO.puts("At end of address #{inspect(address_item)} on map #{inspect(map)} with docubit #{docubit.id}")
     object = %{ docubit: %{ id: docubit.id, docubits: %{} } }
-    case map do
-      %{docubit: %{ docubits: _ }} -> Kernel.put_in(map, [ :docubit, :docubits, address_item ], object)
-      %{} -> Map.put(map, address_item, object)
-    end
+    # IO.puts("At end of address #{inspect(address_item)} on map #{inspect(map)} with docubit #{docubit.id}: #{inspect(object)}")
+    Map.put(map, address_item, object)
   end
+  # To add a nested address item, we'll put the address item, as defined above in the
+  # Address location
   defp add_address_item(map, docubit, [ address_item | address ]) do
-    case Map.get(map, address_item, nil) do
-      nil ->
-        # We reached a dead end in the map and will put in a new item
-        Map.put_new(map, address_item, add_address_item(%{}, docubit, address))
-      taken_map ->
-        # IO.puts("In the address with item #{address_item} and remaining #{inspect(address)}.  The taken map is #{inspect(taken_map)}")
-        Kernel.put_in(map, [ address_item ], add_address_item(taken_map, docubit, address))
-    end
+    location =
+      case Kernel.get_in(map, [ address_item, :docubit, :docubits ]) do
+        nil -> %{}
+        map -> map
+      end
+    item = add_address_item(location, docubit, address)
+    # IO.puts("In the address with item #{address_item} and remaining #{inspect(address)}.  We'll put the docubit in #{inspect(location)}")
+    Kernel.put_in(map, [ address_item, :docubit, :docubits ], item)
   end
 end
