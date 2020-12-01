@@ -639,7 +639,7 @@ defmodule UserDocs.Documents do
   def list_docubits(state, opts) when is_list(opts) do
     StateHandlers.list(state, Docubit, opts)
   end
-  def list_docubits(params, filters) when is_map(params) and is_map(filters) do
+  def list_docubits(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_docubits_query()
     |> maybe_filter_by_document_id(filters[:project_id])
     |> Repo.all()
@@ -660,8 +660,7 @@ defmodule UserDocs.Documents do
     |> maybe_preload_docubit(opts[:preloads], state, opts)
   end
 
-  def get_docubit!(id, params \\ %{}, filters \\ %{})
-  def get_docubit!(id, params, _filters) when is_integer(id) do
+  def get_docubit!(id, params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_docubit_query(id)
     |> maybe_preload_docubits(params[:docubits])
     |> Repo.one!()
