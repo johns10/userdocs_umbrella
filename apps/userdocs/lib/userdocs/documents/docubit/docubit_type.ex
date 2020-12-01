@@ -50,6 +50,18 @@ defmodule UserDocs.Documents.Docubit.Type do
     ]
   end
 
+  def ul(), do: Kernel.struct(Type, ul_attrs())
+  def ul_attrs() do
+    %{
+      name: "Unordered List",
+      id: "ul",
+      contexts: %{
+        settings: [
+        ]
+      }
+    }
+  end
+
   def ol(), do: Kernel.struct(Type, ol_attrs())
   def ol_attrs() do
     %{
