@@ -8,13 +8,15 @@ defmodule UserDocsWeb.ModalMenus do
   alias ProcessAdministratorWeb.VersionLive.FormComponent, as: VersionForm
   alias ProcessAdministratorWeb.ProjectLive.FormComponent, as: ProjectForm
   alias ProcessAdministratorWeb.ProcessLive.FormComponent, as: ProcessForm
+  alias UserDocs.DocumentVersion.Messages, as: DocumentVersionMessage
+  alias UserDocs.Docubit.Messages, as: DocubitMessage
   alias UserDocsWeb.DocumentLive.FormComponent, as: DocumentForm
   alias UserDocsWeb.DocumentVersionLive.FormComponent, as: DocumentVersionForm
+  alias UserDocsWeb.DocubitLive.FormComponent, as: DocubitForm
   alias UserDocs.Project.Messages, as: ProjectMessage
   alias UserDocs.Version.Messages, as: VersionMessage
   alias UserDocs.Process.Messages, as: ProcessMessage
   alias UserDocs.Document.Messages, as: DocumentMessage
-  alias UserDocs.DocumentVersion.Messages, as: DocumentVersionMessage
 
   @impl true
   def render(assigns) do
@@ -78,6 +80,18 @@ defmodule UserDocsWeb.ModalMenus do
                     documents: @select_lists.documents,
                     versions: @select_lists.versions
                   }
+                :docubit ->
+                  LiveHelpers.live_modal @socket, DocubitForm,
+                    id: :new,
+                    title: @title,
+                    action: @action,
+                    docubit: @object,
+                    document_version_id: @document_version_id,
+                    docubit_id: @docubit_id,
+                    channel: @channel,
+                    select_lists: %{
+                      allowed_children: @select_lists.allowed_children
+                    }
             end
           %>
         <% end %>
@@ -85,6 +99,7 @@ defmodule UserDocsWeb.ModalMenus do
     """
   end
 
+  # TODO: Fix this
   def call_menu(message, socket) do
     Phoenix.LiveView.send_update(
       ModalMenus,
@@ -96,9 +111,11 @@ defmodule UserDocsWeb.ModalMenus do
       parent_id: Map.get(message, :parent_id, nil),
       team_id: Map.get(message, :team_id, nil),
       document_id: Map.get(message, :document_id, nil),
+      document_version_id: Map.get(message, :document_id, nil),
+      docubit_id: Map.get(message, :docubit_id, nil),
       version_id: Map.get(message, :version_id, nil),
       type: message.type,
-      select_lists: message.select_lists,
+      select_lists: Map.get(message, :select_lists, nil),
       channel: Map.get(message, :channel, nil)
     )
 
@@ -190,6 +207,14 @@ defmodule UserDocsWeb.ModalMenus do
     {
       :noreply,
       DocumentVersionMessage.edit_modal_menu(socket, params)
+      |> call_menu(socket)
+    }
+  end
+
+  def new_docubit(socket, params) do
+    {
+      :noreply,
+      DocubitMessage.new_modal_menu(socket, params)
       |> call_menu(socket)
     }
   end

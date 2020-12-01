@@ -127,6 +127,9 @@ defmodule UserDocsWeb.Root do
   def handle_event("new-document", params, socket) do
     ModalMenus.new_document(socket, params)
   end
+  def handle_event("create-docubit", params, socket) do
+    ModalMenus.new_docubit(socket, params)
+  end
   def handle_event("select_version", %{"select-version" => version_id_param} = _payload, socket) do
     opts = state_opts()
     with  version_id <- String.to_integer(version_id_param),
