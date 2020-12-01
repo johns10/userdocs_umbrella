@@ -3,6 +3,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
 
   alias UserDocs.Users
   alias UserDocs.Documents
+  alias UserDocs.Projects
   alias UserDocs.Documents.Document
   alias UserDocs.Documents.DocumentVersion
 
@@ -60,7 +61,6 @@ defmodule UserDocsWeb.DocumentLive.Index do
     document = Documents.get_document!(id)
     {:ok, deleted_document} = Documents.delete_document(document)
     UserDocsWeb.Endpoint.broadcast(Defaults.channel(socket), "delete", deleted_document)
-
     {:noreply, socket}
   end
   def handle_event("select_version" = n, p, s) do
@@ -157,8 +157,9 @@ defmodule UserDocsWeb.DocumentLive.Index do
   end
 
   defp projects_select_list(socket) do
-    projects = socket.assigns.data.projects
-    assign(socket, :projects_select, UserDocs.Helpers.select_list(projects, :name, false))
+    projects = Projects.list_projects(socket, state_opts())
+    socket
+    |> assign(:projects_select, UserDocs.Helpers.select_list(projects, :name, false))
   end
 
   defp state_opts() do
