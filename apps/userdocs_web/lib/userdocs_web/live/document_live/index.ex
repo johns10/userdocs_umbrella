@@ -81,9 +81,10 @@ defmodule UserDocsWeb.DocumentLive.Index do
   def handle_event("new-document" = n, _params, socket) do
     params =
       %{}
-      |> Map.put(:parent, UserDocs.Users.get_team!(socket.assigns.current_team_id, socket, state_opts()))
+      |> Map.put(:team, UserDocs.Users.get_team!(socket.assigns.current_team_id, socket, state_opts()))
       |> Map.put(:projects, socket.assigns.data.projects)
       |> Map.put(:channel, Defaults.channel(socket))
+      |> Map.put(:opts, state_opts())
 
     Root.handle_event(n, params, socket)
   end
