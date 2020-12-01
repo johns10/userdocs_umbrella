@@ -689,6 +689,15 @@ defmodule UserDocs.Documents do
   def change_docubit(%Docubit{} = docubit, attrs \\ %{}) do
     Docubit.changeset(docubit, attrs)
   end
+  def delete_docubit(%Docubit{} = docubit) do
+    Repo.delete(docubit)
+  end
+
+  def update_docubit_internal(%Docubit{} = docubit, attrs) do
+    docubit
+    |> Docubit.internal_changeset(attrs)
+    |> Repo.update()
+  end
 
   def update_docubit(%Docubit{} = docubit, attrs) do
     docubit

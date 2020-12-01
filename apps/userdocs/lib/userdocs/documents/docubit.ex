@@ -8,9 +8,7 @@ defmodule UserDocs.Documents.Docubit do
   alias UserDocs.Documents.Docubit
   alias UserDocs.Documents.Docubit.Type
   alias UserDocs.Documents.Docubit.Context
-  alias UserDocs.Documents.Docubit.Preload
   alias UserDocs.Documents.Docubit.Renderer
-  alias UserDocs.Documents.Docubit.Access
   alias UserDocs.Documents.Docubit.Hydrate
 
   alias UserDocs.Documents.DocumentVersion
@@ -38,43 +36,73 @@ defmodule UserDocs.Documents.Docubit do
     belongs_to :through_annotation, Annotation
     belongs_to :through_step, Step
 
+    field :delete, :boolean, virtual: true
     timestamps()
+  end
+
+  defp mark_for_deletion(changeset) do
+    if get_change(changeset, :delete) do
+      %{changeset | action: :delete}
+    else
+      changeset
+    end
   end
 
   def internal_changeset(docubit, attrs \\ %{}) do
     docubit
+    |> change(attrs)
+    |> put_assoc(:docubits, Map.get(attrs, :docubits, nil))
     |> put_assoc(:content, Map.get(attrs, :content, nil))
     |> put_assoc(:through_annotation, Map.get(attrs, :through_annotation, nil))
     |> put_assoc(:through_step, Map.get(attrs, :through_step, nil))
+    |> check_for_deleted_docubits()
+    |> order_changeset_docubits()
+    |> address_docubits()
   end
 
   def changeset(docubit, attrs \\ %{}) do
     docubit
-    |> cast(attrs, [ :type_id, :settings, :address, :document_version_id, :content_id, :through_annotation_id, :through_step_id, :docubit_id ])
+    |> cast(attrs, [ :delete, :type_id, :settings, :address, :document_version_id, :content_id, :through_annotation_id, :through_step_id, :docubit_id ])
     |> cast_assoc(:docubits)
     |> (&(validate_change(&1, :docubits,
       fn(:docubits, docubits) ->
         validate_allowed_docubits(&1, docubits)
       end))).()
     |> cast_settings()
-    |> order_docubits()
+    |> order_changeset_docubits()
     |> address_docubits()
     |> validate_required([ :type_id ])
+    |> mark_for_deletion()
   end
 
-  def order_docubits(changeset) do
+  defp check_for_deleted_docubits(changeset) do
+    case get_change(changeset, :docubits) do
+      nil -> changeset
+      docubits ->
+        put_change(changeset, :docubits, Enum.map(docubits, &mark_for_deletion/1))
+    end
+  end
+
+  def order_changeset_docubits(changeset) do
     case get_change(changeset, :docubits) do
       nil -> changeset
       "" -> changeset
       docubits ->
-        { docubits, order } =
-          Enum.map_reduce(docubits, 0,
-            fn(d, o) ->
-              { put_change(d, :order, o), o + 1}
-            end)
-
-        Ecto.Changeset.put_change(changeset, :docubits, docubits)
+        ordered_docubits = order_docubits(docubits, 0, &put_change/3)
+        Ecto.Changeset.put_change(changeset, :docubits, ordered_docubits)
     end
+  end
+
+  def order_docubits(docubits, init, change_function \\ &put_change/3) do
+    { docubits, _ } =
+      Enum.map_reduce(docubits, init,
+        fn(d, o) ->
+          case d.action do
+            :delete -> { change_function.(d, :order, o), o}
+            _ -> { change_function.(d, :order, o), o + 1}
+          end
+        end)
+    docubits
   end
 
   def address_docubits(changeset) do
@@ -84,24 +112,28 @@ defmodule UserDocs.Documents.Docubit do
       "" -> changeset
       docubits ->
         docubits
-        |> update_docubits_addresses(parent_address)
+        |> update_docubits_addresses(parent_address, &put_change/3)
         |> (&(Ecto.Changeset.put_change(changeset, :docubits, &1))).()
     end
   end
 
-  def update_docubits_addresses(docubits, parent_address) do
+  def update_docubits_addresses(docubits, parent_address, change_function) do
     Enum.map(docubits,
     fn(docubit) ->
       case docubit.action do
+        :delete -> Map.put(docubit, :address, nil)
         :replace -> docubit
-        :update -> docubit
-        :insert ->
-          docubit
-          |> get_field(:order)
-          |> (&(List.insert_at(parent_address, -1, &1))).()
-          |> (&(Ecto.Changeset.put_change(docubit, :address, &1))).()
+        :update -> change_docubit_address(docubit, parent_address, change_function)
+        :insert -> change_docubit_address(docubit, parent_address, change_function)
       end
     end)
+  end
+
+  def change_docubit_address(docubit, parent_address, change_function) do
+    docubit
+    |> get_field(:order)
+    |> (&(List.insert_at(parent_address, -1, &1))).()
+    |> (&(change_function.(docubit, :address, &1))).()
   end
 
   def validate_allowed_docubits(changeset, docubits) do
@@ -116,7 +148,7 @@ defmodule UserDocs.Documents.Docubit do
       fn(d, errors) ->
         case get_field(d, :type_id) in type.allowed_children do
           true -> errors
-          false -> [ docubits: "This type may not be inserted into this docubit."]
+          false -> [ docubits: "This type may not be inserted into docubit #{changeset}."]
         end
       end
     )
