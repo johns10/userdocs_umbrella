@@ -8,6 +8,7 @@ defmodule UserDocs.DocubitsTest do
 
 
     alias UserDocs.DocubitFixtures
+    alias UserDocs.DocumentVersionFixtures, as: DocumentFixtures
 
     alias UserDocs.Documents.Docubit.Type
 
@@ -79,12 +80,12 @@ defmodule UserDocs.DocubitsTest do
 
     test "Docubit.fetch_renderer fetches the correct renderer" do
       f = docubit_fixture()
-      docubit =
+      renderer =
         f.row
         |> Docubit.apply_contexts(%{})
         |> Docubit.renderer()
 
-      assert docubit.renderer == :"Elixir.UserDocs.Documents.Docubit.Renderers.Row"
+      assert renderer == :"Elixir.UserDocsWeb.DocubitLive.Renderers.Row"
     end
 
     test "context gets the parent context and overwrites a nil settings context" do
@@ -129,6 +130,57 @@ defmodule UserDocs.DocubitsTest do
       { :ok, docubit } = Ecto.Changeset.apply_action(changeset, :update)
       { :ok, context } = Docubit.context(docubit, contexts)
       assert context.settings[:name_prefix] == attrs.settings[:name_prefix]
+    end
+
+    test "Marking a record for deletion removes it" do
+      document_version = DocumentFixtures.empty_document_version()
+      docubit = Documents.get_docubit!(document_version.body.id, %{docubits: true})
+      first_attrs = %{ docubits: [ DocubitFixtures.docubit_attrs(:row, document_version.id) ] }
+      { :ok, docubit } = Documents.update_docubit(docubit, first_attrs)
+      preloaded_docubit =
+        Documents.get_docubit!(docubit.id, %{ docubits: true }, %{})
+        |> Map.put(:content, nil)
+        |> Map.put(:through_annotation, nil)
+        |> Map.put(:through_step, nil)
+
+      docubit_to_delete =
+        preloaded_docubit.docubits
+        |> Enum.at(0)
+        |> Map.take(Docubit.__schema__(:fields))
+        |> Map.put(:delete, true)
+
+      new_attrs = %{ docubits: [ docubit_to_delete ] }
+      result = Documents.update_docubit_internal(preloaded_docubit, new_attrs)
+      assert_raise Ecto.NoResultsError, fn -> Documents.get_docubit!(docubit_to_delete.id) end
+    end
+
+    test "Marking a record for deletion removes it and reorders/readdresses the docubits" do
+      document_version = DocumentFixtures.empty_document_version()
+      docubit = Documents.get_docubit!(document_version.body.id, %{docubits: true})
+      first_attrs = %{ docubits: [
+        DocubitFixtures.docubit_attrs(:row, document_version.id),
+        DocubitFixtures.docubit_attrs(:row, document_version.id),
+        DocubitFixtures.docubit_attrs(:row, document_version.id)
+      ]}
+      { :ok, docubit } = Documents.update_docubit(docubit, first_attrs)
+      preloaded_docubit =
+        Documents.get_docubit!(docubit.id, %{ docubits: true }, %{})
+        |> Map.put(:content, nil)
+        |> Map.put(:through_annotation, nil)
+        |> Map.put(:through_step, nil)
+
+      docubit_to_delete =
+        preloaded_docubit.docubits
+        |> Enum.at(1)
+        |> Map.take(Docubit.__schema__(:fields))
+        |> Map.put(:delete, true)
+
+      zero = preloaded_docubit.docubits |> Enum.at(0) |> Map.take(Docubit.__schema__(:fields))
+      two = preloaded_docubit.docubits |> Enum.at(2) |> Map.take(Docubit.__schema__(:fields))
+      new_attrs = %{ docubits: [ zero, docubit_to_delete, two ] }
+      result = Documents.update_docubit_internal(preloaded_docubit, new_attrs)
+      assert Documents.get_docubit!(zero.id) |> Map.get(:order) == 0
+      assert Documents.get_docubit!(two.id) |> Map.get(:order) == 1
     end
   end
 end
