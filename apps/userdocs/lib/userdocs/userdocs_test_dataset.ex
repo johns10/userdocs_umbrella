@@ -916,16 +916,26 @@ defmodule UserDocs.TestDataset do
     Enum.each(content_versions,
       fn(cv) ->
         IO.puts("Inserting cv")
-        result = %ContentVersion{}
+        %ContentVersion{}
         |> ContentVersion.changeset(cv)
         |> Repo.insert()
       end
     )
 
+    document_attrs = %{
+      name: "Cycle Profile Form Reference",
+      title: "Cycle Profile Form Reference",
+      project_id: funnelcloud_manager_project_id
+    }
+
+    { :ok, %Document{id: document_id} } =
+      Documents.create_document(document_attrs)
+
     document_version = %{
       name: "test",
       title: "test",
-      version_id: version_2020_1_id
+      version_id: version_2020_1_id,
+      document_id: document_id
     }
 
     {:ok, %DocumentVersion{id: document_version_id}} =
