@@ -195,6 +195,16 @@ defmodule UserDocs.Documents.Docubit do
 
   # def preload(docubit, state), do: Preload.apply(docubit, state)
   def renderer(docubit = %Docubit{}), do: Renderer.apply(docubit)
-  def hydrate(body, address, data), do: Hydrate.apply(body, address, data)
+  def hydrate(body, data), do: Hydrate.apply(body, data)
 
+  def preload_type(docubit) do
+    docubit
+    |> Map.put(:type, type(docubit))
+  end
+
+  defp type(docubit) do
+    Type.types()
+    |> Enum.filter(fn(t) -> t.id == docubit.type_id end)
+    |> Enum.at(0)
+  end
 end
