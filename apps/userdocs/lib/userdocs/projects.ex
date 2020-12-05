@@ -154,7 +154,7 @@ defmodule UserDocs.Projects do
       [%Version{}, ...]
 
   """
-  def list_versions(params \\ %{}, filters \\ %{}) do
+  def list_versions(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_versions_query()
     |> maybe_filter_by_project(filters[:project_id])
     |> maybe_filter_version_by_team(filters[:team_id])
@@ -162,6 +162,9 @@ defmodule UserDocs.Projects do
     |> maybe_filter_by_version_ids(filters[:version_ids])
     |> maybe_preload_strategy(params[:strategy])
     |> Repo.all()
+  end
+  def list_versions(state, opts) when is_list(opts) do
+    StateHandlers.list(state, Version, opts)
   end
 
   defp maybe_preload_strategy(query, nil), do: query
