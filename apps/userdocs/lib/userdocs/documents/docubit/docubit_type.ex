@@ -22,6 +22,7 @@ defmodule UserDocs.Documents.Docubit.Type do
       column_attrs(),
       p_attrs(),
       ol_attrs(),
+      img_attrs(),
       %{
         name: "List Item",
         id: "li",
@@ -40,11 +41,6 @@ defmodule UserDocs.Documents.Docubit.Type do
       %{
         name: "Text Content",
         id: "text_content",
-        contexts: %{}
-      },
-      %{
-        name: "Image Content",
-        id: "img",
         contexts: %{}
       }
     ]
