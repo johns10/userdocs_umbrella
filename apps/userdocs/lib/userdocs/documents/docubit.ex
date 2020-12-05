@@ -26,8 +26,9 @@ defmodule UserDocs.Documents.Docubit do
     field :settings, { :array, EctoKW }
     field :address, { :array, :integer }
 
-    has_many :docubits, Docubit
+    has_many :docubits, Docubit, on_delete: :delete_all
     has_one :context, Context
+    has_one :type, Type
 
     belongs_to :docubit, Docubit
     belongs_to :document_version, DocumentVersion
