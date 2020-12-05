@@ -261,12 +261,15 @@ defmodule UserDocs.Web do
       [%Element{}, ...]
 
   """
-  def list_elements(params \\ %{}, filters \\ %{}) do
+  def list_elements(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_elements_query()
     |> maybe_filter_element_by_page(filters[:page_id])
     |> maybe_filter_by_version_id(filters[:team_id])
     |> maybe_preload_strategy(params[:strategy])
     |> Repo.all()
+  end
+  def list_elements(state, opts) when is_list(opts) do
+    StateHandlers.list(state, Element, opts)
   end
 
   defp maybe_preload_strategy(query, nil), do: query
