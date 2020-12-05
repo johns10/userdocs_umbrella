@@ -292,7 +292,8 @@ defmodule ProcessAdministratorWeb.IndexLive do
   end
 
   def preload_process(process, state) do
-    raw_steps = UserDocs.Automation.list_steps(%{}, %{ process_id: process.id }, state)
+    opts = [ data_type: :list, strategy: :by_type, filter: {:process_id, process.id} ]
+    raw_steps = UserDocs.Automation.list_steps(state, opts)
     preloaded_steps = Enum.map(raw_steps, &preload_step(&1, state, process))
     process
     |> Map.put(:steps, preloaded_steps)
