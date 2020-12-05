@@ -148,7 +148,7 @@ defmodule UserDocs.Documents.Docubit do
       fn(d, errors) ->
         case get_field(d, :type_id) in type.allowed_children do
           true -> errors
-          false -> [ docubits: "This type may not be inserted into docubit #{changeset}."]
+          false -> [ docubits: "This type may not be inserted into docubit #{inspect(changeset)}."]
         end
       end
     )
