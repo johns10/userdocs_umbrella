@@ -34,6 +34,9 @@ defmodule UserDocs.Web do
     |> maybe_filter_pages_by_team_id(filters[:team_id])
     |> Repo.all()
   end
+  def list_pages(state, opts) when is_list(opts) do
+    StateHandlers.list(state, Page, opts)
+  end
 
   defp maybe_preload_elements(query, nil), do: query
   defp maybe_preload_elements(query, _), do: from(pages in query, preload: [:elements])
