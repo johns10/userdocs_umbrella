@@ -65,7 +65,7 @@ defmodule UserDocs.Documents.Docubit.Context do
   # Docubit
   def apply_context_changes(docubit, parent_contexts) do
     docubit
-    |> preload_type()
+    |> Docubit.preload_type()
     |> add_contexts(parent_contexts, :type)
   end
 
@@ -98,16 +98,5 @@ defmodule UserDocs.Documents.Docubit.Context do
     |> String.to_atom()
     |> (&(Kernel.apply(Type, &1, []))).()
     |> Map.get(:contexts)
-  end
-
-  defp preload_type(docubit) do
-    docubit
-    |> Map.put(:type, type(docubit))
-  end
-
-  defp type(docubit) do
-    Type.types()
-    |> Enum.filter(fn(t) -> t.id == docubit.type_id end)
-    |> Enum.at(0)
   end
 end
