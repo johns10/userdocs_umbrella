@@ -692,6 +692,22 @@ defmodule UserDocs.Documents do
     Repo.delete(docubit)
   end
 
+  def delete_docubit_from_docubits(%Docubit{} = docubit, attrs) do
+    case update_docubit_internal(docubit, attrs) do
+      { :ok, updated_docubit } ->
+        ids = Enum.map(updated_docubit.docubits, fn(d) -> d.id end)
+        {
+          docubit.docubits
+          |> Enum.filter(fn(d) -> d.id not in ids end)
+          |> Enum.at(0),
+          updated_docubit
+        }
+      { :error, changeset } -> { :error, changeset }
+      _ -> raise(RuntimeError, "delete_docubit_from_docubits failed")
+
+    end
+  end
+
   def update_docubit_internal(%Docubit{} = docubit, attrs) do
     docubit
     |> Docubit.internal_changeset(attrs)
