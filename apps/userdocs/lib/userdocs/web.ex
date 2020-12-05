@@ -416,7 +416,7 @@ defmodule UserDocs.Web do
       [%Annotation{}, ...]
 
   """
-  def list_annotations(params \\ %{}, filters \\ %{}) do
+  def list_annotations(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_annotation_query()
     |> maybe_filter_annotation_by_page(filters[:page_id])
     |> maybe_filter_annotation_by_version_id(filters[:version_id])
@@ -426,6 +426,9 @@ defmodule UserDocs.Web do
     |> maybe_preload_annotation_type(params[:annotation_type])
     |> order_by(:name)
     |> Repo.all()
+  end
+  def list_annotations(state, opts) when is_list(opts) do
+    StateHandlers.list(state, Annotation, opts)
   end
 
   defp maybe_preload_annotation_type(query, nil), do: query
