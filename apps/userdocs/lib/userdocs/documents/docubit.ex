@@ -55,6 +55,7 @@ defmodule UserDocs.Documents.Docubit do
     |> put_assoc(:content, Map.get(attrs, :content, nil))
     |> put_assoc(:through_annotation, Map.get(attrs, :through_annotation, nil))
     |> put_assoc(:through_step, Map.get(attrs, :through_step, nil))
+    |> validate_required([ :type_id, :document_version_id ])
     |> check_for_deleted_docubits()
     |> order_changeset_docubits()
     |> address_docubits()
