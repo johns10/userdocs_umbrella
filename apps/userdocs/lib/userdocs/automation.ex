@@ -191,7 +191,7 @@ defmodule UserDocs.Automation do
       [%Step{}, ...]
 
   """
-  def list_steps(params \\ %{}, filters \\ %{}) do
+  def list_steps(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_steps_query()
     |> maybe_filter_by_process(filters[:process_id])
     |> maybe_filter_steps_by_version(filters[:version_id])
@@ -206,9 +206,8 @@ defmodule UserDocs.Automation do
     |> maybe_preload_file(params[:content_versions])
     |> Repo.all()
   end
-  def list_steps(_params, filters, state) do
-    UserDocs.State.get(state, :steps, Step)
-    |> maybe_filter_by_process(filters[:process_id], state)
+  def list_steps(state, opts) when is_list(opts) do
+    StateHandlers.list(state, Step, opts)
   end
 
   defp maybe_filter_by_process(query, nil), do: query
