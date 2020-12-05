@@ -32,6 +32,9 @@ defmodule UserDocs.Media do
     base_files_query()
     |> Repo.all()
   end
+  def list_files(state, opts) when is_list(opts) do
+    StateHandlers.list(state, File, opts)
+  end
 
   defp base_files_query(), do: from(files in File)
 
