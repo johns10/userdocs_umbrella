@@ -22,7 +22,4 @@ defmodule StateHandlers.Get do
   def get(state, id, :by_key, type) do
     Map.get(state, Helpers.id_key(type, id))
   end
-  # def get(_, _, _, opts), do: raise(RuntimeError, "State.Get failed to find a matching clause with options #{inspect(opts)}")
-
-  def apply(_, _, opts), do: raise(RuntimeError, "State.Get.apply failed to find a matching clause with options #{inspect(opts)}")
 end
