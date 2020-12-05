@@ -674,7 +674,7 @@ defmodule UserDocs.Documents do
   end
 
   defp maybe_preload_docubit(docubits, nil, _, _), do: docubits
-  defp maybe_preload_docubit(docubits, preloads, state, opts) do
+  defp maybe_preload_docubit(docubits, _preloads, state, opts) do
     opts = Keyword.delete(opts, :filter)
     StateHandlers.preload(state, docubits, opts)
   end
