@@ -15,6 +15,19 @@ defmodule UserDocs.DocubitFixtures do
   alias UserDocs.DocumentVersionFixtures
   alias UserDocs.MediaFixtures
 
+  def state(state, opts) do
+    opts =
+      opts
+      |> Keyword.put(:types, [ Docubit ])
+
+    dv = Documents.list_document_versions(state, opts) |> Enum.at(0)
+    docubit = docubit(:p, dv.id)
+
+    state
+    |> StateHandlers.initialize(opts)
+    |> StateHandlers.load([docubit], Docubit, opts)
+  end
+
   def state() do
     document_version_attrs = %{ name: "test", title: "Test" }
     { :ok, document_version } = Documents.create_document_version(document_version_attrs)
@@ -108,6 +121,12 @@ defmodule UserDocs.DocubitFixtures do
     }
   end
 
+  def docubit(type, document_version_id \\ nil) do
+    {:ok, object } =
+      docubit_attrs(type, document_version_id)
+      |> Documents.create_docubit()
+    object
+  end
   def column(doc_id), do: Kernel.struct(Docubit, docubit_attrs(:column, doc_id))
   def row(doc_id), do: Kernel.struct(Docubit, docubit_attrs(:row, doc_id))
   def ol(doc_id), do: Kernel.struct(Docubit, docubit_attrs(:ol, doc_id))

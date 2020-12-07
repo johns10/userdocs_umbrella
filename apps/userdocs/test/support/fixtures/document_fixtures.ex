@@ -4,8 +4,34 @@ defmodule UserDocs.DocumentVersionFixtures do
   entities via the `UserDocs.Auth` context.
   """
 
+  alias UserDocs.Users
   alias UserDocs.Documents
+  alias UserDocs.Documents.Document
+  alias UserDocs.Documents.DocumentVersion
+  alias UserDocs.Documents.Content
+  alias UserDocs.Documents.ContentVersion
   alias UserDocs.StateFixtures
+
+  alias UserDocs.Projects
+
+  def state(state, opts) do
+    opts =
+      opts
+      |> Keyword.put(:types, [ Document, DocumentVersion, Content, ContentVersion ])
+
+    v = Projects.list_versions(state, opts) |> Enum.at(0)
+    document = document()
+    document_version = document_version(document.id, v.id)
+    t = Users.list_teams(state, opts) |> Enum.at(0)
+    content = content(t)
+
+    state
+    |> StateHandlers.initialize(opts)
+    |> StateHandlers.load([document], Document, opts)
+    |> StateHandlers.load([document_version], DocumentVersion, opts)
+    |> StateHandlers.load([content], Content, opts)
+
+  end
 
   def state() do
     state = StateFixtures.base_state()

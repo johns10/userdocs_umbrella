@@ -4,11 +4,42 @@ defmodule UserDocs.WebFixtures do
   entities via the `UserDocs.Auth` context.
   """
 
-  alias UserDocs.Web
+  alias UserDocs.Projects
 
-  def page() do
+  alias UserDocs.Web
+  alias UserDocs.Web.Page
+  alias UserDocs.Web.Strategy
+  alias UserDocs.Web.AnnotationType
+  alias UserDocs.Web.Annotation
+  alias UserDocs.Web.Element
+  alias UserDocs.Web.Strategy
+
+
+  def state(state, opts) do
+    opts =
+      opts
+      |> Keyword.put(:types, [ Page, Strategy, Annotation,
+        AnnotationType, Element, Strategy ])
+
+    v = Projects.list_versions(state, opts) |> Enum.at(0)
+    page = page(v.id)
+    strategy = strategy()
+    element = element(page, strategy)
+    annotation_type = annotation_type(:badge)
+    annotation = annotation(page)
+
+    state
+    |> StateHandlers.initialize(opts)
+    |> StateHandlers.load([page], Page, opts)
+    |> StateHandlers.load([strategy], Strategy, opts)
+    |> StateHandlers.load([element], Element, opts)
+    |> StateHandlers.load([annotation_type], AnnotationType, opts)
+    |> StateHandlers.load([annotation], Annotation, opts)
+  end
+
+  def page(version_id \\ nil) do
     {:ok, object } =
-      page_attrs(:valid)
+      page_attrs(:valid, version_id)
       |> Web.create_page()
     object
   end
@@ -44,10 +75,10 @@ defmodule UserDocs.WebFixtures do
     annotation
   end
 
-  def page_attrs(:valid) do
+  def page_attrs(:valid, version_id \\ nil) do
     %{
       url: "some url",
-      version_id: ""
+      version_id: version_id
     }
   end
 

@@ -4,8 +4,41 @@ defmodule UserDocs.AutomationFixtures do
   entities via the `UserDocs.Auth` context.
   """
 
+  alias UserDocs.Projects
   alias UserDocs.Automation
+  alias UserDocs.Automation.Step
+  alias UserDocs.Automation.Process
+  alias UserDocs.Automation.StepType
   alias UserDocs.WebFixtures
+
+  alias UserDocs.Web
+
+  def state(state, opts) do
+    opts =
+      opts
+      |> Keyword.put(:types, [ Process, StepType, Step ])
+
+    v = Projects.list_versions(state, opts) |> Enum.at(0)
+    process = process(v.id)
+    step_type = step_type()
+    p = Web.list_pages(state, opts) |> Enum.at(0)
+    e = Web.list_elements(state, opts) |> Enum.at(0)
+    a = Web.list_annotations(state, opts) |> Enum.at(0)
+    step = step(p.id, process.id, e.id, a.id, step_type.id)
+
+    state
+    |> StateHandlers.initialize(opts)
+    |> StateHandlers.load([process], Process, opts)
+    |> StateHandlers.load([step], Step, opts)
+    |> StateHandlers.load([step_type], StepType, opts)
+  end
+
+  def process(version_id) do
+    { :ok, process } =
+      process_attrs(:valid, version_id)
+      |> Automation.create_process()
+    process
+  end
 
   def step_type() do
     {:ok, step_type } =
@@ -14,12 +47,6 @@ defmodule UserDocs.AutomationFixtures do
     step_type
   end
 
-  def step() do
-    {:ok, step } =
-      step_attrs(:valid)
-      |> Automation.create_step()
-      step
-  end
   def step(:both) do
     {:ok, step } =
       step_attrs(:valid)
@@ -52,15 +79,37 @@ defmodule UserDocs.AutomationFixtures do
 
     step
   end
+  def step(page_id \\ nil, process_id \\ nil,
+    element_id \\ nil, annotation_id \\ nil, step_type_id \\ nil) do
+    {:ok, step } =
+      step_attrs(:valid, page_id, process_id, element_id,
+        annotation_id, step_type_id)
+      |> Automation.create_step()
+      step
+  end
 
-  def step_attrs(:valid) do
+  def step_attrs(:valid, page_id \\ nil, process_id \\ nil,
+    element_id \\ nil, annotation_id \\ nil, step_type_id \\ nil) do
     %{
-      order: 42
+      order: 42,
+      page_id: page_id,
+      process_id: process_id,
+      element_id: element_id,
+      annotation_id: annotation_id,
+      step_type_id: step_type_id
     }
   end
 
   def step_type_attrs(:valid) do
     %{ args: [], name: "some name" }
+  end
+
+  def process_attrs(:valid, version_id \\ nil) do
+    %{
+      name: UUID.uuid4(),
+      order: 1,
+      version_id: version_id
+    }
   end
 
 end

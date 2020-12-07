@@ -5,6 +5,36 @@ defmodule UserDocs.MediaFixtures do
   """
 
   alias UserDocs.Media
+  alias UserDocs.Media.Screenshot
+  alias UserDocs.Media.File
+
+  alias UserDocs.Automation
+
+  def add_file_to_state(state, opts) do
+    opts =
+      opts
+      |> Keyword.put(:types, [ File ])
+
+    file =  file()
+
+    state
+    |> StateHandlers.initialize(opts)
+    |> StateHandlers.load([file], File, opts)
+  end
+
+  def add_screenshot_to_state(state, opts) do
+    opts =
+      opts
+      |> Keyword.put(:types, [ Screenshot ])
+
+    s = Automation.list_steps(state, opts) |> Enum.at(0)
+    f = Media.list_files(state, opts) |> Enum.at(0)
+    screenshot = screenshot(f.id, s.id)
+
+    state
+    |> StateHandlers.initialize(opts)
+    |> StateHandlers.load([screenshot], Screenshot, opts)
+  end
 
   def file() do
     {:ok, object } =

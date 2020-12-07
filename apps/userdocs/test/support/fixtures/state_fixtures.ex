@@ -4,12 +4,39 @@ defmodule UserDocs.StateFixtures do
   entities via the `UserDocs.Auth` context.
   """
 
+  alias UserDocs.Users.User
+  alias UserDocs.Users.TeamUser
+  alias UserDocs.Users.Team
+  alias UserDocs.Projects.Project
+  alias UserDocs.Projects.Version
+
+
   alias UserDocs.DocumentVersionFixtures
   alias UserDocs.UsersFixtures
   alias UserDocs.MediaFixtures
   alias UserDocs.WebFixtures
   alias UserDocs.AutomationFixtures
   alias UserDocs.ProjectsFixtures
+
+  def base_state(state, opts) do
+    opts =
+      opts
+      |> Keyword.put(:types, [ User, TeamUser, Team, Project, Version ])
+
+    user = UsersFixtures.user()
+    team = UsersFixtures.team()
+    team_user = UsersFixtures.team_user(user.id, team.id)
+    project = ProjectsFixtures.project(team.id)
+    version = ProjectsFixtures.version(project.id)
+
+    state
+    |> StateHandlers.initialize(opts)
+    |> StateHandlers.load([user], User, opts)
+    |> StateHandlers.load([team], Team, opts)
+    |> StateHandlers.load([team_user], TeamUser, opts)
+    |> StateHandlers.load([project], Project, opts)
+    |> StateHandlers.load([version], Version, opts)
+  end
 
   def base_state() do
     user = UsersFixtures.user()
