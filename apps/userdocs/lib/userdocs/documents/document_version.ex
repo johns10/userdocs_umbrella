@@ -32,6 +32,7 @@ defmodule UserDocs.Documents.DocumentVersion do
     |> cast_assoc(:body, with: &Docubit.changeset/2)
     |> foreign_key_constraint(:version_id)
     |> foreign_key_constraint(:docubit_id)
+    |> foreign_key_constraint(:document_id)
   end
 
   defp body_is_container_docubit_if_empty(changeset) do
