@@ -5,7 +5,7 @@ defmodule UserDocs.Repo.Migrations.CreateDocuments do
     create table(:documents) do
       add :name, :string
       add :title, :string
-      add :project_id, references(:documents, on_delete: :delete_all)
+      add :project_id, references(:projects, on_delete: :delete_all)
       timestamps()
     end
 
