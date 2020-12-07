@@ -1,4 +1,4 @@
-defmodule UserDocsWeb.DocumentLive.Editor do
+defmodule UserDocsWeb.DocumentLive.OldEditor do
   use UserDocsWeb, :live_view
   use UserdocsWeb.LiveViewPowHelper
 
@@ -18,11 +18,14 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
   alias UserDocs.Users
 
+  alias UserDocsWeb.Root
+
   @impl true
   def mount(_params, session, socket) do
     {:ok,
       socket
-      |> maybe_assign_current_user(session)
+      |> Root.authorize(session)
+      |> Root.initialize()
       |> assign(:dragging, nil)
     }
   end
@@ -74,14 +77,12 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       |> assign(:page_select_list, page_select_list)
       |> assign(:process_select_list, process_select_list)
       |> assign(:language_codes_select_options, language_codes_select_options)
-      |> assign_body()
     }
   end
 
   @impl true
   def handle_event("editor_drag_start", %{ "type" => type, "id" => id}, socket) do
     IO.puts("Started dragging #{type}, id #{id} from editor panel")
-
     {
       :noreply,
       socket
