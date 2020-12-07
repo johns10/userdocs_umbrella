@@ -10,6 +10,7 @@ defmodule UserDocs.TestDataset do
   alias UserDocs.Projects.Version
 
   alias UserDocs.Documents
+  alias UserDocs.Documents.Document
   alias UserDocs.Documents.DocumentVersion
   alias UserDocs.Documents.Content
   alias UserDocs.Documents.ContentVersion
