@@ -29,8 +29,8 @@ defmodule StateHandlers.StateFixtures do
     v1 = ProjectsFixtures.version(project.id)
     v2 = ProjectsFixtures.version(project.id)
     document = DocumentFixtures.document(project.id)
-    dv1 = DocumentFixtures.document_version(project.id, v1.id)
-    dv2 = DocumentFixtures.document_version(project.id, v2.id)
+    dv1 = DocumentFixtures.document_version(document.id, v1.id)
+    dv2 = DocumentFixtures.document_version(document.id, v2.id)
 
     %{}
     |> StateHandlers.initialize(opts)
@@ -143,7 +143,6 @@ defmodule StateHandlersTest do
       )
     end
 
-
     test "StateHandlers.delete" do
       list_data = Enum.map(1..3, fn(_) -> UsersFixtures.user() end)
       state_opts = [
@@ -179,6 +178,40 @@ defmodule StateHandlersTest do
 
     test "StateHandlers.Preload loads and filters has_many relationships" do
       opts = [ data_type: :list, strategy: :by_type, location: :data, preloads: [ :document_versions ] ]
+      state = StateFixtures.state(opts)
+      project_id = StateHandlers.list(state, Project, opts) |> Enum.at(0) |> Map.get(:id)
+      data = StateHandlers.list(state, Document, Keyword.put(opts, :filter, { :project_id, project_id }))
+      expected_result = StateHandlers.list(state, DocumentVersion, opts)
+      result = StateHandlers.preload(state, data, opts[:preloads], opts)
+      assert result |> Enum.at(0) |> Map.get(:document_versions) == expected_result
+    end
+
+    test "StateHandlers.List orders a result" do
+      users = [ user_one = UsersFixtures.user(), user_two = UsersFixtures.user() ]
+      opts = [ types: [User], data_type: :list, strategy: :by_type, order: [ %{ field: :id, order: :desc } ] ]
+      state = %{} |> StateHandlers.initialize(opts) |> StateHandlers.load(users, User, opts)
+      result = StateHandlers.list(state, User, opts)
+      assert result = [ user_two, user_one ]
+    end
+
+    test "StateHandlers.Preload loads and orders nested relationships" do
+      opts = [ data_type: :list, strategy: :by_type, location: :data,
+        preloads: [ :document_versions ],
+        order: [ %{ field: :id, order: :asc }, document_versions: %{ field: :id, order: :desc }]
+      ]
+      state = StateFixtures.state(opts)
+      project_id = StateHandlers.list(state, Project, opts) |> Enum.at(0) |> Map.get(:id)
+      data = StateHandlers.list(state, Document, Keyword.put(opts, :filter, { :project_id, project_id }))
+      expected_result = StateHandlers.list(state, DocumentVersion, opts)
+      result = StateHandlers.preload(state, data, opts[:preloads], opts)
+      assert Enum.at(result, 0) |> Map.get(:document_versions) == Enum.reverse(expected_result)
+    end
+
+    test "StateHandlers.Preload ignores nested ordering for invalid preloads" do
+      opts = [ data_type: :list, strategy: :by_type, location: :data,
+        preloads: [ :document_versions ],
+        order: [ %{ field: :id, order: :asc }, documents: %{ field: :id, order: :desc }]
+      ]
       state = StateFixtures.state(opts)
       project_id = StateHandlers.list(state, Project, opts) |> Enum.at(0) |> Map.get(:id)
       data = StateHandlers.list(state, Document, Keyword.put(opts, :filter, { :project_id, project_id }))
