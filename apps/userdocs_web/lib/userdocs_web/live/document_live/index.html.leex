@@ -4,44 +4,48 @@
     <p class="menu-label">Documents</p>
     <ul class="menu-list">
       <%= for document <- @documents do %>
-        <li>
-          <a class="is-flex-direction-row">
-            <%= document.name %>
-            <%= content_tag :div, to: "#", phx_click: "new-document-version",
-              class: "is-pulled-right pl-2 p-0",
-              phx_value_document_id: document.id do %>
-              <i class="fa fa-lg fa-plus-square"> </i>
-            <% end %>
-            <%= content_tag :div, to: "#", phx_click: "delete",
-              class: "is-pulled-right pl-2 p-0",
-              phx_value_id: document.id do %>
-              <i class="fa fa-lg fa-minus-square"></i>
-            <% end %>
-            <%= content_tag :div, to: "#", phx_click: "edit-document",
-              class: "is-pulled-right pl-2 p-0",
-              phx_value_id: document.id do %>
-              <i class="fa fa-lg fa-edit"></i>
-            <% end %>
-          </a>
+        <li class="">
+          <div class="columns">
+            <a class="column">
+              <%= document.name %>
+            </a>
+            <div class="column is-narrow is-flex px-0 py-0">
+              <%= live_patch to: Routes.document_editor_path(@socket, :edit, document),
+                class: "py-2 px-1" do %>
+                <i class="fa fa-lg fa-search"></i>
+              <% end %>
+              <%= content_tag :a, to: "#", phx_click: "new-document-version",
+                class: "py-2 px-1",
+                phx_value_document_id: document.id do %>
+                <i class="fa fa-lg fa-plus-square"> </i>
+              <% end %>
+              <%= content_tag :a, to: "#", phx_click: "delete",
+                class: "py-2 px-1",
+                phx_value_id: document.id do %>
+                <i class="fa fa-lg fa-minus-square"></i>
+              <% end %>
+              <%= content_tag :a, to: "#", phx_click: "edit-document",
+                class: "py-2 px-1",
+                phx_value_id: document.id do %>
+                <i class="fa fa-lg fa-edit"></i>
+              <% end %>
+            </div>
+          </div>
           <ul>
             <%= for document_version <- document.document_versions do %>
-              <li class="columns is-flex-direction-row">
-                <a class="column is-flex-grow-5">
+              <li class="columns">
+                <a class="column">
                   <%= document_version.version.name %>
                 </a>
-                <div class="column is-justify-content-right is-flex-grow-1">
-                  <%= live_patch to: Routes.document_editor_path(@socket, :edit, document_version),
-                    class: "is-pulled-right pl-2 p-0" do %>
-                    <i class="fa fa-lg fa-search"></i>
-                  <% end %>
+                <div class="column is-narrow is-flex px-0 py-0">
                   <%= content_tag :a, phx_click: "delete-document-version",
                     phx_value_id: document_version.id,
-                    class: "is-pulled-right pl-2 p-0" do %>
+                    class: "py-2 px-1" do %>
                     <i class="fa fa-lg fa-minus-square"></i>
                   <% end %>
                   <%= content_tag :a, phx_click: "edit-document-version",
                     phx_value_id: document_version.id,
-                    class: "is-pulled-right pl-2 p-0" do %>
+                    class: "py-2 px-1" do %>
                     <i class="fa fa-lg fa-edit"></i>
                   <% end %>
                 </div>
