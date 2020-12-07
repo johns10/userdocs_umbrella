@@ -6,8 +6,6 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
   alias UserDocs.Media
   alias UserDocs.Web
 
-  alias UserDocs.Documents.Docubit
-
   def load_document(socket, document, opts) do
     StateHandlers.load(socket, [ document ], opts)
   end
