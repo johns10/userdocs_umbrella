@@ -1,4 +1,5 @@
 defmodule StateHandlers.Preload do
+  require Logger
 
   def apply(state, data, opts) do
     case opts[:preloads] do
@@ -17,7 +18,8 @@ defmodule StateHandlers.Preload do
   end
 
   def apply(_state, nil, _preloads, _opts) do
-    raise(RuntimeError, "State.Preload called with nil data")
+    Logger.error("State.Preload called with nil data")
+    nil
   end
   def apply(_state, data, _preloads, _opts) do
     raise(RuntimeError, "State.Preload failed to find a matching clause")
@@ -36,9 +38,11 @@ defmodule StateHandlers.Preload do
     tuple: This means there's a nested preload so we just call the original preload function and
     apply the preloads to the data.
   """
+  defp handle_preload(state, nil, preload, opts), do: nil
   defp handle_preload(state, data, preload, opts) when is_atom(preload) do
     # IO.puts("handle_preload Atom #{inspect(preload)}")
     schema = data.__meta__.schema
+    opts = prepare_preload_opts(opts, schema, preload)
     preload_data = handle_assoc(state, data, schema.__schema__(:association, preload), opts)
     Map.put(data, preload, preload_data)
   end
@@ -47,6 +51,36 @@ defmodule StateHandlers.Preload do
     data_to_preload = Map.get(data, key)
     preloads = value
     Map.put(data, key, apply(state, data_to_preload, preloads, opts))
+  end
+
+  defp prepare_preload_opts(opts, schema, preload) do
+    opts
+    |> prepare_order_clause(opts[:order], schema.__schema__(:associations), preload)
+  end
+
+  defp prepare_order_clause(opts, nil, _, _), do: opts
+  defp prepare_order_clause(opts, order_clause, fields, preload) do
+    #  IO.puts("prepare_order_clause")
+    updated_order_clause =
+      Enum.reduce(order_clause, [],
+        fn(order_opt, opts) ->
+          handle_order_option(opts, order_opt, fields, preload)
+        end
+      )
+    Keyword.put(opts, :order, updated_order_clause)
+  end
+
+  def handle_order_option(order_opts, %{field: _, order: _} = opt_to_ignore, _fields, _preload) do
+    Enum.reject(order_opts, fn(opt) -> opt == opt_to_ignore end)
+  end
+  def handle_order_option(order_opts, {association, %{ field: _, order: _ } = order_opt}, associations, preload) do
+    # IO.puts("handle_order_option")
+    case (association in associations) and association == preload do
+      true -> [ order_opt | order_opts ]
+      false ->
+        Logger.warn("handle_order_option was passed an invalid association: #{association}, or it didn't match the preload: #{preload}.  Available associations are #{inspect(associations)}")
+        order_opts
+    end
   end
 
   defp handle_assoc(state, source, association, opts) do
