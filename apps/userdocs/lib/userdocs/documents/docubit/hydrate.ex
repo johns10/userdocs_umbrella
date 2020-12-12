@@ -4,7 +4,9 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
 
   require Logger
 
-  alias UserDocs.Documents.Docubit, as: Docubit
+  alias UserDocs.Documents
+  alias UserDocs.Documents.Docubit
+  alias UserDocs.Documents.DocubitType
   alias UserDocs.Documents.Content
   alias UserDocs.Automation.Step
   alias UserDocs.Documents.Docubit.Access
@@ -12,13 +14,11 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
   alias UserDocs.Media.Screenshot
   alias UserDocs.Media.File
 
-  def apply(body, address, data) do
-    with docubit <- Access.get(body, address),
-      { :ok, [] } <- precheck(docubit, data),
-      { :ok, docubit } <- hydrate(docubit, data),
-      body <- Access.insert(body, address, docubit)
+  def apply(docubit, data) do
+    with { :ok, [] } <- precheck(docubit, data),
+      { :ok, docubit } <- hydrate(docubit, data)
     do
-      body
+      (docubit)
     else
       { :error, _body, _errors } -> raise(RuntimeError, "Caught Access Error")
       { :precheck, errors } -> { :error, errors}
@@ -26,60 +26,76 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
   end
 
   def hydrate(
-    %Docubit{ type_id: "p"} = docubit,
+    %Docubit{ docubit_type: %DocubitType{ name: "p" }} = docubit,
     %Content{} = content
   ) do
     attrs = %{
       content_id: content.id,
       content: content
     }
-    docubit
-    |> Docubit.changeset(attrs)
-    |> apply_action(:update)
+    with {:ok, docubit} <- Documents.update_docubit(docubit, attrs),
+      docubit <- Map.put(docubit, :content, content)
+    do
+      { :ok, docubit }
+    else
+      { :error, changeset } -> changeset
+    end
   end
   def hydrate(
-    %Docubit{ type_id: "p"} = docubit,
+    %Docubit{ docubit_type: %DocubitType{ name: "p" }} = docubit,
     %Annotation{} = annotation
   ) do
     attrs = %{
       through_annotation_id: annotation.id,
-      through_annotation: annotation,
-      content_id: annotation.content_id,
-      content: annotation.content
+      content_id: annotation.content_id
     }
-    docubit
-    |> Docubit.changeset(attrs)
-    |> apply_action(:update)
+    with {:ok, docubit} <- Documents.update_docubit(docubit, attrs),
+      docubit <- Map.put(docubit, :content, annotation.content),
+      docubit <- Map.put(docubit, :through_annotation, annotation)
+    do
+      { :ok, docubit }
+    else
+      { :error, changeset } -> changeset
+    end
   end
   def hydrate(
-    %Docubit{ type_id: "p"} = docubit,
+    %Docubit{ docubit_type: %DocubitType{ name: "p" }} = docubit,
     %Step{} = step
   ) do
+    IO.puts("Hydrating with step")
     attrs = %{
       through_step_id: step.id,
-      through_step: step,
       through_annotation_id: step.annotation.id,
-      through_annotation: step.annotation,
       content_id: step.annotation.content_id,
-      content: step.annotation.content
     }
-    docubit
-    |> Docubit.changeset(attrs)
-    |> apply_action(:update)
+    with {:ok, docubit} <- Documents.update_docubit(docubit, attrs),
+      docubit <- Map.put(docubit, :content, step.annotation.content),
+      docubit <- Map.put(docubit, :through_annotation, step.annotation),
+      docubit <- Map.put(docubit, :through_step, step)
+    do
+      { :ok, docubit }
+    else
+      { :error, changeset } -> changeset
+    end
   end
   def hydrate(
-    %Docubit{ type_id: "img"} = docubit,
-    %Step{} = step
+    %Docubit{ docubit_type: %DocubitType{ name: "img" }} = docubit,
+    %Step{ screenshot: %Screenshot{ file: %File{}}} = step
   ) do
     attrs = %{
       through_step_id: step.id,
-      through_step: step,
-      file_id: step.screenshot.file_id,
-      file: step.screenshot.file
+      file_id: step.screenshot.file_id
     }
     docubit
-    |> Docubit.changeset(attrs)
-    |> apply_action(:update)
+    |> Documents.update_docubit(attrs)
+    with {:ok, docubit} <- Documents.update_docubit(docubit, attrs),
+      docubit <- Map.put(docubit, :file, step.screenshot.file),
+      docubit <- Map.put(docubit, :through_step, step)
+    do
+      { :ok, docubit }
+    else
+      { :error, changeset } -> changeset
+    end
   end
   def hydrate(_, _) do
     { :hydrate, "Hydrate Not Implemented for this combination"}
@@ -89,26 +105,29 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
     { :ok, [] }
     |> type?(docubit)
     |> allowed?(docubit, data)
-    |> precheck_data(docubit.type_id, data)
+    |> precheck_data(docubit.docubit_type.name, data)
   end
 
   def type?({ status, errors }, docubit) do
-    case docubit.type != nil do
+    case docubit.docubit_type_id != nil do
       true -> { status, errors }
       false -> { :precheck, Keyword.put(errors, :type, "Type not found in docubit")}
     end
   end
 
-  def allowed?({ status, errors }, docubit, data) do
-    case data.__meta__.schema in docubit.type.allowed_data do
+  def allowed?({ status, errors }, %Docubit{ docubit_type: %DocubitType{} } = docubit, data) do
+    case data.__meta__.schema in docubit.docubit_type.allowed_data do
       true -> { status, errors }
       false ->
         {
           :precheck,
           Keyword.put(errors, :allowed,
-            "#{inspect(data.__meta__.schema)} not allowed in #{docubit.type_id}")
+            "#{inspect(data.__meta__.schema)} not allowed in #{docubit.docubit_type.name}")
         }
     end
+  end
+  def allowed?(_, %Docubit{ docubit_type: %Ecto.Association.NotLoaded{} }, _) do
+    raise(RuntimeError, Atom.to_string(__MODULE__) <> " missing type (Not Loaded).")
   end
 
   def precheck_data(s, "p", %Annotation{} = a), do: precheck_annotation(s, a)
@@ -130,7 +149,6 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
   end
 
   def precheck_step_img({ status, errors }, step) do
-    IO.inspect(step)
     { status, errors }
     |> step_has_screenshot?(step)
     |> screenshot_has_file?(step.screenshot)
