@@ -2,7 +2,7 @@ defmodule UserDocs.Documents.DocubitType do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias UserDocs.Documents.Docubit.Type
+  alias UserDocs.Documents.DocubitType
   alias UserDocs.Documents.Docubit
 
   @valid_data [
@@ -26,10 +26,6 @@ defmodule UserDocs.Documents.DocubitType do
     docubit_type
     |> cast(attrs, [ :name, :allowed_children, :allowed_data, :contexts ])
     |> validate_required([ :name, :allowed_children, :allowed_data ])
-  end
-
-  def types() do
-    Enum.map(attrs(), fn(attrs) -> Kernel.struct(Type, attrs) end)
   end
 
   def attrs() do
@@ -59,7 +55,7 @@ defmodule UserDocs.Documents.DocubitType do
     }
   end
 
-  def ul(), do: Kernel.struct(Type, ul_attrs())
+  def ul(), do: Kernel.struct(DocubitType, ul_attrs())
   def ul_attrs() do
     %{
       name: "ul",
@@ -72,7 +68,7 @@ defmodule UserDocs.Documents.DocubitType do
     }
   end
 
-  def ol(), do: Kernel.struct(Type, ol_attrs())
+  def ol(), do: Kernel.struct(DocubitType, ol_attrs())
   def ol_attrs() do
     %{
       name: "ol",
@@ -86,7 +82,7 @@ defmodule UserDocs.Documents.DocubitType do
     }
   end
 
-  def img(), do: Kernel.struct(Type, img_attrs())
+  def img(), do: Kernel.struct(DocubitType, img_attrs())
   def img_attrs() do
     %{
       name: "img",
@@ -99,7 +95,7 @@ defmodule UserDocs.Documents.DocubitType do
     }
   end
 
-  def p(), do: Kernel.struct(Type, p_attrs())
+  def p(), do: Kernel.struct(DocubitType, p_attrs())
   def p_attrs() do
     %{
       name: "p",
@@ -113,7 +109,7 @@ defmodule UserDocs.Documents.DocubitType do
     }
   end
 
-  def column(), do: Kernel.struct(Type, column_attrs())
+  def column(), do: Kernel.struct(DocubitType, column_attrs())
   def column_attrs() do
   %{
     name: "column",
@@ -123,7 +119,7 @@ defmodule UserDocs.Documents.DocubitType do
   }
   end
 
-  def row(), do: Kernel.struct(Type, row_attrs())
+  def row(), do: Kernel.struct(DocubitType, row_attrs())
   def row_attrs() do
     %{
       name: "row",
@@ -133,7 +129,7 @@ defmodule UserDocs.Documents.DocubitType do
     }
   end
 
-  def container(), do: Kernel.struct(Type, container_attrs())
+  def container(), do: Kernel.struct(DocubitType, container_attrs())
   def container_attrs() do
     %{
       name: "container",
