@@ -260,7 +260,7 @@ defmodule UserDocs.TestDataset do
       |> Team.changeset(funnel_cloud_team)
       |> Repo.insert()
 
-    {:ok, _loreline_team = %Team{id: loreline_team_id}} =
+    {:ok, loreline_team = %Team{id: loreline_team_id}} =
       %Team{}
       |> Team.changeset(loreline_team)
       |> Repo.insert()
@@ -861,6 +861,14 @@ defmodule UserDocs.TestDataset do
       %LanguageCode{}
       |> LanguageCode.changeset(great_britain_language_code)
       |> Repo.insert()
+
+    {:ok, funnel_cloud_team = %Team{}} =
+      funnel_cloud_team
+      |> Users.update_team(%{default_language_code_id: english_language_code_id})
+
+    {:ok, loreline_team = %Team{}} =
+      loreline_team
+      |> Users.update_team(%{default_language_code_id: english_language_code_id})
 
     content_versions = [
       _login_button_2020_1_en_us = %{
