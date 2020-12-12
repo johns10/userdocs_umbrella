@@ -36,14 +36,17 @@ Hooks.docubit = {
   mounted() {
     this.el.addEventListener("drop", e => {
       console.log("Dropping")
-      console.log()
       e.preventDefault();
+      e.stopPropagation();
+      const componentId = e.currentTarget.id
+      const draggingElement = document.getElementById("dragging")
       const payload = { 
-        "column-count": e.target.getAttribute("column-count"),
-        "row-count": e.target.getAttribute("row-count") ,
-        "element-id": e.target.getAttribute("element-id")
+        "object-id": draggingElement.getAttribute("object-id"),
+        "type": draggingElement.getAttribute("object-type") ,
+        "docubit-id": e.currentTarget.getAttribute("phx-value-docubit-id")
       }
-      this.pushEvent("docubit_drop", payload)
+      console.log(payload)
+      this.pushEventTo('#' + componentId, "docubit_drop", payload)
     })
     this.el.addEventListener("dragenter", e => {
       e.dataTransfer.dropEffect = 'move'
