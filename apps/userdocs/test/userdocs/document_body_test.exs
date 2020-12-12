@@ -8,17 +8,34 @@ defmodule UserDocs.DocumentVersionBodyTest do
     alias UserDocs.WebFixtures
     alias UserDocs.UsersFixtures
     alias UserDocs.AutomationFixtures
-    alias UserDocs.DocumentVersionFixtures
+    alias UserDocs.DocumentVersionFixtures, as: DocumentFixtures
     alias UserDocs.MediaFixtures
+    alias UserDocs.StateFixtures
 
     alias UserDocs.Documents
     alias UserDocs.Documents.DocumentVersion
-    alias UserDocs.Documents.Docubit.Type
+    alias UserDocs.Documents.DocubitType
 
     def empty_document_version(), do: DocumentVersionFixtures.empty_document_version
 
     def state_opts() do
       [ data_type: :list, strategy: :by_type, location: :data ]
+    end
+
+    def document_fixture() do
+      opts = state_opts()
+      %{}
+      |> StateFixtures.base_state(opts)
+      |> DocubitFixtures.docubit_types(opts)
+      |> DocumentFixtures.state(opts)
+    end
+
+    test "new docubit gets a container docubit by default" do
+      DocubitFixtures.create_docubit_types()
+      document_version_attrs = DocumentFixtures.document_version_attrs(:valid)
+      { :ok, document_version } = Documents.create_document_version(document_version_attrs)
+      type = Documents.get_docubit_type!(document_version.body.docubit_type_id)
+      assert type.name == "container"
     end
 
     def document_version_with_one_row do
@@ -129,15 +146,10 @@ defmodule UserDocs.DocumentVersionBodyTest do
       }
     end
 
-    test "new docubit gets a container docubit by default" do
-      document_version_attrs = DocumentVersionFixtures.document_version_attrs(:valid)
-      { :ok, document_version } = Documents.create_document_version(document_version_attrs)
-      assert document_version.body.type_id == "container"
-    end
-
     test "adding a couple rows to a docubit works" do
-      document_version = empty_document_version()
-      body = Documents.get_docubit!(document_version.body.id, %{docubits: true})
+      state = document_fixture()
+      document_version = Documents.list_document_versions(state, state_opts()) |> Enum.at(0)
+      body = Documents.get_docubit!(document_version.docubit_id, %{docubits: true})
       row =
         body
         |> add_rows(document_version.id)
@@ -146,7 +158,7 @@ defmodule UserDocs.DocumentVersionBodyTest do
 
       row.type_id == "row"
     end
-
+    """
     test "adding columns to rows works" do
       document_version = empty_document_version()
       body = Documents.get_docubit!(document_version.body.id, %{docubits: true})
@@ -235,5 +247,6 @@ defmodule UserDocs.DocumentVersionBodyTest do
       assert row.type_id == "row"
       assert column.type_id == "column"
     end
+    """
   end
 end
