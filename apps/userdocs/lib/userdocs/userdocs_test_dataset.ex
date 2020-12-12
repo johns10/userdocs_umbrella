@@ -932,6 +932,15 @@ defmodule UserDocs.TestDataset do
     { :ok, %Document{id: document_id} } =
       Documents.create_document(document_attrs)
 
+    _docubit_types =
+      Enum.map(
+        UserDocs.Documents.DocubitType.attrs(),
+        fn(attrs) ->
+          { :ok, docubit_type } = Documents.create_docubit_type(attrs)
+          docubit_type
+        end
+      )
+
     document_version = %{
       name: "test",
       title: "test",
@@ -944,7 +953,7 @@ defmodule UserDocs.TestDataset do
     |> DocumentVersion.changeset(document_version)
     |> Repo.insert()
 
-  ""
+
   end
 
 end
