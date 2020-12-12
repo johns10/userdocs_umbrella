@@ -11,6 +11,7 @@ defmodule UserDocs.DocumentVersionFixtures do
   alias UserDocs.Documents.Content
   alias UserDocs.Documents.ContentVersion
   alias UserDocs.StateFixtures
+  alias UserDocs.DocubitFixtures
 
   alias UserDocs.Projects
 
@@ -35,6 +36,7 @@ defmodule UserDocs.DocumentVersionFixtures do
 
   def state() do
     state = StateFixtures.base_state()
+    DocubitFixtures.create_docubit_types()
     v = Enum.at(state.versions, 0)
     d = document()
     dv = document_version(d.id, v.id)
@@ -78,8 +80,8 @@ defmodule UserDocs.DocumentVersionFixtures do
   end
   def document_attrs(:invalid, project_id) do
     %{
-      name: "",
-      title: "",
+      name: None,
+      title: None,
       project_id: project_id
     }
   end
@@ -91,9 +93,18 @@ defmodule UserDocs.DocumentVersionFixtures do
     }
   end
 
-  def document_version_attrs(:valid, document_id \\ nil, version_id \\ nil) do
+  def document_version_attrs(type, document_id \\ nil, version_id \\ nil)
+  def document_version_attrs(:valid, document_id, version_id) do
     %{
       name: UUID.uuid4(),
+      document_id: document_id,
+      version_id: version_id
+    }
+  end
+
+  def document_version_attrs(:invalid, document_id, version_id) do
+    %{
+      name: None,
       document_id: document_id,
       version_id: version_id
     }
