@@ -127,8 +127,8 @@ defmodule UserDocsWeb.Root do
   def handle_event("new-document", params, socket) do
     ModalMenus.new_document(socket, params)
   end
-  def handle_event("create-docubit", params, socket) do
-    ModalMenus.new_docubit(socket, params)
+  def handle_event("delete-docubit" = name, params, socket) do
+    UserDocsWeb.DocubitLive.EventHandlers.handle_event("delete", params, socket)
   end
   def handle_event("select_version", %{"select-version" => version_id_param} = _payload, socket) do
     opts = state_opts()
@@ -151,8 +151,7 @@ defmodule UserDocsWeb.Root do
   end
 
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
-    Logger.debug("Root handling info on topic #{topic}, event #{event}")
-    IO.inspect(payload)
+    #Logger.debug("Root handling info on topic #{topic}, event #{event}")
     {
       :noreply,
       UserDocs.Subscription.handle_event(socket, event, payload, state_opts())
