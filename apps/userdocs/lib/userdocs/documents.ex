@@ -638,11 +638,18 @@ defmodule UserDocs.Documents do
 
   def list_docubits(state, opts) when is_list(opts) do
     StateHandlers.list(state, Docubit, opts)
+    |> maybe_preload_docubit(opts[:preloads], state, opts)
   end
   def list_docubits(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_docubits_query()
     |> maybe_filter_by_document_id(filters[:project_id])
     |> Repo.all()
+  end
+
+  defp maybe_preload_docubit(docubits, nil, _, _), do: docubits
+  defp maybe_preload_docubit(docubits, preloads, state, opts) do
+    opts = Keyword.delete(opts, :filter)
+    StateHandlers.preload(state, docubits, preloads, opts)
   end
 
   defp maybe_filter_by_document_id(query, nil), do: query
@@ -663,11 +670,16 @@ defmodule UserDocs.Documents do
   def get_docubit!(id, params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_docubit_query(id)
     |> maybe_preload_docubits(params[:docubits])
+    |> maybe_preload_docubit_type(params[:docubit_type])
     |> Repo.one!()
   end
 
   defp maybe_preload_docubits(query, nil), do: query
   defp maybe_preload_docubits(query, _), do: from(docubit in query, preload: [:docubits])
+
+  defp maybe_preload_docubit_type(query, nil), do: query
+  defp maybe_preload_docubit_type(query, _), do: from(docubit in query, preload: [:docubit_type])
+
 
   defp base_docubit_query(id) do
     from(docubit in Docubit, where: docubit.id == ^id)
@@ -720,5 +732,67 @@ defmodule UserDocs.Documents do
     |> Repo.update()
   end
 
+  alias UserDocs.Documents.DocubitType
+
+  def load_docubit_types(state, opts) do
+    StateHandlers.load(state, list_docubit_types(), opts)
+  end
+
+  def list_docubit_types(state, opts) when is_list(opts) do
+    StateHandlers.list(state, DocubitType, opts)
+  end
+  def list_docubit_types(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
+    base_docubit_types_query()
+    |> Repo.all()
+  end
+
+  defp base_docubit_types_query(), do: from(docubit_types in DocubitType)
+
+  def get_docubit_type!(name) when is_bitstring(name) do
+    base_docubit_types_query()
+    |> filter_by_name(name)
+    |> Repo.all()
+    |> Enum.at(0)
+  end
+  def get_docubit_type!(state, name, opts) when is_bitstring(name) and is_list(opts) do
+    list_docubit_types(state, opts)
+    |> Enum.filter(fn(dt) -> dt.name == name end)
+    |> Enum.at(0)
+  end
+
+  defp filter_by_name(query, name) do
+    from(docubit_type in query,
+      where: docubit_type.name == ^name
+    )
+  end
+
+  def get_docubit_type!(id, params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
+    base_docubit_type_query(id)
+    |> Repo.one!()
+  end
+
+  defp base_docubit_type_query(id) do
+    from(docubit_type in DocubitType, where: docubit_type.id == ^id)
+  end
+
+  def create_docubit_type(attrs \\ %{}) do
+    %DocubitType{}
+    |> DocubitType.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_docubit_type(%DocubitType{} = docubit_type, attrs) do
+    docubit_type
+    |> DocubitType.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def change_docubit_type(%DocubitType{} = docubit_type, attrs \\ %{}) do
+    DocubitType.changeset(docubit_type, attrs)
+  end
+
+  def delete_docubit_type(%DocubitType{} = docubit_type) do
+    Repo.delete(docubit_type)
+  end
 
 end
