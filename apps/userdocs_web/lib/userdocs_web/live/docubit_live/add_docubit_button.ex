@@ -5,7 +5,7 @@ defmodule UserDocsWeb.DocubitLive.AddDocubitButton do
     ~L"""
       <a class=<%= @class %>
         phx-click="create-docubit"
-        phx-value-type-id=<%= @type_id %>
+        phx-value-type=<%= @type %>
         phx-target=<%= @parent_cid %>
         phx-value-docubit-id=<%= @docubit.id %>
       ><%= @text %></a>
