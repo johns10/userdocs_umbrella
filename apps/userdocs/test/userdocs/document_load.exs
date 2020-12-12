@@ -16,7 +16,6 @@ defmodule UserDocs.DocumentVersionLoadTest do
     alias UserDocs.Documents.Docubit
     alias UserDocs.Documents.DocumentVersion
     alias UserDocs.DocubitFixtures
-    alias UserDocs.Documents.Docubit.Type
 
     def empty_document_version(), do: DocumentVersionFixtures.empty_document_version
 

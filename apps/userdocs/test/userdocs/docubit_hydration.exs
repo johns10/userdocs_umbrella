@@ -16,7 +16,6 @@ defmodule UserDocs.DocumentHydrationTest do
     alias UserDocs.Web
     alias UserDocs.Media
     alias UserDocs.Documents
-    alias UserDocs.Documents.Docubit.Type
 
     def annotation_with_content(state) do
       content =
