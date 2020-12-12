@@ -1,3 +1,4 @@
+"""
 defmodule UserDocs.Documents.Docubit.Type do
   use Ecto.Schema
 
@@ -132,3 +133,4 @@ defmodule UserDocs.Documents.Docubit.Type do
   end
 
 end
+"""
