@@ -32,7 +32,6 @@ defmodule UserDocsWeb.DocubitLive.EventHandlers do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         IO.puts("Failed Save")
-        IO.inspect(changeset)
         {:noreply, LiveView.assign(socket, changeset: changeset)}
     end
   end
