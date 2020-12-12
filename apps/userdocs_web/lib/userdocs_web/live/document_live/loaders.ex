@@ -10,6 +10,10 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
     StateHandlers.load(socket, [ document ], opts)
   end
 
+  def load_docubit_types(socket, opts) do
+    Documents.load_docubit_types(socket, opts)
+  end
+
   def load_pages(socket, opts) do
     opts =
       opts
