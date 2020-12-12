@@ -123,7 +123,6 @@ defmodule UserDocs.StepChange do
         |> Map.put(:element, element_attrs)
 
       changeset = Automation.change_step_with_nested_data(step, step_attrs, fx.state)
-      IO.inspect(changeset)
 
     end
 
