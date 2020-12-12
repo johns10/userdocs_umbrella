@@ -25,7 +25,15 @@ defmodule UserDocs.Documents do
   """
   def list_content(state, opts) when is_list(opts) do
     StateHandlers.list(state, Content, opts)
+    |> maybe_preload_content(opts[:preloads], state, opts)
   end
+
+  defp maybe_preload_content(content, nil, _, _), do: content
+  defp maybe_preload_content(content, preloads, state, opts) do
+    opts = Keyword.delete(opts, :filter)
+    StateHandlers.preload(state, content, opts)
+  end
+
   def list_content(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_content_query()
     |> maybe_preload_content_versions(params[:content_versions])
