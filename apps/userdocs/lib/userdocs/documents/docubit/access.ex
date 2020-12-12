@@ -1,11 +1,12 @@
+
+"""
 defmodule UserDocs.Documents.Docubit.Access do
 
   require Logger
 
   alias UserDocs.Documents.Docubit
   alias UserDocs.Documents.DocumentVersion
-  alias UserDocs.Documents.Docubit.Type
-"""
+
   def delete({ :error, docubit, errors}, _), do: { :error, docubit, errors}
   def delete(_, [0], _docubit) do
     raise(RuntimeError, "Can't delete the document body")
@@ -149,7 +150,6 @@ defmodule UserDocs.Documents.Docubit.Access do
       :ok -> docubit
     end
   end
-  """
 
   def get({ :error, docubit, errors}, _), do: { :error, docubit, errors}
   def get(%DocumentVersion{} = document_version, []), do: document_version.docubit
@@ -161,3 +161,4 @@ defmodule UserDocs.Documents.Docubit.Access do
 
   defp fetch(docubit, [ index | [] ]), do: IO.inspect("Not Implemented")
 end
+"""
