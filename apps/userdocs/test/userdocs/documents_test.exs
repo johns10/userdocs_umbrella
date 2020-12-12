@@ -1,7 +1,13 @@
 defmodule UserDocs.DocumentsTest do
   use UserDocs.DataCase
-
   alias UserDocs.Documents
+  alias UserDocs.Projects
+  alias UserDocs.StateFixtures
+  alias UserDocs.DocumentFixtures
+  alias UserDocs.WebFixtures
+  alias UserDocs.MediaFixtures
+  alias UserDocs.AutomationFixtures
+  alias UserDocs.DocubitFixtures
 
   describe "content" do
     alias UserDocs.Documents.Content
@@ -135,63 +141,88 @@ defmodule UserDocs.DocumentsTest do
     alias UserDocs.Documents.DocumentVersion
     alias UserDocs.DocumentVersionFixtures, as: DocumentFixtures
 
-    @valid_attrs %{name: "some name", title: "some title"}
-    @update_attrs %{name: "some updated name", title: "some updated title"}
-    @invalid_attrs %{name: "", title: "", version_id: 01933234508 }
+    def state_opts() do
+      [ data_type: :list, strategy: :by_type, location: :data ]
+    end
 
-    def document_version_fixture(attrs \\ %{}) do
-      {:ok, document_version} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Documents.create_document_version()
-
-      document_version
+    def document_version_fixture() do
+      opts = state_opts()
+      %{}
+      |> StateFixtures.base_state(opts)
+      |> DocubitFixtures.docubit_types(opts)
+      |> DocumentFixtures.state(opts)
+      |> WebFixtures.state(opts)
+      |> MediaFixtures.add_file_to_state(opts)
+      |> AutomationFixtures.state(opts)
+      |> MediaFixtures.add_screenshot_to_state(opts)
+      |> DocubitFixtures.state(opts)
     end
 
     test "list_document_versions/0 returns all document_versions" do
-      document_version = document_version_fixture()
-      assert Documents.list_document_versions(%{ body: true }) == [document_version]
+      state = document_version_fixture()
+      document_versions = Documents.list_document_versions(state, state_opts())
+      assert Documents.list_document_versions(%{ body: true }) == document_versions
     end
 
     test "get_document_version!/1 returns the document_version with given id" do
-      document_version = document_version_fixture()
+      state = document_version_fixture()
+      d = Documents.list_documents(state, state_opts()) |> Enum.at(0)
+      v = Projects.list_versions(state, state_opts()) |> Enum.at(0)
+      document_version = DocumentFixtures.document_version(d.id, v.id)
       assert Documents.get_document_version!(document_version.id, %{ body: true }) == document_version
     end
 
     test "create_document_version/1 with valid data creates a document_version" do
-      state = DocumentFixtures.state()
-      attrs = DocumentFixtures.document_version_attrs(:valid, state.document.id, state.version.id)
+      state = document_version_fixture()
+      docubit_type = Documents.get_docubit_type!("container")
+      d = Documents.list_documents(state, state_opts()) |> Enum.at(0)
+      v = Projects.list_versions(state, state_opts()) |> Enum.at(0)
+      attrs = DocumentFixtures.document_version_attrs(:valid, d.id, v.id)
       assert {:ok, %DocumentVersion{} = document_version} = Documents.create_document_version(attrs)
       assert document_version.name == attrs.name
-      assert document_version.version_id == state.version.id
-      assert document_version.document_id == state.document.id
+      assert document_version.version_id == v.id
+      assert document_version.document_id == d.id
     end
 
     test "create_document_version/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Documents.create_document_version(@invalid_attrs)
+      state = document_version_fixture()
+      d = Documents.list_documents(state, state_opts()) |> Enum.at(0)
+      v = Projects.list_versions(state, state_opts()) |> Enum.at(0)
+      attrs = DocumentFixtures.document_version_attrs(:invalid, d.id, v.id)
+      assert {:error, %Ecto.Changeset{}} = Documents.create_document_version(attrs)
     end
 
     test "update_document_version/2 with valid data updates the document_version" do
-      document_version = document_version_fixture()
-      assert {:ok, %DocumentVersion{} = document_version} = Documents.update_document_version(document_version, @update_attrs)
-      assert document_version.name == "some updated name"
+      state = document_version_fixture()
+      dv = Documents.list_document_versions(state, state_opts()) |> Enum.at(0)
+      d = Documents.list_documents(state, state_opts()) |> Enum.at(0)
+      v = Projects.list_versions(state, state_opts()) |> Enum.at(0)
+      attrs = DocumentFixtures.document_version_attrs(:valid, d.id, v.id)
+      assert {:ok, %DocumentVersion{} = document_version} = Documents.update_document_version(dv, attrs)
+      assert document_version.name == attrs.name
     end
 
     test "update_document_version/2 with invalid data returns error changeset" do
-      document_version = document_version_fixture()
-      assert {:error, %Ecto.Changeset{}} = Documents.update_document_version(document_version, @invalid_attrs)
-      assert document_version == Documents.get_document_version!(document_version.id, %{ body: true })
+      state = document_version_fixture()
+      dv = Documents.list_document_versions(state, state_opts()) |> Enum.at(0)
+      d = Documents.list_documents(state, state_opts()) |> Enum.at(0)
+      v = Projects.list_versions(state, state_opts()) |> Enum.at(0)
+      attrs = DocumentFixtures.document_version_attrs(:invalid, d.id, v.id)
+      assert {:error, %Ecto.Changeset{}} = Documents.update_document_version(dv, attrs)
+      assert dv == Documents.get_document_version!(dv.id, %{ body: true })
     end
 
     test "delete_document_version/1 deletes the document_version" do
-      document_version = document_version_fixture()
-      assert {:ok, %DocumentVersion{}} = Documents.delete_document_version(document_version)
-      assert_raise Ecto.NoResultsError, fn -> Documents.get_document_version!(document_version.id) end
+      state = document_version_fixture()
+      dv = Documents.list_document_versions(state, state_opts()) |> Enum.at(0)
+      assert {:ok, %DocumentVersion{}} = Documents.delete_document_version(dv)
+      assert_raise Ecto.NoResultsError, fn -> Documents.get_document_version!(dv.id) end
     end
 
     test "change_document_version/1 returns a document_version changeset" do
-      document_version = document_version_fixture()
-      assert %Ecto.Changeset{} = Documents.change_document_version(document_version)
+      state = document_version_fixture()
+      dv = Documents.list_document_versions(state, state_opts()) |> Enum.at(0)
+      assert %Ecto.Changeset{} = Documents.change_document_version(dv)
     end
   end
 
@@ -378,6 +409,64 @@ defmodule UserDocs.DocumentsTest do
     test "change_language_code/1 returns a language_code changeset" do
       language_code = language_code_fixture()
       assert %Ecto.Changeset{} = Documents.change_language_code(language_code)
+    end
+  end
+
+  describe "docubit_types" do
+    alias UserDocs.Documents
+    alias UserDocs.Documents.DocubitType
+    alias UserDocs.DocubitFixtures
+
+    test "list_docubit_types/0 returns all docubit_types" do
+      docubit_type = DocubitFixtures.docubit_type(:container)
+      assert Documents.list_docubit_types() == [docubit_type]
+    end
+
+    test "get_docubit_type!/1 returns the docubit_type with given id" do
+      docubit_type = DocubitFixtures.docubit_type(:container)
+      assert Documents.get_docubit_type!(docubit_type.id) == docubit_type
+    end
+
+    test "create_docubit_types/1 with container data creates a docubit_types" do
+      attrs = DocubitFixtures.docubit_type_attrs(:ol)
+      assert {:ok, %DocubitType{} = docubit_type} = Documents.create_docubit_type(attrs)
+      assert docubit_type.name == "ol"
+    end
+
+    test "create_docubit_types/1 with invalid data returns error changeset" do
+      attrs = DocubitFixtures.docubit_type_attrs(:invalid)
+      assert {:error, %Ecto.Changeset{}} = Documents.create_language_code(attrs)
+    end
+
+    test "update_docubit_types/2 with valid data updates the docubit_type" do
+      docubit_type = DocubitFixtures.docubit_type(:container)
+      attrs = DocubitFixtures.docubit_type_attrs(:row)
+      assert {:ok, %DocubitType{} = docubit_type} = Documents.update_docubit_type(docubit_type, attrs)
+      assert docubit_type.name == "row"
+    end
+
+    test "update_docubit_type/2 with invalid data returns error changeset" do
+      docubit_type = DocubitFixtures.docubit_type(:container)
+      attrs = DocubitFixtures.docubit_type_attrs(:invalid)
+      assert {:error, %Ecto.Changeset{}} = Documents.update_docubit_type(docubit_type, attrs)
+      assert docubit_type == Documents.get_docubit_type!(docubit_type.id)
+    end
+
+    test "delete_docubit_type/1 deletes the docubit_type" do
+      docubit_type = DocubitFixtures.docubit_type(:container)
+      assert {:ok, %DocubitType{}} = Documents.delete_docubit_type(docubit_type)
+      assert_raise Ecto.NoResultsError, fn -> Documents.get_docubit_type!(docubit_type.id) end
+    end
+
+    test "change_docubit_type/1 returns a docubit_type changeset" do
+      docubit_type = DocubitFixtures.docubit_type(:container)
+      assert %Ecto.Changeset{} = Documents.change_docubit_type(docubit_type)
+    end
+
+    test "get_docubit_type!/1 returns a docubit type" do
+      DocubitFixtures.create_docubit_types()
+      docubit_type = Documents.get_docubit_type!("container")
+      assert docubit_type.name == "container"
     end
   end
 end
