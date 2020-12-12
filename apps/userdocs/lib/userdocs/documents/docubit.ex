@@ -5,8 +5,9 @@ defmodule UserDocs.Documents.Docubit do
   require Logger
   require Kernel
 
+  alias UserDocs.Documents
   alias UserDocs.Documents.Docubit
-  alias UserDocs.Documents.Docubit.Type
+  alias UserDocs.Documents.DocubitType
   alias UserDocs.Documents.Docubit.Context
   alias UserDocs.Documents.Docubit.Renderer
   alias UserDocs.Documents.Docubit.Hydrate
@@ -21,14 +22,13 @@ defmodule UserDocs.Documents.Docubit do
   @valid_settings [ :li_value, :name_prefix ]
 
   schema "docubits" do
-    field :type_id, :string
     field :order, :integer
-    field :settings, { :array, EctoKW }
+    field :settings, :map
     field :address, { :array, :integer }
 
     has_many :docubits, Docubit, on_delete: :delete_all
     has_one :context, Context
-    has_one :type, Type
+    belongs_to :docubit_type, DocubitType
 
     belongs_to :docubit, Docubit
     belongs_to :document_version, DocumentVersion
@@ -56,7 +56,7 @@ defmodule UserDocs.Documents.Docubit do
     |> put_assoc(:content, Map.get(attrs, :content, nil))
     |> put_assoc(:through_annotation, Map.get(attrs, :through_annotation, nil))
     |> put_assoc(:through_step, Map.get(attrs, :through_step, nil))
-    |> validate_required([ :type_id, :document_version_id ])
+    |> validate_required([ :docubit_type_id, :document_version_id ])
     |> check_for_deleted_docubits()
     |> order_changeset_docubits()
     |> address_docubits()
@@ -64,7 +64,7 @@ defmodule UserDocs.Documents.Docubit do
 
   def changeset(docubit, attrs \\ %{}) do
     docubit
-    |> cast(attrs, [ :delete, :type_id, :settings, :address, :document_version_id, :content_id, :through_annotation_id, :through_step_id, :docubit_id ])
+    |> cast(attrs, [ :delete, :docubit_type_id, :settings, :address, :document_version_id, :content_id, :through_annotation_id, :through_step_id, :docubit_id ])
     |> cast_assoc(:docubits)
     |> (&(validate_change(&1, :docubits,
       fn(:docubits, docubits) ->
@@ -73,7 +73,7 @@ defmodule UserDocs.Documents.Docubit do
     |> cast_settings()
     |> order_changeset_docubits()
     |> address_docubits()
-    |> validate_required([ :type_id ])
+    |> validate_required([ :docubit_type_id ])
     |> mark_for_deletion()
   end
 
@@ -142,13 +142,14 @@ defmodule UserDocs.Documents.Docubit do
     Logger.debug("Validating docubits are allowed")
     type =
       changeset
-      |> get_field(:type_id)
-      |> String.to_atom()
-      |> (&(Kernel.apply(Type, &1, []))).()
+      |> get_field(:docubit_type)
+
+    IO.inspect(docubits)
 
     Enum.reduce(docubits, [],
       fn(d, errors) ->
-        case get_field(d, :type_id) in type.allowed_children do
+        type_name = Documents.get_docubit_type!(get_field(d, :docubit_type_id)) |> Map.get(:name) # TODO: Get this in memory
+        case type_name in type.allowed_children do
           true -> errors
           false -> [ docubits: "This type may not be inserted into docubit #{inspect(changeset)}."]
         end
@@ -159,7 +160,7 @@ defmodule UserDocs.Documents.Docubit do
   def print(%Docubit{} = docubit, padding \\ "") do
     type =
       try do
-        docubit.type.name
+        docubit.docubit_type.name
       rescue
         _ -> docubit.type_id
       end
@@ -178,10 +179,10 @@ defmodule UserDocs.Documents.Docubit do
 
   def cast_settings(%{changes: %{ settings: settings }} = changeset) do
     settings =
-      Enum.reduce(settings, changeset.data.settings || [],
+      Enum.reduce(settings, changeset.data.settings || %{},
         fn({k, v}, s) ->
           if k in @valid_settings do
-            Keyword.put_new(s, k, v)
+            Map.put_new(s, k, v)
           else
             raise(RuntimeError, "Tried to cast an invalid setting")
           end
@@ -197,7 +198,7 @@ defmodule UserDocs.Documents.Docubit do
 
   # def preload(docubit, state), do: Preload.apply(docubit, state)
   def renderer(docubit = %Docubit{}), do: Renderer.apply(docubit)
-  def hydrate(body, data), do: Hydrate.apply(body, data)
+  def hydrate(docubit, data), do: Hydrate.apply(docubit, data)
 
   def preload_type(docubit) do
     docubit
