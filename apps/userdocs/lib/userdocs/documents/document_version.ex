@@ -2,14 +2,13 @@ defmodule UserDocs.Documents.DocumentVersion do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias UserDocs.Documents
   alias UserDocs.Projects.Version
   alias UserDocs.Documents.Docubit
   alias UserDocs.Documents.Document
   alias UserDocs.Documents.DocumentVersion
   alias UserDocs.Documents.Document.MapDocubits
   alias UserDocs.Documents.Docubit.Context
-
-  @state_opts [ data_type: :list, strategy: :by_type, location: :data ]
 
   schema "document_versions" do
     field :name, :string
@@ -36,7 +35,8 @@ defmodule UserDocs.Documents.DocumentVersion do
   end
 
   defp body_is_container_docubit_if_empty(changeset) do
-    attrs = %{ type_id: "container", address: [0] }
+    container_type = Documents.get_docubit_type!("container")
+    attrs = %{ docubit_type_id: container_type.id, address: [0] }
 
     case get_field(changeset, :docubit_id) do
       nil -> put_change(changeset, :body, attrs)
