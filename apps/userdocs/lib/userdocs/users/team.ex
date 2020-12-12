@@ -4,10 +4,12 @@ defmodule UserDocs.Users.Team do
 
   alias UserDocs.Users
   alias UserDocs.Projects.Project
+  alias UserDocs.Documents.LanguageCode
 
   schema "teams" do
     field :name, :string
 
+    belongs_to :default_language_code, LanguageCode
     field :default_project_id, :integer
     has_many :projects, Project
 
