@@ -5,18 +5,23 @@ defmodule UserDocsWeb.ModalMenus do
 
   alias UserDocsWeb.ModalMenus
   alias UserDocsWeb.LiveHelpers
+
   alias ProcessAdministratorWeb.VersionLive.FormComponent, as: VersionForm
   alias ProcessAdministratorWeb.ProjectLive.FormComponent, as: ProjectForm
   alias ProcessAdministratorWeb.ProcessLive.FormComponent, as: ProcessForm
-  alias UserDocs.DocumentVersion.Messages, as: DocumentVersionMessage
-  alias UserDocs.Docubit.Messages, as: DocubitMessage
+
+  alias UserDocsWeb.ContentLive.FormComponent, as: ContentForm
   alias UserDocsWeb.DocumentLive.FormComponent, as: DocumentForm
   alias UserDocsWeb.DocumentVersionLive.FormComponent, as: DocumentVersionForm
   alias UserDocsWeb.DocubitLive.FormComponent, as: DocubitForm
+
   alias UserDocs.Project.Messages, as: ProjectMessage
   alias UserDocs.Version.Messages, as: VersionMessage
   alias UserDocs.Process.Messages, as: ProcessMessage
   alias UserDocs.Document.Messages, as: DocumentMessage
+  alias UserDocs.DocumentVersion.Messages, as: DocumentVersionMessage
+  alias UserDocs.Docubit.Messages, as: DocubitMessage
+  alias UserDocs.Documents.Content.Messages, as: ContentMessage
 
   @impl true
   def render(assigns) do
@@ -91,6 +96,19 @@ defmodule UserDocsWeb.ModalMenus do
                     channel: @channel,
                     select_lists: %{
                       allowed_children: @select_lists.allowed_children
+                    }
+                :content ->
+                  LiveHelpers.live_modal @socket, ContentForm,
+                  id: @object.id || :new,
+                    title: @title,
+                    action: @action,
+                    content: @object,
+                    team_id: @team_id,
+                    version_id: @version_id,
+                    channel: @channel,
+                    select_lists: %{
+                      teams: @select_lists.teams,
+                      language_codes: @select_lists.language_codes
                     }
             end
           %>
@@ -217,6 +235,18 @@ defmodule UserDocsWeb.ModalMenus do
       DocubitMessage.new_modal_menu(socket, params)
       |> call_menu(socket)
     }
+  end
+
+  def edit_content(socket, params) do
+    socket
+    |> ContentMessage.edit_modal_menu(params)
+    |> call_menu(socket)
+  end
+
+  def new_content(socket, params) do
+    socket
+    |> ContentMessage.new_modal_menu(params)
+    |> call_menu(socket)
   end
 
   def close(socket) do
