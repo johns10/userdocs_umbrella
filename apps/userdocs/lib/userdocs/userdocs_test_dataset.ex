@@ -845,11 +845,11 @@ defmodule UserDocs.TestDataset do
       |> Repo.insert()
 
     english_language_code = %{
-      code: "en-US"
+      name: "en-US"
     }
 
     great_britain_language_code = %{
-      code: "en-GB"
+      name: "en-GB"
     }
 
     {:ok, %LanguageCode{id: english_language_code_id}} =
