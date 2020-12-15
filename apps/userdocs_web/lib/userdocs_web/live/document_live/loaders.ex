@@ -6,6 +6,8 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
   alias UserDocs.Media
   alias UserDocs.Web
 
+  alias UserDocsWeb.Loaders
+
   def load_document(socket, document, opts) do
     StateHandlers.load(socket, [ document ], opts)
   end
@@ -51,9 +53,6 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
     Automation.load_steps(socket, opts)
   end
 
-  def load_language_codes(socket, opts) do
-    Documents.load_language_codes(socket, opts)
-  end
 
   def load_document_versions(socket, id, opts) do
     opts =
@@ -74,26 +73,9 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
     StateHandlers.load(socket, docubits, opts)
   end
 
-  def load_content(socket, opts) do
-    opts =
-      opts
-      |> Keyword.put(:filters, %{team_id: socket.assigns.current_team_id})
-      |> Keyword.put(:params, %{ content_versions: true })
-
-
-    Documents.load_content(socket, opts)
-  end
-
-  def load_content_versions(socket, opts) do
-    content_ids = Enum.map(Documents.list_content(socket, opts),
-      fn(c) -> c.id end)
-
-    opts =
-      opts
-      |> Keyword.put(:filters, %{content_ids: content_ids})
-
-    Documents.load_content_version(socket, opts)
-  end
+  def load_language_codes(socket, opts), do: Documents.load_language_codes(socket, opts)
+  def load_content(socket, opts), do: Loaders.load_content(socket, opts)
+  def load_content_versions(socket, opts), do: Loaders.load_content_versions(socket, opts)
 
   def load_annotations(socket, opts) do
     params = %{ content: true, content_versions: true, annotation_type: true }
