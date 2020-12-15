@@ -10,7 +10,7 @@ defmodule UserDocsWeb.Endpoint do
     signing_salt: "zbnhmPNC",
     http_only: false,
     same_site: "None",
-    #secure: true
+    secure: true
   ]
 
   socket "/socket", UserDocsWeb.UserSocket,
