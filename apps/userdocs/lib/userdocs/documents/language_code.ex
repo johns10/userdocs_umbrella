@@ -6,7 +6,7 @@ defmodule UserDocs.Documents.LanguageCode do
   import Ecto.Changeset
 
   schema "language_codes" do
-    field :code, :string
+    field :name, :string
 
     timestamps()
   end
@@ -14,7 +14,7 @@ defmodule UserDocs.Documents.LanguageCode do
   @doc false
   def changeset(language_code, attrs) do
     language_code
-    |> cast(attrs, [:code])
-    |> validate_required([:code])
+    |> cast(attrs, [:name])
+    |> validate_required([:name])
   end
 end

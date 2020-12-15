@@ -3,7 +3,7 @@ defmodule UserDocs.Repo.Migrations.CreateLanguageCodes do
 
   def change do
     create table(:language_codes) do
-      add :code, :string
+      add :name, :string
 
       timestamps()
     end
