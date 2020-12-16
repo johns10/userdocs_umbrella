@@ -15,14 +15,12 @@ config :userdocs_web, UserDocsWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 config :userdocs_web, UserDocsWeb.Endpoint,
-  url: [host: "userdocs.gigalixirapp.com", port: 443],
-  https: [
-    port: 443,
-    cipher_suite: :strong,
-    keyfile: System.get_env("USERDOCS_WEB_SSL_KEY_PATH"),
-    certfile: System.get_env("USERDOCS_WEB_SSL_CERT_PATH"),
-    transport_options: [socket_opts: [:inet6]]
-  ]
+  http: [port: {:system, "PORT"}],
+  url: [host: System.get_env("APP_NAME") <> ".gigalixirapp.com", port: 443],
+  secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
+  server: true
+
+
 
 # ## SSL Support
 #
