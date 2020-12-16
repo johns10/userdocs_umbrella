@@ -11,16 +11,8 @@ use Mix.Config
 # before starting your production server.
 
 config :userdocs_web, UserDocsWeb.Endpoint,
-  url: [host: "userdocs.gigalixirapp.com", port: 80],
+  url: [host: "example.com", port: 80],
   cache_static_manifest: "priv/static/cache_manifest.json"
-
-config :userdocs_web, UserDocsWeb.Endpoint,
-  http: [port: {:system, "PORT"}],
-  url: [host: System.get_env("APP_NAME") <> ".gigalixirapp.com", port: 443],
-  secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
-  server: true
-
-
 
 # ## SSL Support
 #
@@ -57,6 +49,17 @@ config :userdocs_web, UserDocsWeb.Endpoint,
 # Check `Plug.SSL` for all available options in `force_ssl`.
 
 # Do not print debug messages in production
+
+config :userdocs_web, UserDocsWeb.Endpoint,
+  secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
+  server: true
+
+config :userdocs_web, UserDocsWeb.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  url: System.get_env("DATABASE_URL"),
+  ssl: true,
+  pool_size: 1 # Free tier db only allows 1 connection
+
 config :logger, level: :info
 
 # Finally import the config/prod.secret.exs which loads secrets
