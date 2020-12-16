@@ -66,11 +66,11 @@ config :process_administrator_web, :pow,
 
 config :cors_plug,
   origin: [
+    "https://userdocs.gigalixirapp.com",
     "chrome-extension://iclibnblhjdakhhijcioglkmdihjelgg",
     "chrome-extension://ohmjkpckjphdcdophkflpmdmihpiaejf",
     "http://localhost",
     "http://app.davenport.rocks",
-    "https://userdocs.gigalixirapp.com"
   ],
   max_age: 86400,
   methods: ["GET", "POST", "OPTIONS"]
