@@ -27,7 +27,7 @@ defmodule UserDocs.Documents.Docubit do
     field :address, { :array, :integer }
 
     has_many :docubits, Docubit, on_delete: :delete_all
-    has_one :context, Context
+    embeds_one :context, Context, on_replace: :delete
     belongs_to :docubit_type, DocubitType
 
     belongs_to :docubit, Docubit
