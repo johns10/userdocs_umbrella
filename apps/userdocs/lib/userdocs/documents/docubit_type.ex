@@ -46,7 +46,7 @@ defmodule UserDocs.Documents.DocubitType do
   def li_attrs() do
     %{
       name: "li",
-      contexts: %{
+      context: %{
         settings: %{
           li_value: None,
           name_prefix: False
@@ -61,11 +61,11 @@ defmodule UserDocs.Documents.DocubitType do
   def ul_attrs() do
     %{
       name: "ul",
-      contexts: %{
+      context: %{
         settings: %{
         }
       },
-      allowed_children: [],
+      allowed_children: [ "li" ],
       allowed_data: [ None ]
     }
   end
@@ -74,12 +74,12 @@ defmodule UserDocs.Documents.DocubitType do
   def ol_attrs() do
     %{
       name: "ol",
-      contexts: %{
+      context: %{
         settings: %{
           name_prefix: False
         }
       },
-      allowed_children: [],
+      allowed_children: [ "li" ],
       allowed_data: [ None ]
     }
   end
@@ -88,7 +88,9 @@ defmodule UserDocs.Documents.DocubitType do
   def img_attrs() do
     %{
       name: "img",
-      contexts: %{},
+      context: %{
+        settings: %{ }
+      },
       allowed_children: [],
       allowed_data: [
         UserDocs.Automation.Step,
@@ -101,7 +103,9 @@ defmodule UserDocs.Documents.DocubitType do
   def p_attrs() do
     %{
       name: "p",
-      contexts: %{},
+      context: %{
+        settings: %{ }
+      },
       allowed_children: [],
       allowed_data: [
         UserDocs.Automation.Step,
@@ -115,7 +119,9 @@ defmodule UserDocs.Documents.DocubitType do
   def column_attrs() do
   %{
     name: "column",
-    contexts: %{},
+    context: %{
+      settings: %{ }
+    },
     allowed_children: [ "ol", "ul", "p", "img" ],
     allowed_data: [ None ]
   }
@@ -125,7 +131,9 @@ defmodule UserDocs.Documents.DocubitType do
   def row_attrs() do
     %{
       name: "row",
-      contexts: %{},
+      context: %{
+        settings: %{ }
+      },
       allowed_children: [ "column" ],
       allowed_data: [ None ]
     }
@@ -135,7 +143,9 @@ defmodule UserDocs.Documents.DocubitType do
   def container_attrs() do
     %{
       name: "container",
-      contexts: %{},
+      context: %{
+        settings: %{ }
+      },
       allowed_children: [ "row" ],
       allowed_data: [ None ]
     }
