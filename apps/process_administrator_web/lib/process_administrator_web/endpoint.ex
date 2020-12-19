@@ -8,9 +8,9 @@ defmodule ProcessAdministratorWeb.Endpoint do
     store: :cookie,
     key: "_userdocs_web_key",
     signing_salt: "z4tHDkXT",
-    http_only: false,
+    #http_only: false,
     same_site: "None",
-    #secure: true
+    secure: true
   ]
 
   socket "/socket", ProcessAdministratorWeb.UserSocket,
