@@ -19,12 +19,11 @@ import {LiveSocket} from "phoenix_live_view"
 import {handle_message} from "./commands.js"
 import {Hooks} from "./hooks.js"
 
-let DOMAIN = "app.davenport.rocks"
-let PORT = "4001"
+let DOMAIN = "userdocs.com"
+let PORT = "4003"
 
-let APP_URL = "http://" + DOMAIN + ":" + PORT + "/"
-let WEBSOCKETS_URI = "ws://" + DOMAIN + ":" + PORT + "/live"
-let COOKIE_KEY = "_userdocs_web_key"
+let APP_URL = "https://" + DOMAIN + ":" + PORT + "/"
+let WEBSOCKETS_URI = "wss://" + DOMAIN + ":" + PORT + "/live"
 
 try {
   chrome.runtime.onMessage.addListener(
