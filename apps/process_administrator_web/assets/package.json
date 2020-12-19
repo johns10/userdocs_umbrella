@@ -9,6 +9,7 @@
     "watch_browser": "webpack js/browser.js -o js/browser_bundle.js --mode development --watch"
   },
   "dependencies": {
+    "bulma": "^0.9.1",
     "css-selector-generator": "^2.1.2",
     "nprogress": "^0.2.0",
     "phoenix": "file:../../../deps/phoenix",
