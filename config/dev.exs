@@ -19,6 +19,12 @@ config :userdocs, UserDocs.Repo,
 # with webpack to recompile .js and .css sources.
 config :userdocs_web, UserDocsWeb.Endpoint,
   http: [port: 4000],
+  https: [
+    port: 4002,
+    cipher_suite: :strong,
+    certfile: "priv/cert/userdocs.com.crt",
+    keyfile: "priv/cert/userdocs.com.key"
+  ],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
@@ -36,7 +42,16 @@ config :userdocs_web,
   uploads_directory: "/media"
 
 config :process_administrator_web, ProcessAdministratorWeb.Endpoint,
-  http: [port: 4001],
+url: [host: "localhost"],
+  http: [
+    port: 4001
+  ],
+  https: [
+    port: 4003,
+    cipher_suite: :strong,
+    certfile: "priv/cert/userdocs.com.crt",
+    keyfile: "priv/cert/userdocs.com.key"
+  ],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
