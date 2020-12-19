@@ -114,7 +114,7 @@ defmodule UserDocs.DocubitFixtures do
   def docubit_type_attrs(:invalid) do
     %{
       name: "",
-      contexts: %{},
+      context: %{},
       allowed_children: [ 1 ],
       allowed_data: [ 2 ]
     }
