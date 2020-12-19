@@ -130,6 +130,13 @@ defmodule UserDocsWeb.Root do
   def handle_event("delete-docubit" = name, params, socket) do
     UserDocsWeb.DocubitLive.EventHandlers.handle_event("delete", params, socket)
   end
+  def handle_event("edit-docubit" = name, params, socket) do
+    ModalMenus.edit_docubit(socket, params)
+  end
+  def handle_event("edit-content", params, socket) do
+    IO.puts("Root handling Content")
+    { :noreply, ModalMenus.edit_content(socket, params) }
+  end
   def handle_event("select_version", %{"select-version" => version_id_param} = _payload, socket) do
     opts = state_opts()
     with  version_id <- String.to_integer(version_id_param),
