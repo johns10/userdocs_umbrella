@@ -1,35 +1,27 @@
 defmodule UserDocs.Docubit.Messages do
 
-  alias UserDocs.Documents.Docubit
+  alias UserDocs.Documents
   alias UserDocs.Helpers
 
-  def new_modal_menu(socket, params) do
-    required_keys = [ :docubit_id, :document_version_id, :channel, :opts, :allowed_children ]
+  def edit_modal_menu(socket, params) do
+    required_keys = [ :docubit, :channel, :opts ]
     params = Helpers.validate_params(params, required_keys, __MODULE__)
 
     %{ target: "ModalMenus" }
-    |> init(socket, params.document_version_id, params.allowed_children, params.channel)
-    |> new(socket)
+    |> init(socket, params.channel)
+    |> edit(socket, params.docubit, params.opts)
   end
 
-  defp new(message, _socket) do
+  defp edit(message, socket, docubit, opts) do
     message
-    |> Map.put(:object, %Docubit{})
-    |> Map.put(:action, :new)
-    |> Map.put(:title, "New Docubit")
+    |> Map.put(:object, docubit)
+    |> Map.put(:action, :edit)
+    |> Map.put(:title, "Edit Docubit")
   end
 
-  defp init(message, _socket, document_version_id, allowed_children, channel) do
-    select_lists = %{
-      allowed_children:
-      allowed_children
-        |> Helpers.select_list(:name, false),
-    }
-
+  defp init(message, _socket, channel) do
     message
     |> Map.put(:type, :docubit)
-    |> Map.put(:document_version_id, document_version_id)
     |> Map.put(:channel, channel)
-    |> Map.put(:select_lists, select_lists)
   end
 end
