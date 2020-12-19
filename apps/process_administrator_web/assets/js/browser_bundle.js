@@ -338,7 +338,8 @@ function collectElementDimensions(job, configuration, proceed) {
 function annotations() {
   return {
     "Outline": outline,
-    "Badge": badge
+    "Badge": badge,
+    "Badge Outline": badge_outline
   };
 }
 
@@ -368,7 +369,7 @@ function applyAnnotation(job, configuration, proceed) {
   console.log(step.annotation.annotation_type.name)
   console.log(annotations())
   */
-
+   
   var apply = annotations()[name];
 
   try {
@@ -380,6 +381,11 @@ function applyAnnotation(job, configuration, proceed) {
 }
 
 function blur(job, configuration) {}
+
+function badge_outline(job, configuration, proceed) {
+  badge(job, configuration, proceed);
+  outline(job, configuration, proceed);
+}
 
 function badge(job, configuration, proceed) {
   console.log("Applying badge annotation");
