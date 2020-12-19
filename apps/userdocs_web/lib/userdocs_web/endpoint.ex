@@ -8,9 +8,9 @@ defmodule UserDocsWeb.Endpoint do
     store: :cookie,
     key: "_userdocs_web_key",
     signing_salt: "zbnhmPNC",
-    http_only: false,
-    same_site: "None",
-    #secure: true
+    #http_only: false,
+    #same_site: "None",
+    secure: true
   ]
 
   socket "/socket", UserDocsWeb.UserSocket,
