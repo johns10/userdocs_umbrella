@@ -93,10 +93,7 @@ defmodule UserDocsWeb.ModalMenus do
                     docubit: @object,
                     document_version_id: @document_version_id,
                     docubit_id: @docubit_id,
-                    channel: @channel,
-                    select_lists: %{
-                      allowed_children: @select_lists.allowed_children
-                    }
+                    channel: @channel
                 :content ->
                   LiveHelpers.live_modal @socket, ContentForm,
                   id: @object.id || :new,
@@ -229,10 +226,10 @@ defmodule UserDocsWeb.ModalMenus do
     }
   end
 
-  def new_docubit(socket, params) do
+  def edit_docubit(socket, params) do
     {
       :noreply,
-      DocubitMessage.new_modal_menu(socket, params)
+      DocubitMessage.edit_modal_menu(socket, params)
       |> call_menu(socket)
     }
   end
