@@ -9,7 +9,6 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
   alias UserDocs.Documents.DocubitType
   alias UserDocs.Documents.Content
   alias UserDocs.Automation.Step
-  alias UserDocs.Documents.Docubit.Access
   alias UserDocs.Web.Annotation
   alias UserDocs.Media.Screenshot
   alias UserDocs.Media.File
