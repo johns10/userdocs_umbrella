@@ -12,7 +12,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Container do
           class: "button",
           parent_cid: @parent_cid,
           docubit: @docubit,
-          type_id: "row"}) %>
+          type: "row"}) %>
       </div>
     """
   end
