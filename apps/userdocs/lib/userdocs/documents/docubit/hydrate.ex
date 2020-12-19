@@ -134,7 +134,7 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
   def precheck_data(s, "p", %Content{} = _data), do: s
   def precheck_data(s, "p", %Step{} = step), do: precheck_step_p(s, step)
   def precheck_data(s, "img", %Step{} = step), do: precheck_step_img(s, step)
-  def precheck_data(_, _, _), do: false
+  def precheck_data(_, _, _), do: { :precheck, [ "Data not allowed in docubit"]}
 
   def precheck_annotation({ status, errors }, annotation) do
     { status, errors }
