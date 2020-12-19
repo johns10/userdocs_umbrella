@@ -105,7 +105,9 @@ defmodule UserDocsWeb.ModalMenus do
                     channel: @channel,
                     select_lists: %{
                       teams: @select_lists.teams,
-                      language_codes: @select_lists.language_codes
+                      versions: @select_lists.versions,
+                      language_codes: @select_lists.language_codes,
+                      content: @select_lists.content
                     }
             end
           %>
