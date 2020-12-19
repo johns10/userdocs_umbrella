@@ -795,6 +795,16 @@ defmodule UserDocs.Documents do
     |> Repo.update()
   end
 
+  def update_all_docubit_types() do
+    list_docubit_types()
+    |> Enum.each(fn(dt) ->
+        attrs_fun = dt.name <> "_attrs" |> String.to_atom()
+        attrs = Kernel.apply(UserDocs.Documents.DocubitType, attrs_fun, [])
+        { :ok, docubit_type } = update_docubit_type(dt, attrs)
+        IO.inspect(docubit_type)
+      end)
+  end
+
   def change_docubit_type(%DocubitType{} = docubit_type, attrs \\ %{}) do
     DocubitType.changeset(docubit_type, attrs)
   end
