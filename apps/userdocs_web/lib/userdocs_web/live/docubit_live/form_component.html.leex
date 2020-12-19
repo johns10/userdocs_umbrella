@@ -8,11 +8,7 @@
 
   <%= hidden_input(f, :docubit_id, value: @docubit_id) %>
 
-  <%= hidden_input(f, :document_version_id, value: @document_version_id) %>
-
-  <%= Layout.select_input(f, :type_id,
-    @select_lists.allowed_children,
-    "control") %>
+  <%= inspect(@docubit.settings) %>
 
   <%= submit "Save", phx_disable_with: "Saving..." %>
 </form>
