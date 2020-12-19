@@ -164,7 +164,8 @@
       </nav>-->
     <% end %>
   <% else %>
-    <%= form_for @changeset, "http://app.davenport.rocks:4001/session", [as: :user], fn f -> %>
+    <%= form_for @changeset, "https://userdocs.com:4003/session", [as: :user], fn f -> %>
+    <%= #form_for @changeset, Routes.login_path(@socket, :new), [as: :user], fn f -> %>
       <%= if @changeset.action do %>
         <div class="alert alert-danger">
           <p>Oops, something went wrong! Please check the errors below.</p>
