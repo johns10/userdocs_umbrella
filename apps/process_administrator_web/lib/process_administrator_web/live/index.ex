@@ -264,6 +264,8 @@ defmodule ProcessAdministratorWeb.IndexLive do
   end
 
   def preload_step(step, state, process) do
+    opts = [ data_type: :list, strategy: :by_type ]
+
     element =
       if step.element_id do
         Web.get_element!(step.element_id, %{ strategy: true }, %{}, state)
@@ -276,7 +278,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
         # TODO: THis guard shouldn't be necessary.  I'm misloading annotations somehow
         if annotation do
           annotation
-          |> Map.put(:content, Documents.get_content!(annotation.content_id, %{}, %{}, state.content))
+          |> Map.put(:content, Documents.get_content!(annotation.content_id, state, opts))
           |> Map.put(:annotation_type, Web.get_annotation_type!(annotation.annotation_type_id, %{}, %{}, state))
         else
           annotation
