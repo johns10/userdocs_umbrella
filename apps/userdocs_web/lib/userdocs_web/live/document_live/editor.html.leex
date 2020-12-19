@@ -33,6 +33,23 @@
   }
 </style>
 
+<%= live_component(@socket, UserDocsWeb.BreadCrumb, [
+  teams: @data.teams,
+  team_users: @data.team_users,
+  projects: @data.projects,
+  versions: @data.versions,
+  current_team_id: @current_team_id,
+  current_project_id: @current_project_id,
+  current_version_id: @current_version_id,
+  additional_items: [ %{ to: "#", name: @document.name } ],
+  last_item: %{ to: "#", name: @document_version.version.name }
+]) %>
+
+<%= live_component(@socket, Dragging, [
+  object_type: @dragging.type,
+  object_id: @dragging.id
+]) %>
+
 <div class="container">
   <div class="columns">
     <div class="column is-3">
@@ -40,47 +57,66 @@
         <%= live_component(@socket, UserDocsWeb.PanelComponent, [
           id: "process-panel-menu",
           title: "Process Menu",
-          select_list: @process_select_list,
+          select_list: @process_select,
           default_selected: @current_process.id,
           items_function: &process_steps/2,
-          items: @step,
-          type: "step"
+          items: @data.steps,
+          type: "Step"
         ]) %>
         <%= live_component(@socket, UserDocsWeb.PanelComponent, [
           id: "annotation-panel-menu",
           title: "Annotation Menu",
-          select_list: @page_select_list,
+          select_list: @pages_select,
           default_selected: @current_page.id,
           items_function: &process_annotations/2,
-          items: @annotation,
-          type: "annotation"
+          items: @data.annotations,
+          type: "Annotation"
         ]) %>
         <%= live_component(@socket, UserDocsWeb.PanelComponent, [
           id: "content-panel-menu",
           title: "Content Menu",
-          select_list: @page_select_list,
+          select_list: @pages_select,
           default_selected: 0,
           items_function: &panel_content/2,
-          items: @content,
-          type: "content"
+          items: @data.content,
+          type: "Content"
         ]) %>
       </div>
     </div>
 
     <div class="column is-9">
       <h1 class="title">
-        <%= @document_version.title %>
-        <%= @document_version.version.name %>,
+        <%= @document.title %> (<%= @current_version.name %>)
         <div class="control is-expanded is-inline">
           <div class="select">
             <%= f = form_for :language, "#", phx_change: "change-language" %>
-              <%= select f, :id, @language_codes_select_options %>
+              <%= select f, :id, @language_codes_select, selected: @current_language_code_id %>
             </form>
           </div>
         </div>
       </h1>
 
-      <%= @body %>
+      <%=
+        live_component(@socket, UserDocsWeb.DocubitEditorLive, [
+          id: "docubit-editor-" <> Integer.to_string(@document_version.body.id),
+          current_language_code_id: @current_language_code_id,
+          current_version_id: @current_version_id,
+          current_team_id: @current_team_id,
+          docubit: @document_version.body,
+          opts: state_opts(),
+          parent_cid: self(),
+          root_cid: self(),
+          data: %{
+            content: @data.content,
+            annotations: @data.annotations,
+            docubits: @data.docubits,
+            files: @data.files,
+            steps: @data.steps,
+            docubit_types: @data.docubit_types,
+            content_versions: @data.content_versions
+          }
+        ])
+      %>
 
       <span><%= live_patch "Edit", to: Routes.document_show_path(@socket, :edit, @document), class: "button" %></span>
       <span><%= live_redirect "Back", to: Routes.document_index_path(@socket, :index) %></span>
