@@ -31,8 +31,7 @@ defmodule UserDocs.Documents.ContentVersion do
   @doc false
   def changeset(content_version, attrs) do
     content_version
-    |> cast(attrs, [:name, :body, :temp_id, :delete,
-      :language_code_id, :content_id, :version_id])
+    |> cast(attrs, [:name, :body, :temp_id, :delete, :language_code_id, :content_id, :version_id])
     |> foreign_key_constraint(:content_id)
     |> foreign_key_constraint(:version_id)
     |> foreign_key_constraint(:language_code_id)
