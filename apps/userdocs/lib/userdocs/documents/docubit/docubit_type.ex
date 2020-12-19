@@ -7,7 +7,7 @@ defmodule UserDocs.Documents.Docubit.Type do
   @primary_key {:id, :binary_id, autogenerate: false}
   embedded_schema do
     field :name, :string
-    field :contexts, {:map, {:array, EctoKW}}
+    field :context, {:map, {:array, EctoKW}}
     field :allowed_children, {:array, :string}
     field :allowed_data, {:array, :string}
   end
@@ -27,7 +27,7 @@ defmodule UserDocs.Documents.Docubit.Type do
       %{
         name: "List Item",
         id: "li",
-        contexts: %{
+        context: %{
           settings: [
             li_value: None,
             name_prefix: False
@@ -37,12 +37,12 @@ defmodule UserDocs.Documents.Docubit.Type do
       %{
         name: "Unordered List",
         id: "unordered_list",
-        contexts: %{}
+        context: %{}
       },
       %{
         name: "Text Content",
         id: "text_content",
-        contexts: %{}
+        context: %{}
       }
     ]
   end
@@ -52,7 +52,7 @@ defmodule UserDocs.Documents.Docubit.Type do
     %{
       name: "Unordered List",
       id: "ul",
-      contexts: %{
+      context: %{
         settings: [
         ]
       }
@@ -64,7 +64,7 @@ defmodule UserDocs.Documents.Docubit.Type do
     %{
       name: "Ordered List",
       id: "ol",
-      contexts: %{
+      context: %{
         settings: [
           name_prefix: False
         ]
@@ -77,7 +77,7 @@ defmodule UserDocs.Documents.Docubit.Type do
     %{
       name: "Image",
       id: "img",
-      contexts: %{},
+      context: %{},
       allowed_data: [
         UserDocs.Automation.Step,
         UserDocs.Media.File
@@ -90,7 +90,7 @@ defmodule UserDocs.Documents.Docubit.Type do
     %{
       name: "Paragraph",
       id: "p",
-      contexts: %{},
+      context: %{},
       allowed_data: [
         UserDocs.Automation.Step,
         UserDocs.Documents.Content,
@@ -104,7 +104,7 @@ defmodule UserDocs.Documents.Docubit.Type do
   %{
     name: "Column",
     id: "column",
-    contexts: %{},
+    context: %{},
     allowed_children: [ "ol", "ul", "p", "img" ],
     allowed_data: []
   }
@@ -115,7 +115,7 @@ defmodule UserDocs.Documents.Docubit.Type do
     %{
       name: "Row",
       id: "row",
-      contexts: %{},
+      context: %{},
       allowed_children: [ "column" ],
       allowed_data: []
     }
@@ -126,7 +126,7 @@ defmodule UserDocs.Documents.Docubit.Type do
     %{
       name: "Container",
       id: "container",
-      contexts: %{},
+      context: %{},
       allowed_children: [ "row" ],
       allowed_data: []
     }

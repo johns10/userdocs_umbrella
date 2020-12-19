@@ -200,9 +200,9 @@ defmodule UserDocs.Documents.Docubit do
   end
   def cast_settings(changeset), do: changeset
 
-  def context(docubit, parent_contexts), do: Context.context(docubit, parent_contexts)
-  # Applies Contexts to the Docubit
-  def apply_contexts(docubit, parent_contexts), do: Context.apply_context_changes(docubit, parent_contexts)
+  def context(docubit, parent_context), do: Context.context(docubit, parent_context)
+  # Applies context to the Docubit
+  def apply_context(docubit, parent_context), do: Context.apply_context_changes(docubit, parent_context)
 
   # def preload(docubit, state), do: Preload.apply(docubit, state)
   def renderer(docubit = %Docubit{}), do: Renderer.apply(docubit)

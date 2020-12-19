@@ -16,6 +16,7 @@ defmodule UserDocs.Documents.Docubit.Context do
   # This function will apply the context in reverse order, overwriting each time.  It's the opposite of what
   # We have below (which might be incorrect on second thought)
   def context(docubit = %Docubit{}, parent_context = %Context{}) do
+    IO.inspect(docubit)
     with { :ok, context } <- update_context(parent_context, type_context(docubit)),
       { :ok, context } <- update_context(context, %{ settings: docubit.settings })
     do
@@ -67,40 +68,48 @@ defmodule UserDocs.Documents.Docubit.Context do
     end
   end
 
-  # Applies all Contexts to a docubit.  Takes a docubit, returns a
-  # Docubit with parent, type, and local contexts applied to the
+  # Applies all context to a docubit.  Takes a docubit, returns a
+  # Docubit with parent, type, and local context applied to the
   # Docubit
-  def apply_context_changes(docubit, parent_contexts) do
+  def apply_context_changes(docubit, parent_context) do
     docubit
-    |> add_contexts(parent_contexts, :type)
+    |> add_context(parent_context, :type)
   end
 
 
-  # Adds a particular type of context by calling add_contexts with the
-  # contexts, fetched from the appropriate place.  Controls the
-  # Hierarchy of contexts
-  defp add_contexts(docubit = %Docubit{}, parent_contexts, :type) do
-    Logger.debug("Adding Contexts to docubit with parent_contexts: #{inspect(parent_contexts)}")
+  # Adds a particular type of context by calling add_context with the
+  # context, fetched from the appropriate place.  Controls the
+  # Hierarchy of context
+  defp add_context(docubit = %Docubit{}, parent_context, :type) do
+    Logger.debug("Adding context to docubit with parent_context: #{inspect(parent_context)}")
     docubit
-    |> add_contexts(parent_contexts)
-    |> add_contexts(docubit.docubit_type.contexts)
+    |> add_context(parent_context)
+    |> add_context(docubit.docubit_type.context)
+    |> add_context(%{ settings: docubit.settings })
   end
 
+  defp add_context(docubit = %Docubit{}, context = %Context{}) do
+    add_context(docubit, Map.from_struct(context))
+  end
   # Converts the kw list of
-  defp add_contexts(docubit = %Docubit{}, contexts) when is_map(contexts) do
-    Logger.debug("Adding contexts #{inspect(contexts)} to Docubit")
-
-    changeset = Docubit.changeset(docubit, contexts)
-
+  defp add_context(docubit = %Docubit{}, context_attrs) when is_map(context_attrs) do
+    Logger.debug("Adding context #{inspect(context_attrs)} to Docubit")
+    existing_context = docubit.context || %Context{}
+    { :ok, context } = update_context(existing_context, context_attrs)
+    changeset = Docubit.changeset(docubit, %{ context: context })
     { :ok, docubit } =
       Ecto.Changeset.apply_action(changeset, :update)
 
+    docubit
+  end
+  defp add_context(docubit = %Docubit{}, nil) do
+    Logger.warn("nil context, returning docubit")
     docubit
   end
 
   defp type_context(docubit = %Docubit{ docubit_type: %DocubitType{} }) do
     docubit
     |> Map.get(:docubit_type)
-    |> Map.get(:contexts)
+    |> Map.get(:context)
   end
 end
