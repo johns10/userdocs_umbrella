@@ -3926,10 +3926,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var DOMAIN = "app.davenport.rocks";
-var PORT = "4001";
-var APP_URL = "http://" + DOMAIN + ":" + PORT + "/";
-var WEBSOCKETS_URI = "ws://" + DOMAIN + ":" + PORT + "/live";
+var DOMAIN = "userdocs.com";
+var PORT = "4003";
+var APP_URL = "https://" + DOMAIN + ":" + PORT + "/";
+var WEBSOCKETS_URI = "wss://" + DOMAIN + ":" + PORT + "/live";
 var COOKIE_KEY = "_userdocs_web_key";
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   console.log("Extension received message");
@@ -3991,6 +3991,7 @@ function handle_message(message, configuration) {
     message.payload.type = 'process';
     handle_job(message.payload, configuration);
   } else if (message.type == 'step') {
+    console.log(message)
     message.payload.type = 'step';
     handle_step(message.payload, configuration);
   } else if (message.type == 'configuration') {
