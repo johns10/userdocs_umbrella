@@ -122,22 +122,6 @@ defmodule ProcessAdministratorWeb.AnnotationLive.FormComponent do
           </div>
         </div>
       </div>
-
-      <%= if form.data.content_id do %>
-        <%= inputs_for form, :content, fn fc -> %>
-          <section class="card">
-            <div class="card-content">
-              <div class="content">
-                <%= ContentLive.FormComponent.render_fields(assigns, fc,
-                  prefix <> @form_ids.content) %>
-              </div>
-            </div>
-          </section>
-        <% end %>
-        <nav class="level"></nav>
-      <%= else %>
-        no form
-      <% end %>
     """
   end
 
