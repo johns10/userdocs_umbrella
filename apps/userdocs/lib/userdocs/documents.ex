@@ -82,7 +82,7 @@ defmodule UserDocs.Documents do
   def get_content!(id, params, filters) when is_map(params) and is_map(filters) do
     Repo.get!(Content, id)
   end
-  def get_content!(id, state, opts) when is_integer(id) and is_list(opts) do
+  def get_content!(id, state, opts) when is_list(opts) do
     StateHandlers.get(state, id, Content, opts)
     |> maybe_preload_content(opts[:preloads], state, opts)
   end
@@ -458,7 +458,7 @@ defmodule UserDocs.Documents do
 
   """
   def get_content_version!(id, _params \\ %{}, _filters \\ %{})
-  def get_content_version!(id, _params, _filters) when is_integer(id) do
+  def get_content_version!(id, params, filters) when is_map(params) and is_map(filters) do
     Repo.get!(ContentVersion, id)
   end
   def get_content_version!(id, _params, _filters, state) when is_integer(id) do
