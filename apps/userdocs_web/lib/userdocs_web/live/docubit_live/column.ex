@@ -6,7 +6,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Column do
   @impl true
   def mount(socket) do
     allowed_children =
-      UserDocs.Documents.Docubit.Type.column()
+      UserDocs.Documents.DocubitType.column_attrs()
       |> Map.get(:allowed_children)
 
     {
@@ -56,7 +56,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Column do
               class: "dropdown-item",
               parent_cid: @parent_cid,
               docubit: @docubit,
-              type_id: allowed_child}) %>
+              type: allowed_child}) %>
           <% end %>
         </div>
       </div>
