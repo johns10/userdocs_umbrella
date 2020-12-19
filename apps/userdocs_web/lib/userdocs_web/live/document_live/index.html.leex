@@ -5,27 +5,23 @@
     <ul class="menu-list">
       <%= for document <- @documents do %>
         <li class="">
-          <div class="columns">
-            <a class="column">
+          <div class="is-flex">
+            <a class="is-flex-grow-1">
               <%= document.name %>
             </a>
-            <div class="column is-narrow is-flex px-0 py-0">
-              <%= live_patch to: Routes.document_editor_path(@socket, :edit, document),
-                class: "py-2 px-1" do %>
+            <div class="is-flex is-flex-direction-row is-flex-grow-0">
+              <%= live_patch to: Routes.document_editor_path(@socket, :edit, document) do %>
                 <i class="fa fa-lg fa-search"></i>
               <% end %>
               <%= content_tag :a, to: "#", phx_click: "new-document-version",
-                class: "py-2 px-1",
                 phx_value_document_id: document.id do %>
                 <i class="fa fa-lg fa-plus-square"> </i>
               <% end %>
               <%= content_tag :a, to: "#", phx_click: "delete",
-                class: "py-2 px-1",
                 phx_value_id: document.id do %>
                 <i class="fa fa-lg fa-minus-square"></i>
               <% end %>
               <%= content_tag :a, to: "#", phx_click: "edit-document",
-                class: "py-2 px-1",
                 phx_value_id: document.id do %>
                 <i class="fa fa-lg fa-edit"></i>
               <% end %>
@@ -33,19 +29,17 @@
           </div>
           <ul>
             <%= for document_version <- document.document_versions do %>
-              <li class="columns">
-                <a class="column">
+              <div class="is-flex">
+                <a class="is-flex-grow-1">
                   <%= document_version.version.name %>
                 </a>
-                <div class="column is-narrow is-flex px-0 py-0">
+                <div class="is-flex is-flex-direction-row is-flex-grow-0">
                   <%= content_tag :a, phx_click: "delete-document-version",
-                    phx_value_id: document_version.id,
-                    class: "py-2 px-1" do %>
+                    phx_value_id: document_version.id do %>
                     <i class="fa fa-lg fa-minus-square"></i>
                   <% end %>
                   <%= content_tag :a, phx_click: "edit-document-version",
-                    phx_value_id: document_version.id,
-                    class: "py-2 px-1" do %>
+                    phx_value_id: document_version.id do %>
                     <i class="fa fa-lg fa-edit"></i>
                   <% end %>
                 </div>
