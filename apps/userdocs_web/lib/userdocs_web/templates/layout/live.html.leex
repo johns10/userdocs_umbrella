@@ -16,29 +16,23 @@
       <div class="navbar-start">
         <a class="navbar-item">Home</a>
         <a class="navbar-item">Documentation</a>
-        <%= if @auth_state == :logged_in do %>
-          <%= live_component(@socket, UserDocsWeb.VersionPicker, [
-            current_user: @current_user,
-            users: @data.users,
-            teams: @data.teams,
-            team_users: @data.team_users,
-            projects: @data.projects,
-            versions: @data.versions
-          ]) %>
-        <% end %>
+        <%= live_component(@socket, UserDocsWeb.VersionPicker, [
+          current_user: @current_user,
+          users: @data.users,
+          teams: @data.teams,
+          team_users: @data.team_users,
+          projects: @data.projects,
+          versions: @data.versions
+        ]) %>
       </div>
 
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
-            <%= if @auth_state != :logged_in do %>
-              <a class="button is-primary">
-                <%= "Sign In" %>
-              </a>
-            <% end %>
-            <%= if @auth_state == :logged_in do %>
-              <%= link "Sign out", to: Routes.pow_session_path(@socket, :delete), method: :delete, class: "button is-light" %>
-            <% end %>
+            <a class="button is-primary">
+              <%= "Sign In" %>
+            </a>
+            <%= link "Sign out", to: Routes.pow_session_path(@socket, :delete), method: :delete, class: "button is-light" %>
           </div>
         </div>
       </div>
@@ -55,11 +49,9 @@
     <%= @inner_content %>
 
 
-    <%= if @auth_state == :logged_in do %>
-      <%= UserDocsWeb.LiveHelpers.live_modal_menus(@socket, [
-        id: "modal-menus",
-        action: @modal_action]) %>
-    <% end %>
+    <%= UserDocsWeb.LiveHelpers.live_modal_menus(@socket, [
+      id: "modal-menus",
+      action: @modal_action]) %>
   </main>
 <% else %>
   <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns) %>
