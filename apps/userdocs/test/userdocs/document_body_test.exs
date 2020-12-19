@@ -35,6 +35,7 @@ defmodule UserDocs.DocumentVersionBodyTest do
       document_version_attrs = DocumentFixtures.document_version_attrs(:valid)
       { :ok, document_version } = Documents.create_document_version(document_version_attrs)
       type = Documents.get_docubit_type!(document_version.body.docubit_type_id)
+      assert document_version.body.document_version_id == document_version.id
       assert type.name == "container"
     end
 
@@ -145,7 +146,7 @@ defmodule UserDocs.DocumentVersionBodyTest do
         document_version: Map.put(document_version, :body, body)
       }
     end
-
+    """
     test "adding a couple rows to a docubit works" do
       state = document_fixture()
       document_version = Documents.list_document_versions(state, state_opts()) |> Enum.at(0)
@@ -158,7 +159,7 @@ defmodule UserDocs.DocumentVersionBodyTest do
 
       row.type_id == "row"
     end
-    """
+
     test "adding columns to rows works" do
       document_version = empty_document_version()
       body = Documents.get_docubit!(document_version.body.id, %{docubits: true})

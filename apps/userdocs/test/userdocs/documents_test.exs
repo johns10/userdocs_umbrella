@@ -243,7 +243,7 @@ defmodule UserDocs.DocumentsTest do
       name: nil,
       content_id: nil
     }
-    @language_code_attrs %{ code: "EN-us" }
+    @language_code_attrs %{ name: "EN-us" }
     @team_attrs %{name: "team", users: []}
     @content_attrs %{ name: "cname" }
     @version_attrs %{name: "some name"}
@@ -356,9 +356,9 @@ defmodule UserDocs.DocumentsTest do
   describe "language_codes" do
     alias UserDocs.Documents.LanguageCode
 
-    @valid_attrs %{code: "some code"}
-    @update_attrs %{code: "some updated code"}
-    @invalid_attrs %{code: nil }
+    @valid_attrs %{name: "some code"}
+    @update_attrs %{name: "some updated code"}
+    @invalid_attrs %{name: nil }
 
     def language_code_fixture(attrs \\ %{}) do
       {:ok, language_code} =
@@ -381,7 +381,7 @@ defmodule UserDocs.DocumentsTest do
 
     test "create_language_code/1 with valid data creates a language_code" do
       assert {:ok, %LanguageCode{} = language_code} = Documents.create_language_code(@valid_attrs)
-      assert language_code.code == "some code"
+      assert language_code.name == "some code"
     end
 
     test "create_language_code/1 with invalid data returns error changeset" do
@@ -391,7 +391,7 @@ defmodule UserDocs.DocumentsTest do
     test "update_language_code/2 with valid data updates the language_code" do
       language_code = language_code_fixture()
       assert {:ok, %LanguageCode{} = language_code} = Documents.update_language_code(language_code, @update_attrs)
-      assert language_code.code == "some updated code"
+      assert language_code.name == "some updated code"
     end
 
     test "update_language_code/2 with invalid data returns error changeset" do
@@ -430,7 +430,9 @@ defmodule UserDocs.DocumentsTest do
     test "create_docubit_types/1 with container data creates a docubit_types" do
       attrs = DocubitFixtures.docubit_type_attrs(:ol)
       assert {:ok, %DocubitType{} = docubit_type} = Documents.create_docubit_type(attrs)
+      IO.inspect(docubit_type)
       assert docubit_type.name == "ol"
+      assert docubit_type.context.settings == attrs.context.settings
     end
 
     test "create_docubit_types/1 with invalid data returns error changeset" do
@@ -443,6 +445,7 @@ defmodule UserDocs.DocumentsTest do
       attrs = DocubitFixtures.docubit_type_attrs(:row)
       assert {:ok, %DocubitType{} = docubit_type} = Documents.update_docubit_type(docubit_type, attrs)
       assert docubit_type.name == "row"
+      assert docubit_type.context.settings == attrs.context.settings
     end
 
     test "update_docubit_type/2 with invalid data returns error changeset" do

@@ -7,6 +7,7 @@ defmodule UserDocs.DocubitsTest do
     alias UserDocs.Media
     alias UserDocs.Documents.Docubit, as: Docubit
     alias UserDocs.Documents.Docubit.Context
+    alias UserDocs.Documents.DocubitType
 
     alias UserDocs.DocubitFixtures
     alias UserDocs.WebFixtures
@@ -33,34 +34,49 @@ defmodule UserDocs.DocubitsTest do
       |> DocubitFixtures.state(opts)
     end
 
+    test "update_context changes a context" do
+      context = %Context{}
+      context_changes = %{ settings:  %{li_value: "test_value"} }
+      { :ok, context } = Context.update_context(context, context_changes)
+      assert context.settings[:li_value] == "test_value"
+    end
+
+    test "create_context creates a context" do
+      docubit_type_attrs = DocubitType.li_attrs()
+      { :ok, docubit_type } = Documents.create_docubit_type(docubit_type_attrs)
+      assert docubit_type.context.settings == docubit_type_attrs.context.settings
+    end
+
     test "apply_context applies a context to the docubit" do
       opts = Keyword.put(state_opts(), :preloads, [ :docubit_type ])
       state = docubit_fixture()
       docubit = Documents.list_docubits(state, opts) |> Enum.at(0)
-      contexts = %{ settings:  %{li_value: "test_value"} }
-      updated_docubit = Docubit.apply_contexts(docubit, contexts)
-      assert updated_docubit.settings[:li_value] == "test_value"
+      context = %{ settings:  %{li_value: "test_value"} }
+      updated_docubit = Docubit.apply_context(docubit, context)
+      assert updated_docubit.context.settings[:li_value] == "test_value"
     end
 
     test "apply_context respects the heirarchy of parent over type" do
       state = docubit_fixture()
       ol = DocubitFixtures.docubit(:ol, state, state_opts())
       preloaded_ol = Documents.get_docubit!(ol.id, %{ docubit_type: true })
-      contexts = %{ settings: %{name_prefix: True} }
-      docubit = Docubit.apply_contexts(preloaded_ol, contexts)
-      assert docubit.settings[:name_prefix] == contexts.settings[:name_prefix]
+      context = %{ settings: %{name_prefix: True} }
+      docubit = Docubit.apply_context(preloaded_ol, context)
+      assert docubit.context.settings[:name_prefix] == context.settings[:name_prefix]
     end
 
     test "apply_context respects the heirarchy of object over parent" do
       state = docubit_fixture()
+      # Make a docubit and change its settings
       ol = DocubitFixtures.docubit(:ol, state, state_opts())
       preloaded_ol = Documents.get_docubit!(ol.id, %{ docubit_type: true })
       attrs = %{ settings:  %{name_prefix: True} }
-      contexts = %{ settings: %{name_prefix: False} }
       changeset = Docubit.changeset(preloaded_ol, attrs)
       { :ok, docubit } = Ecto.Changeset.apply_action(changeset, :update)
-      docubit = Docubit.apply_contexts(docubit, contexts)
-      assert docubit.settings[:name_prefix] == attrs.settings[:name_prefix]
+      # Apply some context and make sure the orignal settings are retained
+      context = %{ settings: %{name_prefix: False} }
+      docubit = Docubit.apply_context(docubit, context)
+      assert docubit.context.settings[:name_prefix] == attrs.settings[:name_prefix]
     end
 
     alias UserDocs.Documents.Content
@@ -102,7 +118,7 @@ defmodule UserDocs.DocubitsTest do
       preloaded_docubit = StateHandlers.preload(state, [ docubit ], opts) |> Enum.at(0)
       renderer =
         preloaded_docubit
-        |> Docubit.apply_contexts(%{})
+        |> Docubit.apply_context(%{})
         |> Docubit.renderer()
 
       assert renderer == :"Elixir.UserDocsWeb.DocubitLive.Renderers.Row"
@@ -113,15 +129,8 @@ defmodule UserDocs.DocubitsTest do
       state = docubit_fixture()
       docubit = DocubitFixtures.docubit(:ol, state, state_opts())
       preloaded_docubit = Documents.get_docubit!(docubit.id, %{ docubit_type: true })
-      context = %Context{ settings: [ li_value: "test_value"] }
+      context = %Context{ settings: %{li_value: "test_value"} }
       { :ok, context } = Docubit.context(preloaded_docubit, context)
-      assert context.settings[:li_value] == "test_value"
-    end
-
-    test "update_context changes a context" do
-      context = %Context{}
-      context_changes = %{ settings:  %{li_value: "test_value"} }
-      { :ok, context } = Context.update_context(context, context_changes)
       assert context.settings[:li_value] == "test_value"
     end
 
@@ -149,10 +158,10 @@ defmodule UserDocs.DocubitsTest do
       docubit = DocubitFixtures.docubit(:ol, state, state_opts())
       docubit = Documents.get_docubit!(docubit.id, %{ docubit_type: true })
       attrs = %{ settings: %{name_prefix: True}}
-      contexts = %Context{ settings: %{name_prefix: False}}
+      context = %Context{ settings: %{name_prefix: False}}
       changeset = Docubit.changeset(docubit, attrs)
       { :ok, docubit } = Ecto.Changeset.apply_action(changeset, :update)
-      { :ok, context } = Docubit.context(docubit, contexts)
+      { :ok, context } = Docubit.context(docubit, context)
       assert context.settings[:name_prefix] == attrs.settings[:name_prefix]
     end
 
