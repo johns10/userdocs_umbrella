@@ -10,6 +10,8 @@ defmodule UserDocs.TestDataset do
   alias UserDocs.Projects.Version
 
   alias UserDocs.Documents
+  alias UserDocs.Documents.DocubitType
+  alias UserDocs.Documents.Docubit
   alias UserDocs.Documents.Document
   alias UserDocs.Documents.DocumentVersion
   alias UserDocs.Documents.Content
@@ -52,6 +54,9 @@ defmodule UserDocs.TestDataset do
     Repo.delete_all(Strategy)
     Repo.delete_all(Content)
     Repo.delete_all(TeamUser)
+    Repo.delete_all(LanguageCode)
+    Repo.delete_all(Docubit)
+    Repo.delete_all(DocubitType)
     Enum.each(Users.list_teams, fn(t) -> Users.delete_team(t) end)
     Enum.each(Users.list_users, fn(u) -> Users.delete_user(u) end)
   end
