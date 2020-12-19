@@ -2,20 +2,60 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocs.Documents
+  alias UserDocs.Documents.ContentVersion
 
-  alias UserDocsWeb.DomainHelpers
+  alias UserDocsWeb.Layout
+
+  alias UserDocsWeb.ContentVersionLive.FormComponent, as: ContentVersionForm
+
+  @impl true
+  @spec render(any) :: Phoenix.LiveView.Rendered.t()
+  def render(assigns) do
+    ~L"""
+      <%= form = form_for @changeset, "#",
+        id: "content-form",
+        phx_target: @myself.cid,
+        phx_change: "validate",
+        phx_submit: "save" %>
+
+        <%= render_fields(assigns, form) %>
+
+        <%= submit "Save", phx_disable_with: "Saving..." %>z
+      </form>
+    """
+  end
+
+  def render_fields(assigns, form, _prefix \\ "") do
+    ~L"""
+      <div class="field is-grouped">
+        <%= Layout.select_input(form, :team_id, @select_lists.teams, [
+            value: form.data.team_id || @team_id
+          ], "control") %>
+
+        <%= Layout.text_input(form, :name, [
+          ], "control is-expanded") %>
+      </div>
+      <%= inputs_for form, :content_versions, fn fcv -> %>
+
+        <%= ContentVersionForm.render_fields(assigns, fcv, "test") %>
+
+      <% end %>
+
+      <a class="button" href="#" phx-click="add-content-version"
+        phx-target="<%= @myself.cid %>">
+        Add a content translation
+      </a>
+    """
+  end
 
   @impl true
   def update(%{content: content} = assigns, socket) do
     changeset = Documents.change_content(content)
 
-
-
     {
       :ok,
       socket
       |> assign(assigns)
-      |> assign(:teams_select_options, DomainHelpers.select_list_temp(assigns.select_lists.teams, :name, false))
       |> assign(:changeset, changeset)
     }
   end
@@ -29,19 +69,54 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
 
     {:noreply, assign(socket, :changeset, changeset)}
   end
-
   def handle_event("save", %{"content" => content_params}, socket) do
     save_content(socket, socket.assigns.action, content_params)
+  end
+  def handle_event("add-content-version", _, socket) do
+    existing_variants =
+      Ecto.Changeset.get_field(socket.assigns.changeset, :content_versions)
+
+    content_version = %ContentVersion{
+      temp_id: UserDocs.ID.temp_id(),
+      content_id: socket.assigns.content.id,
+      version_id: socket.assigns.version_id,
+      body: ""
+    }
+
+    content_versions =
+      existing_variants
+      |> Enum.concat([ Documents.change_content_version(content_version) ])
+
+    changeset =
+      socket.assigns.changeset
+      |> Ecto.Changeset.put_assoc(:content_versions, content_versions)
+
+    {:noreply, assign(socket, changeset: changeset)}
+  end
+  def handle_event("remove-content-version", %{"remove" => remove_id}, socket) do
+    content_versions =
+      Ecto.Changeset.get_change(socket.assigns.changeset, :content_versions)
+      |> Enum.reject(fn %{data: variant} -> variant.temp_id == remove_id end)
+
+    changeset =
+      socket.assigns.changeset
+      |> Ecto.Changeset.put_assoc(:content_versions, content_versions)
+
+    {:noreply, assign(socket, changeset: changeset)}
+  end
+  def handle_event("delete-content-version", %{"id" => id}, socket) do
+    content_version = Documents.get_content_version!(id)
+    {:ok, _} = Documents.delete_content_version(content_version)
+    {:noreply, socket}
   end
 
   defp save_content(socket, :edit, content_params) do
     case Documents.update_content(socket.assigns.content, content_params) do
       {:ok, _content} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Content updated successfully")
-         # |> push_redirect(to: socket.assigns.return_to)
-         |> push_patch(to: socket.assigns.return_to)
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "Content updated successfully")
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -63,4 +138,7 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
         {:noreply, assign(socket, changeset: changeset)}
     end
   end
+
+  def is_expanded?(false), do: " is-hidden"
+  def is_expanded?(true), do: ""
 end
