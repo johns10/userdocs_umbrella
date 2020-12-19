@@ -64,8 +64,16 @@ defmodule UserDocs.Documents.Docubit do
 
   def changeset(docubit, attrs \\ %{}) do
     docubit
-    |> cast(attrs, [ :delete, :docubit_type_id, :settings, :address, :document_version_id, :content_id, :through_annotation_id, :through_step_id, :docubit_id ])
+    |> cast(attrs, [ :delete, :docubit_type_id, :settings, :address,
+        :document_version_id, :content_id, :through_annotation_id,
+        :through_step_id, :docubit_id, :file_id ])
     |> cast_assoc(:docubits)
+    |> put_embed(:context, Map.get(attrs, :context, nil))
+    |> foreign_key_constraint(:docubit_type_id)
+    |> foreign_key_constraint(:document_version_id)
+    |> foreign_key_constraint(:content_id)
+    |> foreign_key_constraint(:through_annotation_id)
+    |> foreign_key_constraint(:through_step_id)
     |> (&(validate_change(&1, :docubits,
       fn(:docubits, docubits) ->
         validate_allowed_docubits(&1, docubits)
@@ -73,7 +81,7 @@ defmodule UserDocs.Documents.Docubit do
     |> cast_settings()
     |> order_changeset_docubits()
     |> address_docubits()
-    |> validate_required([ :docubit_type_id ])
+    |> validate_required([ :docubit_type_id, :document_version_id ])
     |> mark_for_deletion()
   end
 
