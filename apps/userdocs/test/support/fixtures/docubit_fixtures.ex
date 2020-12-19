@@ -9,12 +9,6 @@ defmodule UserDocs.DocubitFixtures do
   alias UserDocs.Documents
   alias UserDocs.Documents.DocubitType
 
-  alias UserDocs.WebFixtures
-  alias UserDocs.UsersFixtures
-  alias UserDocs.AutomationFixtures
-  alias UserDocs.DocumentVersionFixtures
-  alias UserDocs.MediaFixtures
-
   def state(state, opts) do
     opts =
       opts
