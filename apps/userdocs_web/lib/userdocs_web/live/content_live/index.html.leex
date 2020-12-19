@@ -1,36 +1,36 @@
 <h1>Listing Content</h1>
 
-<%= if @live_action in [:new, :edit] do %>
-  <%= live_modal @socket, UserDocsWeb.ContentLive.FormComponent,
-    id: @content.id || :new,
-    title: @page_title,
-    action: @live_action,
-    content: @content,
-    current_user: @current_user,
-    return_to: Routes.content_index_path(@socket, :index) %>
-<% end %>
-
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-
-      <th></th>
-    </tr>
-  </thead>
-  <tbody id="content">
-    <%= for content <- @content_collection do %>
-      <tr id="content-<%= content.id %>">
-        <td><%= content.name %></td>
-
-        <td>
-          <span><%= live_redirect "Show", to: Routes.content_show_path(@socket, :show, content) %></span>
-          <span><%= live_patch "Edit", to: Routes.content_index_path(@socket, :edit, content) %></span>
-          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: content.id, data: [confirm: "Are you sure?"] %></span>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+  <aside class="menu">
+    <p class="menu-label">Content</p>
+    <ul class="menu-list">
+      <%= for content <- @content do %>
+        <li class="">
+          <div class="is-flex">
+            <a class="is-flex-grow-1">
+              <%= content.name %>
+            </a>
+            <div class="is-flex is-flex-direction-row is-flex-grow-0">
+              <%= content_tag :a, to: "#", phx_click: "edit-content",
+                class: "py-2 px-1",
+                phx_value_id: content.id do %>
+                <i class="fa fa-lg fa-edit"></i>
+              <% end %>
+            </div>
+          </div>
+          <%= if content.content_versions != [] do %>
+            <ul>
+              <%= for content_version <- content.content_versions do %>
+                <li class="">
+                  <a class="">
+                    <%= content_version.version.name %>
+                  </a>
+                </li>
+              <% end %>
+            </ul>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </aside>
 
 <span><%= live_patch "New Content", to: Routes.content_index_path(@socket, :new) %></span>
