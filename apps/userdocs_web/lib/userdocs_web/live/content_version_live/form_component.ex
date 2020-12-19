@@ -1,41 +1,98 @@
 defmodule UserDocsWeb.ContentVersionLive.FormComponent do
   use UserDocsWeb, :live_component
 
-  require Logger
-
-  alias UserDocs.Projects
   alias UserDocs.Documents
-  alias UserDocs.Documents.LanguageCode
-  alias UserDocs.Documents.ContentVersion
-  alias UserDocsWeb.DomainHelpers
+
+  alias UserDocsWeb.Layout
+
+  def render_fields(assigns) do
+    ~L"""
+      <h2><%= @title %></h2>
+      <%= @action %>
+      <%= f = form_for @changeset, "#",
+        id: "content_version-form",
+        phx_target: @myself,
+        phx_change: "validate",
+        phx_submit: "save" %>
+
+        <%= UserDocsWeb.ContentVersionLive.FormComponent.render_fields(assigns, f) %>
+
+        <%= submit "Save", phx_disable_with: "Saving..." %>
+      </form>
+
+    """
+  end
+
+  def render_fields(assigns, form, prefix \\ "") do
+    ~L"""
+      <%= hidden_input form, :content_id %>
+      <%= hidden_input form, :temp_id %>
+
+      <div class="field is-grouped">
+
+        <%= Layout.select_input(form, :language_code_id, @select_lists.language_codes, [
+          value: form.data.language_code_id
+        ], "control") %>
+
+        <%= Layout.select_input(form, :version_id, @select_lists.versions, [
+          value: form.data.version_id
+        ], "control") %>
+
+        <%= Layout.select_input(form, :content_id, @select_lists.content, [
+          value: form.data.content_id
+        ], "control") %>
+
+      </div>
+
+      <div class="field">
+        <%= label form, :body %>
+        <div class="control">
+          <%= textarea form, :body,
+            class: "textarea" %>
+        </div>
+        <%= error_tag form, :body %>
+      </div>
+
+      <div class="field">
+        <div class="control">
+          <%=
+            temp_id = Map.get(form.source.changes, :temp_id, form.data.temp_id)
+            if is_nil(temp_id) do %>
+            <a
+              class="button"
+              phx-click="delete-content-version"
+              phx-value-id= <%= form.data.id %>
+              phx-target="<%= @myself.cid %>"
+            >
+              &times Delete Existing
+            </a>
+          <% else %>
+            <a
+              class="button"
+              phx-click="remove-content-version"
+              phx-value-remove="<%= temp_id %>"
+              phx-target="<%= @myself.cid %>"
+            >
+              &times Delete
+            </a>
+          <% end %>
+        </div>
+      </div>
+    """
+  end
 
   @impl true
+  @spec update(
+          %{content_version: UserDocs.Documents.ContentVersion.t()},
+          Phoenix.LiveView.Socket.t()
+        ) :: {:ok, Phoenix.LiveView.Socket.t()}
   def update(%{content_version: content_version} = assigns, socket) do
     changeset = Documents.change_content_version(content_version)
-
-    content_select_options =
-      content(assigns, assigns.current_user.default_team_id)
-      |> DomainHelpers.select_list_temp(:name, false)
-
-    version_select_options =
-      versions(assigns.current_user.default_team_id)
-      |> DomainHelpers.select_list_temp(:name, false)
-
-    selected_language_code = selected_language_code(content_version.language_code)
-    language_code_select_options =
-      language_codes(assigns)
-      |> DomainHelpers.select_list_temp(:code, false)
 
     {:ok,
      socket
      |> assign(assigns)
      |> assign(:changeset, changeset)
-     |> assign(:content_select_options, content_select_options)
-     |> assign(:selected_content_id, content_version.content_id)
-     |> assign(:version_select_options, version_select_options)
-     |> assign(:selected_version_id, content_version.version_id)
-     |> assign(:language_code_select_options, language_code_select_options)
-     |> assign(:selected_language_code, selected_language_code)
     }
   end
 
@@ -59,8 +116,6 @@ defmodule UserDocsWeb.ContentVersionLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Content version updated successfully")
-         # |> push_redirect(to: socket.assigns.return_to)
-         |> push_patch(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -74,39 +129,10 @@ defmodule UserDocsWeb.ContentVersionLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Content version created successfully")
-         # |> push_redirect(to: socket.assigns.return_to)
-         |> push_patch(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
   end
-
-  defp content(assigns, team_id) do
-    try do
-      assigns.select_lists.available_content
-    rescue
-      _ ->
-        Logger.warn("ContentVersionLive.FormComponent reverting to database for content")
-        Documents.list_content(%{}, %{team_id: team_id})
-    end
-  end
-
-  defp versions(team_id) do
-    Projects.list_versions(%{}, %{team_id: team_id})
-  end
-
-  defp language_codes(assigns) do
-    try do
-      assigns.select_lists.language_codes
-    rescue
-      _ ->
-        Logger.warn("ContentVersionLive.FormComponent reverting to database for language codes")
-        Documents.list_language_codes()
-    end
-  end
-
-  defp selected_language_code(language_code = %LanguageCode{}), do: language_code.id
-  defp selected_language_code(_), do: 0
 end
