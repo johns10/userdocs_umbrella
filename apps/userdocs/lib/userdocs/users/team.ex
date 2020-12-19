@@ -24,7 +24,8 @@ defmodule UserDocs.Users.Team do
   @doc false
   def changeset(team, attrs) do
     team
-    |> cast(attrs, [:name, :default_project_id])
+    |> cast(attrs, [:name, :default_project_id, :default_language_code_id])
+    |> foreign_key_constraint(:default_language_code_id)
     |> handle_users(attrs)
     |> validate_required([:name])
   end
