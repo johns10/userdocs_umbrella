@@ -8,11 +8,12 @@ defmodule UserDocs.Documents.Docubit.Context do
   alias UserDocs.Documents.DocubitType
   alias UserDocs.Documents.Docubit.Context
 
+  @primary_key false
   embedded_schema do
     field :settings, :map
   end
 
-  # This function will apply the contexts in reverse order, overwriting each time.  It's the opposite of what
+  # This function will apply the context in reverse order, overwriting each time.  It's the opposite of what
   # We have below (which might be incorrect on second thought)
   def context(docubit = %Docubit{}, parent_context = %Context{}) do
     with { :ok, context } <- update_context(parent_context, type_context(docubit)),
