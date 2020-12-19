@@ -6,7 +6,7 @@ defmodule UserDocs.Repo.Migrations.CreateDocubits do
       add :name, :string
       add :allowed_data, {:array, :string}
       add :allowed_children, {:array, :string}
-      add :contexts, :jsonb
+      add :context, :jsonb
     end
 
   end
