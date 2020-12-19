@@ -69,7 +69,9 @@ config :cors_plug,
     "chrome-extension://iclibnblhjdakhhijcioglkmdihjelgg",
     "chrome-extension://ohmjkpckjphdcdophkflpmdmihpiaejf",
     "http://localhost",
-    "http://app.davenport.rocks"
+    "http://app.davenport.rocks",
+    "https://app.davenport.rocks",
+    "https://userdocs.gigalixirapp.com"
   ],
   max_age: 86400,
-  methods: ["GET", "POST", "OPTIONS"]
+  methods: ["GET", "PUT", "POST", "OPTIONS"]
