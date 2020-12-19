@@ -17,7 +17,7 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
     with { :ok, [] } <- precheck(docubit, data),
       { :ok, docubit } <- hydrate(docubit, data)
     do
-      (docubit)
+      docubit
     else
       { :error, _body, _errors } -> raise(RuntimeError, "Caught Access Error")
       { :precheck, errors } -> { :error, errors}
@@ -87,6 +87,7 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
     }
     docubit
     |> Documents.update_docubit(attrs)
+
     with {:ok, docubit} <- Documents.update_docubit(docubit, attrs),
       docubit <- Map.put(docubit, :file, step.screenshot.file),
       docubit <- Map.put(docubit, :through_step, step)
