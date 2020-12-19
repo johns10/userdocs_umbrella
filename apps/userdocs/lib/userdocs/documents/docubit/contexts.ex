@@ -31,7 +31,13 @@ defmodule UserDocs.Documents.Docubit.Context do
     |> apply_action(:update)
   end
 
-  defp changeset(context, attrs) do
+  def create_context(attrs) do
+    %Context{}
+    |> changeset(attrs)
+    |> apply_action(:update)
+  end
+
+  def changeset(context, attrs) do
     context
     |> cast(attrs, [ :settings ])
     |> apply_overwrite_policy(:settings)
