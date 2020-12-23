@@ -22,8 +22,8 @@ config :userdocs_web, UserDocsWeb.Endpoint,
   https: [
     port: 4002,
     cipher_suite: :strong,
-    certfile: "priv/cert/userdocs.com.crt",
-    keyfile: "priv/cert/userdocs.com.key"
+    certfile: "priv/cert/user-docs.com.crt",
+    keyfile: "priv/cert/user-docs.com.key"
   ],
   debug_errors: true,
   code_reloader: true,
@@ -49,8 +49,8 @@ url: [host: "localhost"],
   https: [
     port: 4003,
     cipher_suite: :strong,
-    certfile: "priv/cert/userdocs.com.crt",
-    keyfile: "priv/cert/userdocs.com.key"
+    certfile: "priv/cert/user-docs.com.crt",
+    keyfile: "priv/cert/user-docs.com.key"
   ],
   debug_errors: true,
   code_reloader: true,
