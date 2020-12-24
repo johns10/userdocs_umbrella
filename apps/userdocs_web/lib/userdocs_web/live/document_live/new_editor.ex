@@ -132,9 +132,11 @@ defmodule UserDocsWeb.DocumentLive.Editor do
         [ _ | _ ] = docubits -> docubits |> Enum.at(-1) |> Map.get(:order, nil)
       end
 
-    docubit_type = Documents.get_docubit_type!(socket, type, state_opts())
+    docubit_type = Documents.get_docubit_type_by_name!(socket, type, state_opts())
+    docubit_type_attrs = Map.take(docubit_type, DocubitType.__schema__(:fields))
 
     new_docubit_attrs = %{
+      docubit_type: docubit_type_attrs,
       docubit_type_id: docubit_type.id,
       order: max_order + 1,
       docubit_id: docubit.id,
@@ -142,7 +144,6 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       settings: docubit_type.context.settings
     }
 
-    IO.inspect(new_docubit_attrs)
 
     # Get the exising docubits and extract attrs.  There's a better way to do this.
     # Probably change to put_assoc

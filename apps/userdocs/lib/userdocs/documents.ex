@@ -762,10 +762,15 @@ defmodule UserDocs.Documents do
     |> Repo.all()
     |> Enum.at(0)
   end
-  def get_docubit_type!(state, name, opts) when is_bitstring(name) and is_list(opts) do
+  def get_docubit_type_by_name!(state, name, opts) when is_bitstring(name) and is_list(opts) do
     list_docubit_types(state, opts)
     |> Enum.filter(fn(dt) -> dt.name == name end)
     |> Enum.at(0)
+  end
+  def get_docubit_type_by_id!(id, state, opts) when is_list(opts) do
+  list_docubit_types(state, opts)
+  |> Enum.filter(fn(dt) -> dt.id == id end)
+  |> Enum.at(0)
   end
 
   defp filter_by_name(query, name) do

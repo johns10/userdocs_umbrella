@@ -106,17 +106,19 @@ defmodule UserDocsWeb.DocubitEditorLive do
     ~L"""
       <div class="dropdown-menu" id="dropdown-menu" role="menu">
         <div class="dropdown-content">
-          <a href="#"
-            class="dropdown-item"
-            phx-click="delete-docubit"
-            phx-target=<%= @parent_cid %>
-            phx-value-id=<%= @docubit.id %>>
-            Delete
-          </a>
+          <%= if is_integer(@parent_cid) do %>
+            <a href="#"
+              class="dropdown-item"
+              phx-click="delete-docubit"
+              phx-target=<%= @parent_cid %>
+              phx-value-id=<%= @docubit.id %>>
+              Delete
+            </a>
+          <% end %>
           <a href="#"
             class="dropdown-item"
             phx-click="edit-docubit"
-            phx-target=<%= @parent_cid %>
+            phx-target=<%= @myself.cid %>
             phx-value-id=<%= @docubit.id %>>
             Settings
           </a>
