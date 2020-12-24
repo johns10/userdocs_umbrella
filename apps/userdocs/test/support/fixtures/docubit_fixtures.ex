@@ -15,7 +15,7 @@ defmodule UserDocs.DocubitFixtures do
       |> Keyword.put(:types, [ Docubit ])
 
     dv = Documents.list_document_versions(state, opts) |> Enum.at(0)
-    p_type = Documents.get_docubit_type!(state, "p", opts)
+    p_type = Documents.get_docubit_type_by_name!(state, "p", opts)
     docubit = docubit(:p, dv.id, p_type.id)
 
     state
@@ -37,7 +37,7 @@ defmodule UserDocs.DocubitFixtures do
 
   def docubit(type, state, opts) when is_list(opts) do
     dv = Documents.list_document_versions(state, opts) |> Enum.at(0)
-    docubit_type = Documents.get_docubit_type!(state, Atom.to_string(type), opts)
+    docubit_type = Documents.get_docubit_type_by_name!(state, Atom.to_string(type), opts)
     docubit(type, dv.id, docubit_type.id)
   end
   def docubit(type, document_version_id \\ nil, docubit_type_id \\ nil) do
