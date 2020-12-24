@@ -1,4 +1,4 @@
-defmodule UserDocs.Repo.Migrations.CreateDocubitTypes do
+defmodule UserDocs.Repo.Migrations.CreateDocubits do
   use Ecto.Migration
 
   def change do
