@@ -14,10 +14,16 @@ defmodule UserDocs.Documents.DocubitType do
     None
   ]
 
+  @valid_settings [
+    :li_value,
+    :name_prefix
+  ]
+
   schema "docubit_types" do
     field :name, :string
     embeds_one :context, Context, on_replace: :delete
     field :allowed_children, {:array, :string}
+    field :allowed_settings, {:array, Ecto.Enum}, values: @valid_settings
     field :allowed_data, {:array, Ecto.Enum }, values: @valid_data
 
     has_many :docubits, Docubit
@@ -25,7 +31,7 @@ defmodule UserDocs.Documents.DocubitType do
 
   def changeset(docubit_type, attrs \\ %{}) do
     docubit_type
-    |> cast(attrs, [ :name, :allowed_children, :allowed_data ])
+    |> cast(attrs, [ :name, :allowed_children, :allowed_data, :allowed_settings ])
     |> put_embed(:context, Map.get(attrs, :context, nil))
     |> validate_required([ :name, :allowed_children, :allowed_data ])
   end
@@ -52,6 +58,7 @@ defmodule UserDocs.Documents.DocubitType do
           name_prefix: False
         }
       },
+      allowed_settings: [ :li_value, :name_prefix ],
       allowed_children: [],
       allowed_data: [ None ]
     }
@@ -65,6 +72,7 @@ defmodule UserDocs.Documents.DocubitType do
         settings: %{
         }
       },
+      allowed_settings: [],
       allowed_children: [ "li" ],
       allowed_data: [ None ]
     }
@@ -79,6 +87,7 @@ defmodule UserDocs.Documents.DocubitType do
           name_prefix: False
         }
       },
+      allowed_settings: [ :li_value, :name_prefix ],
       allowed_children: [ "li" ],
       allowed_data: [ None ]
     }
@@ -91,6 +100,7 @@ defmodule UserDocs.Documents.DocubitType do
       context: %{
         settings: %{ }
       },
+      allowed_settings: [],
       allowed_children: [],
       allowed_data: [
         UserDocs.Automation.Step,
@@ -106,6 +116,7 @@ defmodule UserDocs.Documents.DocubitType do
       context: %{
         settings: %{ }
       },
+      allowed_settings: [],
       allowed_children: [],
       allowed_data: [
         UserDocs.Automation.Step,
@@ -122,6 +133,7 @@ defmodule UserDocs.Documents.DocubitType do
     context: %{
       settings: %{ }
     },
+    allowed_settings: [],
     allowed_children: [ "ol", "ul", "p", "img" ],
     allowed_data: [ None ]
   }
@@ -134,6 +146,7 @@ defmodule UserDocs.Documents.DocubitType do
       context: %{
         settings: %{ }
       },
+      allowed_settings: [],
       allowed_children: [ "column" ],
       allowed_data: [ None ]
     }
@@ -146,6 +159,7 @@ defmodule UserDocs.Documents.DocubitType do
       context: %{
         settings: %{ }
       },
+      allowed_settings: [],
       allowed_children: [ "row" ],
       allowed_data: [ None ]
     }
