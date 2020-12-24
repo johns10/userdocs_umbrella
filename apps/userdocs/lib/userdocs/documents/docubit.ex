@@ -78,7 +78,7 @@ defmodule UserDocs.Documents.Docubit do
       fn(:docubits, docubits) ->
         validate_allowed_docubits(&1, docubits)
       end))).()
-    |> cast_settings()
+    |> cast_settings(Map.get(attrs, :docubit_type, nil))
     |> order_changeset_docubits()
     |> address_docubits()
     |> validate_required([ :docubit_type_id, :document_version_id ])
@@ -185,20 +185,22 @@ defmodule UserDocs.Documents.Docubit do
     changeset
   end
 
-  def cast_settings(%{changes: %{ settings: settings }} = changeset) do
+  def cast_settings(%{changes: %{ settings: settings }} = changeset, type) do
+    IO.inspect(type)
+    valid_settings = Map.get(type, :allowed_settings, [])
     settings =
       Enum.reduce(settings, changeset.data.settings || %{},
         fn({k, v}, s) ->
-          if k in @valid_settings do
+          if String.to_atom(k) in valid_settings do
             Map.put_new(s, k, v)
           else
-            raise(RuntimeError, "Tried to cast an invalid setting")
+            raise(RuntimeError, "Tried to cast an invalid setting.  Valid settings are #{Enum.map(valid_settings, fn(setting) -> Atom.to_string(setting) <> ", " end)}")
           end
         end)
 
     Ecto.Changeset.put_change(changeset, :settings, settings)
   end
-  def cast_settings(changeset), do: changeset
+  def cast_settings(changeset, _), do: changeset
 
   def context(docubit, parent_context), do: Context.context(docubit, parent_context)
   # Applies context to the Docubit
