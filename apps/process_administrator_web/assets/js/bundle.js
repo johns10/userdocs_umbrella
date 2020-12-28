@@ -3926,7 +3926,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var DOMAIN = "userdocs.com";
+var DOMAIN = "user-docs.com";
 var PORT = "4003";
 var APP_URL = "https://" + DOMAIN + ":" + PORT + "/";
 var WEBSOCKETS_URI = "wss://" + DOMAIN + ":" + PORT + "/live";
