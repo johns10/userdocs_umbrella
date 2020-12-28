@@ -3,6 +3,7 @@ defmodule UserDocs.Documents.DocubitType do
   import Ecto.Changeset
 
   alias UserDocs.Documents.DocubitType
+  alias UserDocs.Documents.DocubitSetting
   alias UserDocs.Documents.Docubit.Context
   alias UserDocs.Documents.Docubit
 
@@ -14,16 +15,11 @@ defmodule UserDocs.Documents.DocubitType do
     None
   ]
 
-  @valid_settings [
-    :li_value,
-    :name_prefix
-  ]
-
   schema "docubit_types" do
     field :name, :string
-    embeds_one :context, Context, on_replace: :delete
+    field :context, EctoContext
     field :allowed_children, {:array, :string}
-    field :allowed_settings, {:array, Ecto.Enum}, values: @valid_settings
+    field :allowed_settings, {:array, Ecto.Enum}, values: UserDocs.Documents.DocubitSetting.valid_settings()
     field :allowed_data, {:array, Ecto.Enum }, values: @valid_data
 
     has_many :docubits, Docubit
@@ -31,8 +27,7 @@ defmodule UserDocs.Documents.DocubitType do
 
   def changeset(docubit_type, attrs \\ %{}) do
     docubit_type
-    |> cast(attrs, [ :name, :allowed_children, :allowed_data, :allowed_settings ])
-    |> put_embed(:context, Map.get(attrs, :context, nil))
+    |> cast(attrs, [ :name, :allowed_children, :allowed_data, :allowed_settings, :context ])
     |> validate_required([ :name, :allowed_children, :allowed_data ])
   end
 
