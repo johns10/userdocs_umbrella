@@ -1,86 +1,121 @@
-defmodule UserDocsWeb.DocumentLive.OldEditor do
+defmodule UserDocsWeb.DocumentLive.Editor do
   use UserDocsWeb, :live_view
   use UserdocsWeb.LiveViewPowHelper
 
-  @allowed_step_types ["Full Screen Screenshot", "Element Screenshot"]
-
   require Logger
 
-  alias UserDocsWeb.DomainHelpers
+  alias UserDocsWeb.DocumentLive.Loaders
+  alias UserDocsWeb.DocumentLive.SelectLists
 
   alias UserDocs.Documents
-  alias UserDocs.Documents.Editor
-
-  alias UserDocs.Web
-  alias UserDocs.Documents
-
   alias UserDocs.Automation
-
+  alias UserDocs.Projects
+  alias UserDocs.Web
   alias UserDocs.Users
 
+  alias UserDocs.Automation.Process
+  alias UserDocs.Automation.Step
+  alias UserDocs.Documents
+  alias UserDocs.Documents.Document
+  alias UserDocs.Documents.Content
+  alias UserDocs.Documents.ContentVersion
+  alias UserDocs.Documents.DocumentVersion
+  alias UserDocs.Documents.LanguageCode
+  alias UserDocs.Documents.Docubit
+  alias UserDocs.Documents.DocubitType
+  alias UserDocs.Documents.DocubitSetting
+  alias UserDocs.Documents.Docubit.Context
+  alias UserDocs.Web.Page
+  alias UserDocs.Web.Annotation
+  alias UserDocs.Media.File
+
   alias UserDocsWeb.Root
+  alias UserDocsWeb.Defaults
+  alias UserDocsWeb.DocubitEditorLive
+  alias UserDocsWeb.DocubitLive.Dragging
+
+  @allowed_step_types ["Full Screen Screenshot", "Element Screenshot", "Apply Annotation"]
 
   @impl true
   def mount(_params, session, socket) do
+    opts =
+      state_opts()
+      |> Keyword.put(:types, [  Document, DocumentVersion, Page,
+        Process, Content, ContentVersion, Step, LanguageCode, Annotation,
+        Docubit, File, DocubitType ])
+
     {:ok,
       socket
+      |> StateHandlers.initialize(opts)
       |> Root.authorize(session)
       |> Root.initialize()
-      |> assign(:dragging, nil)
+      |> assign(:dragging, %{ type: nil, id: nil})
     }
   end
 
   @impl true
-  def handle_params(%{"id" => id}, _, socket) do
+  def handle_params(%{"id" => id}, _, %{ assigns: %{ auth_state: :logged_in }} = socket) do
     IO.puts("Opening editor")
-    document_version = Documents.get_document_version!(id, %{version: true})
-
-    changeset = Documents.change_document_version(document_version)
-
-    team = team(document_version.version_id)
-
-    pages = pages(document_version.version_id)
-    page_select_list =
-      DomainHelpers.select_list_temp(pages, :name, false)
-
-    processes = processes(document_version.version_id)
-    process_select_list =
-      DomainHelpers.select_list_temp(processes, :name, false)
-
-    language_codes = language_codes()
-    language_codes_select_options =
-      DomainHelpers.select_list_temp(language_codes, :code, false)
-
-    current_process = Enum.at(processes, 0)
-    current_page = Enum.at(pages, 0)
-    current_language_code = Enum.at(language_codes, 0)
-
-    steps = steps(team.id)
-    annotations = annotations(team.id)
-    content = content(team.id)
-
+    id = String.to_integer(id)
+    document = Documents.get_document!(id, %{ document_versions: true })
     {
       :noreply,
       socket
-      |> assign(:page_title, page_title(socket.assigns.live_action))
-      |> assign(:document_version, document_version)
-      |> assign(:changeset, changeset)
-      |> assign(:page, pages)
-      |> assign(:process, processes)
-      |> assign(:step, steps)
-      |> assign(:annotation, annotations)
-      |> assign(:content, content)
-      |> assign(:language_codes, language_codes)
-      |> assign(:current_page, current_page)
-      |> assign(:current_process, current_process)
-      |> assign(:current_language_code, current_language_code)
-      |> assign(:page_select_list, page_select_list)
-      |> assign(:process_select_list, process_select_list)
-      |> assign(:language_codes_select_options, language_codes_select_options)
+      |> Loaders.load_docubit_types(state_opts())
+      |> Loaders.load_document(Documents.get_document!(id), state_opts())
+      |> Loaders.load_document_versions(id, state_opts())
+      |> Loaders.load_language_codes(state_opts())
+      |> Loaders.load_pages(state_opts())
+      |> Loaders.load_processes(state_opts())
+      |> Loaders.load_files(state_opts())
+      |> Loaders.load_content(state_opts())
+      |> Loaders.load_content_versions(state_opts())
+      |> Loaders.load_steps(state_opts())
+      |> SelectLists.process(state_opts())
+      |> current_selections()
+      |> SelectLists.page(state_opts())
+      |> Loaders.load_annotations(state_opts())
+      |> SelectLists.language_code(state_opts())
+      |> prepare_document(document)
+      |> default_language_code_id()
+      |> (&(Loaders.load_docubits(&1, default_document_version_id(&1, document), state_opts()))).()
+      |> (&(prepare_document_version(&1, default_document_version_id(&1, document)))).()
+      |> SelectLists.versions(state_opts())
+      |> StateHandlers.inspect(state_opts())
     }
+  end
+  def handle_params(_, _, socket), do: { :noreply, socket }
+
+  def render_body(docubit) do
+    IO.puts("Rendering body")
+    result = render_docubit(docubit)
+    result
+  end
+
+  def render_docubit(%{ docubits: [ _ | _ ] = docubits } = docubit) when is_list(docubits) do
+    # IO.puts("Rendering docubits")
+    docubit.renderer.render(
+      docubit,
+      Enum.map(docubits, fn(d) -> render_docubit(d) end),
+      :editor
+    )
+  end
+  def render_docubit(%{ docubits: [ ]} = docubit) do
+    # IO.puts("Rendering docubit #{docubit.type_id}")
+    docubit.renderer.render(
+      docubit,
+      [],
+      :editor
+    )
   end
 
   @impl true
+  def handle_event("change-language", %{"language" => %{"id" => id}}, socket) do
+    { :noreply, assign(socket, :current_language_code_id, String.to_integer(id)) }
+  end
+  def handle_event("change-document-version", %{"document_version" => %{"id" => id}}, socket) do
+    { :noreply, assign_document_version(socket, String.to_integer(id)) }
+  end
   def handle_event("editor_drag_start", %{ "type" => type, "id" => id}, socket) do
     IO.puts("Started dragging #{type}, id #{id} from editor panel")
     {
@@ -89,206 +124,191 @@ defmodule UserDocsWeb.DocumentLive.OldEditor do
       |> assign(:dragging, %{ type: type, id: id })
     }
   end
+  def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   @impl true
-  def handle_event("add_column",
-    %{"row-count" => row_count, "column-count" => column_count},
-    socket = %{ assigns: %{ document_version: document_version }}
-  ) when is_binary(row_count) and is_binary(column_count) do
+  def handle_info({:create_docubit, %{ type: type, docubit: docubit }}, socket) do
 
-    payload = %{
-      row_count: String.to_integer(row_count),
-      column_count: String.to_integer(column_count)
+    max_order =
+      case docubit.docubits  do
+        [] -> 0
+        [ _ | _ ] = docubits -> docubits |> Enum.at(-1) |> Map.get(:order, nil)
+      end
+
+    docubit_type = Documents.get_docubit_type_by_name!(socket, type, state_opts())
+
+    new_docubit_attrs = %{
+      docubit_type: convert_docubit_type_struct_to_map(docubit_type),
+      docubit_type_id: docubit_type.id,
+      order: max_order + 1,
+      docubit_id: docubit.id,
+      document_version_id: socket.assigns.document_version.id,
+      #settings: convert_settings_struct_to_map(docubit_type.context.settings)
     }
 
-    document_version =
-      Editor.add_new_column_to_body(document_version, payload)
+    # Get the exising docubits and extract attrs.  There's a better way to do this.
+    # Probably change to put_assoc
+    docubits =
+      docubit.docubits
+      |> Enum.map(fn(docubit) ->
+          docubit
+          |> Map.take(Docubit.__schema__(:fields))
+          |> Map.put(:context, convert_context_struct_to_map(docubit.context))
+          |> Map.put(:settings, convert_settings_struct_to_map(docubit.settings))
+        end)
+      |> List.insert_at(-1, new_docubit_attrs)
 
-    { _status, document_version } =
-      Documents.update_document_version(socket.assigns.document_version,
-        %{body: document_version.body})
+    # update the parent docubit with the new children, and broadcast it
+    socket =
+      case Documents.update_docubit(docubit, %{ docubits: docubits }) do
+        { :ok, docubit } ->
+          IO.puts("Created Docubit Successfully")
+          # This probably isn't sustainable
+          added_docubit = Enum.at(docubit.docubits, -1)
+          UserDocsWeb.Endpoint.broadcast(Defaults.channel(socket), "create", added_docubit)
+          socket
+          |> put_flash(:info, "Document created successfully")
+        { :error, changeset } ->
+          put_flash(socket, :error, "Creating Docubit failed  #{inspect(changeset.errors)}")
+      end
 
-    {
-      :noreply,
-      socket
-      |> assign(:document_version, document_version)
-      |> assign(:changeset, Documents.change_document_version(document_version))
-      |> assign_body()
-    }
+    { :noreply, socket }
   end
-
-  @impl true
-  def handle_event("add_row", payload = %{"row-count" =>  _}, socket = %{ assigns: %{ document_version: document_version }}) do
-    document_version = Editor.add_new_row_to_body(document_version, payload)
-
-    { status, document_version } =
-      Documents.update_document_version(socket.assigns.document_version,
-        %{body: document_version.body})
-
-    {
-      :noreply,
-      socket
-      |> assign(:document_version, document_version)
-      |> assign(:changeset, Documents.change_document_version(document_version))
-      |> assign_body()
-    }
+  def handle_info(%{topic: topic, event: event, payload: %Docubit{} = docubit}, socket) do
+    IO.puts("Handling Docubit Subscription")
+    { :noreply, _ } = Root.handle_info(%{ topic: topic, event: event, payload: docubit }, socket)
   end
-
-  @impl true
-  def handle_event("docubit_drop", %{ "element-id" => element_id, "column-count" => column_count, "row-count" => row_count}, socket
-  ) when is_binary(column_count) and is_binary(row_count) do
-    IO.puts("Dropping on docubit element #{element_id} column #{column_count}, row #{row_count}")
-    Logger.debug(socket.assigns.dragging)
-    type = socket.assigns.dragging.type
-    id = String.to_integer(socket.assigns.dragging.id)
-    Logger.debug(type)
-    Logger.debug(id)
-
-    document_version = Editor.add_item_to_document_version_column(
-      socket.assigns.document_version,
-      String.to_integer(row_count),
-      String.to_integer(column_count),
-      type,
-      id
+  def handle_info({ :close_all_dropdowns, exclude }, socket) do
+    Enum.each(Documents.list_docubits(socket, state_opts()),
+      fn(docubit) ->
+        if docubit.id not in exclude do
+          send_update(
+            DocubitEditorLive,
+            id: "docubit-editor-" <> Integer.to_string(docubit.id),
+            close_all_dropdowns: true
+          )
+        else
+          IO.puts("Skipping #{docubit.id}")
+        end
+      end
     )
+    { :noreply, socket }
+  end
+  def handle_info(n, s), do: Root.handle_info(n, s)
 
-    { _status, document_version } =
-      Documents.update_document_version(socket.assigns.document_version,
-        %{body: document_version.body})
-
-    {
-      :noreply,
-      socket
-      |> assign(:document_version, document_version)
-      |> assign_body()
-    }
+  defp convert_docubit_type_struct_to_map(docubit_type) do
+    docubit_type
+    |> Map.take(DocubitType.__schema__(:fields))
+    |> Map.put(:context, convert_context_struct_to_map(docubit_type.context))
   end
 
-  @impl true
-  def handle_event("change-language", %{"language" => %{"id" => id}}, socket)
-  when is_binary(id) do
-    IO.puts("Changing Language")
-    Logger.debug(id)
-    language_code_id = String.to_integer(id)
-
-    current_language_code =
-      socket.assigns.language_codes
-      |> Enum.filter(fn(c) -> c.id == language_code_id end)
-      |> Enum.at(0)
-
-    {
-      :noreply,
-      socket
-      |> assign(:current_language_code, current_language_code)
-      |> assign_body()
-    }
+  defp convert_context_struct_to_map(context) do
+    context
+    |> Map.take(Context.__schema__(:fields))
+    |> Map.put(:settings, convert_settings_struct_to_map(context.settings))
   end
 
-  @impl true
-  def handle_event("delete_body_item", %{ "body-element-id" => address }, socket) do
-    IO.puts("Handling a delete item event")
-    new_body = delete_body_item(address, socket.assigns.document_version.body)
-
-    { _status, new_document_version } =
-      Documents.update_document_version(socket.assigns.document_version,
-        %{body: new_body})
-
-    {
-      :noreply,
-      socket
-      |> assign(:document_version, new_document_version)
-      |> assign_body()
-    }
+  defp convert_settings_struct_to_map(nil), do: nil
+  defp convert_settings_struct_to_map(settings) do
+    settings
+    |> Map.take(DocubitSetting.__schema__(:fields))
   end
 
-  def delete_body_item(address, docubit) when is_binary(address) do
-    address
-    |> parse_address()
-    |> delete_body_item(docubit)
-  end
-  def delete_body_item([ ], docubit) do
-    raise(RunTimeError, message: "address list was already empty")
-  end
-  def delete_body_item([ h ], docubit) do
-    IO.puts("at end of list")
-    new_children = List.delete_at(docubit["children"], h)
-    Map.put(docubit, "children", new_children)
-  end
-  def delete_body_item([ h | t ], docubit) do
-    IO.puts("not at end of list")
-    child = Enum.at(docubit["children"], h)
-    child = delete_body_item(t, child)
-    new_children = List.replace_at(docubit["children"], h, child)
-    Map.put(docubit, "children", new_children)
+  defp prepare_document(socket, document) do
+    assign(socket, :document, document)
   end
 
-  def locate_body_item(body, address) do
-    address
-    |> parse_address()
-    |> Enum.reduce(body,
-      fn(id, docubit) ->
-        Enum.at(docubit["children"], id)
-      end)
+  defp prepare_document_version(socket, document_version_id) do
+    IO.puts("Preparing Document Version")
+    opts =
+      state_opts()
+      |> Keyword.put(:preloads, [
+          :body,
+          :docubits,
+          :version,
+          [ body: :content ],
+          [ body: :file ],
+          [ body: :through_annotation ],
+          [ body: :through_step ],
+          [ body: :docubit_type ],
+          [ body: [ content: :content_versions ] ],
+        ])
+
+    document_version = Documents.get_document_version!(document_version_id, socket, opts)
+
+    body =
+      document_version.body
+      |> Docubit.apply_context(%{ settings: %{} })
+
+    document_version = Map.put(document_version, :body, body)
+
+    socket
+    |> assign(:document_version, document_version)
   end
 
-  def parse_address(address) do
-    address
-    |> String.split(":")
-    |> (fn([ _ | t ]) -> t end).()
-    |> Enum.map(fn(e) -> String.to_integer(e) end)
+  defp state_opts() do
+    Defaults.state_opts
+    |> Keyword.put(:location, :data)
   end
 
-  def inspect_second({ body, second }) do
-    { body, second }
+  defp assign_document_version(socket) do
+    document_version = socket.assigns.document.document_versions |> Enum.at(0)
+    document = Map.put(socket.assigns.document, :document_version, document_version)
+    socket
+    |> assign(:document, document)
+  end
+  defp assign_document_version(socket, id) do
+    document_version = default_document_version(socket, id)
+    document = Map.put(socket.assigns.document, :document_version, document_version)
+    socket
+    |> assign(:document, document)
   end
 
-  defp assign_body(socket) do
-    case socket.assigns.document_version.body do
-      nil -> raise(ArgumentError, "UserDocsWeb.DocumentLive.Editor.body/1 can't parse a null body")
-      _ -> assign(socket, :body, body(socket))
-    end
-  end
-  defp body(socket) do
-    socket.assigns.document_version.body
-    |> UserDocs.Documents.OldDocuBit.parse(socket)
-    |> UserDocs.Documents.OldDocuBit.render_editor(%{renderer: "Editor", prefix: ""})
-  end
+  defp current_selections(socket) do
+    process = Automation.list_processes(socket, state_opts()) |> Enum.at(0)
+    page = Web.list_pages(socket, state_opts()) |> Enum.at(0)
+    version = Projects.get_version!(socket.assigns.current_version_id, socket, state_opts())
 
-  defp page_title(:show), do: "Show Document"
-  defp page_title(:edit), do: "Edit Document"
-
-  defp team(version_id) do
-    Users.get_version_team!(version_id)
+    socket
+    |> assign(:current_page, page)
+    |> assign(:current_process, process)
+    |> assign(:current_version, version)
   end
 
-  defp pages(version_id) do
-    Web.list_pages(%{}, %{version_id: version_id})
+  defp default_language_code_id(socket) do
+    IO.puts("default_language_code_id")
+    language_code_id =
+      Users.get_team!(socket.assigns.current_team_id, socket, state_opts())
+      |> Map.get(:default_language_code_id)
+
+    socket
+    |> assign(:current_language_code_id, language_code_id)
   end
 
-  defp processes(version_id) do
-    Automation.list_processes(%{}, %{version_id: version_id})
+  defp default_document_version_id(socket, document_or_id) do
+    default_document_version(socket, document_or_id)
+    |> Map.get(:id)
+  end
+  defp default_document_version(_socket, %Document{} = document) do
+    document.document_versions
+    |> Enum.at(0)
+  end
+  defp default_document_version(socket, _document_id) do
+    socket.assigns.document.document_versions
+    |> Enum.at(0)
+  end
+  defp document_version(document_versions, document_version_id) do
+    document_versions
+    |> Enum.filter(fn(dv) -> dv.id == document_version_id end)
+    |> Enum.at(0)
   end
 
-  defp content(team_id) do
-    Documents.list_content(
-      %{ content_versions: true },
-      %{ team_id: team_id }
-    )
+  defp channel(socket) do
+    Defaults.channel(socket)
   end
 
-  defp steps(team_id) do
-    Automation.list_steps(
-      %{
-        screenshot: true,
-        step_type: true,
-        annotation: true,
-        annotation_type: true,
-        content_versions: true,
-        file: true
-      },
-      %{team_id: team_id}
-    )
-    #|> Enum.filter(fn(s) -> s.step_type.name in @allowed_step_types end)
+  defp local_channel(socket) do
+    "document-version-" <> Integer.to_string(socket.assigns.document_version)
   end
 
   defp process_steps(process_id, steps) when is_integer(process_id) do
@@ -296,28 +316,10 @@ defmodule UserDocsWeb.DocumentLive.OldEditor do
     |> Enum.filter(fn(s) -> s.process_id == process_id end)
     |> Enum.filter(fn(s) -> s.step_type.name in @allowed_step_types end)
   end
-
-  defp annotations(team_id) do
-    Web.list_annotations(
-      %{
-        content: true,
-        content_versions: true,
-        annotation_type: true
-      },
-      %{team_id: team_id}
-    )
-  end
-
   defp process_annotations(page_id, annotations) do
     IO.puts("Process annotations")
     annotations
     |> Enum.filter(fn(a) -> a.page_id == page_id end)
   end
-
   defp panel_content(_, content), do: content
-
-  defp language_codes() do
-    Logger.debug("UserDocsWeb.DocumentLive.Editor querying language codes")
-    Documents.list_language_codes()
-  end
 end
