@@ -7,11 +7,13 @@ defmodule UserDocs.Repo.Migrations.CreateDocubits do
       add :docubit_id, references(:docubits, on_delete: :nothing)
       add :content_id, references(:content, on_delete: :nothing)
       add :file_id, references(:files, on_delete: :nothing)
+      add :allowed_settings, {:array, :string}
       add :through_annotation_id, references(:annotations, on_delete: :nothing)
       add :through_step_id, references(:steps, on_delete: :nothing)
       add :settings, :map
       add :address, {:array, :integer}
       add :order, :integer
+      add :context, :map
 
       timestamps()
     end
