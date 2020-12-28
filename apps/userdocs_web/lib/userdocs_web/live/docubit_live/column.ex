@@ -65,7 +65,6 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Column do
 
   @impl true
   def handle_event("display-create-menu", _, socket) do
-    IO.puts("Create Docubit")
     { :noreply, assign(socket, :display_create_menu, not socket.assigns.display_create_menu) }
   end
 end
