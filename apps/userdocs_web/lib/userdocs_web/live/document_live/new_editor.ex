@@ -203,18 +203,8 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
     document_version = Map.put(document_version, :body, body)
 
-    IO.inspect(document_version.body)
-
     socket
     |> assign(:document_version, document_version)
-  end
-
-  defp prepare_map(socket) do
-    assign(socket, :map, DocumentVersion.map_docubits(socket.assigns.document_version))
-  end
-
-  defp prepare_body(socket) do
-    assign(socket, :body, DocumentVersion.traverse_docubit_map(socket.assigns.map, socket, state_opts()))
   end
 
   defp state_opts() do
