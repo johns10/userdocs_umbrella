@@ -10,12 +10,12 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   alias UserDocs.Documents
   alias UserDocs.Automation
   alias UserDocs.Projects
-  alias UserDocs.Media
   alias UserDocs.Web
   alias UserDocs.Users
 
   alias UserDocs.Automation.Process
   alias UserDocs.Automation.Step
+  alias UserDocs.Documents
   alias UserDocs.Documents.Document
   alias UserDocs.Documents.Content
   alias UserDocs.Documents.ContentVersion
@@ -23,12 +23,15 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   alias UserDocs.Documents.LanguageCode
   alias UserDocs.Documents.Docubit
   alias UserDocs.Documents.DocubitType
+  alias UserDocs.Documents.DocubitSetting
+  alias UserDocs.Documents.Docubit.Context
   alias UserDocs.Web.Page
   alias UserDocs.Web.Annotation
   alias UserDocs.Media.File
 
   alias UserDocsWeb.Root
   alias UserDocsWeb.Defaults
+  alias UserDocsWeb.DocubitEditorLive
   alias UserDocsWeb.DocubitLive.Dragging
 
   @allowed_step_types ["Full Screen Screenshot", "Element Screenshot", "Apply Annotation"]
@@ -133,23 +136,26 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       end
 
     docubit_type = Documents.get_docubit_type_by_name!(socket, type, state_opts())
-    docubit_type_attrs = Map.take(docubit_type, DocubitType.__schema__(:fields))
 
     new_docubit_attrs = %{
-      docubit_type: docubit_type_attrs,
+      docubit_type: convert_docubit_type_struct_to_map(docubit_type),
       docubit_type_id: docubit_type.id,
       order: max_order + 1,
       docubit_id: docubit.id,
       document_version_id: socket.assigns.document_version.id,
-      settings: docubit_type.context.settings
+      #settings: convert_settings_struct_to_map(docubit_type.context.settings)
     }
-
 
     # Get the exising docubits and extract attrs.  There's a better way to do this.
     # Probably change to put_assoc
     docubits =
       docubit.docubits
-      |> Enum.map(fn(d) -> Map.take(d, Docubit.__schema__(:fields)) end)
+      |> Enum.map(fn(docubit) ->
+          docubit
+          |> Map.take(Docubit.__schema__(:fields))
+          |> Map.put(:context, convert_context_struct_to_map(docubit.context))
+          |> Map.put(:settings, convert_settings_struct_to_map(docubit.settings))
+        end)
       |> List.insert_at(-1, new_docubit_attrs)
 
     # update the parent docubit with the new children, and broadcast it
@@ -190,6 +196,23 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   end
   def handle_info(n, s), do: Root.handle_info(n, s)
 
+  defp convert_docubit_type_struct_to_map(docubit_type) do
+    docubit_type
+    |> Map.take(DocubitType.__schema__(:fields))
+    |> Map.put(:context, convert_context_struct_to_map(docubit_type.context))
+  end
+
+  defp convert_context_struct_to_map(context) do
+    context
+    |> Map.take(Context.__schema__(:fields))
+    |> Map.put(:settings, convert_settings_struct_to_map(context.settings))
+  end
+
+  defp convert_settings_struct_to_map(nil), do: nil
+  defp convert_settings_struct_to_map(settings) do
+    settings
+    |> Map.take(DocubitSetting.__schema__(:fields))
+  end
 
   defp prepare_document(socket, document) do
     assign(socket, :document, document)
