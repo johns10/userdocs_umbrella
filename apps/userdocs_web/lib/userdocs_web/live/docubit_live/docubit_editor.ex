@@ -2,6 +2,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
   use UserDocsWeb, :live_component
 
   alias UserDocsWeb.DocubitEditorLive
+  alias UserDocsWeb.Endpoint
   alias UserDocsWeb.Defaults
   alias UserDocsWeb.Root
   alias UserDocs.Documents.Docubit
@@ -9,6 +10,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
 
   @impl true
   def mount(socket) do
+    Endpoint.subscribe("docubit-editor")
     {
       :ok,
       socket
@@ -17,12 +19,15 @@ defmodule UserDocsWeb.DocubitEditorLive do
   end
 
   @impl true
+  def update(%{ close_all_dropdowns: true }, socket) do
+    { :ok, assign(socket, :display_settings_menu, false) }
+  end
   def update(assigns, socket) do
-    IO.puts("Running Docubit Editor Update")
     docubit = assigns.docubit
 
     preloads = [
       :docubits,
+      :docubit_type,
       [ docubits: :content ],
       [ docubits: :file ],
       [ docubits: :through_annotation ],
@@ -36,19 +41,23 @@ defmodule UserDocsWeb.DocubitEditorLive do
       |> Keyword.put(:preloads, preloads)
       |> Keyword.put(:order, docubits: %{field: :order, order: :asc})
 
-    preloaded_docubit = Documents.get_docubit!(assigns.docubit.id, assigns, opts)
+    preloaded_docubit =
+      Documents.get_docubit!(assigns.docubit.id, assigns, opts)
 
     docubits =
       preloaded_docubit.docubits
-      |> Enum.map(fn(d) -> Docubit.apply_context(d, docubit.context) end)
+      |> Enum.map(
+        fn(d) ->
+          Docubit.apply_context(d, docubit.context)
+        end)
 
-    docubit = Map.put(docubit, :docubits, docubits)
+    final_docubit = Map.put(docubit, :docubits, docubits)
 
     {
       :ok,
       socket
       |> assign(assigns)
-      |> assign(:docubit, docubit)
+      |> assign(:docubit, final_docubit)
       |> assign(:renderer, Docubit.renderer(docubit))
     }
   end
@@ -66,14 +75,32 @@ defmodule UserDocsWeb.DocubitEditorLive do
         <div class="is-flex is-flex-direction-row is-justify-content-space-between py-1">
           <div><%= @docubit.docubit_type.name %></div>
           <div class="py-0">
-            <div class="dropdown is-active">
+            <div class="<%= dropdown_is_active?(@display_settings_menu) %>" >
               <i class="fa fa-gear"
                 phx-click="display-settings-menu"
+                phx-value-docubit-id=<%= @docubit.id %>
                 phx-target="<%= @myself.cid %>"
               ></i>
-              <%= if @display_settings_menu do %>
-                <%= docubit_editor_options_dropdown(assigns) %>
-              <% end %>
+              <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                <div class="dropdown-content">
+                  <%= if is_integer(@parent_cid) do %>
+                    <a href="#"
+                      class="dropdown-item"
+                      phx-click="delete-docubit"
+                      phx-target=<%= @parent_cid %>
+                      phx-value-id=<%= @docubit.id %>>
+                      Delete
+                    </a>
+                  <% end %>
+                  <a href="#"
+                    class="dropdown-item"
+                    phx-click="edit-docubit"
+                    phx-target=<%= @myself.cid %>
+                    phx-value-id=<%= @docubit.id %>>
+                    Settings
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -102,29 +129,11 @@ defmodule UserDocsWeb.DocubitEditorLive do
     """
   end
 
-  def docubit_editor_options_dropdown(assigns) do
-    ~L"""
-      <div class="dropdown-menu" id="dropdown-menu" role="menu">
-        <div class="dropdown-content">
-          <%= if is_integer(@parent_cid) do %>
-            <a href="#"
-              class="dropdown-item"
-              phx-click="delete-docubit"
-              phx-target=<%= @parent_cid %>
-              phx-value-id=<%= @docubit.id %>>
-              Delete
-            </a>
-          <% end %>
-          <a href="#"
-            class="dropdown-item"
-            phx-click="edit-docubit"
-            phx-target=<%= @myself.cid %>
-            phx-value-id=<%= @docubit.id %>>
-            Settings
-          </a>
-        </div>
-      </div>
-    """
+  def dropdown_is_active?(true), do: "dropdown is-right is-active"
+  def dropdown_is_active?(false), do: "dropdown is-right"
+
+  def handle_event(socket, "delete" = event, payload, opts) do
+    StateHandlers.delete(socket, payload, opts)
   end
 
   def handle_event("delete-docubit", %{"id" => id }, socket) do
@@ -147,8 +156,6 @@ defmodule UserDocsWeb.DocubitEditorLive do
 
     case Documents.delete_docubit_from_docubits(socket.assigns.docubit, attrs) do
       {:error, changeset} ->
-        IO.puts("Delete failed")
-
         {
           :noreply,
           socket
@@ -165,7 +172,8 @@ defmodule UserDocsWeb.DocubitEditorLive do
         }
     end
   end
-  def handle_event("create-docubit", %{"type" => type, "docubit-id" => _docubit_id}, socket) do
+  def handle_event("create-docubit", %{"type" => type, "docubit-id" => docubit_id}, socket) do
+    send(self(), { :close_all_dropdowns, [ String.to_integer(docubit_id) ] })
     send(self(), {:create_docubit, %{type: type, docubit: socket.assigns.docubit}})
     {:noreply, socket}
   end
@@ -218,8 +226,8 @@ defmodule UserDocsWeb.DocubitEditorLive do
       |> assign(:docubit, docubit)
     }
   end
-  def handle_event("display-settings-menu", _, socket) do
-    IO.puts("Create Docubit")
+  def handle_event("display-settings-menu", %{"docubit-id" => docubit_id}, socket) do
+    send(self(), { :close_all_dropdowns, [ String.to_integer(docubit_id) ] })
     {:noreply, assign(socket, :display_settings_menu, not socket.assigns.display_settings_menu)}
   end
   def handle_event("edit-docubit" = name, %{"id" => id}, socket) do
