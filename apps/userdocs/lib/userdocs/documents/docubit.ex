@@ -8,6 +8,7 @@ defmodule UserDocs.Documents.Docubit do
   alias UserDocs.Documents
   alias UserDocs.Documents.Docubit
   alias UserDocs.Documents.DocubitType
+  alias UserDocs.Documents.DocubitSetting
   alias UserDocs.Documents.Docubit.Context
   alias UserDocs.Documents.Docubit.Renderer
   alias UserDocs.Documents.Docubit.Hydrate
@@ -23,11 +24,13 @@ defmodule UserDocs.Documents.Docubit do
 
   schema "docubits" do
     field :order, :integer
-    field :settings, :map
     field :address, { :array, :integer }
+    field :context, EctoContext
+
+    embeds_one :settings, DocubitSetting, on_replace: :delete
 
     has_many :docubits, Docubit, on_delete: :delete_all
-    embeds_one :context, Context, on_replace: :delete
+
     belongs_to :docubit_type, DocubitType
 
     belongs_to :docubit, Docubit
@@ -64,11 +67,11 @@ defmodule UserDocs.Documents.Docubit do
 
   def changeset(docubit, attrs \\ %{}) do
     docubit
-    |> cast(attrs, [ :delete, :docubit_type_id, :settings, :address,
+    |> cast(attrs, [ :delete, :docubit_type_id, :address,
         :document_version_id, :content_id, :through_annotation_id,
-        :through_step_id, :docubit_id, :file_id ])
+        :through_step_id, :docubit_id, :file_id, :context ])
+    |> cast_embed(:settings)
     |> cast_assoc(:docubits)
-    |> put_embed(:context, Map.get(attrs, :context, nil))
     |> foreign_key_constraint(:docubit_type_id)
     |> foreign_key_constraint(:document_version_id)
     |> foreign_key_constraint(:content_id)
@@ -78,7 +81,6 @@ defmodule UserDocs.Documents.Docubit do
       fn(:docubits, docubits) ->
         validate_allowed_docubits(&1, docubits)
       end))).()
-    |> cast_settings(Map.get(attrs, :docubit_type, nil))
     |> order_changeset_docubits()
     |> address_docubits()
     |> validate_required([ :docubit_type_id, :document_version_id ])
@@ -151,8 +153,6 @@ defmodule UserDocs.Documents.Docubit do
     type =
       changeset
       |> get_field(:docubit_type)
-
-    IO.inspect(docubits)
 
     Enum.reduce(docubits, [],
       fn(d, errors) ->
