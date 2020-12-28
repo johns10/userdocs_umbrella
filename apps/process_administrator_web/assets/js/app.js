@@ -19,7 +19,7 @@ import {LiveSocket} from "phoenix_live_view"
 import {handle_message} from "./commands.js"
 import {Hooks} from "./hooks.js"
 
-let DOMAIN = "userdocs.com"
+let DOMAIN = "user-docs.com"
 let PORT = "4003"
 
 let APP_URL = "https://" + DOMAIN + ":" + PORT + "/"
