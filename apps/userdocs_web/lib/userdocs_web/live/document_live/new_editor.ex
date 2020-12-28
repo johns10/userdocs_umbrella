@@ -254,7 +254,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
     document.document_versions
     |> Enum.at(0)
   end
-  defp default_document_version(socket, document_id) do
+  defp default_document_version(socket, _document_id) do
     socket.assigns.document.document_versions
     |> Enum.at(0)
   end
