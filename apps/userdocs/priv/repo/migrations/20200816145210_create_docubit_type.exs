@@ -6,7 +6,8 @@ defmodule UserDocs.Repo.Migrations.CreateDocubitTypes do
       add :name, :string
       add :allowed_data, {:array, :string}
       add :allowed_children, {:array, :string}
-      add :context, :jsonb
+      add :allowed_settings, {:array, :string}
+      add :context, :map
     end
 
   end
