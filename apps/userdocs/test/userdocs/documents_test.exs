@@ -430,7 +430,6 @@ defmodule UserDocs.DocumentsTest do
     test "create_docubit_types/1 with container data creates a docubit_types" do
       attrs = DocubitFixtures.docubit_type_attrs(:ol)
       assert {:ok, %DocubitType{} = docubit_type} = Documents.create_docubit_type(attrs)
-      IO.inspect(docubit_type)
       assert docubit_type.name == "ol"
       assert docubit_type.context.settings == attrs.context.settings
     end
