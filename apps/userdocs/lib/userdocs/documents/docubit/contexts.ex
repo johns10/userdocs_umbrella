@@ -6,24 +6,35 @@ defmodule UserDocs.Documents.Docubit.Context do
 
   alias UserDocs.Documents.Docubit, as: Docubit
   alias UserDocs.Documents.DocubitType
+  alias UserDocs.Documents.DocubitSetting
   alias UserDocs.Documents.Docubit.Context
 
   @primary_key false
   embedded_schema do
-    field :settings, :map
+    field :settings, EctoSettings
   end
 
   # This function will apply the context in reverse order, overwriting each time.  It's the opposite of what
   # We have below (which might be incorrect on second thought)
   def context(docubit = %Docubit{}, parent_context = %Context{}) do
-    IO.inspect(docubit)
-    with { :ok, context } <- update_context(parent_context, type_context(docubit)),
-      { :ok, context } <- update_context(context, %{ settings: docubit.settings })
-    do
-      { :ok, context }
-    else
-      { :error, changeset }-> changeset
+    docubit.docubit_type.context
+    |> handle_context_update(parent_context)
+    |> handle_context_update(%Context{ settings: docubit.settings })
+  end
+
+  def handle_context_update(context, %Context{ settings: nil }), do: context
+  def handle_context_update(context, attrs) do
+    case update_context(context, attrs) do
+      { :ok, context } -> context
+      _ -> raise(RuntimeError, "#{__MODULE__}.handle_context_update failed")
     end
+  end
+
+  def update_context(%Context{} = context, %Context{} = attrs) do
+    # IO.puts("Internal update_context")
+    context
+    |> internal_changeset(attrs)
+    |> apply_action(:update)
   end
 
   def update_context(%Context{} = context, attrs \\ %{}) do
@@ -41,31 +52,34 @@ defmodule UserDocs.Documents.Docubit.Context do
   def changeset(context, attrs) do
     context
     |> cast(attrs, [ :settings ])
-    |> apply_overwrite_policy(:settings)
+    |> remove_all_nil_settings()
   end
 
-  defp apply_overwrite_policy(changeset, field) do
-    case get_change(changeset, field) do # When there's a change to the field, do stuff, otherwise, return the changeset
-      nil ->
-        delete_change(changeset, field) # Because we apply in reverse order, changing to a nil value must be ignored
+  def remove_all_nil_settings(changeset) do
+    case get_change(changeset, :settings) do
+      nil -> changeset
       "" -> changeset
-      changes ->
-        changes =
-          Enum.reduce(changes, Map.get(changeset.data, field, %{}),
-            fn({ key, value }, fields) -> # When there's a change, rip through the values and retreive each key from the existin fields
-              case fields do # When the fields aren't there, we return the changeset, because we want to apply the changes as is
-                nil -> changes
-                _ ->
-                  case Map.get(fields, key, :not_exist) do # This is the policy of the change.  Basically we overwrite everything because we apply in reverse order.e
-                    nil -> Map.put(fields, key, value) # When the field is there but has a nil value, put the value from the changeset
-                    :not_exist -> Map.put_new(fields, key, value) # When the field doesn't exist, put the value from the changeset
-                    _ -> Map.put(fields, key, value) # When the field is there and has a value, put the value
-                  end
-              end
-            end
-          )
-        put_change(changeset, field, changes)
+      settings when settings == %{} -> delete_change(changeset, :settings)
+      settings -> put_change(changeset, :settings, ignore_nil_settings(settings))
     end
+  end
+
+  def ignore_nil_settings(settings) do
+    Enum.reduce(settings, %{},
+      fn({key, value}, acc) ->
+        case value do
+          nil -> acc
+          value -> Map.put(acc,key, value)
+        end
+      end
+    )
+  end
+
+  def internal_changeset(context, attrs) do
+    # IO.puts("internal_changeset")
+    context
+    |> change()
+    |> put_change(:settings, attrs.settings)
   end
 
   # Applies all context to a docubit.  Takes a docubit, returns a
@@ -73,43 +87,37 @@ defmodule UserDocs.Documents.Docubit.Context do
   # Docubit
   def apply_context_changes(docubit, parent_context) do
     docubit
-    |> add_context(parent_context, :type)
+    |> apply_context_change(docubit.docubit_type.context)
+    |> apply_context_change(parent_context)
+    |> apply_context_change(%{ settings: docubit.settings })
   end
 
-
-  # Adds a particular type of context by calling add_context with the
-  # context, fetched from the appropriate place.  Controls the
-  # Hierarchy of context
-  defp add_context(docubit = %Docubit{}, parent_context, :type) do
-    Logger.debug("Adding context to docubit with parent_context: #{inspect(parent_context)}")
+  defp apply_context_change(docubit = %Docubit{}, context = %Context{}) do
+    apply_context_change(docubit, Map.take(context, Context.__schema__(:fields)))
+  end
+  defp apply_context_change(docubit = %Docubit{}, nil) do
+    # Logger.debug("nil context, returning docubit")
     docubit
-    |> add_context(parent_context)
-    |> add_context(docubit.docubit_type.context)
-    |> add_context(%{ settings: docubit.settings })
+  end
+  defp apply_context_change(docubit = %Docubit{}, %{settings: nil}), do: docubit
+  defp apply_context_change(docubit = %Docubit{}, context_attrs) when is_map(context_attrs) do
+    #Logger.debug("Adding context #{inspect(context_attrs)} to Docubit #{inspect(docubit)}")
+    context = update_existing_context(docubit, context_attrs)
+    update_docubit_context(docubit, context)
   end
 
-  defp add_context(docubit = %Docubit{}, context = %Context{}) do
-    add_context(docubit, Map.from_struct(context))
+  defp update_existing_context(docubit, context_attrs) do
+    case update_context(docubit.context || %Context{}, context_attrs) do
+      { :ok, context } -> context
+      _ -> raise(RuntimeError, "#{__MODULE__}.existing_context failed to update context")
+    end
   end
-  # Converts the kw list of
-  defp add_context(docubit = %Docubit{}, context_attrs) when is_map(context_attrs) do
-    Logger.debug("Adding context #{inspect(context_attrs)} to Docubit")
-    existing_context = docubit.context || %Context{}
-    { :ok, context } = update_context(existing_context, context_attrs)
+
+  defp update_docubit_context(docubit, context) do
     changeset = Docubit.changeset(docubit, %{ context: context })
-    { :ok, docubit } =
-      Ecto.Changeset.apply_action(changeset, :update)
-
-    docubit
-  end
-  defp add_context(docubit = %Docubit{}, nil) do
-    Logger.warn("nil context, returning docubit")
-    docubit
-  end
-
-  defp type_context(docubit = %Docubit{ docubit_type: %DocubitType{} }) do
-    docubit
-    |> Map.get(:docubit_type)
-    |> Map.get(:context)
+    case Ecto.Changeset.apply_action(changeset, :update) do
+      { :ok, docubit } -> docubit
+      _ -> raise(RuntimeError, "#{__MODULE__}.update_docubit failed to update docubit")
+    end
   end
 end
