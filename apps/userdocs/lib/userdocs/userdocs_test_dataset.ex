@@ -962,10 +962,7 @@ defmodule UserDocs.TestDataset do
     }
 
     {:ok, %DocumentVersion{id: document_version_id}} =
-    %DocumentVersion{}
-    |> DocumentVersion.changeset(document_version)
-    |> Repo.insert()
-
+      Documents.create_document_version(document_version)
 
   end
 
