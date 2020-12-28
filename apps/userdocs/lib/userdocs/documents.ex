@@ -806,7 +806,6 @@ defmodule UserDocs.Documents do
         attrs_fun = dt.name <> "_attrs" |> String.to_atom()
         attrs = Kernel.apply(UserDocs.Documents.DocubitType, attrs_fun, [])
         { :ok, docubit_type } = update_docubit_type(dt, attrs)
-        IO.inspect(docubit_type)
       end)
   end
 
