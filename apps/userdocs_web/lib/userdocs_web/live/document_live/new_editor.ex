@@ -172,6 +172,22 @@ defmodule UserDocsWeb.DocumentLive.Editor do
     IO.puts("Handling Docubit Subscription")
     { :noreply, _ } = Root.handle_info(%{ topic: topic, event: event, payload: docubit }, socket)
   end
+  def handle_info({ :close_all_dropdowns, exclude }, socket) do
+    Enum.each(Documents.list_docubits(socket, state_opts()),
+      fn(docubit) ->
+        if docubit.id not in exclude do
+          send_update(
+            DocubitEditorLive,
+            id: "docubit-editor-" <> Integer.to_string(docubit.id),
+            close_all_dropdowns: true
+          )
+        else
+          IO.puts("Skipping #{docubit.id}")
+        end
+      end
+    )
+    { :noreply, socket }
+  end
   def handle_info(n, s), do: Root.handle_info(n, s)
 
 
