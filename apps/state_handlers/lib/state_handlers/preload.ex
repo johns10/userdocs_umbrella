@@ -18,7 +18,7 @@ defmodule StateHandlers.Preload do
   end
 
   def apply(_state, nil, _preloads, _opts) do
-    Logger.error("State.Preload called with nil data")
+    #Logger.error("State.Preload called with nil data")
     nil
   end
   def apply(_state, data, _preloads, _opts) do
@@ -78,7 +78,7 @@ defmodule StateHandlers.Preload do
     case (association in associations) and association == preload do
       true -> [ order_opt | order_opts ]
       false ->
-        Logger.warn("handle_order_option was passed an invalid association: #{association}, or it didn't match the preload: #{preload}.  Available associations are #{inspect(associations)}")
+        #Logger.warn("handle_order_option was passed an invalid association: #{association}, or it didn't match the preload: #{preload}.  Available associations are #{inspect(associations)}")
         order_opts
     end
   end
