@@ -20,6 +20,7 @@ defmodule StateHandlers do
   def preload(state, data, opts), do: StateHandlers.Preload.apply(state, data, opts)
   def list(state, schema, opts), do: StateHandlers.List.apply(state, schema, opts)
   def create(state, data, opts), do: StateHandlers.Create.apply(state, data, opts)
+  def update(state, data, opts), do: StateHandlers.Update.do_update(state, data, opts)
   def inspect(state, opts), do: StateHandlers.Inspect.apply(state, opts)
   def initialize(state, opts), do: StateHandlers.Initialize.apply(state, opts)
   def delete(state, data, opts), do: StateHandlers.Delete.apply(state, data, opts)
