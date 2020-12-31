@@ -28,6 +28,21 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
     %Docubit{ docubit_type: %DocubitType{ name: "p" }} = docubit,
     %Content{} = content
   ) do
+    hydrate_with_content(docubit, content)
+  end
+  def hydrate(
+    %Docubit{ docubit_type: %DocubitType{ name: "li" }} = docubit,
+    %Content{} = content
+  ) do
+    hydrate_with_content(docubit, content)
+  end
+  def hydrate(
+    %Docubit{ docubit_type: %DocubitType{ name: "info" }} = docubit,
+    %Content{} = content
+  ) do
+    hydrate_with_content(docubit, content)
+  end
+  def hydrate_with_content(docubit = %Docubit{}, content = %Content{}) do
     attrs = %{
       content_id: content.id,
       content: content
@@ -44,6 +59,15 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
     %Docubit{ docubit_type: %DocubitType{ name: "p" }} = docubit,
     %Annotation{} = annotation
   ) do
+    hydrate_with_annotation(docubit, annotation)
+  end
+  def hydrate(
+    %Docubit{ docubit_type: %DocubitType{ name: "li" }} = docubit,
+    %Annotation{} = annotation
+  ) do
+    hydrate_with_annotation(docubit, annotation)
+  end
+  def hydrate_with_annotation(docubit = %Docubit{}, annotation = %Annotation{}) do
     attrs = %{
       through_annotation_id: annotation.id,
       content_id: annotation.content_id
@@ -58,9 +82,18 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
     end
   end
   def hydrate(
+    %Docubit{ docubit_type: %DocubitType{ name: "li" }} = docubit,
+    %Step{} = step
+  ) do
+    hydrate_with_step(docubit, step)
+  end
+  def hydrate(
     %Docubit{ docubit_type: %DocubitType{ name: "p" }} = docubit,
     %Step{} = step
   ) do
+    hydrate_with_step(docubit, step)
+  end
+  def hydrate_with_step(docubit = %Docubit{}, step = %Step{}) do
     IO.puts("Hydrating with step")
     attrs = %{
       through_step_id: step.id,
@@ -97,8 +130,8 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
       { :error, changeset } -> changeset
     end
   end
-  def hydrate(_, _) do
-    { :hydrate, "Hydrate Not Implemented for this combination"}
+  def hydrate(%Docubit{ docubit_type: %DocubitType{ name: docubit_type }}, object) do
+    { :hydrate, "Hydrate Not Implemented for this combination: #{docubit_type} and #{inspect(object.__struct__)}"}
   end
 
   def precheck(docubit, data) do
@@ -130,9 +163,14 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
     raise(RuntimeError, Atom.to_string(__MODULE__) <> " missing type (Not Loaded).")
   end
 
+  #TODO: THis is dumb.  Remove
   def precheck_data(s, "p", %Annotation{} = a), do: precheck_annotation(s, a)
   def precheck_data(s, "p", %Content{} = _data), do: s
   def precheck_data(s, "p", %Step{} = step), do: precheck_step_p(s, step)
+  def precheck_data(s, "li", %Annotation{} = a), do: precheck_annotation(s, a)
+  def precheck_data(s, "li", %Content{} = _data), do: s
+  def precheck_data(s, "li", %Step{} = step), do: precheck_step_p(s, step)
+  def precheck_data(s, "info", %Content{} = _data), do: s
   def precheck_data(s, "img", %Step{} = step), do: precheck_step_img(s, step)
   def precheck_data(_, _, _), do: { :precheck, [ "Data not allowed in docubit"]}
 
