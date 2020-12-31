@@ -4,15 +4,15 @@ defmodule UserDocs.Docubit.Messages do
   alias UserDocs.Helpers
 
   def edit_modal_menu(socket, params) do
-    required_keys = [ :docubit, :channel, :opts ]
+    required_keys = [ :docubit, :channel, :state_opts ]
     params = Helpers.validate_params(params, required_keys, __MODULE__)
 
     %{ target: "ModalMenus" }
     |> init(socket, params.channel)
-    |> edit(socket, params.docubit, params.opts)
+    |> edit(socket, params.docubit, params.state_opts)
   end
 
-  defp edit(message, socket, docubit, opts) do
+  defp edit(message, _socket, docubit, _opts) do
     message
     |> Map.put(:object, docubit)
     |> Map.put(:action, :edit)
