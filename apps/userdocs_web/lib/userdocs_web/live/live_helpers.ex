@@ -33,7 +33,7 @@ defmodule UserDocsWeb.LiveHelpers do
   def live_modal_menus(socket, opts) do
     picker_opts = [
       id: Keyword.fetch!(opts, :id),
-      action: Keyword.fetch!(opts, :action),
+      form_data: Keyword.fetch!(opts, :form_data),
     ]
 
     live_component(socket, ModalMenus, picker_opts)
