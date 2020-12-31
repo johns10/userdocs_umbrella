@@ -349,12 +349,14 @@ defmodule UserDocs.TestDataset do
 
     version_2020_1 = %{
       name: "2020.2.1",
+      order: 1,
       project_id: funnelcloud_manager_project_id,
       strategy_id: css_strategy_id
     }
 
     version_2020_2 = %{
       name: "2020.2.2",
+      order: 2,
       project_id: funnelcloud_manager_project_id,
       strategy_id: css_strategy_id
     }
