@@ -27,87 +27,89 @@ defmodule UserDocsWeb.ModalMenus do
   def render(assigns) do
     ~L"""
       <div id="<%= @id %>">
-        <%= if @action in [:new, :edit] do %>
+        <%= IO.puts("Rendering form"); "" %>
+        <%= if @form_data.action in [:new, :edit] do %>
           <%=
-            case @type do
+            IO.puts("Running form code")
+            case @form_data.type do
               :version ->
                 LiveHelpers.live_modal @socket, VersionForm,
-                  id: @object.id || :new,
-                  title: @title,
-                  action: @action,
-                  version: @object,
-                  parent_id: @parent.id,
+                  id: @form_data.object.id || :new,
+                  title: @form_data.title,
+                  action: @form_data.action,
+                  version: @form_data.object,
+                  parent_id: @form_data.parent.id,
                   select_lists: %{
-                    strategies: @select_lists.strategies,
-                    projects: @select_lists.projects
+                    strategies: @form_data.select_lists.strategies,
+                    projects: @form_data.select_lists.projects
                   }
               :project ->
                 LiveHelpers.live_modal @socket, ProjectForm,
-                  id: @object.id || :new,
-                  title: @title,
-                  action: @action,
-                  project: @object,
-                  parent_id: @parent.id,
+                  id: @form_data.object.id || :new,
+                  title: @form_data.title,
+                  action: @form_data.action,
+                  project: @form_data.object,
+                  parent_id: @form_data.parent.id,
                   select_lists: %{
-                    teams: @select_lists.teams,
+                    teams: @form_data.select_lists.teams,
                   }
               :process ->
                 LiveHelpers.live_modal @socket, ProcessForm,
-                  id: @object.id || :new,
-                  title: @title,
-                  action: @action,
-                  process: @object,
-                  parent_id: @parent.id,
+                  id: @form_data.object.id || :new,
+                  title: @form_data.title,
+                  action: @form_data.action,
+                  process: @form_data.object,
+                  parent_id: @form_data.parent.id,
                   select_lists: %{
-                    versions: @select_lists.versions,
+                    versions: @form_data.select_lists.versions,
                   }
               :document ->
                 LiveHelpers.live_modal @socket, DocumentForm,
-                  id: @object.id || :new,
-                  title: @title,
-                  action: @action,
-                  document: @object,
-                  team_id: @team_id,
-                  channel: @channel,
+                  id: @form_data.object.id || :new,
+                  title: @form_data.title,
+                  action: @form_data.action,
+                  document: @form_data.object,
+                  team_id: @form_data.team_id,
+                  channel: @form_data.channel,
                   select_lists: %{
-                    projects: @select_lists.projects,
+                    projects: @form_data.select_lists.projects,
                   }
               :document_version ->
                 LiveHelpers.live_modal @socket, DocumentVersionForm,
-                  id: @object.id || :new,
-                  title: @title,
-                  action: @action,
-                  document_version: @object,
-                  document_id: @document_id,
-                  version_id: @version_id,
-                  channel: @channel,
+                  id: @form_data.object.id || :new,
+                  title: @form_data.title,
+                  action: @form_data.action,
+                  document_version: @form_data.object,
+                  document_id: @form_data.document_id,
+                  version_id: @form_data.version_id,
+                  channel: @form_data.channel,
                   select_lists: %{
-                    documents: @select_lists.documents,
-                    versions: @select_lists.versions
+                    documents: @form_data.select_lists.documents,
+                    versions: @form_data.select_lists.versions
                   }
                 :docubit ->
                   LiveHelpers.live_modal @socket, DocubitForm,
-                    id: :new,
-                    title: @title,
-                    action: @action,
-                    docubit: @object,
-                    document_version_id: @document_version_id,
-                    docubit_id: @docubit_id,
-                    channel: @channel
+                    id: @form_data.object.id || :new,
+                    title: @form_data.title,
+                    action: @form_data.action,
+                    docubit: @form_data.object,
+                    document_version_id: @form_data.document_version_id,
+                    docubit_id: @form_data.docubit_id,
+                    channel: @form_data.channel
                 :content ->
                   LiveHelpers.live_modal @socket, ContentForm,
-                  id: @object.id || :new,
-                    title: @title,
-                    action: @action,
-                    content: @object,
-                    team_id: @team_id,
-                    version_id: @version_id,
-                    channel: @channel,
+                  id: @form_data.object.id || :new,
+                    title: @form_data.title,
+                    action: @form_data.action,
+                    content: @form_data.object,
+                    team_id: @form_data.team_id,
+                    version_id: @form_data.version_id,
+                    channel: @form_data.channel,
                     select_lists: %{
-                      teams: @select_lists.teams,
-                      versions: @select_lists.versions,
-                      language_codes: @select_lists.language_codes,
-                      content: @select_lists.content
+                      teams: @form_data.select_lists.teams,
+                      versions: @form_data.select_lists.versions,
+                      language_codes: @form_data.select_lists.language_codes,
+                      content: @form_data.select_lists.content
                     }
             end
           %>
@@ -118,9 +120,8 @@ defmodule UserDocsWeb.ModalMenus do
 
   # TODO: Fix this
   def call_menu(message, socket) do
-    Phoenix.LiveView.send_update(
-      ModalMenus,
-      id: "modal-menus",
+    IO.puts("Assigning form data")
+    form_data = %{
       title: message.title,
       object: message.object,
       action: message.action,
@@ -134,9 +135,8 @@ defmodule UserDocsWeb.ModalMenus do
       type: message.type,
       select_lists: Map.get(message, :select_lists, nil),
       channel: Map.get(message, :channel, nil)
-    )
-
-    socket
+    }
+    assign(socket, :form_data, form_data)
   end
 
   @impl true
@@ -249,11 +249,7 @@ defmodule UserDocsWeb.ModalMenus do
   end
 
   def close(socket) do
-    Phoenix.LiveView.send_update(
-      ModalMenus,
-      id: "modal-menus",
-      action: :show)
-    socket
+    assign(socket, :form_data, Map.put(socket.assigns.form_data, :action, :show))
   end
 
 end

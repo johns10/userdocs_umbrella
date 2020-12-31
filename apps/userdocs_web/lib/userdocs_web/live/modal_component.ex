@@ -4,7 +4,6 @@ defmodule UserDocsWeb.ModalComponent do
   @impl true
   def render(assigns) do
     ~L"""
-    <%= @opts[:action] %>
     <div id="<%= @id %>" class="modal is-active"
       phx-capture-click="close"
       phx-window-keydown="close"

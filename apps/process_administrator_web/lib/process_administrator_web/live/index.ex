@@ -45,6 +45,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
       socket
       |> validate_logged_in(session)
       |> initialize()
+      |> assign(:form_data, %{ action: :show })
 
     {:ok, socket}
   end
@@ -248,7 +249,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
     {:noreply, State.apply_changes(socket, changes)}
   end
   @impl true
-  def handle_event("select_version", %{ "version" => %{"id" => id} }, socket) do
+  def handle_event("select-version", %{ "version" => %{"id" => id} }, socket) do
     changes = Select.handle_version_selection(socket.assigns, String.to_integer(id))
     send(socket.root_pid, {:update_current_version, changes})
     {:noreply, State.apply_changes(socket, changes)}
