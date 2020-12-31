@@ -171,6 +171,7 @@ defmodule ProcessAdministratorWeb.State do
   def plural("project"), do: "projects"
   def plural("process"), do: "processes"
   def plural("page"), do: "pages"
+  def plural("content"), do: "content"
   def plural(item) do
     raise(ArgumentError, "Plural not implemented for #{item}")
   end
