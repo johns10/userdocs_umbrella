@@ -18,8 +18,8 @@
     %>
     <%= LiveHelpers.live_modal_menus(@socket, [
       id: "modal-menus",
-      action: @modal_action])
-    %>
+      form_data: @form_data
+    ]) %>
     <%= if @current_version do %>
       <%= for process <- @current_processes do %>
         <%= live_component(@socket, ProcessAdministratorWeb.GroupComponent, [
