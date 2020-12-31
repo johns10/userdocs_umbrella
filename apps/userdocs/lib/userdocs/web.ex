@@ -150,6 +150,10 @@ defmodule UserDocs.Web do
 
   alias UserDocs.Web.AnnotationType
 
+  def load_annotation_types(state, opts) do
+    StateHandlers.load(state, list_annotation_types(), AnnotationType, opts)
+  end
+
   @doc """
   Returns the list of annotation_types.
 
