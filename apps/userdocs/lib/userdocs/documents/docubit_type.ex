@@ -160,4 +160,20 @@ defmodule UserDocs.Documents.DocubitType do
     }
   end
 
+  def info(), do: Kernel.struct(DocubitType, info_attrs())
+  def info_attrs() do
+    %{
+      name: "info",
+      context: %{
+        settings: %{}
+      },
+      allowed_settings: [
+        :show_title
+      ],
+      allowed_children: [ "p" ],
+      allowed_data: [
+        UserDocs.Documents.Content
+      ]
+    }
+  end
 end
