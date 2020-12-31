@@ -10,6 +10,7 @@ defmodule UserDocs.Projects.Version do
   @derive {Jason.Encoder, only: [:name, :project, :strategy, :pages, :processes]}
   schema "versions" do
     field :name, :string
+    field :order, :integer
 
     belongs_to :project, Project
     belongs_to :strategy, Strategy
@@ -23,7 +24,7 @@ defmodule UserDocs.Projects.Version do
   @doc false
   def changeset(version, attrs) do
     version
-    |> cast(attrs, [:name, :project_id, :strategy_id])
+    |> cast(attrs, [:name, :order, :project_id, :strategy_id])
     |> foreign_key_constraint(:project_id)
     |> foreign_key_constraint(:strategy_id)
     |> validate_required([:name])
