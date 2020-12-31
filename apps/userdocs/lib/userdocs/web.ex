@@ -420,6 +420,17 @@ defmodule UserDocs.Web do
       [%Annotation{}, ...]
 
   """
+  def list_annotations(state, opts) when is_list(opts) do
+    StateHandlers.list(state, Annotation, opts)
+    |> maybe_preload_annotation(opts[:preloads], state, opts)
+  end
+
+  defp maybe_preload_annotation(annotation, nil, _, _), do: annotation
+  defp maybe_preload_annotation(annotation, preloads, state, opts) do
+    opts = Keyword.delete(opts, :filter)
+    StateHandlers.preload(state, annotation, opts)
+  end
+
   def list_annotations(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_annotation_query()
     |> maybe_filter_annotation_by_page(filters[:page_id])
