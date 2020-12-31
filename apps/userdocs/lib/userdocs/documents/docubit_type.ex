@@ -50,12 +50,16 @@ defmodule UserDocs.Documents.DocubitType do
       context: %{
         settings: %{
           li_value: None,
-          name_prefix: False
+          name_prefix: false
         }
       },
       allowed_settings: [ :li_value, :name_prefix ],
-      allowed_children: [],
-      allowed_data: [ None ]
+      allowed_children: [ "p", "info" ],
+      allowed_data: [
+        UserDocs.Automation.Step,
+        UserDocs.Documents.Content,
+        UserDocs.Web.Annotation
+      ]
     }
   end
 
@@ -79,10 +83,14 @@ defmodule UserDocs.Documents.DocubitType do
       name: "ol",
       context: %{
         settings: %{
-          name_prefix: False
+          name_prefix: false
         }
       },
-      allowed_settings: [ :li_value, :name_prefix ],
+      allowed_settings: [
+        :li_value,
+        :name_prefix,
+        :show_title
+        ],
       allowed_children: [ "li" ],
       allowed_data: [ None ]
     }
@@ -111,7 +119,10 @@ defmodule UserDocs.Documents.DocubitType do
       context: %{
         settings: %{ }
       },
-      allowed_settings: [],
+      allowed_settings: [
+        :li_value,
+        :name_prefix
+        ],
       allowed_children: [],
       allowed_data: [
         UserDocs.Automation.Step,
