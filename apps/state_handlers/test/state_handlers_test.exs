@@ -6,6 +6,7 @@ defmodule StateHandlers.StateFixtures do
   alias UserDocs.WebFixtures
   alias UserDocs.AutomationFixtures
   alias UserDocs.ProjectsFixtures
+  alias UserDocs.DocubitFixtures
 
   alias UserDocs.Users.User
   alias UserDocs.Users.TeamUser
@@ -15,12 +16,13 @@ defmodule StateHandlers.StateFixtures do
   alias UserDocs.Projects.Version
   alias UserDocs.Documents
   alias UserDocs.Documents.Document
+  alias UserDocs.Documents.DocubitType
   alias UserDocs.Documents.DocumentVersion
 
   def state(opts) do
     opts =
       opts
-      |> Keyword.put(:types, [ User, TeamUser, Team, Project, Version, Document, DocumentVersion ])
+      |> Keyword.put(:types, [ User, TeamUser, Team, Project, Version, Document, DocumentVersion, DocubitType ])
 
     user = UsersFixtures.user()
     team = UsersFixtures.team()
@@ -29,6 +31,7 @@ defmodule StateHandlers.StateFixtures do
     v1 = ProjectsFixtures.version(project.id)
     v2 = ProjectsFixtures.version(project.id)
     document = DocumentFixtures.document(project.id)
+    docubit_types = DocubitFixtures.create_docubit_types()
     dv1 = DocumentFixtures.document_version(document.id, v1.id)
     dv2 = DocumentFixtures.document_version(document.id, v2.id)
 
@@ -39,6 +42,7 @@ defmodule StateHandlers.StateFixtures do
     |> StateHandlers.load([team_user], TeamUser, opts)
     |> StateHandlers.load([project], Project, opts)
     |> StateHandlers.load([v1, v2], Version, opts)
+    |> StateHandlers.load(docubit_types, DocubitType, opts)
     |> StateHandlers.load([document], Document, opts)
     |> StateHandlers.load([dv1, dv2], DocumentVersion, opts)
   end
@@ -218,6 +222,55 @@ defmodule StateHandlersTest do
       expected_result = StateHandlers.list(state, DocumentVersion, opts)
       result = StateHandlers.preload(state, data, opts[:preloads], opts)
       assert result |> Enum.at(0) |> Map.get(:document_versions) == expected_result
+    end
+
+    test "StateHandlers.Update" do
+      list_data = Enum.map(1..2, fn(_) -> UsersFixtures.user() end)
+      state_opts = [
+        { [ data_type: :list, strategy: :by_type ], %{ users: list_data } },
+        { [ data_type: :list, strategy: :by_type, location: :data ], %{ data: %{ users: list_data}} }
+      ]
+      Enum.each(state_opts,
+        fn({ opts, initial_state}) ->
+          IO.puts("Running StateHandlers.Update with {inspect(opts)}")
+          user = StateHandlers.list(initial_state, User, opts) |> Enum.at(0) |> Map.put(:email, "test@test.com")
+          result = StateHandlers.update(initial_state, user, opts)
+          case { opts[:data_type], opts[:location] } do
+            { :list, nil } ->
+              assert user in result.users
+              assert Enum.count(result.users) == Enum.count(initial_state.users)
+            { :list, location } ->
+              assert user in result[location][:users]
+              assert Enum.count(result[location][:users]) == Enum.count(initial_state[location][:users])
+          end
+        end
+      )
+    end
+
+    test "StateHandlers.Update with list" do
+      list_data = Enum.map(1..2, fn(_) -> UsersFixtures.user() end)
+      state_opts = [
+        { [ data_type: :list, strategy: :by_type ], %{ users: list_data } },
+        { [ data_type: :list, strategy: :by_type, location: :data ], %{ data: %{ users: list_data}} }
+      ]
+      Enum.each(state_opts,
+        fn({ opts, initial_state}) ->
+          IO.puts("Running StateHandlers.Update with {inspect(opts)}")
+          user1 = StateHandlers.list(initial_state, User, opts) |> Enum.at(0) |> Map.put(:email, "test@test.com")
+          user2 = StateHandlers.list(initial_state, User, opts) |> Enum.at(1) |> Map.put(:email, "test2@test.com")
+          result = StateHandlers.update(initial_state, %{ objects: [ user1, user2 ]}, opts)
+          case { opts[:data_type], opts[:location] } do
+            { :list, nil } ->
+              assert user1 in result.users
+              assert user2 in result.users
+              assert Enum.count(result.users) == Enum.count(initial_state.users)
+            { :list, location } ->
+              assert user1 in result[location][:users]
+              assert user2 in result[location][:users]
+              assert Enum.count(result[location][:users]) == Enum.count(initial_state[location][:users])
+          end
+        end
+      )
     end
   end
 end
