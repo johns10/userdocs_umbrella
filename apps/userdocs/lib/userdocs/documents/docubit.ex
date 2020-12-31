@@ -35,10 +35,10 @@ defmodule UserDocs.Documents.Docubit do
 
     belongs_to :docubit, Docubit
     belongs_to :document_version, DocumentVersion
-    belongs_to :content, Content
-    belongs_to :file, File
-    belongs_to :through_annotation, Annotation
-    belongs_to :through_step, Step
+    belongs_to :content, Content, on_replace: :nilify
+    belongs_to :file, File, on_replace: :nilify
+    belongs_to :through_annotation, Annotation, on_replace: :nilify
+    belongs_to :through_step, Step, on_replace: :nilify
 
     field :delete, :boolean, virtual: true
     timestamps()
