@@ -50,7 +50,7 @@ defmodule ProcessAdministratorWeb.VersionPicker do
 
             <%= f = form_for :version, "#",
               id: "select-version-form",
-              phx_change: "select_version" %>
+              phx_change: "select-version" %>
 
               <%= Layout.select_input(f, :id, @versions_select_options,
                 value: @current_version_id, label: false) %>
@@ -107,7 +107,7 @@ defmodule ProcessAdministratorWeb.VersionPicker do
   end
 
   @impl true
-  def handle_event("select_version", %{ "version" => %{"id" => id} }, socket) do
+  def handle_event("select-version", %{ "version" => %{"id" => id} }, socket) do
     changes = Select.handle_version_selection(socket.assigns, String.to_integer(id))
     send(socket.root_pid, {:update_current_version, changes})
     {:noreply, State.apply_changes(socket, changes)}

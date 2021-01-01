@@ -137,7 +137,7 @@ defmodule UserDocsWeb.Root do
     IO.puts("Root handling Content")
     { :noreply, ModalMenus.edit_content(socket, params) }
   end
-  def handle_event("select_version", %{"select-version" => version_id_param} = _payload, socket) do
+  def handle_event("select-version", %{"select-version" => version_id_param} = _payload, socket) do
     opts = state_opts()
     with  version_id <- String.to_integer(version_id_param),
       version <- UserDocs.Projects.get_version!(version_id, socket, opts),

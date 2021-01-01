@@ -98,7 +98,7 @@ defmodule UserDocsWeb.ContentLive.Index do
     {:ok, _} = Documents.delete_content(content)
     {:noreply, socket}
   end
-  def handle_event("select_version" = n, p, s) do
+  def handle_event("select-version" = n, p, s) do
     { :noreply, socket } = Root.handle_event(n, p, s)
     { :noreply, prepare_content(socket) }
   end

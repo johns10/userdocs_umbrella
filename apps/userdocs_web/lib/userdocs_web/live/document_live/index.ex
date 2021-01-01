@@ -63,7 +63,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
     UserDocsWeb.Endpoint.broadcast(Defaults.channel(socket), "delete", deleted_document)
     {:noreply, socket}
   end
-  def handle_event("select_version" = n, p, s) do
+  def handle_event("select-version" = n, p, s) do
     { :noreply, socket } = Root.handle_event(n, p, s)
     { :noreply, prepare_documents(socket) }
   end
