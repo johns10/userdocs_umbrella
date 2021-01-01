@@ -92,29 +92,6 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   end
   def handle_params(_, _, socket), do: { :noreply, socket }
 
-  def render_body(docubit) do
-    IO.puts("Rendering body")
-    result = render_docubit(docubit)
-    result
-  end
-
-  def render_docubit(%{ docubits: [ _ | _ ] = docubits } = docubit) when is_list(docubits) do
-    # IO.puts("Rendering docubits")
-    docubit.renderer.render(
-      docubit,
-      Enum.map(docubits, fn(d) -> render_docubit(d) end),
-      :editor
-    )
-  end
-  def render_docubit(%{ docubits: [ ]} = docubit) do
-    # IO.puts("Rendering docubit #{docubit.type_id}")
-    docubit.renderer.render(
-      docubit,
-      [],
-      :editor
-    )
-  end
-
   @impl true
   def handle_event("select-version" = name, %{"select-version" => version_id_param} = payload, socket) do
     IO.puts("Select version")
@@ -177,12 +154,11 @@ defmodule UserDocsWeb.DocumentLive.Editor do
     socket =
       case Documents.update_docubit(docubit, %{ docubits: docubits }) do
         { :ok, docubit } ->
-          IO.puts("Created Docubit Successfully")
           # This probably isn't sustainable
           added_docubit = Enum.at(docubit.docubits, -1)
           UserDocsWeb.Endpoint.broadcast(Defaults.channel(socket), "create", added_docubit)
           socket
-          |> put_flash(:info, "Document created successfully")
+          |> put_flash(:info, "Docubit created successfully")
         { :error, changeset } ->
           put_flash(socket, :error, "Creating Docubit failed  #{inspect(changeset.errors)}")
       end
@@ -202,8 +178,6 @@ defmodule UserDocsWeb.DocumentLive.Editor do
             id: "docubit-editor-" <> Integer.to_string(docubit.id),
             close_all_dropdowns: true
           )
-        else
-          IO.puts("Skipping #{docubit.id}")
         end
       end
     )
