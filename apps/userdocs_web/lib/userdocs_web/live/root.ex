@@ -161,7 +161,8 @@ defmodule UserDocsWeb.Root do
     #Logger.debug("Root handling info on topic #{topic}, event #{event}")
     {
       :noreply,
-      UserDocs.Subscription.handle_event(socket, event, payload, state_opts())
+      socket
+      |> UserDocs.Subscription.handle_event(event, payload, socket.assigns.state_opts)
     }
   end
   def handle_info(:close_modal, socket), do: { :noreply, ModalMenus.close(socket) }
