@@ -102,8 +102,10 @@
           current_language_code_id: @current_language_code_id,
           current_version_id: @current_version_id,
           current_team_id: @current_team_id,
+          document_id: @document_version.document_id,
           docubit: @document_version.body,
-          opts: state_opts(),
+          channel: @channel,
+          state_opts: state_opts(),
           parent_cid: self(),
           root_cid: self(),
           data: %{
@@ -113,7 +115,8 @@
             files: @data.files,
             steps: @data.steps,
             docubit_types: @data.docubit_types,
-            content_versions: @data.content_versions
+            content_versions: @data.content_versions,
+            versions: @data.versions
           }
         ])
       %>
