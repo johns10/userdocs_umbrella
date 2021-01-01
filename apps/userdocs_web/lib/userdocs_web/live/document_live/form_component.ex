@@ -33,8 +33,9 @@ defmodule UserDocsWeb.DocumentLive.FormComponent do
 
   defp save_document(socket, :edit, document_params) do
     case Documents.update_document(socket.assigns.document, document_params) do
-      {:ok, _document} ->
+      {:ok, document} ->
         send(self(), :close_modal)
+        UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "update", document)
         {:noreply, put_flash(socket, :info, "Document updated successfully") }
 
       {:error, %Ecto.Changeset{} = changeset} ->
