@@ -39,7 +39,7 @@ defmodule UserDocsWeb.Root do
 
     socket
     |> StateHandlers.initialize(opts)
-    |> assign(:modal_action, :show)
+    |> assign(:form_data, %{ action: :show })
     |> users()
     |> team_users()
     |> teams()
