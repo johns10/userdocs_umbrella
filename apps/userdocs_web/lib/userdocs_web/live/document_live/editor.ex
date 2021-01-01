@@ -295,11 +295,19 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   defp current_selections(socket) do
     process = Automation.list_processes(socket, state_opts()) |> Enum.at(0)
     page = Web.list_pages(socket, state_opts()) |> Enum.at(0)
-    version = Projects.get_version!(socket.assigns.current_version_id, socket, state_opts())
 
     socket
     |> assign(:current_page, page)
     |> assign(:current_process, process)
+    |> assign_current_version()
+  end
+
+  defp assign_current_version(socket) do
+    version =
+      socket.assigns.current_version_id
+      |> Projects.get_version!(socket, state_opts())
+
+    socket
     |> assign(:current_version, version)
   end
 
