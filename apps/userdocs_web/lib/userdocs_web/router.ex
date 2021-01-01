@@ -152,6 +152,7 @@ defmodule UserDocsWeb.Router do
     live "/documents/:id/show/edit", DocumentLive.Show, :edit
 
     live "/documents/:id/editor", DocumentLive.Editor, :edit
+    live "/documents/:id/viewer", DocumentLive.Viewer, :edit
 
     live "/content_versions", ContentVersionLive.Index, :index
     live "/content_versions/new", ContentVersionLive.Index, :new
