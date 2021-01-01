@@ -24,6 +24,8 @@ defmodule UserDocsWeb.DocubitSettingsLive.FormComponent do
     <%= Layout.text_input(form, :li_value, [ hidden: :li_value not in @settings_to_display ]) %>
     <%= Layout.select_input(form, :name_prefix, setting_select_options(:name_prefix),
       [ hidden: :name_prefix not in @settings_to_display ]) %>
+    <%= Layout.select_input(form, :show_title, setting_select_options(:show_title),
+      [ hidden: :show_title not in @settings_to_display ]) %>
     <div class="field">
       <div class="control">
         <%= if @display_settings_dropdown do %>
