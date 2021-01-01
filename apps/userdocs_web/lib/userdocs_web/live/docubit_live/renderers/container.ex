@@ -1,19 +1,22 @@
-defmodule UserDocsWeb.DocubitLive.Renderers.Row do
+defmodule UserDocsWeb.DocubitLive.Renderers.Container do
   use UserDocsWeb, :live_component
   alias UserDocsWeb.DocubitLive.AddDocubitButton
+  alias UserDocsWeb.DocubitLive.Renderers.Base
+
+  def header(_), do: "Container"
 
   def render(assigns) do
     ~L"""
-      <div class="is-flex is-flex-direction-row is-justify-content-space-between">
-        <%= @inner_content.([]) %>
-        <div class="is-justify-self-flex-center is-flex-grow-0">
+      <div class="container">
+        <%= Base.render_inner_content(assigns) %>
+        <%= if @editor do %>
           <%= AddDocubitButton.render(%{
             text: "+",
             class: "button",
             parent_cid: @parent_cid,
             docubit: @docubit,
-            type: "column"}) %>
-        </div>
+            type: "row"}) %>
+        <% end %>
       </div>
     """
   end

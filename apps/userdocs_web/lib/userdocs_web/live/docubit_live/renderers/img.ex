@@ -1,15 +1,17 @@
 defmodule UserDocsWeb.DocubitLive.Renderers.Img do
   use UserDocsWeb, :live_component
   use Phoenix.HTML
+  alias UserDocsWeb.DocubitLive.Renderers.Base
 
   alias UserDocs.Documents.Docubit
 
+  def header(_), do: ""
 
   def render(assigns) do
     ~L"""
       <img>
       <%= display_image(assigns, @docubit) %>
-      <%= @inner_content.([]) %>
+      <%= Base.render_inner_content(assigns) %>
     """
   end
 
