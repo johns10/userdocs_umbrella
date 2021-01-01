@@ -57,7 +57,10 @@ defmodule UserDocsWeb.DocubitLive.FormComponent do
 
   defp save_docubit(socket, :edit, docubit_params) do
     case Documents.update_docubit(socket.assigns.docubit, docubit_params) do
-      {:ok, _docubit} ->
+      {:ok, docubit} ->
+        message = %{ objects: docubit.docubits }
+        UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "update", docubit)
+        UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "update", message)
         send(self(), :close_modal)
         {:noreply,
           socket
