@@ -8,6 +8,10 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
 
   alias UserDocsWeb.Loaders
 
+  def load_annotation_types(socket, opts) do
+    Web.load_annotation_types(socket, opts)
+  end
+
   def load_document(socket, document, opts) do
     StateHandlers.load(socket, [ document ], opts)
   end
