@@ -9,7 +9,6 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
   alias UserDocsWeb.ContentVersionLive.FormComponent, as: ContentVersionForm
 
   @impl true
-  @spec render(any) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~L"""
       <%= form = form_for @changeset, "#",
@@ -112,10 +111,15 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
 
   defp save_content(socket, :edit, content_params) do
     case Documents.update_content(socket.assigns.content, content_params) do
-      {:ok, _content} ->
+      {:ok, content} ->
+        message = %{ objects: content.content_versions }
+        UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "update", content)
+        UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "update", message)
         {
           :noreply,
           socket
+          |> assign(:content, content)
+          |> assign(:changeset, Documents.change_content(content))
           |> put_flash(:info, "Content updated successfully")
         }
 
@@ -126,12 +130,15 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
 
   defp save_content(socket, :new, content_params) do
     case Documents.create_content(content_params) do
-      {:ok, _content} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Content created successfully")
-         # |> push_redirect(to: socket.assigns.return_to)
-         |> push_patch(to: socket.assigns.return_to)
+      {:ok, content} ->
+        message = %{ objects: content.content_versions }
+        UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "create", content)
+        UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "update", message)
+        send(self(), :close_modal)
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "Content created successfully")
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
