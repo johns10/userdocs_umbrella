@@ -69,7 +69,7 @@
           select_list: @pages_select,
           default_selected: @current_page.id,
           items_function: &process_annotations/2,
-          items: @data.annotations,
+          items: @annotations,
           type: "Annotation"
         ]) %>
         <%= live_component(@socket, UserDocsWeb.PanelComponent, [
@@ -78,7 +78,7 @@
           select_list: @pages_select,
           default_selected: 0,
           items_function: &panel_content/2,
-          items: @data.content,
+          items: @content,
           type: "Content"
         ]) %>
       </div>
