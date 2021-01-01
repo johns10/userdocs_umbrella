@@ -40,7 +40,7 @@ defmodule UserDocsWeb.VersionPicker do
                         <%= for version <- project.versions do %>
                           <a href="#"
                             class="dropdown-item"
-                            phx-click="select_version"
+                            phx-click="select-version"
                             phx-value-select-version="<%= version.id %>"
                           ><%= version.name %></a>
                         <% end %>

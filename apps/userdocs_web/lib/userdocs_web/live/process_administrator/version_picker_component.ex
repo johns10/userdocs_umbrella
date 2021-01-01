@@ -49,7 +49,7 @@ defmodule UserDocsWeb.ProcessAdministratorLive.VersionPicker do
 
             <%= f = form_for :version, "#",
               id: "select-version-form",
-              phx_change: "select_version" %>
+              phx_change: "select-version" %>
 
               <%= Layout.select_input(f, :id, @versions_select_options,
                 value: @current_version_id, label: false) %>
