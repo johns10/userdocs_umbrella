@@ -103,6 +103,14 @@ defmodule UserDocsWeb.ContentLive.Index do
     { :noreply, prepare_content(socket) }
   end
 
+  def handle_info(%{topic: _, event: _, payload: %{ objects: [ %ContentVersion{} | _ ]}} = sub_data, socket) do
+    { :noreply, socket } = Root.handle_info(sub_data, socket)
+    { :noreply, prepare_content(socket) }
+  end
+  def handle_info(%{topic: _, event: _, payload: %Content{}} = sub_data, socket) do
+    { :noreply, socket } = Root.handle_info(sub_data, socket)
+    { :noreply, prepare_content(socket) }
+  end
   def handle_info(n, s), do: Root.handle_info(n, s)
 
   defp prepare_content(socket) do
