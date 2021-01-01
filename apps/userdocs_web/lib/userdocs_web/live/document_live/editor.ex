@@ -112,6 +112,15 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   end
 
   @impl true
+  def handle_event("select-version" = name, %{"select-version" => version_id_param} = payload, socket) do
+    IO.puts("Select version")
+    socket =
+      socket
+      |> assign(:current_version_id, String.to_integer(version_id_param))
+      |> assign_current_version()
+
+    Root.handle_event(name, payload, socket)
+  end
   def handle_event("change-language", %{"language" => %{"id" => id}}, socket) do
     { :noreply, assign(socket, :current_language_code_id, String.to_integer(id)) }
   end
