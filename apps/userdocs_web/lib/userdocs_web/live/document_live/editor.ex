@@ -27,6 +27,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   alias UserDocs.Documents.Docubit.Context
   alias UserDocs.Web.Page
   alias UserDocs.Web.Annotation
+  alias UserDocs.Web.AnnotationType
   alias UserDocs.Media.File
 
   alias UserDocsWeb.Root
@@ -42,7 +43,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       state_opts()
       |> Keyword.put(:types, [  Document, DocumentVersion, Page,
         Process, Content, ContentVersion, Step, LanguageCode, Annotation,
-        Docubit, File, DocubitType ])
+        Docubit, File, DocubitType, AnnotationType ])
 
     {:ok,
       socket
@@ -50,6 +51,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       |> Root.authorize(session)
       |> Root.initialize()
       |> assign(:dragging, %{ type: nil, id: nil})
+      |> assign(:state_opts, state_opts())
     }
   end
 
@@ -61,6 +63,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
     {
       :noreply,
       socket
+      |> Loaders.load_annotation_types(state_opts())
       |> Loaders.load_docubit_types(state_opts())
       |> Loaders.load_document(Documents.get_document!(id), state_opts())
       |> Loaders.load_document_versions(id, state_opts())
@@ -83,6 +86,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       |> (&(Loaders.load_docubits(&1, default_document_version_id(&1, document), state_opts()))).()
       |> (&(prepare_document_version(&1, default_document_version_id(&1, document)))).()
       |> SelectLists.versions(state_opts())
+      |> assign(:channel, Defaults.channel(socket))
       |> StateHandlers.inspect(state_opts())
     }
   end
