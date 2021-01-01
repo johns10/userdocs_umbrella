@@ -34,15 +34,17 @@ defmodule UserDocsWeb.DocubitEditorLive do
       [ docubits: :through_step ],
       [ docubits: :docubit_type ],
       [ docubits: [ content: :content_versions ] ],
+      [ docubits: [ content: :annotation ] ],
+      [ docubits: [ content: [ content_versions: :version ]]]
     ]
 
-    opts =
-      assigns.opts
+    state_opts =
+      get_state_opts(assigns)
       |> Keyword.put(:preloads, preloads)
       |> Keyword.put(:order, docubits: %{field: :order, order: :asc})
 
     preloaded_docubit =
-      Documents.get_docubit!(assigns.docubit.id, assigns, opts)
+      Documents.get_docubit!(assigns.docubit.id, assigns, state_opts)
 
     docubits =
       preloaded_docubit.docubits
@@ -73,7 +75,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
         id=<%= @id %>
       >
         <div class="is-flex is-flex-direction-row is-justify-content-space-between py-1">
-          <div><%= @docubit.docubit_type.name %></div>
+          <div><%= @renderer.header(assigns) %></div>
           <div class="py-0">
             <div class="<%= dropdown_is_active?(@display_settings_menu) %>" >
               <i class="fa fa-gear"
@@ -105,10 +107,13 @@ defmodule UserDocsWeb.DocubitEditorLive do
           </div>
         </div>
         <%= live_component(@socket, @renderer, [
+          editor: true,
+          component: true,
           current_language_code_id: @current_language_code_id,
           current_version_id: @current_version_id,
           docubit: @docubit,
           parent_cid: @myself.cid,
+          state_opts: get_state_opts(assigns),
           id: "docubit-" <> @docubit.docubit_type.name <> Integer.to_string(@docubit.id)
         ]) do %>
           <%= for docubit <- @docubit.docubits do %>
@@ -117,11 +122,13 @@ defmodule UserDocsWeb.DocubitEditorLive do
               current_language_code_id: @current_language_code_id,
               current_version_id: @current_version_id,
               current_team_id: @current_team_id,
+              document_id: @document_id,
               docubit: docubit,
-              opts: @opts,
+              state_opts: get_state_opts(assigns),
               root_cid: @root_cid,
               parent_cid: @myself.cid,
-              data: @data
+              data: @data,
+              channel: @channel
             ]) %>
           <% end %>
         <% end %>
@@ -132,8 +139,15 @@ defmodule UserDocsWeb.DocubitEditorLive do
   def dropdown_is_active?(true), do: "dropdown is-right is-active"
   def dropdown_is_active?(false), do: "dropdown is-right"
 
-  def handle_event(socket, "delete" = event, payload, opts) do
-    StateHandlers.delete(socket, payload, opts)
+  def get_state_opts(assigns) do
+    case Map.get(assigns, :state_opts, nil) do
+      nil -> raise(RuntimeError, "Failed to get state opts from assigns")
+      [ _ | _ ] = state_opts -> state_opts
+    end
+  end
+
+  def handle_event(socket, "delete" = event, payload, state_opts) do
+    StateHandlers.delete(socket, payload, state_opts)
   end
 
   def handle_event("delete-docubit", %{"id" => id }, socket) do
@@ -155,7 +169,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
     }
 
     case Documents.delete_docubit_from_docubits(socket.assigns.docubit, attrs) do
-      {:error, changeset} ->
+      {:error, _changeset} ->
         {
           :noreply,
           socket
@@ -174,7 +188,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
   end
   def handle_event("create-docubit", %{"type" => type, "docubit-id" => docubit_id}, socket) do
     send(self(), { :close_all_dropdowns, [ String.to_integer(docubit_id) ] })
-    send(self(), {:create_docubit, %{type: type, docubit: socket.assigns.docubit}})
+    send(self(), { :create_docubit, %{type: type, docubit: socket.assigns.docubit}} )
     {:noreply, socket}
   end
 
@@ -192,52 +206,77 @@ defmodule UserDocsWeb.DocubitEditorLive do
 
     preloads =
       case type do
-        "Content" -> [:annotation, :content_versions]
-        "Step" -> []
-        "Annotation" -> []
+        "Content" -> [
+          :annotation,
+          :content_versions,
+          [ content_versions: :version]
+        ]
+        "Step" -> [
+          :annotation,
+          [ annotation: :content ],
+          [ annotation: [ content: :content_versions ]],
+          [ annotation: [ content: [ content_versions: :version ]]],
+        ]
+        "Annotation" -> [
+          :content,
+          [ content: :content_versions ],
+          [ content: [ content_versions: :version ]]
+        ]
       end
 
-    opts =
-      socket.assigns.opts
+    state_opts =
+      get_state_opts(socket.assigns)
       |> Keyword.put(:preloads, preloads)
 
-    object = StateHandlers.get(socket, String.to_integer(object_id), schema, opts)
-    object = StateHandlers.preload(socket, object, opts)
+    object = StateHandlers.get(socket, String.to_integer(object_id), schema, state_opts)
+    object = StateHandlers.preload(socket, object, state_opts)
     docubit = socket.assigns.docubit
 
-    docubit =
-      case Docubit.hydrate(docubit, object) do
-        %Docubit{} = docubit -> docubit
-        { :error, message } -> IO.puts(inspect(message))
+    case Docubit.hydrate(docubit, object) do
+      %Docubit{} = docubit ->
+        UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "update", docubit)
+        Phoenix.LiveView.send_update(
+          socket.assigns.renderer,
+          current_language_code_id: socket.assigns.current_language_code_id,
+          current_version_id: socket.assigns.current_version_id,
+          docubit: docubit,
+          parent_cid: socket.assigns.myself.cid,
+          id: "docubit-" <> docubit.docubit_type.name <> Integer.to_string(docubit.id)
+        )
+
+        {
+          :noreply,
+          socket
+          |> assign(:docubit, docubit)
+        }
+      { :error, message } ->
+        IO.inspect("Hydrate Error")
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, inspect(message))
+          |> push_patch(to: Routes.document_editor_path(socket, :edit, socket.assigns.document_id))
+        }
       end
 
-    Phoenix.LiveView.send_update(
-      socket.assigns.renderer,
-      current_language_code_id: socket.assigns.current_language_code_id,
-      current_version_id: socket.assigns.current_version_id,
-      docubit: docubit,
-      parent_cid: self(),
-      id: "docubit-" <> docubit.docubit_type.name <> Integer.to_string(docubit.id)
-    )
 
-    {
-      :noreply,
-      socket
-      |> assign(:docubit, docubit)
-    }
   end
   def handle_event("display-settings-menu", %{"docubit-id" => docubit_id}, socket) do
     send(self(), { :close_all_dropdowns, [ String.to_integer(docubit_id) ] })
     {:noreply, assign(socket, :display_settings_menu, not socket.assigns.display_settings_menu)}
   end
   def handle_event("edit-docubit" = name, %{"id" => id}, socket) do
+    IO.puts("Handling event edit-docubit")
     params =
       %{}
+      |> Map.put(:docubit_id, String.to_integer(id))
       |> Map.put(:docubit, socket.assigns.docubit)
       |> Map.put(:channel, Defaults.channel(socket))
-      |> Map.put(:opts, socket.assigns.opts)
+      |> Map.put(:state_opts, get_state_opts(socket.assigns))
 
-    Root.handle_event(name, params, socket)
+    { :noreply, invalid_socket } = Root.handle_event(name, params, socket)
+    send(self(), { :update_form_data, invalid_socket.assigns.form_data })
+    { :noreply, socket }
   end
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 end
