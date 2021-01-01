@@ -234,6 +234,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
           [ body: :through_step ],
           [ body: :docubit_type ],
           [ body: [ content: :content_versions ] ],
+          [ body: [ content: [ content_versions: :version ]]]
         ])
 
     document_version = Documents.get_document_version!(document_version_id, socket, opts)
