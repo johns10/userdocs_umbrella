@@ -77,6 +77,8 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       |> Loaders.load_annotations(state_opts())
       |> SelectLists.language_code(state_opts())
       |> prepare_document(document)
+      |> prepare_content()
+      |> prepare_annotations()
       |> default_language_code_id()
       |> (&(Loaders.load_docubits(&1, default_document_version_id(&1, document), state_opts()))).()
       |> (&(prepare_document_version(&1, default_document_version_id(&1, document)))).()
@@ -244,6 +246,32 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
     socket
     |> assign(:document_version, document_version)
+  end
+
+  defp prepare_content(socket) do
+    opts =
+      state_opts()
+      |> Keyword.put(:preloads, [
+        :content_versions,
+        [ content_versions: :version ]
+      ])
+
+    socket
+    |> assign(:content, Documents.list_content(socket, opts))
+  end
+
+  defp prepare_annotations(socket) do
+    opts =
+      state_opts()
+      |> Keyword.put(:preloads, [
+        :content,
+        :annotation_type,
+        [ content: :content_versions ],
+        [ content: [ content_versions: :version] ]
+      ])
+
+    socket
+    |> assign(:annotations, Web.list_annotations(socket, opts))
   end
 
   defp state_opts() do
