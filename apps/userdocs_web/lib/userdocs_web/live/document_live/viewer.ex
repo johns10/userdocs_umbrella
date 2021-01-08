@@ -76,6 +76,7 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
       |> default_language_code_id()
       |> (&(Loaders.load_docubits(&1, default_document_version_id(&1, document), state_opts()))).()
       |> (&(prepare_document_version(&1, default_document_version_id(&1, document)))).()
+      |> assign(:img_path, Routes.static_path(socket, "/images/"))
       |> StateHandlers.inspect(state_opts())
     }
   end

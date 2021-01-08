@@ -114,7 +114,8 @@ defmodule UserDocsWeb.DocubitEditorLive do
           docubit: @docubit,
           parent_cid: @myself.cid,
           state_opts: get_state_opts(assigns),
-          id: "docubit-" <> @docubit.docubit_type.name <> Integer.to_string(@docubit.id)
+          id: "docubit-" <> @docubit.docubit_type.name <> Integer.to_string(@docubit.id),
+          img_path: @img_path
         ]) do %>
           <%= for docubit <- @docubit.docubits do %>
             <%= live_component(@socket, DocubitEditorLive, [
@@ -128,7 +129,8 @@ defmodule UserDocsWeb.DocubitEditorLive do
               root_cid: @root_cid,
               parent_cid: @myself.cid,
               data: @data,
-              channel: @channel
+              channel: @channel,
+              img_path: @img_path
             ]) %>
           <% end %>
         <% end %>
