@@ -22,10 +22,10 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
 
     case status do
       :ok -> content_tag(:img, "", [
-          src: Routes.static_path(assigns.socket, "/images/" <> docubit.file.filename)
+          src: assigns.img_path <> docubit.file.filename
         ])
       :nofile -> content_tag(:img, "", [
-        src: Routes.static_path(assigns.socket, "/images/"),
+        src: assigns.img_path,
         alt: " No File Found for this Docubit"
       ])
     end

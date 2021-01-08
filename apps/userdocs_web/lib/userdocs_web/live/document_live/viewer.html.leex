@@ -4,9 +4,9 @@
       current_language_code_id: @current_language_code_id,
       current_version_id: @current_version_id,
       docubit: @document_version.body,
-      socket: @socket,
       component: false,
       editor: false,
-      content: Base.display_content(assigns, @document_version.body)
+      content: Base.display_content(assigns, @document_version.body),
+      img_path: @img_path
     }) %>
 </div>

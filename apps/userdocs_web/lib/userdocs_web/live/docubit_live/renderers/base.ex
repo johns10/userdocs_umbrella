@@ -19,8 +19,8 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
             component: false,
             editor: false,
             docubit: docubit,
-            socket: assigns.socket,
-            content: Base.display_content(assigns, docubit)
+            content: Base.display_content(assigns, docubit),
+            img_path: @img_path
           }) %>
         <% end %>
       <% end %>

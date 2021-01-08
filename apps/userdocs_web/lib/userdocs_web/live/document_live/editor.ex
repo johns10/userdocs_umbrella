@@ -87,6 +87,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       |> (&(prepare_document_version(&1, default_document_version_id(&1, document)))).()
       |> SelectLists.versions(state_opts())
       |> assign(:channel, Defaults.channel(socket))
+      |> assign(:img_path, Routes.static_path(socket, "/images/"))
       |> StateHandlers.inspect(state_opts())
     }
   end
