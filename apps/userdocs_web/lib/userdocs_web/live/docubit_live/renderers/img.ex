@@ -16,18 +16,33 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
   end
 
   def display_image(assigns, docubit) do
+    IO.inspect(docubit)
     { status, docubit } =
       { :ok, docubit }
       |> maybe_file()
 
+    content_tag(:img, "", handle_opts(assigns, docubit))
+  end
+
+  def handle_opts(assigns, docubit) do
+    []
+    |> handle_src(assigns.img_path, docubit)
+    |> handle_alt(docubit)
+  end
+
+  def handle_src(opts, path, docubit) do
+    { status, docubit } = maybe_file({ :ok, docubit })
     case status do
-      :ok -> content_tag(:img, "", [
-          src: assigns.img_path <> docubit.file.filename
-        ])
-      :nofile -> content_tag(:img, "", [
-        src: assigns.img_path,
-        alt: " No File Found for this Docubit"
-      ])
+      :ok -> Keyword.put(opts, :src, path <> docubit.file.filename)
+      :nofile -> Keyword.put(opts, :src, path)
+    end
+  end
+
+  def handle_alt(opts, docubit) do
+    { status, docubit } = maybe_file({ :ok, docubit })
+    case status do
+      :ok -> Keyword.put(opts, :alt, docubit.through_step.name)
+      :nofile -> Keyword.put(opts, :alt, "No File Found for this Docubit")
     end
   end
 
