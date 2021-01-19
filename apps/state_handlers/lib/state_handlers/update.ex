@@ -5,7 +5,8 @@ defmodule StateHandlers.Update do
   def do_update(state, data, opts) when is_struct(data) do
     do_update(state, data, data.__meta__.schema, opts)
   end
-  def do_update(state, data, opts) when is_map(data) do
+  def do_update(state, %{ objects: [ _ | _ ]} = data, opts)  do
+    IO.inspect(data)
     schema =
       data.objects
         |> Enum.at(0)
@@ -14,12 +15,14 @@ defmodule StateHandlers.Update do
 
     do_update(state, data, schema, opts)
   end
+  def do_update(state, %{ objects: []}, opts) do
+    raise(RuntimeError, "Objects empty")
+  end
   def do_update(state, data, schema, opts) do
     #IO.puts("Updating an obect with opts #{inspect(opts)}")
     loader = opts[:loader] || &Map.put/3
     state
     |> Helpers.maybe_access_assigns()
-    |> Helpers.inspector(opts)
     |> Helpers.maybe_access_location(opts[:location])
     |> Helpers.maybe_access_type(opts[:strategy], schema)
     |> update(data, opts[:data_type])
