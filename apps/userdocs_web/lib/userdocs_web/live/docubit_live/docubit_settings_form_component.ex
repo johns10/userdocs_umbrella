@@ -21,11 +21,22 @@ defmodule UserDocsWeb.DocubitSettingsLive.FormComponent do
         <% end %>
       </div>
     </div>
+
     <%= Layout.text_input(form, :li_value, [ hidden: :li_value not in @settings_to_display ]) %>
+
     <%= Layout.select_input(form, :name_prefix, setting_select_options(:name_prefix),
       [ hidden: :name_prefix not in @settings_to_display ]) %>
+
     <%= Layout.select_input(form, :show_title, setting_select_options(:show_title),
       [ hidden: :show_title not in @settings_to_display ]) %>
+
+    <%= Layout.select_input(form, :img_border, setting_select_options(:img_border),
+      [ hidden: :img_border not in @settings_to_display ]) %>
+
+    <%= Layout.number_input(form, :border_width, [ hidden: :border_width not in @settings_to_display ]) %>
+
+    <%= Layout.text_input(form, :border_color, [ hidden: :border_color not in @settings_to_display ]) %>
+
     <div class="field">
       <div class="control">
         <%= if @display_settings_dropdown do %>
