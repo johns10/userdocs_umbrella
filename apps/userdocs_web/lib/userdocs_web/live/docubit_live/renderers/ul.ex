@@ -4,6 +4,8 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Ul do
 
   alias UserDocsWeb.DocubitLive.AddDocubitButton
 
+  def header(_), do: "OL"
+
   def render(assigns) do
     ~L"""
       <ul>
