@@ -103,7 +103,11 @@ defmodule UserDocs.Documents.DocubitType do
       context: %{
         settings: %{ }
       },
-      allowed_settings: [],
+      allowed_settings: [
+        :img_border,
+        :border_width,
+        :border_color
+      ],
       allowed_children: [],
       allowed_data: [
         UserDocs.Automation.Step,
