@@ -36,7 +36,7 @@ defmodule UserDocs.Documents.DocubitSetting do
   def li_value() do
     %{
       field_type: :select,
-      select_options: [{ "False", false }, { "True", true }]
+      select_options: [{"None", nil}, { "False", false }, { "True", true }]
     }
   end
 
@@ -44,7 +44,7 @@ defmodule UserDocs.Documents.DocubitSetting do
   def name_prefix() do
     %{
       field_type: :select,
-      select_options: [{ "False", false }, { "True", true }]
+      select_options: [{"None", nil}, { "False", false }, { "True", true }]
     }
   end
 
@@ -52,7 +52,7 @@ defmodule UserDocs.Documents.DocubitSetting do
   def show_title() do
     %{
       field_type: :select,
-      select_options: [{ "False", false }, { "True", true }]
+      select_options: [{"None", nil}, { "False", false }, { "True", true }]
     }
   end
 
@@ -60,7 +60,7 @@ defmodule UserDocs.Documents.DocubitSetting do
   def img_border() do
     %{
       field_type: :select,
-      select_options: [{ "False", false }, { "True", true }]
+      select_options: [{"None", nil}, { "False", false }, { "True", true }]
     }
   end
 
