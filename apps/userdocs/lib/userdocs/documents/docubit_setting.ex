@@ -25,7 +25,7 @@ defmodule UserDocs.Documents.DocubitSetting do
 
   def changeset(docubit_type, attrs \\ %{}) do
     docubit_type
-    |> cast(attrs, [ :li_value, :name_prefix, :show_title ])
+    |> cast(attrs, @fields)
   end
 
   def valid_settings() do
