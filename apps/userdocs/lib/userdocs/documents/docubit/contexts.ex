@@ -30,17 +30,40 @@ defmodule UserDocs.Documents.Docubit.Context do
   end
 
   def update_context(%Context{} = context, %Context{} = attrs) do
-    # IO.puts("Internal update_context")
+    #IO.puts("Internal update_context")
     context
     |> internal_changeset(attrs)
     |> apply_action(:update)
   end
 
   def update_context(%Context{} = context, attrs \\ %{}) do
-    context
-    |> changeset(attrs)
+    #IO.puts("update_context")
+    changeset = changeset(context, attrs)
+    changeset =
+      case get_change(changeset, :settings) do
+        nil -> changeset
+        "" -> changeset
+        settings when map_size(settings) == 0 ->
+          put_change(changeset, :settings, %DocubitSettings{})
+        settings ->
+          params =
+            Map.take(settings, DocubitSettings.__schema__(:fields))
+
+          IO.inspect(params)
+
+          { :ok, updated_settings } =
+            current_settings_or_empty_settings(changeset.data.settings)
+            |> DocubitSettings.ignore_nils_changeset(params)
     |> apply_action(:update)
+
+          put_change(changeset, :settings, updated_settings)
   end
+
+    apply_action(changeset, :update)
+  end
+
+  def current_settings_or_empty_settings(nil), do: %DocubitSettings{}
+  def current_settings_or_empty_settings(settings), do: settings
 
   def create_context(attrs) do
     %Context{}
