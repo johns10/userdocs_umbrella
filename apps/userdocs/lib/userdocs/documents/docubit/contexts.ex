@@ -49,8 +49,6 @@ defmodule UserDocs.Documents.Docubit.Context do
           params =
             Map.take(settings, DocubitSettings.__schema__(:fields))
 
-          IO.inspect(params)
-
           { :ok, updated_settings } =
             current_settings_or_empty_settings(changeset.data.settings)
             |> DocubitSettings.ignore_nils_changeset(params)
