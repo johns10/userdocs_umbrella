@@ -105,9 +105,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
   defp maybe_title(current_content, %Context{ settings: %{ show_title: false } }, _) do
     Map.put(current_content, :title, nil)
   end
-  defp maybe_title(current_content, context, content) do
-    Map.put(current_content, :title, nil)
-  end
+  defp maybe_title(current_content, _, _), do: Map.put(current_content, :title, nil)
 
   def maybe_render_title(%{title: nil}), do: ""
   def maybe_render_title(%{title: title}) do
