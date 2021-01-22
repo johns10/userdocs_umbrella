@@ -32,8 +32,8 @@ defmodule EctoSettings do
   end
 
   def handle_value(nil), do: nil
-  def handle_value(value) when is_atom(value), do: value
-  def handle_value(value), do: String.to_existing_atom(value)
+  def handle_value(value) when is_atom(value), do: Atom.to_string(value)
+  def handle_value(value) when is_binary(value), do: value
 
   # dumping data to the database
   def dump(settings) when is_map(settings) do
