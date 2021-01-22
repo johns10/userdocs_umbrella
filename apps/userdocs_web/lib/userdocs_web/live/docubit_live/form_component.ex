@@ -60,7 +60,11 @@ defmodule UserDocsWeb.DocubitLive.FormComponent do
       {:ok, docubit} ->
         message = %{ objects: docubit.docubits }
         UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "update", docubit)
+        case message do
+          %{ objects: [ _ | _ ]} ->
         UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "update", message)
+          %{ objects: [] } -> nil
+        end
         send(self(), :close_modal)
         {:noreply,
           socket
