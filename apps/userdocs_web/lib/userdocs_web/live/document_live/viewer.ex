@@ -54,7 +54,6 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   @impl true
   def handle_params(%{"id" => id}, _, %{ assigns: %{ auth_state: :logged_in }} = socket) do
     id = String.to_integer(id)
-    IO.puts("Handle Params")
     document = Documents.get_document!(id, %{ document_versions: true })
     {
       :noreply,
@@ -77,7 +76,6 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
       |> (&(Loaders.load_docubits(&1, default_document_version_id(&1, document), state_opts()))).()
       |> (&(prepare_document_version(&1, default_document_version_id(&1, document)))).()
       |> assign(:img_path, Routes.static_path(socket, "/images/"))
-      |> StateHandlers.inspect(state_opts())
     }
   end
   def handle_params(_, _, socket), do: { :noreply, socket }
