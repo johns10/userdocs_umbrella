@@ -89,7 +89,6 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   end
 
   def render_docubit(%{ docubits: [ _ | _ ] = docubits } = docubit) when is_list(docubits) do
-    # IO.puts("Rendering docubits")
     docubit.renderer.render(
       docubit,
       Enum.map(docubits, fn(d) -> render_docubit(d) end),
@@ -97,7 +96,6 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
     )
   end
   def render_docubit(%{ docubits: [ ]} = docubit) do
-    # IO.puts("Rendering docubit #{docubit.type_id}")
     docubit.renderer.render(
       docubit,
       [],
@@ -121,7 +119,6 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   end
 
   defp prepare_document_version(socket, document_version_id) do
-    IO.puts("Preparing Document Version")
     opts =
       state_opts()
       |> Keyword.put(:preloads, [
@@ -183,14 +180,6 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
     Map.put(docubit, :docubits, docubits)
   end
 
-  def inspector(docubit, parent_docubit) do
-    IO.inspect(parent_docubit.address)
-    IO.inspect(parent_docubit.context)
-    IO.inspect(docubit.address)
-    IO.inspect(docubit.context)
-    docubit
-  end
-
   defp state_opts() do
     Defaults.state_opts
     |> Keyword.put(:location, :data)
@@ -221,7 +210,6 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   end
 
   defp default_language_code_id(socket) do
-    IO.puts("default_language_code_id")
     language_code_id =
       Users.get_team!(socket.assigns.current_team_id, socket, state_opts())
       |> Map.get(:default_language_code_id)
