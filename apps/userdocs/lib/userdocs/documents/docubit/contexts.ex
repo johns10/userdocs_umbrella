@@ -74,31 +74,10 @@ defmodule UserDocs.Documents.Docubit.Context do
   def changeset(context, attrs) do
     context
     |> cast(attrs, [ :settings ])
-    |> remove_all_nil_settings()
-  end
-
-  def remove_all_nil_settings(changeset) do
-    case get_change(changeset, :settings) do
-      nil -> changeset
-      "" -> changeset
-      settings when settings == %{} -> delete_change(changeset, :settings)
-      settings -> put_change(changeset, :settings, ignore_nil_settings(settings))
-    end
-  end
-
-  def ignore_nil_settings(settings) do
-    Enum.reduce(settings, %{},
-      fn({key, value}, acc) ->
-        case value do
-          nil -> acc
-          value -> Map.put(acc,key, value)
         end
-      end
-    )
-  end
 
   def internal_changeset(context, attrs) do
-    # IO.puts("internal_changeset")
+    #IO.puts("internal_changeset")
     context
     |> change()
     |> put_change(:settings, attrs.settings)
@@ -108,6 +87,7 @@ defmodule UserDocs.Documents.Docubit.Context do
   # Docubit with parent, type, and local context applied to the
   # Docubit
   def apply_context_changes(docubit, parent_context) do
+    #IO.puts("Applying Context change to #{inspect(docubit.address)}")
     docubit
     |> apply_context_change(docubit.docubit_type.context)
     |> apply_context_change(parent_context)
