@@ -49,7 +49,7 @@ defmodule UserDocs.Documents.DocubitType do
       name: "li",
       context: %{
         settings: %{
-          li_value: None,
+          li_value: "",
           name_prefix: false
         }
       },
