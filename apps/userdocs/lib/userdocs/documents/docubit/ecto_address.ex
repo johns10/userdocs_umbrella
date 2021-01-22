@@ -5,12 +5,12 @@ defmodule EctoAddress do
 
   def cast(address = %{ docubit_id: docubit_id, body: body }) when is_integer(docubit_id) and is_struct(body, Address) do
     IO.puts("Casting struct EctoAddress")
-    IO.inspect(address)
+    #IO.inspect(address)
     { :ok, address }
   end
   def cast(address = %{ docubit_id: docubit_id, body: body }) when is_integer(docubit_id) and is_map(body) do
     IO.puts("Casting map EctoAddress")
-    IO.inspect(address)
+    #IO.inspect(address)
     { :ok, %{ docubit_id: docubit_id, body: Kernel.struct(Address, body) } }
   end
 
