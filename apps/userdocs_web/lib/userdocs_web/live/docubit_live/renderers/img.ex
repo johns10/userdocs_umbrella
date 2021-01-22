@@ -4,6 +4,8 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
   alias UserDocsWeb.DocubitLive.Renderers.Base
 
   alias UserDocs.Documents.Docubit
+  alias UserDocs.Documents.Docubit.Context
+  alias UserDocs.Documents.DocubitSetting, as: DocubitSettings
 
   def header(_), do: ""
 
