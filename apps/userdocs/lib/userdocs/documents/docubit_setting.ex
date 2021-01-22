@@ -2,6 +2,8 @@ defmodule UserDocs.Documents.DocubitSetting do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias UserDocs.Documents.DocubitSetting, as: DocubitSettings
+
   @fields [
     :li_value,
     :name_prefix,
@@ -26,6 +28,25 @@ defmodule UserDocs.Documents.DocubitSetting do
   def changeset(settings, attrs \\ %{}) do
     settings
     |> cast(attrs, @fields)
+  end
+
+  def ignore_nils_changeset(settings, attrs \\ %{}) do
+    #IO.puts("ignore_nils_changeset")
+    settings
+    |> cast(attrs, @fields)
+    |> ignore_nil_setting_changes()
+  end
+
+  def ignore_nil_setting_changes(changeset) do
+    #IO.puts("ignore_nil_setting_changes")
+    Enum.reduce(changeset.changes, changeset,
+      fn({key, value}, changeset) ->
+        case value do
+          nil -> delete_change(changeset, key)
+          value -> changeset
+        end
+      end
+    )
   end
 
   def valid_settings() do
