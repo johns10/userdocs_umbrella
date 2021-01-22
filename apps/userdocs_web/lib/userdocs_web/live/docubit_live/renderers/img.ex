@@ -30,6 +30,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
     []
     |> handle_src(assigns.img_path, docubit)
     |> handle_alt(docubit)
+    |> handle_border(docubit)
   end
 
   def handle_src(opts, path, docubit) do
@@ -54,4 +55,15 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
   def maybe_file({ :ok, docubit = %Docubit{ file: _ }}) do
     { :ok, docubit }
   end
+
+  def handle_border(opts,
+    %Docubit{ context: %Context{ settings: settings = %DocubitSettings{
+      img_border: true, border_color: border_color, border_width: border_width }}}
+  ) do
+    IO.puts("handle_border")
+    opts
+    |> Keyword.put(:border,
+      "#{border_width}px solid #{border_color}")
+  end
+  def handle_border(opts, _), do: opts
 end
