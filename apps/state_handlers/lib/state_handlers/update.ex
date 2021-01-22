@@ -6,7 +6,7 @@ defmodule StateHandlers.Update do
     do_update(state, data, data.__meta__.schema, opts)
   end
   def do_update(state, %{ objects: [ _ | _ ]} = data, opts)  do
-    IO.inspect(data)
+    #IO.inspect(data)
     schema =
       data.objects
         |> Enum.at(0)
