@@ -57,7 +57,6 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Li do
   def outer_tag(%{ editor: false }), do: "li"
 
   def li_opts(docubit) do
-    IO.inspect(docubit.context)
     settings =
       docubit
       |> extract_context()
@@ -65,7 +64,6 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Li do
 
     []
     |> maybe_name_prefix(Map.get(settings, :name_prefix, nil), docubit)
-    |> IO.inspect
   end
 
   def maybe_name_prefix(opts, nil, _), do: opts
