@@ -5,9 +5,8 @@ defmodule UserDocs.Documents.Docubit.Context do
   require Logger
 
   alias UserDocs.Documents.Docubit, as: Docubit
-  alias UserDocs.Documents.DocubitType
-  alias UserDocs.Documents.DocubitSetting
   alias UserDocs.Documents.Docubit.Context
+  alias UserDocs.Documents.DocubitSetting, as: DocubitSettings
 
   @primary_key false
   embedded_schema do
