@@ -23,6 +23,8 @@ config :userdocs_web,
 config :userdocs_web, UserDocsWeb.Endpoint,
   url: [
     host: "localhost",
+    host: "user-docs.com",
+    host: "www.user-docs.com",
     host: "userdocs.gigalixirapp.com"
     ],
   secret_key_base: "uYNO0z5S7TuzLxe//ihPPyhDY+9/juUgfW4fFJkw+nKlP/omZmmVMmcIWuBolrzY",
