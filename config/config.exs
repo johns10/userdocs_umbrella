@@ -21,7 +21,10 @@ config :userdocs_web,
 
 # Configures the endpoint
 config :userdocs_web, UserDocsWeb.Endpoint,
-  url: [host: "localhost"],
+  url: [
+    host: "localhost",
+    host: "userdocs.gigalixirapp.com"
+    ],
   secret_key_base: "uYNO0z5S7TuzLxe//ihPPyhDY+9/juUgfW4fFJkw+nKlP/omZmmVMmcIWuBolrzY",
   render_errors: [view: UserDocsWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: UserDocs.PubSub,
@@ -66,11 +69,11 @@ config :process_administrator_web, :pow,
 
 config :cors_plug,
   origin: [
+    "https://userdocs.gigalixirapp.com",
     "chrome-extension://iclibnblhjdakhhijcioglkmdihjelgg",
     "chrome-extension://ohmjkpckjphdcdophkflpmdmihpiaejf",
     "http://localhost",
     "http://app.davenport.rocks",
-    "https://app.davenport.rocks",
     "https://userdocs.gigalixirapp.com"
   ],
   max_age: 86400,
