@@ -72,7 +72,6 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Image do
     case content_versions |> Enum.at(0) do
       nil -> raise(RuntimeError, "Content Version Not Found in maybe_body")
       result ->
-        IO.inspect(content_name)
         ": "
         <> content_name
         <> " ("
