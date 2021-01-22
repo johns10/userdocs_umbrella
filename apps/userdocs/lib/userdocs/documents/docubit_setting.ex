@@ -23,8 +23,8 @@ defmodule UserDocs.Documents.DocubitSetting do
     field :border_color, :string
   end
 
-  def changeset(docubit_type, attrs \\ %{}) do
-    docubit_type
+  def changeset(settings, attrs \\ %{}) do
+    settings
     |> cast(attrs, @fields)
   end
 
