@@ -15,7 +15,6 @@ defmodule UserDocs.Documents.DocubitSetting do
 
 
   @primary_key false
-  @derive {Jason.Encoder, only: @fields}
   embedded_schema do
     field :li_value, :string
     field :name_prefix, :boolean
