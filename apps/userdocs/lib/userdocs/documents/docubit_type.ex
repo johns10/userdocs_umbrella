@@ -143,7 +143,7 @@ defmodule UserDocs.Documents.DocubitType do
     context: %{
       settings: %{ }
     },
-    allowed_settings: [],
+    allowed_settings: [ :li_value, :name_prefix ],
     allowed_children: [ "ol", "ul", "p", "img" ],
     allowed_data: [ None ]
   }
@@ -156,7 +156,7 @@ defmodule UserDocs.Documents.DocubitType do
       context: %{
         settings: %{ }
       },
-      allowed_settings: [],
+      allowed_settings: [ :li_value, :name_prefix ],
       allowed_children: [ "column" ],
       allowed_data: [ None ]
     }
@@ -169,7 +169,7 @@ defmodule UserDocs.Documents.DocubitType do
       context: %{
         settings: %{ }
       },
-      allowed_settings: [],
+      allowed_settings: [ :li_value, :name_prefix ],
       allowed_children: [ "row" ],
       allowed_data: [ None ]
     }
