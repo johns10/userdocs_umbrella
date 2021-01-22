@@ -35,9 +35,23 @@ defmodule UserDocs.DocubitsTest do
       |> DocubitFixtures.state(opts)
     end
 
+    test "contexts retain values that aren't overriden" do
+      context = %Context{ settings:  %DocubitSetting{li_value: "test_value"} }
+      context_changes = %{ settings:  %{name_prefix: true} }
+      { :ok, context } = Context.update_context(context, context_changes)
+      assert context.settings.li_value == "test_value"
+    end
+
+    test "nil contexts don't override values" do
+      context = %Context{ settings:  %DocubitSetting{li_value: "test_value"} }
+      context_changes = %{ settings:  %{li_value: nil} }
+      { :ok, context } = Context.update_context(context, context_changes)
+      assert context.settings.li_value == "test_value"
+    end
+
     test "update_context changes a context" do
       context = %Context{}
-      context_changes = %{ settings:  %{li_value: "test_value"} }
+      context_changes = %Context{ settings:  %DocubitSetting{li_value: "test_value"} }
       { :ok, context } = Context.update_context(context, context_changes)
       assert context.settings.li_value == "test_value"
     end
@@ -46,12 +60,11 @@ defmodule UserDocs.DocubitsTest do
       opts = Keyword.put(state_opts(), :preloads, [ :docubit_type ])
       state = docubit_fixture()
       docubit = Documents.list_docubits(state, opts) |> Enum.at(0)
-      IO.inspect(docubit)
       context = %{ settings:  %{li_value: "test_value"} }
       updated_docubit = Docubit.apply_context(docubit, context)
       assert updated_docubit.context.settings.li_value == "test_value"
     end
-"""
+
     test "apply_context respects the heirarchy of parent over type" do
       state = docubit_fixture()
       ol = DocubitFixtures.docubit(:ol, state, state_opts())
@@ -70,7 +83,7 @@ defmodule UserDocs.DocubitsTest do
       changeset = Docubit.changeset(preloaded_ol, attrs)
       { :ok, docubit } = Ecto.Changeset.apply_action(changeset, :update)
       # Apply some context and make sure the orignal settings are retained
-      context = %{ settings: %{name_prefix: False} }
+      context = %{ settings: %{name_prefix: false} }
       docubit = Docubit.apply_context(docubit, context)
       assert docubit.context.settings.name_prefix == attrs.settings.name_prefix
     end
@@ -228,6 +241,5 @@ defmodule UserDocs.DocubitsTest do
       assert docubit_type.context.settings.li_value == docubit_type_attrs.context.settings.li_value
       assert docubit_type.context.settings.name_prefix == docubit_type_attrs.context.settings.name_prefix
     end
-    """
   end
 end
