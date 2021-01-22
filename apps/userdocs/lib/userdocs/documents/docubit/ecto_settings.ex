@@ -7,10 +7,6 @@ defmodule EctoSettings do
   # Cast strings into the URI struct to be used at runtime
   def cast(settings = %DocubitSetting{}) do
     #IO.puts("Casting Ecto settings")
-    settings =
-      settings
-      |> Map.take(DocubitSetting.__schema__(:fields))
-
     { :ok, settings }
   end
   def cast(settings) when is_map(settings)  do
