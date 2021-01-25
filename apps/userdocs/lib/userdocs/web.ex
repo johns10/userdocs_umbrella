@@ -604,6 +604,10 @@ defmodule UserDocs.Web do
 
   alias UserDocs.Web.Strategy
 
+  def load_strategies(state, opts) do
+    StateHandlers.load(state, list_strategies(), Strategy, opts)
+  end
+
   @doc """
   Returns the list of strategies.
   """
