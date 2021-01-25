@@ -52,7 +52,7 @@ defmodule ProcessAdministratorWeb.State do
     #Enum.reduce(changes, socket, fn({x, y}, acc) -> Phoenix.LiveView.assign(acc, x, y) end)
     Enum.reduce(changes, socket,
       fn({key, value}, current_socket) ->
-        IO.puts("Updating Key #{key}")
+        #IO.puts("Updating Key #{key}")
         current_socket = Phoenix.LiveView.assign(current_socket, key, value)
         #IO.puts("Updated value to #{Map.get(current_socket, key)}")
         current_socket
@@ -150,7 +150,6 @@ defmodule ProcessAdministratorWeb.State do
     Documents.list_language_codes()
   end
 
-  @spec strategies :: any
   def strategies do
     Web.list_strategies()
   end
