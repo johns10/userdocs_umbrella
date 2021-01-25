@@ -17,7 +17,10 @@ defmodule StateHandlers.Helpers do
   end
   def maybe_access_location([{data, _, _} | _ ] = state, location) do
    #IO.puts("Accessing Location")
-    [ { Map.get(data, location, nil), location, :location } | state ]
+    case Map.get(data, location, nil) do
+      nil -> raise(RuntimeError, "Access location failed because the location wasn't initialized properly")
+      location_data -> [ { location_data, location, :location } | state ]
+    end
   end
 
   def maybe_access_type(nil, _, _), do: raise(RuntimeError, "maybe_access_type got nil data from location")
