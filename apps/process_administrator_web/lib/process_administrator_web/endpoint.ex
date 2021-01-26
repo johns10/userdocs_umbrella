@@ -7,7 +7,7 @@ defmodule ProcessAdministratorWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_userdocs_web_key",
-    signing_salt: "z4tHDkXT",
+    signing_salt: "zbnhmPNC",
     #http_only: false,
     same_site: "None",
     secure: true
