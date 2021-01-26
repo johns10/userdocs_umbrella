@@ -43,35 +43,12 @@ defmodule ProcessAdministratorWeb.IndexLive do
     Logger.debug("DB operations")
     socket =
       socket
-      |> validate_logged_in(session)
+      |> Root.authorize(session)
+      |> Root.initialize(opts)
       |> initialize()
       |> assign(:form_data, %{ action: :show })
 
     {:ok, socket}
-  end
-
-  def validate_logged_in(socket, session) do
-    try do
-      case maybe_assign_current_user(socket, session) do
-        %{ assigns: %{ current_user: nil }} ->
-          socket
-          |> assign(:auth_state, :not_logged_in)
-          |> assign(:changeset, Users.change_user(%User{}))
-        %{ assigns: %{ current_user: _ }} ->
-          socket
-          |> maybe_assign_current_user(session)
-          |> assign(:auth_state, :logged_in)
-          |> (&(assign(&1, :changeset, Users.change_user(&1.assigns.current_user)))).()
-        error ->
-          Logger.error(error)
-          socket
-      end
-    rescue
-      FunctionClauseError ->
-        socket
-        |> assign(:auth_state, :not_logged_in)
-        |> assign(:changeset, Users.change_user(%User{}))
-    end
   end
 
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
