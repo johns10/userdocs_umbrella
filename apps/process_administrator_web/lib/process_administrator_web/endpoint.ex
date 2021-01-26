@@ -53,7 +53,9 @@ defmodule ProcessAdministratorWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug Pow.Plug.Session, otp_app: :process_administrator_web
+  plug Pow.Plug.Session,
+    otp_app: :process_administrator_web,
+    session_key: "userdocs_web_auth"
   plug CORSPlug
   plug ProcessAdministratorWeb.Router
 end
