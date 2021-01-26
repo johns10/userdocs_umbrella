@@ -387,7 +387,7 @@ defmodule UserDocs.Documents do
 
   alias UserDocs.Documents.ContentVersion
 
-  def load_content_version(state, opts) do
+  def load_content_versions(state, opts) do
     StateHandlers.load(state, list_content_versions(%{}, opts[:filters]), ContentVersion, opts)
   end
 

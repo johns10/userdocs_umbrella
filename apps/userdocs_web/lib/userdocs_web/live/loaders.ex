@@ -21,7 +21,7 @@ defmodule UserDocsWeb.Loaders do
       opts
       |> Keyword.put(:filters, %{content_ids: content_ids})
 
-    Documents.load_content_version(socket, opts)
+    Documents.load_content_versions(socket, opts)
   end
 
 end
