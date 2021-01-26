@@ -72,6 +72,10 @@ defmodule UserDocs.Automation do
 
   alias UserDocs.Automation.StepType
 
+  def load_step_types(state, opts) do
+    StateHandlers.load(state, list_step_types(), StepType, opts)
+  end
+
   @doc """
   Returns the list of step_types.
 
