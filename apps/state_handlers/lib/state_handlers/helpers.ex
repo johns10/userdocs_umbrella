@@ -18,7 +18,7 @@ defmodule StateHandlers.Helpers do
   def maybe_access_location([{data, _, _} | _ ] = state, location) do
    #IO.puts("Accessing Location")
     case Map.get(data, location, nil) do
-      nil -> raise(RuntimeError, "Access location failed because the location wasn't initialized properly")
+      nil -> raise(RuntimeError, "Access location failed because the location (#{location}) wasn't initialized properly  Available keys are #{inspect(Map.keys(data))}")
       location_data -> [ { location_data, location, :location } | state ]
     end
   end
@@ -31,7 +31,7 @@ defmodule StateHandlers.Helpers do
 
   def access_type([ { data, _key, _type } | _ ] = state, schema) do
     case Map.get(data, type(schema)) do
-      nil -> raise(RuntimeError, "access_type failed because it retreived a nil value from #{type(schema)}")
+      nil -> raise(RuntimeError, "access_type failed because it retreived a nil value from #{type(schema)}.  Available keys are #{inspect(Map.keys(data))}")
       result -> [ { result, type(schema), :type } | state ]
     end
   end
