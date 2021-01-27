@@ -32,25 +32,28 @@ defmodule UserDocsWeb.Root do
     |> validate_logged_in(session)
   end
 
-  def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
-    opts =
-      state_opts()
-      |> Keyword.put(:types, [ User, TeamUser, Team, Project, Version  ])
+  def initialize(socket, opts \\ state_opts())
+  def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket, opts) do
+    types_to_initialize = [ User, TeamUser, Team, Project, Version ] ++ Keyword.get(opts, :types, [])
+
+    initialization_opts =
+      opts
+      |> Keyword.put(:types, types_to_initialize)
 
     socket
-    |> StateHandlers.initialize(opts)
+    |> StateHandlers.initialize(initialization_opts)
     |> assign(:form_data, %{ action: :show })
-    |> users()
-    |> team_users()
-    |> teams()
-    |> projects()
-    |> versions()
+    |> users(opts)
+    |> team_users(opts)
+    |> teams(opts)
+    |> projects(opts)
+    |> versions(opts)
     |> Select.assign_default_team_id(&assign/3)
-    |> Select.assign_default_project_id(&assign/3, state_opts())
-    |> Select.assign_default_version_id(&assign/3, state_opts())
+    |> Select.assign_default_project_id(&assign/3, opts)
+    |> Select.assign_default_version_id(&assign/3, opts)
     |> subscribe()
   end
-  def initialize(socket), do: socket
+  def initialize(socket, _), do: socket
 
   def subscribe(socket) do
     UserDocsWeb.Endpoint.subscribe(Defaults.channel(socket))
@@ -58,33 +61,28 @@ defmodule UserDocsWeb.Root do
   end
 
 
-  def users(%{ assigns: %{ current_user: current_user }} = socket) do
-    data =
-      socket.assigns
-      |> Map.get(:data)
-      |> Map.put(:users, [ current_user ])
-
-    assign(socket, :data, data)
+  def users(%{ assigns: %{ current_user: current_user }} = socket, opts \\ state_opts()) do
+    socket
+    |> StateHandlers.load([ current_user ], opts)
   end
 
-  @spec team_users(Phoenix.LiveView.Socket.t()) :: Phoenix.LiveView.Socket.t()
-  def team_users(%{ assigns: %{ current_user: %{ id: user_id }}} = socket) do
-    opts = state_opts() |> Keyword.put(:filters, %{ user_id: user_id })
+  def team_users(%{ assigns: %{ current_user: %{ id: user_id }}} = socket, opts \\ state_opts()) do
+    opts = opts |> Keyword.put(:filters, %{ user_id: user_id })
     Users.load_team_users(socket, opts)
   end
 
-  def teams(%{ assigns: %{ current_user: %{ id: user_id }}} = socket) do
-    opts = state_opts() |> Keyword.put(:filters, %{ user_id: user_id })
+  def teams(%{ assigns: %{ current_user: %{ id: user_id }}} = socket, opts \\ state_opts()) do
+    opts = opts |> Keyword.put(:filters, %{ user_id: user_id })
     Users.load_teams(socket, opts)
   end
 
-  def projects(%{ assigns: %{ current_user: %{ id: user_id }}} = socket) do
-    opts = state_opts() |> Keyword.put(:filters, %{ user_id: user_id })
+  def projects(%{ assigns: %{ current_user: %{ id: user_id }}} = socket, opts \\ state_opts()) do
+    opts = opts |> Keyword.put(:filters, %{ user_id: user_id })
     Projects.load_projects(socket, opts)
   end
 
-  def versions(%{ assigns: %{ current_user: %{ id: user_id }}} = socket) do
-    opts = state_opts() |> Keyword.put(:filters, %{ user_id: user_id })
+  def versions(%{ assigns: %{ current_user: %{ id: user_id }}} = socket, opts \\ state_opts()) do
+    opts = opts |> Keyword.put(:filters, %{ user_id: user_id })
     Projects.load_versions(socket, opts)
   end
 
@@ -101,6 +99,7 @@ defmodule UserDocsWeb.Root do
           |> assign(:auth_state, :logged_in)
           |> (&(assign(&1, :changeset, Users.change_user(&1.assigns.current_user)))).()
         error ->
+          IO.puts("Error")
           Logger.error(error)
           socket
       end
@@ -138,7 +137,7 @@ defmodule UserDocsWeb.Root do
     { :noreply, ModalMenus.edit_content(socket, params) }
   end
   def handle_event("select-version", %{"select-version" => version_id_param} = _payload, socket) do
-    opts = state_opts()
+    opts = Map.get(socket.assigns, :state_opts, state_opts())
     with  version_id <- String.to_integer(version_id_param),
       version <- UserDocs.Projects.get_version!(version_id, socket, opts),
       project <- UserDocs.Projects.get_project!(version.project_id, socket, opts),
