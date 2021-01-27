@@ -5,24 +5,16 @@ defmodule ProcessAdministratorWeb.StepLive.FormComponent do
 
   alias UserDocsWeb.LiveHelpers
 
-  alias ProcessAdministratorWeb.LiveHelpers
   alias ProcessAdministratorWeb.AnnotationLive
   alias ProcessAdministratorWeb.ElementLive
   alias ProcessAdministratorWeb.PageLive
-  alias ProcessAdministratorWeb.State
   alias ProcessAdministratorWeb.ID
 
   alias UserDocsWeb.Layout
   alias UserDocs.Automation
-  alias UserDocs.Automation.Step.ChangeHandler
   alias UserDocs.Automation.Process.RecentPage
-  alias UserDocs.ChangeTracker
-  alias UserDocs.Documents
-  alias UserDocs.Documents.ContentVersion
   alias UserDocs.Web
   alias UserDocs.Web.Page
-  alias UserDocs.Web.Element
-  alias UserDocs.Web.Annotation
 
   @impl true
   def update(%{step: step} = assigns, socket) do
