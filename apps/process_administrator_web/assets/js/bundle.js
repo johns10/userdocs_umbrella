@@ -87,9 +87,9 @@
 /******/ ({
 
 /***/ "../../../deps/phoenix/priv/static/phoenix.js":
-/*!******************************************************************************************************!*\
-  !*** c:/Users/johnd/OneDrive/Documents/GitHub/userdocs_umbrella/deps/phoenix/priv/static/phoenix.js ***!
-  \******************************************************************************************************/
+/*!***********************************************************************************************!*\
+  !*** D:/Users/johns10/Documents/GitHub/userdocs_umbrella/deps/phoenix/priv/static/phoenix.js ***!
+  \***********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1161,9 +1161,9 @@
 /***/ }),
 
 /***/ "../../../deps/phoenix_html/priv/static/phoenix_html.js":
-/*!****************************************************************************************************************!*\
-  !*** c:/Users/johnd/OneDrive/Documents/GitHub/userdocs_umbrella/deps/phoenix_html/priv/static/phoenix_html.js ***!
-  \****************************************************************************************************************/
+/*!*********************************************************************************************************!*\
+  !*** D:/Users/johns10/Documents/GitHub/userdocs_umbrella/deps/phoenix_html/priv/static/phoenix_html.js ***!
+  \*********************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1251,9 +1251,9 @@
 /***/ }),
 
 /***/ "../../../deps/phoenix_live_view/priv/static/phoenix_live_view.js":
-/*!**************************************************************************************************************************!*\
-  !*** c:/Users/johnd/OneDrive/Documents/GitHub/userdocs_umbrella/deps/phoenix_live_view/priv/static/phoenix_live_view.js ***!
-  \**************************************************************************************************************************/
+/*!*******************************************************************************************************************!*\
+  !*** D:/Users/johns10/Documents/GitHub/userdocs_umbrella/deps/phoenix_live_view/priv/static/phoenix_live_view.js ***!
+  \*******************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3991,7 +3991,6 @@ function handle_message(message, configuration) {
     message.payload.type = 'process';
     handle_job(message.payload, configuration);
   } else if (message.type == 'step') {
-    console.log(message)
     message.payload.type = 'step';
     handle_step(message.payload, configuration);
   } else if (message.type == 'configuration') {
@@ -4416,10 +4415,8 @@ function setSize(job, configuration, proceed) {
 function navigate(job, configuration, proceed) {
   var activeTabId = job.activeTabId;
   var step = current_step(job);
-  var payload = step.page_reference == "url" ? {
+  var payload = {
     url: step.url
-  } : {
-    url: step.page.url
   };
   var log_string = "Executing a navigate step to " + activeTabId;
   console.log(log_string);

