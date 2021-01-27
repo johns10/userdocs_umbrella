@@ -2,9 +2,9 @@ defmodule UserDocsWeb.UserLive.LoginFormComponent do
   use UserDocsWeb, :live_component
 
   @impl true
-  def render(assigns) do
+  def render(assigns, path) do
     ~L"""
-      <%= form_for @changeset, Routes.login_path(@socket, :new), [as: :user], fn f -> %>
+      <%= form_for @changeset, path, [as: :user], fn f -> %>
         <%= if @changeset.action do %>
           <div class="alert alert-danger">
             <p>Oops, something went wrong! Please check the errors below.</p>
