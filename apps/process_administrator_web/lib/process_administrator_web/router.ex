@@ -61,6 +61,7 @@ defmodule ProcessAdministratorWeb.Router do
 
     scope "/" do
       pipe_through :browser
+      pow_routes() # TODO: Figure out if this is the right thing.
       live_dashboard "/dashboard", metrics: ProcessAdministratorWeb.Telemetry
     end
   end
