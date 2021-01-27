@@ -255,6 +255,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
       socket
     }
   end
+  def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   def preload_step(step, state, process) do
     opts = [ data_type: :list, strategy: :by_type ]
