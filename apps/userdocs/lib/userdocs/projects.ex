@@ -221,11 +221,18 @@ defmodule UserDocs.Projects do
   """
   def get_version!(id, state, opts) when is_integer(id) and is_list(opts) do
     StateHandlers.get(state, id, Version, opts)
+    |> maybe_preload_version(opts[:preloads], state, opts)
   end
   def get_version!(id, params \\ %{}, _filters \\ %{}) when is_integer(id) and is_map(params) do
     base_version_query(id)
     |> maybe_preload_pages(params[:pages])
     |> Repo.one!()
+  end
+
+  defp maybe_preload_version(versions, nil, _, _), do: versions
+  defp maybe_preload_version(versions, preloads, state, opts) do
+    opts = Keyword.delete(opts, :filter)
+    StateHandlers.preload(state, versions, preloads, opts)
   end
 
   def get_version!(%{ versions: versions }, id, _params, _filters) do
