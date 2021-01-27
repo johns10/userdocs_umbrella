@@ -96,11 +96,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
     |> assign(:state_opts, state_opts())
     |> State.report()
   end
-
-  def initialize(%{ assigns: %{ auth_state: _ }} = socket) do
-    Logger.debug("User not logged in")
-    socket
-  end
+  def initialize(socket), do: socket
 
   def handle_info({:close_modal}, socket), do: { :noreply, ModalMenus.close(socket) }
   def handle_info({:update_current_version, changes}, socket) do
