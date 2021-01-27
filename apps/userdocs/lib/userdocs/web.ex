@@ -256,6 +256,9 @@ defmodule UserDocs.Web do
 
   alias UserDocs.Web.Element
 
+  def load_elements(state, opts) do
+    StateHandlers.load(state, list_elements(opts[:params], opts[:filters]), Element, opts)
+  end
   @doc """
   Returns the list of elements.
 
