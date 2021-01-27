@@ -156,6 +156,11 @@ defmodule UserDocs.Projects.Select do
     |> Enum.at(0)
   end
 
+  def assign_default_strategy_id(%{ assigns: %{ current_version_id: id }} = state, loader, opts) do
+    version = StateHandlers.get(state, id, UserDocs.Projects.Version, opts)
+    loader.(state, :current_strategy_id, version.strategy_id)
+  end
+
   defp convert_to_select_list(list, field \\ :name) do
     Enum.map(list, &{Map.get(&1, field), &1.id})
   end
