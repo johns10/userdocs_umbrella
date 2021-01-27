@@ -1,7 +1,6 @@
 defmodule UserDocsWeb.DocumentLive.Index do
   use UserDocsWeb, :live_view
 
-  alias UserDocs.Users
   alias UserDocs.Documents
   alias UserDocs.Projects
   alias UserDocs.Documents.Document
@@ -11,7 +10,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
   alias UserDocsWeb.Defaults
 
   @impl true
-  def mount(params, session, socket) do
+  def mount(_params, session, socket) do
     {
       :ok,
       socket
