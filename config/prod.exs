@@ -11,7 +11,7 @@ use Mix.Config
 # before starting your production server.
 
 config :userdocs_web, UserDocsWeb.Endpoint,
-  url: [host: "www.user-docs.com", port: 80],
+  url: [host: "user-docs.com", port: 80],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # ## SSL Support
