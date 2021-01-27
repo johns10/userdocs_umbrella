@@ -3,7 +3,7 @@ defmodule ProcessAdministratorWeb.IndexLive do
   require Logger
 
   use ProcessAdministratorWeb, :live_view
-  use ProcessAdministratorWeb.LiveViewPowHelper
+  use UserdocsWeb.LiveViewPowHelper
 
   alias ProcessAdministratorWeb.Endpoint
   alias ProcessAdministratorWeb.ID
@@ -11,22 +11,39 @@ defmodule ProcessAdministratorWeb.IndexLive do
   alias ProcessAdministratorWeb.ProcessLive
   alias ProcessAdministratorWeb.StepLive
   alias ProcessAdministratorWeb.LiveHelpers
+  alias ProcessAdministratorWeb.Loaders
 
   alias UserDocsWeb.ModalMenus, as: ModalMenus
 
   alias UserDocs.Automation.Step
   alias UserDocs.Web
+  alias UserDocs.Users
   alias UserDocs.Web.Strategy
   alias UserDocs.Projects.Version
   alias UserDocs.Automation
+  alias UserDocs.Projects
   alias UserDocs.Projects.Select
   alias UserDocs.Projects.Version
   alias UserDocs.Documents
   alias UserDocs.Projects.Select
-  alias UserDocs.Users
-  alias UserDocs.Users.User
 
   alias ProcessAdministratorWeb.State
+
+  alias UserDocsWeb.Root
+
+  @types_to_initialize [
+    UserDocs.Web.AnnotationType,
+    UserDocs.Web.Strategy,
+    UserDocs.Documents.LanguageCode,
+    UserDocs.Automation.StepType,
+    UserDocs.Documents.Content,
+    UserDocs.Documents.ContentVersion,
+    UserDocs.Automation.Process,
+    UserDocs.Automation.Step,
+    UserDocs.Web.Annotation,
+    UserDocs.Web.Element,
+    UserDocs.Web.Page
+  ]
 
   @impl true
   def mount(_params, session, socket) do
@@ -41,6 +58,10 @@ defmodule ProcessAdministratorWeb.IndexLive do
 
     # Get Data from the Database
     Logger.debug("DB operations")
+    opts =
+      state_opts()
+      |> Keyword.put(:types, @types_to_initialize)
+
     socket =
       socket
       |> Root.authorize(session)
@@ -56,25 +77,23 @@ defmodule ProcessAdministratorWeb.IndexLive do
     |> assign(:modal_action, :show)
     |> assign(:transferred_strategy, %Strategy{})
     |> assign(:transferred_selector, "")
-    |> (&(  assign(&1, :annotation_types, State.annotation_types())                                         )).()
-    |> (&(  assign(&1, :strategies,       State.strategies())                                               )).()
-    |> (&(  assign(&1, :language_codes,   State.language_codes())                                           )).()
-    |> (&(  assign(&1, :step_types,       State.step_types())                                               )).()
-    |> (&(  assign(&1, :teams,            State.teams(&1.assigns.current_user.id))                          )).()
-    |> (&(  assign(&1, :team_users,       State.team_users(&1.assigns.current_user.id))                     )).()
-    |> (&(  assign(&1, :projects,         State.projects(&1.assigns.current_user.id))                       )).()
-    |> (&(  assign(&1, :versions,         State.versions(&1.assigns.current_user.default_team_id))          )).()
-    |> (&(  assign(&1, :content,          State.content(&1.assigns.current_user.default_team_id))           )).()
-    |> (&(  assign(&1, :content_versions, State.content_versions(&1.assigns.current_user.default_team_id))  )).()
-    |> (&(  State.apply_changes(&1, Select.initialize(&1.assigns))                                          )).()
-    |> (&(  assign(&1, :current_strategy, &1.assigns.current_version.strategy)                              )).()
-    |> (&(  assign(&1, :processes,        State.processes(&1.assigns.current_version.id))                   )).()
-    |> (&(  assign(&1, :steps,            State.steps(&1.assigns.current_version.id))                       )).()
-    |> (&(  assign(&1, :annotations,      State.annotations(&1.assigns.current_version.id))                 )).()
-    |> (&(  assign(&1, :elements,         State.elements(&1.assigns.current_version.id))                    )).()
-    |> (&(  assign(&1, :pages,            State.pages(&1.assigns.current_version.id))                       )).()
+    |> Web.load_annotation_types(state_opts())
+    |> Web.load_strategies(state_opts())
+    |> Documents.load_language_codes(state_opts())
+    |> Automation.load_step_types(state_opts())
+    |> Loaders.content(state_opts())
+    |> Loaders.content_versions(state_opts())
+    |> Select.assign_default_strategy_id(&assign/3, state_opts())
+    |> Loaders.processes(state_opts())
+    |> Loaders.steps(state_opts())
+    |> Loaders.annotations(state_opts())
+    |> Loaders.elements(state_opts())
+    |> Loaders.pages(state_opts())
+    |> legacy_object_assigner(state_opts())
     |> current_processes()
+    |> prepare_version()
     |> assign(:process_menu, [])
+    |> assign(:state_opts, state_opts())
     |> State.report()
   end
 
@@ -281,9 +300,38 @@ defmodule ProcessAdministratorWeb.IndexLive do
 
   def current_processes(socket) do
     processes =
-      Version.processes(socket.assigns.current_version.id, socket.assigns.processes)
+      Version.processes(socket.assigns.current_version_id, socket.assigns.processes)
       |> Enum.map(fn(p) -> preload_process(p, socket.assigns) end)
 
     assign(socket, :current_processes, processes)
+  end
+
+  def prepare_version(socket) do
+    IO.puts("Preparing Version")
+    preloads =
+      [
+        :processes,
+        [ processes: :steps ],
+        [ processes: [ steps: :step_type ] ],
+        [ processes: [ steps: :page ] ]
+      ]
+
+
+    opts =
+      state_opts()
+      |> Keyword.put(:preloads, preloads)
+
+    assign(socket, :current_version, Projects.get_version!(socket.assigns.current_version_id, socket, opts))
+  end
+
+  defp legacy_object_assigner(socket, opts) do
+    socket
+    |> assign(:current_team, Users.get_user!(socket.assigns.current_user.id, %{}, %{}, socket, opts))
+    |> assign(:current_project, Projects.get_project!(socket.assigns.current_project_id, socket, opts))
+    |> assign(:current_version, Projects.get_version!(socket.assigns.current_version_id, socket, opts))
+  end
+
+  defp state_opts() do
+    UserDocsWeb.Defaults.state_opts()
   end
 end
