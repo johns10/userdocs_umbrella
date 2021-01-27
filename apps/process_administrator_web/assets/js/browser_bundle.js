@@ -86,22 +86,139 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "../../userdocs_web/assets/js/commands.js":
-/*!**********************************************************************************************************!*\
-  !*** C:/Users/johnd/OneDrive/Documents/GitHub/userdocs_umbrella/apps/userdocs_web/assets/js/commands.js ***!
-  \**********************************************************************************************************/
+/***/ "./js/browser.js":
+/*!***********************!*\
+  !*** ./js/browser.js ***!
+  \***********************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _browser_main_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./browser_main.js */ "./js/browser_main.js");
+
+Object(_browser_main_js__WEBPACK_IMPORTED_MODULE_0__["main"])();
+
+/***/ }),
+
+/***/ "./js/browser_main.js":
+/*!****************************!*\
+  !*** ./js/browser_main.js ***!
+  \****************************/
+/*! exports provided: main */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "main", function() { return main; });
+/* harmony import */ var css_selector_generator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! css-selector-generator */ "./node_modules/css-selector-generator/build/index.js");
+/* harmony import */ var css_selector_generator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(css_selector_generator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _process_administrator_web_assets_js_commands_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../process_administrator_web/assets/js/commands.js */ "./js/commands.js");
+
+
+var getCssSelectorOptions = {
+  selectors: ["class", "tag", "attribute", "nthchild"]
+};
+var XPATH = null;
+var CSSS = null;
+var XPATH_STRATEGY_TYPE = 1;
+var CSS_STRATEGY_TYPE = 2;
+
+function main() {
+  console.log("Initializing Browser stuff");
+  window.active_annotations = [];
+  chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    var logSuffix = sender.tab ? "from a content script:" + sender.tab.url : "from the extension";
+    console.log("Browser received message " + logSuffix);
+    Object(_process_administrator_web_assets_js_commands_js__WEBPACK_IMPORTED_MODULE_1__["handle_message"])(request, {
+      environment: 'browser'
+    });
+  });
+
+  document.onmouseover = function (event) {// const el =  event.target;
+    // console.log(el)
+    // console.log(getCssSelector(el, getCssSelectorOptions))
+    // CSSS = getCssSelector(el, getCssSelectorOptions);
+    // XPATH = getPathTo(event.target);
+  };
+
+  document.onkeydown = function (event) {
+    var x = event.keyCode;
+
+    if (x === 67) {
+      chrome.storage.local.get(['strategy'], function (result) {
+        console.log("Retreived configuration value");
+        console.log(result.strategy);
+        var selector;
+        var configuration = {
+          environment: 'browser',
+          strategy: result.strategy
+        };
+
+        if (result.strategy.name === 'xpath') {
+          selector = XPATH;
+        } else if (result.strategy.name === 'css') {
+          selector = CSSS;
+        }
+
+        var message = {
+          type: 'step',
+          payload: {
+            id: 0,
+            status: 'not_started',
+            process: {
+              steps: [{
+                id: 0,
+                selector: selector,
+                strategy: result.strategy,
+                step_type: {
+                  name: "Set Selector"
+                }
+              }]
+            }
+          }
+        };
+        Object(_process_administrator_web_assets_js_commands_js__WEBPACK_IMPORTED_MODULE_1__["handle_message"])(message, configuration);
+      });
+    }
+  };
+}
+
+function getPathTo(element) {
+  if (element === document.body) return element.tagName.toLowerCase();
+  var ix = 0;
+  var siblings = element.parentNode.childNodes;
+
+  for (var i = 0; i < siblings.length; i++) {
+    var sibling = siblings[i];
+    if (sibling === element) return getPathTo(element.parentNode) + '/' + element.tagName.toLowerCase() + '[' + (ix + 1) + ']';
+
+    if (sibling.nodeType === 1 && sibling.tagName === element.tagName) {
+      ix++;
+    }
+  }
+}
+
+
+
+/***/ }),
+
+/***/ "./js/commands.js":
+/*!************************!*\
+  !*** ./js/commands.js ***!
+  \************************/
 /*! exports provided: handle_message */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "handle_message", function() { return handle_message; });
-/* harmony import */ var nprogress__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! nprogress */ "../../userdocs_web/assets/node_modules/nprogress/nprogress.js");
+/* harmony import */ var nprogress__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! nprogress */ "./node_modules/nprogress/nprogress.js");
 /* harmony import */ var nprogress__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(nprogress__WEBPACK_IMPORTED_MODULE_0__);
 
 
 function handle_message(message, configuration) {
-  const log_string = "Received " + message.type + " message.  ";
+  var log_string = "Received " + message.type + " message.  ";
   console.log(log_string);
 
   if (message.type == 'process') {
@@ -125,8 +242,8 @@ function configure_environment(payload) {
 }
 
 function handle_job(job, configuration) {
-  const status = job.status;
-  const log_string = "handling job " + job.id + " step " + job.current_step_id + " sequence " + job.current_sequence + " status " + status;
+  var status = job.status;
+  var log_string = "handling job " + job.id + " step " + job.current_step_id + " sequence " + job.current_sequence + " status " + status;
   console.log(log_string);
 
   if (status === 'not_started') {
@@ -135,18 +252,19 @@ function handle_job(job, configuration) {
   } else if (status == 'running') {
     run_current_step(job, configuration, handle_job);
   } else if (status == 'failed') {
-    const step = current_step(job);
+    var step = current_step(job);
     updateStepStatus(step);
     updateJobStatus(job);
   } else if (status == 'complete') {
-    const step = current_step(job);
-    updateStepStatus(step);
+    var _step = current_step(job);
+
+    updateStepStatus(_step);
     updateJobStatus(job);
   }
 }
 
 function handle_step(job, configuration) {
-  const status = job.status;
+  var status = job.status;
   console.log("Handling Step");
   console.log(job);
 
@@ -155,17 +273,18 @@ function handle_step(job, configuration) {
   } else if (status == 'running') {
     run_current_step(job, configuration, handle_step);
   } else if (status == 'failed') {
-    const step = current_step(job);
+    var step = current_step(job);
     updateStepStatus(step);
   } else if (status == 'complete') {
-    const step = current_step(job);
-    updateStepStatus(step);
+    var _step2 = current_step(job);
+
+    updateStepStatus(_step2);
   }
 }
 
 function start_job(job, configuration, proceed) {
-  const steps = job.process.steps;
-  const log_string = "Starting Job";
+  var steps = job.process.steps;
+  var log_string = "Starting Job";
   console.log(log_string);
   job.status = 'running';
   job.current_step_id = steps[0].id;
@@ -180,20 +299,24 @@ function run_current_step(job, configuration, proceed) {
 }
 
 function current_step(job) {
-  const steps = job.process.steps;
-  return steps.filter(step => step.id === job.current_step_id)[0];
+  var steps = job.process.steps;
+  return steps.filter(function (step) {
+    return step.id === job.current_step_id;
+  })[0];
 }
 
 function current_step_index(job) {
-  const steps = job.process.steps;
-  return steps.findIndex(step => step.id === job.current_step_id);
+  var steps = job.process.steps;
+  return steps.findIndex(function (step) {
+    return step.id === job.current_step_id;
+  });
 }
 
 function current_sequence(job, step) {
-  const log_string = "Locating current sequence of " + step.step_type.name;
+  var log_string = "Locating current sequence of " + step.step_type.name;
   console.log(step);
-  const step_type_name = step.step_type.name;
-  const sequence_id = job.current_sequence;
+  var step_type_name = step.step_type.name;
+  var sequence_id = job.current_sequence;
   return commands()[step_type_name][sequence_id];
 }
 
@@ -206,7 +329,7 @@ function success(job, configuration, proceed) {
 function updateStepStatus(step) {
   // # TODO: Remove this convention and replace with something I pass in
   console.log("Updating step status");
-  const step_element_id = "step-" + step.id + "-runner";
+  var step_element_id = "step-" + step.id + "-runner";
   var step_element = document.getElementById(step_element_id);
   step.element_id = step_element_id;
   console.log(step);
@@ -219,7 +342,7 @@ function updateStepStatus(step) {
 function updateJobStatus(job) {
   // # TODO: Remove this convention and replace with something I pass in
   console.log("Updating Job Status");
-  const job_element_id = "process-" + job.process.id + "-runner";
+  var job_element_id = "process-" + job.process.id + "-runner";
   var job_element = document.getElementById(job_element_id);
   job.element_id = job_element_id;
   job_element.dispatchEvent(new CustomEvent("message", {
@@ -325,11 +448,11 @@ function commands() {
 }
 
 function collectElementDimensions(job, configuration, proceed) {
-  const step = current_step(job);
-  const step_index = current_step_index(job);
-  const selector = step.element.selector;
-  const strategy = step.element.strategy;
-  const element = getElement(strategy, selector);
+  var step = current_step(job);
+  var step_index = current_step_index(job);
+  var selector = step.element.selector;
+  var strategy = step.element.strategy;
+  var element = getElement(strategy, selector);
   step.element.size = element.getBoundingClientRect();
   job.process.steps[step_index] = step;
   success(job, configuration, proceed);
@@ -338,16 +461,15 @@ function collectElementDimensions(job, configuration, proceed) {
 function annotations() {
   return {
     "Outline": outline,
-    "Badge": badge,
-    "Badge Outline": badge_outline
+    "Badge": badge
   };
 }
 
 function clearAnnotations(job, configuration, proceed) {
-  const step = current_step(job);
+  var step = current_step(job);
 
   try {
-    for (let i = 0; i < window.active_annotations.length; i++) {
+    for (var i = 0; i < window.active_annotations.length; i++) {
       document.body.removeChild(window.active_annotations[i]);
     }
 
@@ -361,15 +483,15 @@ function clearAnnotations(job, configuration, proceed) {
 }
 
 function applyAnnotation(job, configuration, proceed) {
-  const step = current_step(job);
-  const name = step.annotation.annotation_type.name;
+  var step = current_step(job);
+  var name = step.annotation.annotation_type.name;
   console.log("applying annotation");
   /*
   console.log(step)
   console.log(step.annotation.annotation_type.name)
   console.log(annotations())
   */
-   
+
   var apply = annotations()[name];
 
   try {
@@ -382,17 +504,12 @@ function applyAnnotation(job, configuration, proceed) {
 
 function blur(job, configuration) {}
 
-function badge_outline(job, configuration, proceed) {
-  badge(job, configuration, proceed);
-  outline(job, configuration, proceed);
-}
-
 function badge(job, configuration, proceed) {
   console.log("Applying badge annotation");
-  const step = current_step(job);
-  const selector = step.element.selector;
-  const strategy = step.element.strategy;
-  const element = getElement(strategy, selector);
+  var step = current_step(job);
+  var selector = step.element.selector;
+  var strategy = step.element.strategy;
+  var element = getElement(strategy, selector);
   var badge_x = step.annotation.x_orientation;
   var badge_y = step.annotation.y_orientation;
   var size = step.annotation.size;
@@ -404,19 +521,19 @@ function badge(job, configuration, proceed) {
   var wrapper = document.createElement('div');
   var badge = document.createElement('span');
   var label = document.createElement('span');
-  const rect = element.getBoundingClientRect();
-  const x_calcs = {
+  var rect = element.getBoundingClientRect();
+  var x_calcs = {
     L: Math.round(rect.left - size + xOffset).toString() + 'px',
     M: Math.round(rect.left + rect.width / 2 - size + xOffset).toString() + 'px',
     R: Math.round(rect.right - size + xOffset).toString() + 'px'
   };
-  const y_calcs = {
+  var y_calcs = {
     T: Math.round(rect.top - size + yOffset).toString() + 'px',
     M: Math.round(rect.bottom - rect.height / 2 - size + yOffset).toString() + 'px',
     B: Math.round(rect.bottom - size + yOffset).toString() + 'px'
   };
-  const x = x_calcs[badge_x];
-  const y = y_calcs[badge_y];
+  var x = x_calcs[badge_x];
+  var y = y_calcs[badge_y];
   console.log("Placing a badge at " + x.toString() + ", " + y.toString());
   wrapper.style.display = 'static';
   wrapper.style.justifyContent = 'center';
@@ -452,14 +569,14 @@ function badge(job, configuration, proceed) {
 }
 
 function outline(job, configuration, proceed) {
-  const step = current_step(job);
-  const selector = step.element.selector;
-  const strategy = step.element.strategy;
-  const outlineColor = step.annotation.color;
-  const thickness = step.annotation.thickness + 'px';
-  const element = getElement(strategy, selector);
-  const rect = element.getBoundingClientRect();
-  const outline = document.createElement('div');
+  var step = current_step(job);
+  var selector = step.element.selector;
+  var strategy = step.element.strategy;
+  var outlineColor = step.annotation.color;
+  var thickness = step.annotation.thickness + 'px';
+  var element = getElement(strategy, selector);
+  var rect = element.getBoundingClientRect();
+  var outline = document.createElement('div');
   outline.style.position = 'fixed';
   outline.style.width = Math.round(rect.width).toString() + 'px';
   outline.style.height = Math.round(rect.height).toString() + 'px';
@@ -479,8 +596,8 @@ function outline(job, configuration, proceed) {
 }
 
 function fullScreenShot(job, configuration, proceed) {
-  const activeWindowId = job.activeWindowId;
-  const step = current_step(job);
+  var activeWindowId = job.activeWindowId;
+  var step = current_step(job);
   console.log("Taking a full screen screenshot");
 
   try {
@@ -497,7 +614,7 @@ function fullScreenShot(job, configuration, proceed) {
         success(job, configuration, proceed);
       } else if (result == undefined) {
         step.status = "failed";
-        const error = "No Screenshot Returned";
+        var error = "No Screenshot Returned";
         step.error = error;
         failStep(job, error, configuration, proceed);
       }
@@ -510,9 +627,9 @@ function fullScreenShot(job, configuration, proceed) {
 }
 
 function setSize(job, configuration, proceed) {
-  const activeWindowId = job.activeWindowId;
-  const step = current_step(job);
-  const payload = {
+  var activeWindowId = job.activeWindowId;
+  var step = current_step(job);
+  var payload = {
     width: step.width,
     height: step.height
   };
@@ -530,12 +647,12 @@ function setSize(job, configuration, proceed) {
 }
 
 function navigate(job, configuration, proceed) {
-  const activeTabId = job.activeTabId;
-  const step = current_step(job);
-  const payload = {
+  var activeTabId = job.activeTabId;
+  var step = current_step(job);
+  var payload = {
     url: step.url
   };
-  const log_string = "Executing a navigate step to " + activeTabId;
+  var log_string = "Executing a navigate step to " + activeTabId;
   console.log(log_string);
 
   try {
@@ -552,12 +669,12 @@ function navigate(job, configuration, proceed) {
 
 function fillField(job, configuration, proceed) {
   console.log("Filling a field");
-  const step = current_step(job);
-  const selector = step.element.selector;
-  const strategy = step.element.strategy;
-  const text = step.text;
-  const element = getElement(strategy, selector);
-  const event = new Event('input', {
+  var step = current_step(job);
+  var selector = step.element.selector;
+  var strategy = step.element.strategy;
+  var text = step.text;
+  var element = getElement(strategy, selector);
+  var event = new Event('input', {
     bubbles: true
   });
 
@@ -575,7 +692,7 @@ function fillField(job, configuration, proceed) {
 
 function waitForLoad(job, configuration, proceed) {
   console.log("waiting for load");
-  const activeTabId = job.activeTabId;
+  var activeTabId = job.activeTabId;
   var timeout = setTimeout(function () {
     clearInterval(interval);
     console.log("Not found");
@@ -596,10 +713,10 @@ function waitForLoad(job, configuration, proceed) {
 function startStep(job, configuration, proceed) {
   var step = current_step(job); // TODO: This is a convention.  Find a cleaner way to pass from backend
 
-  const step_element_id = "step-" + step.id + "-runner";
-  const step_element = document.getElementById(step_element_id);
-  const step_index = current_step_index(job);
-  const steps = job.process.steps;
+  var step_element_id = "step-" + step.id + "-runner";
+  var step_element = document.getElementById(step_element_id);
+  var step_index = current_step_index(job);
+  var steps = job.process.steps;
   console.log("Starting a " + step.type + " step");
   step.status = "running";
   step.element_id = step_element_id;
@@ -618,16 +735,16 @@ function startStep(job, configuration, proceed) {
 
 function completeStep(job, configuration, proceed) {
   var step = current_step(job);
-  const step_index = current_step_index(job); // TODO: This is a convention.  Find a cleaner way to pass from backend
+  var step_index = current_step_index(job); // TODO: This is a convention.  Find a cleaner way to pass from backend
 
-  const step_element_id = "step-" + step.id + "-runner";
-  const step_element = document.getElementById(step_element_id);
-  const event = new CustomEvent("message", {
+  var step_element_id = "step-" + step.id + "-runner";
+  var step_element = document.getElementById(step_element_id);
+  var event = new CustomEvent("message", {
     bubbles: false,
     detail: step
   });
-  const steps = job.process.steps;
-  const log_string = "Completing step " + step_element_id;
+  var steps = job.process.steps;
+  var log_string = "Completing step " + step_element_id;
   console.log(log_string);
   step.status = "complete";
 
@@ -661,7 +778,7 @@ function sendToBrowser(job, configuration, proceed) {
   if (configuration.environment == 'extension') {
     console.log("Sending to browser"); // console.log(job.activeTabId)
 
-    const message = {
+    var message = {
       type: job.type,
       payload: job
     };
@@ -683,7 +800,7 @@ function sendToExtension(job, configuration, proceed) {
 
   if (configuration.environment == 'browser') {
     console.log("sending to browser");
-    const message = {
+    var message = {
       type: job.type,
       payload: job
     };
@@ -702,11 +819,11 @@ function sendToExtension(job, configuration, proceed) {
 
 function waitForElement(job, configuration, proceed) {
   var step = current_step(job);
-  const selector = step.element.selector;
-  const strategy = step.element.strategy;
+  var selector = step.element.selector;
+  var strategy = step.element.strategy;
   console.log(strategy);
   var element = null;
-  const log_string = "Waiting for element, strategy: " + strategy.name + " selector: " + selector;
+  var log_string = "Waiting for element, strategy: " + strategy.name + " selector: " + selector;
   console.log(log_string);
   var timeout = setTimeout(function () {
     clearInterval(interval);
@@ -727,9 +844,9 @@ function waitForElement(job, configuration, proceed) {
 }
 
 function click(job, configuration, proceed) {
-  const step = current_step(job);
-  const selector = step.element.selector;
-  const strategy = step.element.strategy;
+  var step = current_step(job);
+  var selector = step.element.selector;
+  var strategy = step.element.strategy;
 
   try {
     console.log("Getting element");
@@ -764,8 +881,8 @@ function getSelector(job, configuration, proceed) {
 }
 
 function setSelector(job, configuration, proceed) {
-  const step = current_step(job);
-  const payload = {
+  var step = current_step(job);
+  var payload = {
     selector: step.selector,
     strategy: step.strategy
   };
@@ -778,9 +895,9 @@ function setSelector(job, configuration, proceed) {
 }
 
 function testSelector(job, configuration, proceed) {
-  const step = current_step(job);
-  const selector = step.selector;
-  const strategy = step.strategy;
+  var step = current_step(job);
+  var selector = step.selector;
+  var strategy = step.strategy;
   console.log("22 Testing " + strategy + " Selector " + selector);
   console.log(step);
 
@@ -796,10 +913,21 @@ function testSelector(job, configuration, proceed) {
 
 /***/ }),
 
-/***/ "../../userdocs_web/assets/node_modules/nprogress/nprogress.js":
-/*!*******************************************************************************************************************************!*\
-  !*** C:/Users/johnd/OneDrive/Documents/GitHub/userdocs_umbrella/apps/userdocs_web/assets/node_modules/nprogress/nprogress.js ***!
-  \*******************************************************************************************************************************/
+/***/ "./node_modules/css-selector-generator/build/index.js":
+/*!************************************************************!*\
+  !*** ./node_modules/css-selector-generator/build/index.js ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+!function(t,n){ true?module.exports=n():undefined}(window,(function(){return function(t){var n={};function r(e){if(n[e])return n[e].exports;var o=n[e]={i:e,l:!1,exports:{}};return t[e].call(o.exports,o,o.exports,r),o.l=!0,o.exports}return r.m=t,r.c=n,r.d=function(t,n,e){r.o(t,n)||Object.defineProperty(t,n,{enumerable:!0,get:e})},r.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},r.t=function(t,n){if(1&n&&(t=r(t)),8&n)return t;if(4&n&&"object"==typeof t&&t&&t.__esModule)return t;var e=Object.create(null);if(r.r(e),Object.defineProperty(e,"default",{enumerable:!0,value:t}),2&n&&"string"!=typeof t)for(var o in t)r.d(e,o,function(n){return t[n]}.bind(null,o));return e},r.n=function(t){var n=t&&t.__esModule?function(){return t.default}:function(){return t};return r.d(n,"a",n),n},r.o=function(t,n){return Object.prototype.hasOwnProperty.call(t,n)},r.p="",r(r.s=2)}([function(t,n,r){var e=r(1);function o(t,n,r){Array.isArray(t)?t.push(n):t[r]=n}t.exports=function(t){var n,r,i,u=[];if(Array.isArray(t))r=[],n=t.length-1;else{if("object"!=typeof t||null===t)throw new TypeError("Expecting an Array or an Object, but `"+(null===t?"null":typeof t)+"` provided.");r={},i=Object.keys(t),n=i.length-1}return function r(c,a){var f,l,s;for(l=i?i[a]:a,Array.isArray(t[l])||(void 0===t[l]?t[l]=[]:t[l]=[t[l]]),f=0;f<t[l].length;f++)p=c,o(s=Array.isArray(p)?[].concat(p):e(p),t[l][f],l),a>=n?u.push(s):r(s,a+1);var p}(r,0),u}},function(t,n){t.exports=function(){for(var t={},n=0;n<arguments.length;n++){var e=arguments[n];for(var o in e)r.call(e,o)&&(t[o]=e[o])}return t};var r=Object.prototype.hasOwnProperty},function(t,n,r){"use strict";r.r(n);var e="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol?"symbol":typeof t},o=function(t){return null!=t&&"object"===(void 0===t?"undefined":e(t))&&1===t.nodeType&&"object"===e(t.style)&&"object"===e(t.ownerDocument)};function i(t){var n=t.parentNode;if(n)for(var r=0,e=n.childNodes,i=0;i<e.length;i++)if(o(e[i])&&(r+=1,e[i]===t))return[":nth-child(".concat(r,")")];return[]}function u(t){return Object.assign({},c,{root:t.ownerDocument.querySelector(":root")})}var c={selectors:["id","class","tag","attribute"],includeTag:!1,whitelist:[],blacklist:[],combineWithinSelector:!0,combineBetweenSelectors:!0},a=new RegExp(["^$","\\s","^\\d"].join("|")),f=new RegExp(["^$","^\\d"].join("|")),l=["nthoftype","tag","id","class","attribute","nthchild"],s=r(0),p=r.n(s);function d(t){return function(t){if(Array.isArray(t)){for(var n=0,r=new Array(t.length);n<t.length;n++)r[n]=t[n];return r}}(t)||function(t){if(Symbol.iterator in Object(t)||"[object Arguments]"===Object.prototype.toString.call(t))return Array.from(t)}(t)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance")}()}function y(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:[],n=[[]];return t.forEach((function(t){n.forEach((function(r){n.push(r.concat(t))}))})),n.shift(),n.sort((function(t,n){return t.length-n.length}))}function v(t){return t.replace(/[|\\{}()[\]^$+?.]/g,"\\$&").replace(/\*/g,".+")}function g(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:[];if(0===t.length)return new RegExp(".^");var n=t.map((function(t){return"string"==typeof t?v(t):t.source})).join("|");return new RegExp(n)}function h(t,n){var r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:document,e=r.querySelectorAll(n);return 1===e.length&&e[0]===t}function b(t){for(var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:m(t),r=[],e=t;o(e)&&e!==n;)r.push(e),e=e.parentElement;return r}function m(t){return t.ownerDocument.querySelector(":root")}function j(t){return[N(t.tagName.toLowerCase())]}function A(t){return function(t){if(Array.isArray(t)){for(var n=0,r=new Array(t.length);n<t.length;n++)r[n]=t[n];return r}}(t)||function(t){if(Symbol.iterator in Object(t)||"[object Arguments]"===Object.prototype.toString.call(t))return Array.from(t)}(t)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance")}()}var w=g(["class","id","ng-*"]);function S(t){var n=t.nodeName,r=t.nodeValue;return"[".concat(n,"='").concat(N(r),"']")}function O(t){var n=t.nodeName;return!w.test(n)}function x(t){return function(t){if(Array.isArray(t)){for(var n=0,r=new Array(t.length);n<t.length;n++)r[n]=t[n];return r}}(t)||function(t){if(Symbol.iterator in Object(t)||"[object Arguments]"===Object.prototype.toString.call(t))return Array.from(t)}(t)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance")}()}var E=":".charCodeAt(0).toString(16).toUpperCase(),T=/[ !"#$%&'()\[\]{|}<>*+,./;=?@^`~\\]/;function N(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"";return t.split("").map((function(t){return":"===t?"\\".concat(E," "):T.test(t)?"\\".concat(t):escape(t).replace(/%/g,"\\")})).join("")}var C={tag:j,id:function(t){var n=t.getAttribute("id")||"",r="#".concat(N(n));return!a.test(n)&&h(t,r,t.ownerDocument)?[r]:[]},class:function(t){return(t.getAttribute("class")||"").trim().split(/\s+/).filter((function(t){return!f.test(t)})).map((function(t){return".".concat(N(t))}))},attribute:function(t){return A(t.attributes).filter(O).map(S)},nthchild:i,nthoftype:function(t){var n=j(t)[0],r=t.parentElement;if(r)for(var e=r.querySelectorAll(n),o=0;o<e.length;o++)if(e[o]===t)return["".concat(n,":nth-of-type(").concat(o+1,")")];return[]}};function P(t,n){if(t.parentNode)for(var r=function(t,n){return function(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{},r=n.selectors,e=n.combineBetweenSelectors,o=n.includeTag,i=e?y(r):r.map((function(t){return[t]}));return o?i.map(_):i}(t,n).map((function(n){return r=t,e={},n.forEach((function(t){var n=r[t];n.length>0&&(e[t]=n)})),p()(e).map(q);var r,e})).filter((function(t){return""!==t}))}(function(t,n){var r=n.blacklist,e=n.whitelist,o=n.combineWithinSelector,i=g(r),u=g(e);return function(t){var n=t.selectors,r=t.includeTag,e=[].concat(n);r&&!e.includes("tag")&&e.push("tag");return e}(n).reduce((function(n,r){var e=function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:[],n=arguments.length>1?arguments[1]:void 0;return t.sort((function(t,r){var e=n.test(t),o=n.test(r);return e&&!o?-1:!e&&o?1:0}))}(function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:[],n=arguments.length>1?arguments[1]:void 0,r=arguments.length>2?arguments[2]:void 0;return t.filter((function(t){return r.test(t)||!n.test(t)}))}(function(t,n){return(C[n]||function(){return[]})(t)}(t,r),i,u),u);return n[r]=o?y(e):e.map((function(t){return[t]})),n}),{})}(t,n),n),e=(u=r,(c=[]).concat.apply(c,d(u))),o=0;o<e.length;o++){var i=e[o];if(h(t,i,t.parentNode))return i}var u,c;return"*"}function _(t){return t.includes("tag")||t.includes("nthoftype")?x(t):[].concat(x(t),["tag"])}function $(t,n){return n[t]?n[t].join(""):""}function q(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{};return l.map((function(n){return $(n,t)})).join("")}function D(t,n){return b(t,n).map((function(t){return i(t)[0]})).reverse().join(" > ")}function M(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};return Object.assign({},u(t),n)}function R(t){for(var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{},r=M(t,n),e=b(t,r.root),o=[],i=0;i<e.length;i++){o.unshift(P(e[i],r));var u=o.join(" > ");if(h(t,u,r.root))return u}return D(t,r.root)}r.d(n,"getCssSelector",(function(){return R}));n.default=R}])}));
+
+/***/ }),
+
+/***/ "./node_modules/nprogress/nprogress.js":
+/*!*********************************************!*\
+  !*** ./node_modules/nprogress/nprogress.js ***!
+  \*********************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1280,134 +1408,6 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/* NProgress, 
 });
 
 
-
-/***/ }),
-
-/***/ "./js/browser.js":
-/*!***********************!*\
-  !*** ./js/browser.js ***!
-  \***********************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _browser_main_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./browser_main.js */ "./js/browser_main.js");
-
-Object(_browser_main_js__WEBPACK_IMPORTED_MODULE_0__["main"])();
-
-/***/ }),
-
-/***/ "./js/browser_main.js":
-/*!****************************!*\
-  !*** ./js/browser_main.js ***!
-  \****************************/
-/*! exports provided: main */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "main", function() { return main; });
-/* harmony import */ var css_selector_generator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! css-selector-generator */ "./node_modules/css-selector-generator/build/index.js");
-/* harmony import */ var css_selector_generator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(css_selector_generator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _userdocs_web_assets_js_commands_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../userdocs_web/assets/js/commands.js */ "../../userdocs_web/assets/js/commands.js");
-
-
-var getCssSelectorOptions = {
-  selectors: ["class", "tag", "attribute", "nthchild"]
-};
-var XPATH = null;
-var CSSS = null;
-var XPATH_STRATEGY_TYPE = 1;
-var CSS_STRATEGY_TYPE = 2;
-
-function main() {
-  console.log("Initializing Browser stuff");
-  window.active_annotations = [];
-  chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    var logSuffix = sender.tab ? "from a content script:" + sender.tab.url : "from the extension";
-    console.log("Browser received message " + logSuffix);
-    Object(_userdocs_web_assets_js_commands_js__WEBPACK_IMPORTED_MODULE_1__["handle_message"])(request, {
-      environment: 'browser'
-    });
-  });
-
-  document.onmouseover = function (event) {// const el =  event.target;
-    // console.log(el)
-    // console.log(getCssSelector(el, getCssSelectorOptions))
-    // CSSS = getCssSelector(el, getCssSelectorOptions);
-    // XPATH = getPathTo(event.target);
-  };
-
-  document.onkeydown = function (event) {
-    var x = event.keyCode;
-
-    if (x === 67) {
-      chrome.storage.local.get(['strategy'], function (result) {
-        console.log("Retreived configuration value");
-        console.log(result.strategy);
-        var selector;
-        var configuration = {
-          environment: 'browser',
-          strategy: result.strategy
-        };
-
-        if (result.strategy.name === 'xpath') {
-          selector = XPATH;
-        } else if (result.strategy.name === 'css') {
-          selector = CSSS;
-        }
-
-        var message = {
-          type: 'step',
-          payload: {
-            id: 0,
-            status: 'not_started',
-            process: {
-              steps: [{
-                id: 0,
-                selector: selector,
-                strategy: result.strategy,
-                step_type: {
-                  name: "Set Selector"
-                }
-              }]
-            }
-          }
-        };
-        Object(_userdocs_web_assets_js_commands_js__WEBPACK_IMPORTED_MODULE_1__["handle_message"])(message, configuration);
-      });
-    }
-  };
-}
-
-function getPathTo(element) {
-  if (element === document.body) return element.tagName.toLowerCase();
-  var ix = 0;
-  var siblings = element.parentNode.childNodes;
-
-  for (var i = 0; i < siblings.length; i++) {
-    var sibling = siblings[i];
-    if (sibling === element) return getPathTo(element.parentNode) + '/' + element.tagName.toLowerCase() + '[' + (ix + 1) + ']';
-
-    if (sibling.nodeType === 1 && sibling.tagName === element.tagName) {
-      ix++;
-    }
-  }
-}
-
-
-
-/***/ }),
-
-/***/ "./node_modules/css-selector-generator/build/index.js":
-/*!************************************************************!*\
-  !*** ./node_modules/css-selector-generator/build/index.js ***!
-  \************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-!function(t,n){ true?module.exports=n():undefined}(window,(function(){return function(t){var n={};function r(e){if(n[e])return n[e].exports;var o=n[e]={i:e,l:!1,exports:{}};return t[e].call(o.exports,o,o.exports,r),o.l=!0,o.exports}return r.m=t,r.c=n,r.d=function(t,n,e){r.o(t,n)||Object.defineProperty(t,n,{enumerable:!0,get:e})},r.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},r.t=function(t,n){if(1&n&&(t=r(t)),8&n)return t;if(4&n&&"object"==typeof t&&t&&t.__esModule)return t;var e=Object.create(null);if(r.r(e),Object.defineProperty(e,"default",{enumerable:!0,value:t}),2&n&&"string"!=typeof t)for(var o in t)r.d(e,o,function(n){return t[n]}.bind(null,o));return e},r.n=function(t){var n=t&&t.__esModule?function(){return t.default}:function(){return t};return r.d(n,"a",n),n},r.o=function(t,n){return Object.prototype.hasOwnProperty.call(t,n)},r.p="",r(r.s=2)}([function(t,n,r){var e=r(1);function o(t,n,r){Array.isArray(t)?t.push(n):t[r]=n}t.exports=function(t){var n,r,i,u=[];if(Array.isArray(t))r=[],n=t.length-1;else{if("object"!=typeof t||null===t)throw new TypeError("Expecting an Array or an Object, but `"+(null===t?"null":typeof t)+"` provided.");r={},i=Object.keys(t),n=i.length-1}return function r(c,a){var f,l,s;for(l=i?i[a]:a,Array.isArray(t[l])||(void 0===t[l]?t[l]=[]:t[l]=[t[l]]),f=0;f<t[l].length;f++)p=c,o(s=Array.isArray(p)?[].concat(p):e(p),t[l][f],l),a>=n?u.push(s):r(s,a+1);var p}(r,0),u}},function(t,n){t.exports=function(){for(var t={},n=0;n<arguments.length;n++){var e=arguments[n];for(var o in e)r.call(e,o)&&(t[o]=e[o])}return t};var r=Object.prototype.hasOwnProperty},function(t,n,r){"use strict";r.r(n);var e="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol?"symbol":typeof t},o=function(t){return null!=t&&"object"===(void 0===t?"undefined":e(t))&&1===t.nodeType&&"object"===e(t.style)&&"object"===e(t.ownerDocument)};function i(t){var n=t.parentNode;if(n)for(var r=0,e=n.childNodes,i=0;i<e.length;i++)if(o(e[i])&&(r+=1,e[i]===t))return[":nth-child(".concat(r,")")];return[]}function u(t){return Object.assign({},c,{root:t.ownerDocument.querySelector(":root")})}var c={selectors:["id","class","tag","attribute"],includeTag:!1,whitelist:[],blacklist:[],combineWithinSelector:!0,combineBetweenSelectors:!0},a=new RegExp(["^$","\\s","^\\d"].join("|")),f=new RegExp(["^$","^\\d"].join("|")),l=["nthoftype","tag","id","class","attribute","nthchild"],s=r(0),p=r.n(s);function d(t){return function(t){if(Array.isArray(t)){for(var n=0,r=new Array(t.length);n<t.length;n++)r[n]=t[n];return r}}(t)||function(t){if(Symbol.iterator in Object(t)||"[object Arguments]"===Object.prototype.toString.call(t))return Array.from(t)}(t)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance")}()}function y(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:[],n=[[]];return t.forEach((function(t){n.forEach((function(r){n.push(r.concat(t))}))})),n.shift(),n.sort((function(t,n){return t.length-n.length}))}function v(t){return t.replace(/[|\\{}()[\]^$+?.]/g,"\\$&").replace(/\*/g,".+")}function g(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:[];if(0===t.length)return new RegExp(".^");var n=t.map((function(t){return"string"==typeof t?v(t):t.source})).join("|");return new RegExp(n)}function h(t,n){var r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:document,e=r.querySelectorAll(n);return 1===e.length&&e[0]===t}function b(t){for(var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:m(t),r=[],e=t;o(e)&&e!==n;)r.push(e),e=e.parentElement;return r}function m(t){return t.ownerDocument.querySelector(":root")}function j(t){return[N(t.tagName.toLowerCase())]}function A(t){return function(t){if(Array.isArray(t)){for(var n=0,r=new Array(t.length);n<t.length;n++)r[n]=t[n];return r}}(t)||function(t){if(Symbol.iterator in Object(t)||"[object Arguments]"===Object.prototype.toString.call(t))return Array.from(t)}(t)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance")}()}var w=g(["class","id","ng-*"]);function S(t){var n=t.nodeName,r=t.nodeValue;return"[".concat(n,"='").concat(N(r),"']")}function O(t){var n=t.nodeName;return!w.test(n)}function x(t){return function(t){if(Array.isArray(t)){for(var n=0,r=new Array(t.length);n<t.length;n++)r[n]=t[n];return r}}(t)||function(t){if(Symbol.iterator in Object(t)||"[object Arguments]"===Object.prototype.toString.call(t))return Array.from(t)}(t)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance")}()}var E=":".charCodeAt(0).toString(16).toUpperCase(),T=/[ !"#$%&'()\[\]{|}<>*+,./;=?@^`~\\]/;function N(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"";return t.split("").map((function(t){return":"===t?"\\".concat(E," "):T.test(t)?"\\".concat(t):escape(t).replace(/%/g,"\\")})).join("")}var C={tag:j,id:function(t){var n=t.getAttribute("id")||"",r="#".concat(N(n));return!a.test(n)&&h(t,r,t.ownerDocument)?[r]:[]},class:function(t){return(t.getAttribute("class")||"").trim().split(/\s+/).filter((function(t){return!f.test(t)})).map((function(t){return".".concat(N(t))}))},attribute:function(t){return A(t.attributes).filter(O).map(S)},nthchild:i,nthoftype:function(t){var n=j(t)[0],r=t.parentElement;if(r)for(var e=r.querySelectorAll(n),o=0;o<e.length;o++)if(e[o]===t)return["".concat(n,":nth-of-type(").concat(o+1,")")];return[]}};function P(t,n){if(t.parentNode)for(var r=function(t,n){return function(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{},r=n.selectors,e=n.combineBetweenSelectors,o=n.includeTag,i=e?y(r):r.map((function(t){return[t]}));return o?i.map(_):i}(t,n).map((function(n){return r=t,e={},n.forEach((function(t){var n=r[t];n.length>0&&(e[t]=n)})),p()(e).map(q);var r,e})).filter((function(t){return""!==t}))}(function(t,n){var r=n.blacklist,e=n.whitelist,o=n.combineWithinSelector,i=g(r),u=g(e);return function(t){var n=t.selectors,r=t.includeTag,e=[].concat(n);r&&!e.includes("tag")&&e.push("tag");return e}(n).reduce((function(n,r){var e=function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:[],n=arguments.length>1?arguments[1]:void 0;return t.sort((function(t,r){var e=n.test(t),o=n.test(r);return e&&!o?-1:!e&&o?1:0}))}(function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:[],n=arguments.length>1?arguments[1]:void 0,r=arguments.length>2?arguments[2]:void 0;return t.filter((function(t){return r.test(t)||!n.test(t)}))}(function(t,n){return(C[n]||function(){return[]})(t)}(t,r),i,u),u);return n[r]=o?y(e):e.map((function(t){return[t]})),n}),{})}(t,n),n),e=(u=r,(c=[]).concat.apply(c,d(u))),o=0;o<e.length;o++){var i=e[o];if(h(t,i,t.parentNode))return i}var u,c;return"*"}function _(t){return t.includes("tag")||t.includes("nthoftype")?x(t):[].concat(x(t),["tag"])}function $(t,n){return n[t]?n[t].join(""):""}function q(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{};return l.map((function(n){return $(n,t)})).join("")}function D(t,n){return b(t,n).map((function(t){return i(t)[0]})).reverse().join(" > ")}function M(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};return Object.assign({},u(t),n)}function R(t){for(var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{},r=M(t,n),e=b(t,r.root),o=[],i=0;i<e.length;i++){o.unshift(P(e[i],r));var u=o.join(" > ");if(h(t,u,r.root))return u}return D(t,r.root)}r.d(n,"getCssSelector",(function(){return R}));n.default=R}])}));
 
 /***/ })
 

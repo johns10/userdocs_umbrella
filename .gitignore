@@ -37,3 +37,8 @@ Mnesia.nonode@nohost/LATEST.LOG
 *.png
 *.jpg
 apps/process_administrator_web/assets/css/app.css.map
+apps/process_administrator_web/assets/js/browser_bundle.js.map
+apps/process_administrator_web/assets/js/browser_bundle.js
+apps/process_administrator_web/assets/js/bundle.js
+apps/process_administrator_web/assets/js/bundle.js.map
+apps/userdocs_web/assets/js/bundle.js
