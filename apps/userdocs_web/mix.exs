@@ -55,7 +55,6 @@ defmodule UserDocsWeb.MixProject do
       {:dialyxir, "~> 0.5.0", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:cors_plug, "~> 2.0"},
-      {:phx_gen_auth, "~> 0.5", only: [:dev], runtime: false},
       {:pbkdf2_elixir, "~> 1.0"},
       {:userdocs, in_umbrella: true},
     ]
