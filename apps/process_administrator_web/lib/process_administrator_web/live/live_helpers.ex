@@ -5,7 +5,6 @@ defmodule ProcessAdministratorWeb.LiveHelpers do
   alias ProcessAdministratorWeb.GroupComponent
   alias ProcessAdministratorWeb.EmbeddedFormComponent
   alias ProcessAdministratorWeb.NestedFormComponent
-  alias ProcessAdministratorWeb.VersionPicker
   alias UserDocsWeb.ModalMenus
   alias ProcessAdministratorWeb.ModalComponent
 
@@ -30,23 +29,6 @@ defmodule ProcessAdministratorWeb.LiveHelpers do
     ]
 
     live_component(socket, ModalMenus, picker_opts)
-  end
-
-  def live_version_picker(socket, opts) do
-    picker_opts = [
-      id: Keyword.fetch!(opts, :id),
-      current_user: Keyword.fetch!(opts, :current_user),
-      current_team: Keyword.fetch!(opts, :current_team),
-      current_team_id: Keyword.fetch!(opts, :current_team_id),
-      current_project: Keyword.fetch!(opts, :current_project),
-      current_project_id: Keyword.fetch!(opts, :current_project_id),
-      current_version: Keyword.fetch!(opts, :current_version),
-      current_version_id: Keyword.fetch!(opts, :current_version_id),
-      data: Keyword.fetch!(opts, :data),
-      live_action: Keyword.fetch!(opts, :live_action),
-    ]
-
-    live_component(socket, VersionPicker, picker_opts)
   end
 
   def live_nested_form(socket, opts) do
