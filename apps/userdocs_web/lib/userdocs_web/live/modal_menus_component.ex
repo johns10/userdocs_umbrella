@@ -56,10 +56,10 @@ defmodule UserDocsWeb.ModalMenus do
               :process ->
                 LiveHelpers.live_modal @socket, ProcessForm,
                   id: @form_data.object.id || :new,
+                  process: @form_data.object,
                   title: @form_data.title,
                   action: @form_data.action,
-                  process: @form_data.object,
-                  parent_id: @form_data.parent.id,
+                  parent_id: @form_data.version_id,
                   select_lists: %{
                     versions: @form_data.select_lists.versions,
                   }
@@ -129,7 +129,7 @@ defmodule UserDocsWeb.ModalMenus do
       parent_id: Map.get(message, :parent_id, nil),
       team_id: Map.get(message, :team_id, nil),
       document_id: Map.get(message, :document_id, nil),
-      document_version_id: Map.get(message, :document_id, nil),
+      document_version_id: Map.get(message, :document_id, nil), # TODO: Is this bug?
       docubit_id: Map.get(message, :docubit_id, nil),
       version_id: Map.get(message, :version_id, nil),
       type: message.type,
@@ -156,10 +156,10 @@ defmodule UserDocsWeb.ModalMenus do
     }
   end
 
-  def new_process(socket) do
+  def new_process(socket, params) do
     {
       :noreply,
-      ProcessMessage.new_modal_menu(socket)
+      ProcessMessage.new_modal_menu(socket, params)
       |> call_menu(socket)
     }
   end
