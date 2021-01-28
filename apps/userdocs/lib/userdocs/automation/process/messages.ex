@@ -3,9 +3,12 @@ defmodule UserDocs.Process.Messages do
   alias UserDocs.Automation.Process
   alias UserDocs.Helpers
 
-  def new_modal_menu(socket) do
+  def new_modal_menu(socket, params) do
+    required_keys = [ :project_id, :versions, :version_id ]
+    params = Helpers.validate_params(params, required_keys, __MODULE__)
+
     %{ target: "ModalMenus" }
-    |> init(socket)
+    |> init(socket, params.project_id, params.versions, params.version_id)
     |> new(socket)
   end
 
@@ -16,17 +19,17 @@ defmodule UserDocs.Process.Messages do
     |> Map.put(:title, "New Process")
   end
 
-  defp init(message, socket) do
+  defp init(message, _socket, project_id, versions, version_id) do
     select_lists = %{
       versions:
-        socket.assigns.versions
-        |> Enum.filter(fn(v) -> v.project_id == socket.assigns.current_project.id end)
+        versions
         |> Helpers.select_list(:name, false),
     }
 
     message
     |> Map.put(:type, :process)
-    |> Map.put(:parent, socket.assigns.current_project)
+    |> Map.put(:project_id, project_id)
+    |> Map.put(:version_id, version_id)
     |> Map.put(:select_lists, select_lists)
   end
 end
