@@ -30,7 +30,6 @@ defmodule UserDocsWeb.ModalMenus do
         <%= IO.puts("Rendering form"); "" %>
         <%= if @form_data.action in [:new, :edit] do %>
           <%=
-            IO.puts("Running form code")
             case @form_data.type do
               :version ->
                 LiveHelpers.live_modal @socket, VersionForm,
@@ -120,7 +119,6 @@ defmodule UserDocsWeb.ModalMenus do
 
   # TODO: Fix this
   def call_menu(message, socket) do
-    IO.puts("Assigning form data")
     form_data = %{
       title: message.title,
       object: message.object,
