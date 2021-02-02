@@ -8,12 +8,12 @@ defmodule StateHandlers.Preload do
     end
   end
   def apply(state, data, preloads, opts) when is_list(data) do
-    # IO.puts("Apply Preloads List to #{inspect(preloads)}")
+    #IO.puts("Apply Preloads List to #{inspect(preloads)}")
     Enum.map(data, fn(d) -> apply(state, d, preloads, opts) end)
   end
 
   def apply(state, data, preloads, opts) when is_struct(data) do
-    # IO.puts("Apply Preloads Struct to #{inspect(preloads)}")
+    #IO.puts("Apply Preloads Struct to #{inspect(preloads)}")
     handle_preload(state, data, preloads, opts)
   end
 
@@ -26,7 +26,7 @@ defmodule StateHandlers.Preload do
   end
 
   defp handle_preload(state, data, preloads, opts) when is_list(preloads) do
-    # IO.puts("handle_preload List #{inspect(preloads)}")
+    #IO.puts("handle_preload List #{inspect(preloads)}")
     Enum.reduce(preloads, data, fn(preload, d) -> handle_preload(state, d, preload, opts) end)
   end
 
@@ -40,27 +40,29 @@ defmodule StateHandlers.Preload do
   """
   defp handle_preload(state, nil, preload, opts), do: nil
   defp handle_preload(state, data, preload, opts) when is_atom(preload) do
-    # IO.puts("handle_preload Atom #{inspect(preload)}")
+    #IO.puts("handle_preload Atom #{inspect(preload)}")
     schema = data.__meta__.schema
     opts = prepare_preload_opts(opts, schema, preload)
+    #IO.inspect(opts[:order])
     preload_data = handle_assoc(state, data, schema.__schema__(:association, preload), opts)
     Map.put(data, preload, preload_data)
   end
   defp handle_preload(state, data, { key, value } = preload, opts) when is_tuple(preload) do
-    # IO.puts("handle_preload tuple, #{inspect(key)}, #{inspect(value)}")
+    #IO.puts("handle_preload tuple, #{inspect(key)}, #{inspect(value)}")
     data_to_preload = Map.get(data, key)
     preloads = value
     Map.put(data, key, apply(state, data_to_preload, preloads, opts))
   end
 
   defp prepare_preload_opts(opts, schema, preload) do
+    #IO.puts("preparing preload opts for #{schema}")
     opts
     |> prepare_order_clause(opts[:order], schema.__schema__(:associations), preload)
   end
 
   defp prepare_order_clause(opts, nil, _, _), do: opts
   defp prepare_order_clause(opts, order_clause, fields, preload) do
-    #  IO.puts("prepare_order_clause")
+    #IO.puts("Preparing order clause ")
     updated_order_clause =
       Enum.reduce(order_clause, [],
         fn(order_opt, opts) ->
@@ -71,10 +73,11 @@ defmodule StateHandlers.Preload do
   end
 
   def handle_order_option(order_opts, %{field: _, order: _} = opt_to_ignore, _fields, _preload) do
-    Enum.reject(order_opts, fn(opt) -> opt == opt_to_ignore end)
+    #IO.puts("Rejecting order option")
+    order_opts
   end
   def handle_order_option(order_opts, {association, %{ field: _, order: _ } = order_opt}, associations, preload) do
-    # IO.puts("handle_order_option")
+    #IO.puts("handle_order_option")
     case (association in associations) and association == preload do
       true -> [ order_opt | order_opts ]
       false ->
@@ -106,7 +109,7 @@ defmodule StateHandlers.Preload do
   end
 
   defp preload_has_many(state, source, association, opts) do
-    # IO.puts("preload_has_many")
+    #IO.puts("Preloading has_many from #{inspect(association.owner)} to #{inspect(association.queryable)}")
     owner = schema_atom(association.owner)
     owner_key = association.queryable.__schema__(:association, owner).owner_key
 
@@ -122,7 +125,7 @@ defmodule StateHandlers.Preload do
     queryable = schema_atom(association.queryable)
     queryable_key = association.join_through.__schema__(:association, queryable).owner_key
 
-    # IO.puts("Handling Many to Many Association.  Owner is #{owner}.  Joining through #{}.  Queryable is #{queryable}")
+    #IO.puts("Handling Many to Many Association.  Owner is #{owner}.  Joining through #{}.  Queryable is #{queryable}")
     join_opts = Keyword.put(opts, :filter, { owner_key, source.id })
 
     queryable_ids =
