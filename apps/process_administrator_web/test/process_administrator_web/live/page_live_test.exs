@@ -1,4 +1,4 @@
-defmodule ProcessAdministratorWeb.PageLiveTest do
+defmodule UserDocsWeb.PageLiveTest do
   use ProcessAdministratorWeb.ConnCase
 
   import Phoenix.LiveViewTest
