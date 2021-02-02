@@ -54,5 +54,5 @@
     ]) %>
   </main>
 <% else %>
-  <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns) %>
+  <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns, Routes.login_path(@socket, :new)) %>
 <% end %>
