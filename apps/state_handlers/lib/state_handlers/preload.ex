@@ -65,8 +65,8 @@ defmodule StateHandlers.Preload do
     #IO.puts("Preparing order clause ")
     updated_order_clause =
       Enum.reduce(order_clause, [],
-        fn(order_opt, opts) ->
-          handle_order_option(opts, order_opt, fields, preload)
+        fn(order_opt, inner_opts) ->
+          handle_order_option(inner_opts, order_opt, fields, preload)
         end
       )
     Keyword.put(opts, :order, updated_order_clause)
