@@ -85,6 +85,9 @@ defmodule UserDocs.Automation do
       [%StepType{}, ...]
 
   """
+  def list_step_types(state, opts) when is_list(opts) do
+    StateHandlers.list(state, StepType, opts)
+  end
   def list_step_types do
     Repo.all(StepType)
   end
