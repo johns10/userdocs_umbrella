@@ -132,7 +132,9 @@ defmodule UserDocsWeb.ModalMenus do
       version_id: Map.get(message, :version_id, nil),
       type: message.type,
       select_lists: Map.get(message, :select_lists, nil),
-      channel: Map.get(message, :channel, nil)
+      channel: Map.get(message, :channel, nil),
+      state_opts: Map.get(message, :state_opts, nil),
+      data: Map.get(message, :data, nil)
     }
     assign(socket, :form_data, form_data)
   end
