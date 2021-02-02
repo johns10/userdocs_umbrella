@@ -62,8 +62,11 @@ defmodule StateHandlers.List do
     have multiple order clauses
   """
   defp handle_order_clause(data, nil, _), do: data
-  defp handle_order_clause(data, { _, _ }, _), do: data
+  defp handle_order_clause(data, { _, %{}}, _), do: data
+  defp handle_order_clause(data, { _, [ _ ]}, _), do: data
+  defp handle_order_clause(data, [ _ ], _), do: data
   defp handle_order_clause(data, %{ field: field, order: order }, :list) do
+    #IO.puts("handle_order_clause")
     Enum.sort(data,
       fn(i1, i2) ->
         case order do
