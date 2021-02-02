@@ -85,6 +85,15 @@ defmodule StateHandlers.Preload do
         order_opts
     end
   end
+  def handle_order_option(order_opts, {association, [ _ ] = order_opt}, _associations, _preload) do
+    #IO.puts("Handling Order Option for a deeply nested order call: #{association}, #{inspect(order_opt)}")
+    order_opts ++ order_opt
+  end
+  def handle_order_option(order_opts, {association, order_opt}, _associations, _preload) do
+    #IO.puts("Handling Order Option for a nested order call: #{association}: #{inspect(order_opt)}")
+    [ order_opt | order_opts ]
+  end
+  def handle_order_option([], _, _, _), do: []
 
   defp handle_assoc(state, source, association, opts) do
     case association do
