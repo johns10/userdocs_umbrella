@@ -1,0 +1,44 @@
+<div class="card" id="<%= @id %>">
+  <header class="card-header">
+    <p class="card-header-title"  style="margin-bottom:0px;">
+      <%= @object.name || "No Name" %>
+    </p>
+    <%= @runner %>
+    <a
+      class="card-header-icon"
+      phx-click="expand"
+      phx-target="<%= @myself.cid %>"
+      aria-label="expand">
+      <span class="icon" >
+        <i class="fa fa-angle-down" aria-hidden="true"></i>
+      </span>
+    </a>
+  </header>
+  <div class="card-content <%= is_expanded?(@expanded) %>">
+    <div class="content">
+      <%= @header_form %>
+    </div>
+    <nav class="level"></nav>
+    <div class="content">
+      <%= @inner_content.([]) %>
+      <div class="card">
+        <%= if @footer_action not in [:new] do %>
+          <a
+            phx-click="new"
+            phx-target="<%= @myself.cid %>"
+            class="card-footer-item"
+          >New</a>
+        <% else %>
+          <div class="card-content">
+            <%= @footer_form %>
+          </div>
+          <a
+            phx-click="cancel"
+            phx-target="<%= @myself.cid %>"
+            class="card-footer-item"
+          >Cancel</a>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
