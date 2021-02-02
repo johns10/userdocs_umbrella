@@ -1,4 +1,4 @@
-defmodule ProcessAdministratorWeb.LevelComponent do
+defmodule UserDocsWeb.LevelComponent do
   use Phoenix.LiveView
 
   def render(assigns) do
