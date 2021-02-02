@@ -372,9 +372,8 @@ defmodule UserDocs.Automation do
       { :ok, step } <- Repo.update(changeset), # Apply to database and get new step
       step <- update_step_preloads(step, changeset.changes, state), # Preload data according to changes
       changeset <- Step.change_remaining(step, changeset.params), # Apply the changeset to the remaining fields
-      { status, step } <- Repo.update(changeset), # Apply the changes to the database
-      step <- update_children(step, changeset),
-      { :ok, step } <- Subscription.broadcast({status, step}, "step", "update")
+      { :ok, step } <- Repo.update(changeset), # Apply the changes to the database
+      step <- update_children(step, changeset)
     do
       { :ok, step }
     else
