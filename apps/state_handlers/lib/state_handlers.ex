@@ -25,4 +25,5 @@ defmodule StateHandlers do
   def initialize(state, opts), do: StateHandlers.Initialize.apply(state, opts)
   def delete(state, data, opts), do: StateHandlers.Delete.apply(state, data, opts)
   def broadcast(state, data, opts), do: StateHandlers.Broadcast.apply(state, data, opts)
+  def upsert(state, data, opts), do: StateHandlers.Upsert.do_upsert(state, data, opts)
 end
