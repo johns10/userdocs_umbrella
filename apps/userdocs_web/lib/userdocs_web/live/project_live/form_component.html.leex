@@ -1,70 +1,21 @@
-<h2><%= @title %></h2>
-
 <%= f = form_for @changeset, "#",
-  id: "project-form",
+  id: @id,
   phx_target: @myself.cid,
   phx_change: "validate",
   phx_submit: "save" %>
 
-  <div class="field is-grouped">
-    <%= if(:parent in assigns and @action in [:new]) do %>
-      <%= hidden_input f, :team_id,
-        value: @parent_id,
-        id: Layout.form_field_id(@action, f, :team_id,
-          "project", @parent_id) %>
-    <% else %>
-      <div class="control">
-        <div class="field">
-          <%= label f, :team_id, class: :label %>
-          <div class="control">
-            <div class="select">
-              <%= select f, :team_id,
-                @teams_select_list,
-                value: @project.team_id,
-                id: Layout.form_field_id(@action, f, :team_id, "project", @project.team_id) %>
-            </div>
-          </div>
-          <%= error_tag f, :team_id %>
-        </div>
-      </div>
-    <% end %>
-    <div class="control">
-      <div class="field">
-        <%= label f, :default_version_id, class: :label %>
-        <div class="control">
-          <div class="select">
-            <%= select f, :default_version_id,
-              @versions_select_list,
-              value: @project.default_version_id,
-              id: Layout.form_field_id(@action, f, :default_version_id, "project", @project.team_id) %>
-          </div>
-        </div>
-        <%= error_tag f, :default_version_id %>
-      </div>
-    </div>
-  </div>
+  <%= Layout.select_input(f, :team_id, @select_lists.teams, [
+    selected: @parent_id || "",
+    id: @field_ids.team_id
+  ]) %>
 
-  <div class="field">
-    <%= label f, :name %>
-    <div class="control">
-      <%= text_input f, :name,
-        class: "input",
-        type: "text",
-        id: Layout.form_field_id(@action, f, :name, "project", @project.team_id) %>
-    </div>
-    <%= error_tag f, :name %>
-  </div>
+  <%= Layout.text_input(f, :name, [
+    id: @field_ids.name
+  ]) %>
 
-  <div class="field">
-    <%= label f, :base_url %>
-    <div class="control">
-      <%= text_input f, :base_url,
-        class: "input",
-        type: "text",
-        id: Layout.form_field_id(@action, f, :base_url, "project", @project.team_id) %>
-    </div>
-    <%= error_tag f, :base_url %>
-  </div>
+  <%= Layout.text_input(f, :base_url, [
+    id: @field_ids.base_url
+  ]) %>
 
   <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
 
