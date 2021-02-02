@@ -23,15 +23,15 @@ defmodule UserDocs.Subscription do
   end
 
   def handle_event(socket, "create" = event, payload, opts) do
-    IO.puts("Handling Event")
+    #IO.puts("Handling Event")
     StateHandlers.create(socket, payload, opts)
   end
   def handle_event(socket, "update" = event, payload, opts) do
-    IO.puts("Handling Update Event")
+    #IO.puts("Handling Update Event")
     StateHandlers.update(socket, payload, opts)
   end
   def handle_event(socket, "delete" = event, payload, opts) do
-    IO.puts("Handling Event")
+    #IO.puts("Handling Event")
     StateHandlers.delete(socket, payload, opts)
   end
 end
