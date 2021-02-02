@@ -452,12 +452,16 @@ function navigate(job, configuration, proceed) {
   const activeTabId = job.activeTabId
   const step = current_step(job)
 
-  const payload = {
-    url: step.url
+  var payload = {}
+
+  if (step.page_reference == "page") {
+    payload.url = step.page.url
+  } else {
+    payload.url = step.url
   }
 
+
   const log_string = "Executing a navigate step to " + activeTabId
-  console.log(log_string)
   
   try {
     chrome.tabs.update(activeTabId, payload, function(result) {
@@ -523,7 +527,8 @@ function startStep(job, configuration, proceed) {
   const step_index = current_step_index(job)
   const steps = job.process.steps
 
-  console.log("Starting a " + step.type + " step")
+  console.log(step)
+  console.log("Starting a " + step.step_type.name + " step")
 
   step.status = "running"
   step.element_id = step_element_id
