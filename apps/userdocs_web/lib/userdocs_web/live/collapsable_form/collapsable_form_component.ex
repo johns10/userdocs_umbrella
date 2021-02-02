@@ -1,10 +1,6 @@
-defmodule ProcessAdministratorWeb.CollapsableFormComponent do
-  use ProcessAdministratorWeb, :live_component
+defmodule UserDocsWeb.CollapsableFormComponent do
+  use UserDocsWeb, :live_component
   use Phoenix.HTML
-
-  alias ProcessAdministratorWeb.VersionLive
-  alias ProcessAdministratorWeb.LiveHelpers
-  alias ProcessAdministratorWeb.ID
 
   @impl true
   def mount(socket) do
