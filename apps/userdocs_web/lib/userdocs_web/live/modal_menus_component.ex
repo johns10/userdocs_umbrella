@@ -202,7 +202,7 @@ defmodule UserDocsWeb.ModalMenus do
   def edit_project(socket) do
     {
       :noreply,
-      ProcessMessage.new_modal_menu(socket)
+      ProjectMessage.new_modal_menu(socket)
       |> call_menu(socket)
     }
   end
