@@ -1,23 +1,22 @@
-<h2><%= @title %></h2>
-
 <%= f = form_for @changeset, "#",
   id: "version-form",
   phx_target: @myself.cid,
   phx_change: "validate",
   phx_submit: "save" %>
 
-  <%= label f, :project_id %>
-  <%= select f, :project_id, @projects_select_list %>
-  <%= error_tag f, :project_id %>
+  <%= Layout.text_input(f, [
+    field_name: :name
+  ]) %>
 
-  <%= label f, :strategy_id %>
-  <%= select f, :strategy_id, @strategies_select_options %>
-  <%= error_tag f, :strategy_id %>
+  <%= Layout.form_row([
+    Layout.select_input(f, :strategy_id, @select_lists.strategies, [
+      id: @field_ids.strategy_id,
+    ]),
+    Layout.select_input(f, :project_id, @select_lists.projects, [
+      selected: @parent_id || "",
+      id: @field_ids.project_id
+    ])
+  ]) %>
 
-  <%= label f, :name %>
-  <%= text_input f, :name %>
-  <%= error_tag f, :name %>
-
-
-  <%= submit "Save", phx_disable_with: "Saving..." %>
+  <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
 </form>
