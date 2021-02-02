@@ -1,9 +1,15 @@
-defmodule ProcessAdministratorWeb.ID do
+defmodule UserDocsWeb.ID do
   require Logger
 
   def group(type, id) do
     type
     <> "-group-"
+    <> Integer.to_string(id)
+  end
+
+  def collapsable_form(type, id) do
+    type
+    <> "-collapsable-form-"
     <> Integer.to_string(id)
   end
 
