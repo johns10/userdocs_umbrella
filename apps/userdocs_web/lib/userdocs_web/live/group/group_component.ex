@@ -1,9 +1,8 @@
-defmodule ProcessAdministratorWeb.GroupComponent do
-  use ProcessAdministratorWeb, :live_component
+defmodule UserDocsWeb.GroupComponent do
+  use UserDocsWeb, :live_component
   use Phoenix.HTML
 
   alias ProcessAdministratorWeb.LiveHelpers
-  alias ProcessAdministratorWeb.ID
 
   @impl true
   def mount(socket) do
