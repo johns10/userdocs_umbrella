@@ -5,91 +5,122 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
 
   alias UserDocs.Web
 
-  alias UserDocsWeb.LiveHelpers
-  alias UserDocsWeb.DomainHelpers
   alias UserDocsWeb.Layout
+  alias UserDocsWeb.ID
 
-  @impl true
-  def mount(socket) do
-    socket =
-      socket
-      |> assign(:copied_selector, None)
+  def render(assigns) do
+    ~L"""
+      <%= form = form_for @changeset, "#",
+        id: @id,
+        phx_target: @myself.cid,
+        phx_change: "validate",
+        phx_submit: "save" %>
+        <%= render_fields(assigns, form) %>
+        <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
+      </form>
+    """
+  end
 
-    {:ok, socket}
+  def render_fields(assigns, form, prefix \\ "") do
+    ~L"""
+      <%= hidden_input(form, :id, [ value: form.data.id ]) %>
+
+      <div class="field is-grouped">
+
+        <%= Layout.select_input(form, :page_id, @select_lists.pages_select, [
+          selected: form.data.page_id || @default_page_id || "",
+          id: prefix <> @field_ids.page_id,
+        ], "control") %>
+
+        <%= Layout.text_input(form, :name, [
+          id: prefix <> @field_ids.name
+        ], "control") %>
+
+        <%= Layout.number_input(form, :order, [
+          id: prefix <> @field_ids.order
+        ]) %>
+
+      </div>
+      <div class="field">
+        <%= label form, :selector, class: "label" %>
+        <p class="control is-expanded">
+          <div class="field has-addons">
+
+            <%= Layout.select_input(form, :strategy_id, @select_lists.strategies, [
+                id: prefix <> @field_ids.strategy_id, label: false
+              ], "control") %>
+
+            <%= Layout.text_input(form, :selector, [
+                label: false,
+                id: prefix <> @field_ids.selector
+              ], "control is-expanded") %>
+
+            <div class="control">
+              <button
+                class="button"
+                type="button"
+                id="<%= ID.strategy_field(form.data.page_id, form.data.id) %>"
+                selector="<%= ID.form_field(form.data, :strategy_id, prefix) %>"
+                strategy="<%= ID.form_field(form.data, :selector, prefix) %>"
+                phx-hook="CopySelector"
+              >
+                <span class="icon" >
+                  <i
+                    class="fa fa-arrow-left"
+                    aria-hidden="true"
+                  ></i>
+                </span>
+              </span>
+            </div>
+            <!-- TODO validate that @changeset.data.selector works here -->
+            <p class="control">
+              <button
+                type="button"
+                class="button"
+                phx-target="<%= @myself.cid %>"
+                phx-value-element-id="<%= form.data.id %>"
+                phx-value-selector="test"
+                phx-value-strategy="css"
+                phx-click="test_selector"
+              >
+                <span class="icon" >
+                  <i class="fa fa-cloud-upload"
+                    aria-hidden="true"
+                  ></i>
+                </span>
+              </span>
+            </p>
+          </div>
+          <%= error_tag form, :selector %>
+        </p>
+      </div>
+    """
   end
 
   @impl true
   def update(%{element: element} = assigns, socket) do
     changeset = Web.change_element(element)
-    maybe_parent_id = DomainHelpers.maybe_parent_id(assigns, :page_id)
 
-    strategies_select_options =
-      strategies(assigns)
-      |> DomainHelpers.select_list_temp(:name, false)
-
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign(:read_only, LiveHelpers.read_only?(assigns))
-     |> assign(:maybe_action, LiveHelpers.maybe_action(assigns))
-     |> assign(:maybe_parent_id, maybe_parent_id)
-     |> assign(:selector_field_id, selector_field_id(assigns, changeset))
-     |> assign(:strategy_field_id, strategy_field_id(assigns, changeset))
-     |> assign(:strategies_select_options, strategies_select_options)
-     |> assign(:changeset, changeset)}
+    {
+      :ok,
+      socket
+      |> assign(assigns)
+      |> assign(:changeset, changeset)
+    }
   end
 
   @impl true
   def handle_event("validate", %{"element" => element_params}, socket) do
-    IO.puts("Validating")
     changeset =
       socket.assigns.element
       |> Web.change_element(element_params)
       |> Map.put(:action, :validate)
 
-    {:noreply, assign(socket, :changeset, changeset)}
+    { :noreply, assign(socket, :changeset, changeset) }
   end
 
   def handle_event("save", %{"element" => element_params}, socket) do
     save_element(socket, socket.assigns.action, element_params)
-  end
-
-  def handle_event("test_selector", %{ "element-id" => element_id }, socket) do
-    element_id = String.to_integer(element_id)
-
-    IO.puts("Testing selector")
-
-    element =
-      socket.assigns.select_lists.available_elements
-      |> Enum.filter(fn(e) -> e.id == element_id end)
-      |> Enum.at(0)
-
-    payload =  %{
-      type: "step",
-      payload: %{
-        process: %{
-          steps: [
-            %{
-              id: 0,
-              selector: element.selector,
-              strategy: element.strategy,
-              step_type: %{
-                name: "Test Selector"
-              }
-            }
-           ],
-        },
-        element_id: socket.assigns.id,
-        status: "not_started",
-        active_annotations: []
-      }
-    }
-
-    {
-      :noreply,
-      socket
-      |> push_event("test_selector", payload)
-    }
   end
 
   defp save_element(socket, :edit, element_params) do
@@ -98,8 +129,6 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Element updated successfully")
-         |> push_patch(to: socket.assigns.return_to)
-         # |> LiveHelpers.maybe_push_redirect()
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -113,8 +142,6 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Element created successfully")
-         |> push_patch(to: socket.assigns.return_to)
-         #|> LiveHelpers.maybe_push_redirect()
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -122,29 +149,20 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
     end
   end
 
-  defp strategies(assigns) do
-    try do
-      assigns.select_lists.strategies
-    rescue
-      _ ->
-        Logger.warn("ElementLive.FormComponent Failed to fetch strategies from assigns, falling back to query")
-        Web.list_strategies()
-    end
+  def field_ids(element = %Web.Element{}) do
+    %{}
+    |> Map.put(:page_id, ID.form_field(element, :page_id))
+    |> Map.put(:order, ID.form_field(element, :order))
+    |> Map.put(:name, ID.form_field(element, :name))
+    |> Map.put(:strategy_id, ID.form_field(element, :strategy_id))
+    |> Map.put(:selector, ID.form_field(element, :selector))
   end
-
-  defp strategy_field_id(assigns, changeset) do
-    "page-"
-    <> Integer.to_string(DomainHelpers.maybe_parent_id(assigns, :page_id))
-    <> "-element-"
-    <> LiveHelpers.maybe_value(changeset.data.id, "new")
-    <> "-form-strategy-field"
-  end
-
-  defp selector_field_id(assigns, changeset) do
-    "page-"
-    <> Integer.to_string(DomainHelpers.maybe_parent_id(assigns, :page_id))
-    <> "-element-"
-    <> LiveHelpers.maybe_value(changeset.data.id, "new")
-    <> "-form-selector-field"
+  def field_ids(_) do
+    %{}
+    |> Map.put(:page_id, "")
+    |> Map.put(:order, "")
+    |> Map.put(:name, "")
+    |> Map.put(:strategy_id, "")
+    |> Map.put(:selector, "")
   end
 end
