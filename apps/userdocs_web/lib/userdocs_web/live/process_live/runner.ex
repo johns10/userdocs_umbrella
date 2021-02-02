@@ -9,7 +9,7 @@ defmodule UserDocsWeb.ProcessLive.Runner do
     <a class="navbar-item"
       id="<%= @id %>"
       phx-click="execute_job"
-      phx-value-process-id="<%= @object.id %>"
+      phx-value-process-id="<%= @process.id %>"
       phx-target="<%= @myself.cid %>"
       phx-hook="jobRunner"
       status="<%= @status %>"
@@ -34,7 +34,7 @@ defmodule UserDocsWeb.ProcessLive.Runner do
     payload =  %{
       type: "process",
       payload: %{
-        process: Runner.parse(socket.assigns.object),
+        process: Runner.parse(socket.assigns.process),
         element_id: socket.assigns.id,
         status: "not_started",
         active_annotations: []
