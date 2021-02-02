@@ -163,6 +163,9 @@ defmodule UserDocs.Web do
       [%AnnotationType{}, ...]
 
   """
+  def list_annotation_types(state, opts) when is_list(opts) do
+    StateHandlers.list(state, AnnotationType, opts)
+  end
   def list_annotation_types do
     Repo.all(AnnotationType)
   end
