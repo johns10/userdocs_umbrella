@@ -51,6 +51,15 @@ defmodule StateHandlers.Preload do
     #IO.puts("handle_preload tuple, #{inspect(key)}, #{inspect(value)}")
     data_to_preload = Map.get(data, key)
     preloads = value
+    opts =
+      case data_to_preload do
+        nil -> opts
+        [] -> opts
+        [ object | _ ] ->
+          prepare_preload_opts(opts, object.__meta__.schema, preload)
+        object ->
+          prepare_preload_opts(opts, object.__meta__.schema, preload)
+      end
     Map.put(data, key, apply(state, data_to_preload, preloads, opts))
   end
 
