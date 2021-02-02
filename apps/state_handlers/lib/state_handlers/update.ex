@@ -6,7 +6,6 @@ defmodule StateHandlers.Update do
     do_update(state, data, data.__meta__.schema, opts)
   end
   def do_update(state, %{ objects: [ _ | _ ]} = data, opts)  do
-    #IO.inspect(data)
     schema =
       data.objects
         |> Enum.at(0)
@@ -32,7 +31,6 @@ defmodule StateHandlers.Update do
   end
 
   def update([ { state, key, state_type } | breadcrumb ], data, data_type) do
-    IO.puts("update state parser")
     [ { update(state, data, data_type), key, state_type} | breadcrumb ]
   end
   def update(state, %{ objects: data }, :list) when is_list(data) do
