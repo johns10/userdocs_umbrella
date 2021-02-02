@@ -1,280 +1,169 @@
-<%= f = form_for @changeset, "#",
-  id: @id,
-  phx_target: @myself.cid,
-  phx_change: "validate",
-  phx_submit: "save" %>
+  <%= f = form_for @changeset, "#",
+    id: @id,
+    phx_target: @myself.cid,
+    phx_change: "validate",
+    phx_submit: "save" %>
 
-  <h4><%= @title %></h4>
+    <div class="field is-grouped">
 
-  <%= form_field = :process_id
-    if(LiveHelpers.maybe_action(assigns) in [:edit]) do %>
-    <div class="field">
-      <%= label f, form_field, class: :label %>
-      <div class="control">
-        <div class="select">
-          <%= select f, form_field, @processes_select_options,
-            value: @selected_process_id,
-            id: form_field_id(assigns, f, form_field) %>
+      <%= Layout.select_input(f, :process_id, @select_lists.processes_select, [
+        selected: @parent_id || "",
+        id: @field_ids.process_id || ""
+      ], "control") %>
+
+      <%= Layout.number_input(f, :order, [
+        id: @field_ids.order || ""
+      ], "control") %>
+
+      <%= Layout.select_input(f, :step_type_id, @select_lists.step_types_select, [
+        id: @field_ids.step_type_id || ""
+      ], "control") %>
+
+    </div>
+
+    <%= if "page_reference" in @enabled_step_fields and @action not in [:new] do %>
+      <div class="field">
+        <%= label(f, :page_reference, [ class: :label ]) %>
+        <div class="control">
+          <label class="radio">
+            <%= radio_button(f, :page_reference, "url", [
+              id: @field_ids.page_reference_url,
+              label: "url",
+            ]) %>
+              Type
+          </label>
+          <label class="radio">
+            <%= radio_button(f, :page_reference, "page", [
+              id: @field_ids.page_reference_page,
+              label: "page",
+            ]) %>
+              Select
+          </label>
         </div>
+        <%= error_tag(f, :page_reference) %>
       </div>
-      <%= error_tag f, form_field %>
-    </div>
-  <% else %>
-    <%= hidden_input f, form_field,
-      value: maybe_parent_id(assigns),
-      id: form_field_id(assigns, f, form_field) %>
-  <% end %>
+    <% end %>
 
-  <div class="field">
-    <%= label f, form_field = :order %>
-    <div class="control">
-      <%= number_input f, form_field,
-        class: "input",
-        type: "text",
-        readonly: @read_only,
-        id: form_field_id(assigns, f, form_field) %>
-    </div>
-    <%= error_tag f, form_field %>
-  </div>
-
-  <div class="field">
-    <%= label f, form_field = :name %>
-    <div class="control">
-      <%= text_input f, form_field, class: "input", type: "text",
-        readonly: @read_only, value: @auto_gen_name,
-        id: form_field_id(assigns, f, form_field) %>
-    </div>
-    <%= error_tag f, form_field %>
-  </div>
-
-  <div class="field">
-    <%= label f, form_field = :step_type_id, class: :label %>
-    <div class="control">
-      <div class="select">
-        <%= select f, form_field, @step_type_select_options,
-          selected: @changeset.data.step_type_id,
-          disabled: @read_only,
-          id: form_field_id(assigns, f, form_field) %>
+    <%= if @action not in [:new] do %>
+      <%= label f, :page_id, class: "label" %>
+      <div class="field has-addons">
+        <%=
+          Layout.select_input(f, :page_id, @select_lists.pages_select, [
+            value: f.data.page_id || @default_page_id || "",
+            id: @field_ids.page_id,
+            label: false,
+          ], "control")
+        %>
+        <%= Layout.new_item_button("new-page", [ button_class: :a, phx_target: @myself.cid ], "control") %>
       </div>
-    </div>
-    <%= error_tag f, form_field %>
-  </div>
+      <%= error_tag(f, :page_id) %>
+    <% end %>
 
-  <%= if("element_id" in @enabled_fields or "annotation_id" in @enabled_fields) do %>
-    <div class="field">
-      <div class="field-body">
-        <div class="field">
-          <div class="label">Page</div>
-          <div class="control is-expanded">
-            <div class="select is-fullwidth">
-              <%= select f, :page_id, @pages_select_options,
-                selected: @selected_page_id,
-                id: Layout.form_field_id(@maybe_action, f, :page_id, "process", @maybe_parent_id) %>
+    <%= if "page_id" in @enabled_step_fields and page_reference(@changeset) == "page" do %>
+      <%= inputs_for f, :page, [id: @form_ids.page ], fn fp -> %>
+        <section class="card">
+          <div class="card-content">
+            <div class="content">
+              <%= PageLive.FormComponent.render_fields(
+                Map.put(assigns, :field_ids, @field_ids.page),
+                fp, [ prefix: @form_ids.prefix ]) %>
             </div>
           </div>
-        </div>
-        <%= if("element_id" in @enabled_fields) do %>
-          <fieldset>
-            <%= label f, form_field = :element_id, class: "label" %>
-            <div class="field has-addons">
-              <div class="control">
-                <button
-                  class="button"
-                  type="button"
-                  phx-click="new-element"
-                  phx-value-page-id=<%= @selected_page_id %>
-                >
-                  <span class="icon" >
-                    <i class="fa fa-plus" aria-hidden="true"></i>
-                  </span>
-                </button>
-              </div>
-              <div class="control is-expanded">
-                <div class="select is-fullwidth">
-                  <%= select f, form_field, @elements_select_options,
-                    selected: @changeset.data.element_id,
-                    disabled: @read_only,
-                    id: Layout.form_field_id(@maybe_action, f, form_field,
-                      "process", @maybe_parent_id) %>
-                </div>
-              </div>
-            </div>
-            <%= error_tag f, form_field %>
-          </fieldset>
-        <% end %>
-        <%= if("annotation_id" in @enabled_fields) do %>
-          <fieldset>
-            <%= label f, form_field = :annotation_id, class: "label" %>
-            <div class="field has-addons">
-              <div class="control">
-                <button
-                  class="button"
-                  type="button"
-                  phx-click="new-annotation"
-                  phx-value-page-id=<%= @selected_page_id %>
-                  phx-value-element-id=<%= @selected_element_id %>
-                >
-                  <span class="icon" >
-                    <i class="fa fa-plus" aria-hidden="true"></i>
-                  </span>
-                </button>
-              </div>
-              <div class="control is-expanded">
-                <div class="select is-fullwidth">
-                  <%= select f, form_field, @annotations_select_options,
-                    selected: @changeset.data.annotation_id,
-                    disabled: @read_only,
-                    id: Layout.form_field_id(@maybe_action, f, form_field,
-                      "process", @maybe_parent_id) %>
-                </div>
-              </div>
-            </div>
-            <%= error_tag f, form_field %>
-          </fieldset>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
-
-  <%= if("element_id" in @enabled_fields and is_integer(f.data.element_id)) do %>
-    <div class="field">
-      <%= live_component @socket,
-        UserDocsWeb.ElementLive.EmbeddedFormComponent, [
-        form: f,
-        read_only: @read_only,
-        action: @action,
-        elements: @select_lists.available_elements,
-        strategies_select_options: @strategies_select_options,
-        element_subform_disabled: @element_subform_disabled,
-        id: subform_id("element", "step", @changeset.data.id, @changeset.data.element),
-        base_form_id: subform_id("element", "step", @changeset.data.id, @changeset.data.element) <> "_"
-      ] %>
-    </div>
-  <% end %>
-
-  <%= if("annotation_id" in @enabled_fields and is_integer(f.data.annotation_id)) do %>
-    <%= live_component @socket,
-      UserDocsWeb.AnnotationLive.EmbeddedFormComponent, [
-      form: f,
-      read_only: @read_only,
-      action: @action,
-      current_version: @current_version,
-      current_content: @current_content,
-      enabled_fields: @enabled_annotation_fields,
-      versions_select_options: @versions_select_options,
-      annotation_types_select_options: @annotation_types_select_options,
-      contents_select_options: @contents_select_options,
-      language_codes_select_options: @language_codes_select_options,
-      form_disabled: @annotation_subform_disabled,
-      content_versions: @content_versions,
-      parent_cid: @myself.cid,
-      id: subform_id("annotation", "step", @changeset.data.id, @changeset.data.element),
-      base_form_id: subform_id("annotation", "step", @changeset.data.id, @changeset.data.element) <> "_",
-      auto_gen_name: @auto_gen_annotation_name
-    ] %>
-  <% end %>
-
-  <%= if("url" in @enabled_fields) do %>
-    <%= if @final_url_reference == :url do %>
-      <%= hidden_input f, :page_reference,
-        value: "url",
-        id: Layout.form_field_id(@maybe_action, f, :page_reference,
-          "process", @maybe_parent_id) %>
-    <% else %>
-      <%= hidden_input f, :page_reference,
-        value: "page",
-        id: Layout.form_field_id(@maybe_action, f, :page_reference,
-          "process", @maybe_parent_id) %>
+        </section>
+      <% end %>
+      <div class="level"></div>
     <% end %>
-  <% end %>
 
-  <%= if("url" in @enabled_fields) do %>
-    <div class="field">
-      <%= label f, form_field = :url, class: "label" %>
-      <p class="control">
-        <div class="field has-addons">
-          <%= if @final_url_reference == form_field do %>
-            <div class="control">
-              <a class="button"
-                phx-click= "toggle_url_mode",
-                phx-value-arg= "page"
-                phx-target= "<%= @myself.cid %>">Pick</a>
+    <%= if "element_id" in @enabled_step_fields and @action not in [:new] do %>
+      <%= label f, :element_id, class: "label" %>
+      <div class="field has-addons">
+        <%=
+          Layout.select_input(f, :element_id, @select_lists.elements_select, [
+            value: f.data.element_id || "",
+            id: @field_ids.element_id,
+            label: false,
+            hidden: "element_id" not in @enabled_step_fields
+          ], "control")
+        %>
+        <%= Layout.new_item_button("new-element", [ button_class: :a, phx_target: @myself.cid ], "control") %>
+      </div>
+      <%= inputs_for f, :element, [id: @form_ids.element], fn fe -> %>
+        <section class="card">
+          <div class="card-content">
+            <div class="content">
+              <h4><%= fe.data.name %></h4>
+              <%= ElementLive.FormComponent.render_fields(
+                  Map.put(assigns, :field_ids, @field_ids.element),
+                  fe, @form_ids.prefix) %>
             </div>
-          <% else %>
-            <div class="control">
-              <a class="button"
-                phx-click= "toggle_url_mode",
-                phx-value-arg= "url"
-                phx-target= "<%= @myself.cid %>">Type</a>
+          </div>
+        </section>
+      <% end %>
+      <div class="level"></div>
+    <% end %>
+
+    <%= if "annotation_id" in @enabled_step_fields and @action not in [:new] do %>
+      <%= label f, :annotation_id, class: "label" %>
+      <div class="field has-addons">
+        <%=
+          Layout.select_input(f, :annotation_id, @select_lists.annotations, [
+            value: f.data.annotation_id || "",
+            id: @field_ids.annotation_id,
+            label: false,
+            hidden: "annotation_id" not in @enabled_step_fields
+          ], "control")
+        %>
+        <%= Layout.new_item_button("new-annotation", [ button_class: :a, phx_target: @myself.cid ], "control") %>
+      </div>
+      <%= inputs_for f, :annotation, [id: @form_ids.annotation ], fn fa -> %>
+        <section class="card">
+          <div class="card-content">
+            <div class="content">
+              <%= AnnotationLive.FormComponent.render_fields(assigns, fa,
+                @form_ids.prefix) %>
             </div>
-          <% end %>
-          <p class="control">
-            <%= if @final_url_reference == form_field do %>
-              <%= text_input f, form_field,
-                class: "input",
-                type: "text",
-                readonly: @read_only,
-                id: Layout.form_field_id(@maybe_action, f, form_field,
-                  "process", @maybe_parent_id) %>
-            <% else %>
-              <div class="select">
-                <%= select f, :page_id, @pages_select_options,
-                  id: Layout.form_field_id(@maybe_action, f, form_field, "process", @maybe_parent_id) %>
-              </div>
-            <% end %>
-          </p>
-          <%= error_tag f, form_field %>
-            <!--
-            TODO: Get this prefix picker working somehow
-            <p class="control">
-              <span class="select">
-                <select>
-                  <option>http://</option>
-                  <option>https://</option>
-                </select>
-              </span>
-            </p>-->
-        </div>
-      </p>
-    </div>
-  <% end %>
+          </div>
+        </section>
+      <% end %>
+      <div class="level"></div>
+    <% end %>
 
-  <%= if("text" in @enabled_fields) do %>
-    <div class="field">
-      <%= label f, form_field = :text %>
-      <div class="control">
-        <%= text_input f, form_field, class: "input", type: "text", readonly: @read_only,
-          id: Layout.form_field_id(@maybe_action, f, form_field, "process", @maybe_parent_id) %>
-      </div>
-      <%= error_tag f, form_field %>
-    </div>
-  <% end %>
+    <%= Layout.text_input(f, [
+      field_name: :url,
+      id: @field_ids.url,
+      hidden: not(
+        ("url" in @enabled_step_fields) and
+        (page_reference(@changeset) == "url")
+      )
+    ]) %>
 
-  <%=
-    form_field = :width
-    if("width" in @enabled_fields) do %>
-    <div class="field">
-      <%= label f, form_field %>
-      <div class="control">
-        <%= text_input f, form_field, class: "input", type: "text", readonly: @read_only %>
-      </div>
-      <%= error_tag f, form_field %>
-    </div>
-  <% end %>
+    <%= Layout.text_input(f, [
+      field_name: :text,
+      id: @field_ids.text,
+      hidden: not("text" in @enabled_step_fields)
+    ]) %>
 
-  <%=
-    form_field = :height
-    if("height" in @enabled_fields) do %>
-    <div class="field">
-      <%= label f, form_field %>
-      <div class="control">
-        <%= text_input f, form_field, class: "input", type: "text", readonly: @read_only %>
-      </div>
-      <%= error_tag f, form_field %>
-    </div>
-  <% end %>
+    <%= Layout.text_input(f, [
+      field_name: :width,
+      id: @field_ids.width,
+      hidden: not("width" in @enabled_step_fields)
+    ]) %>
 
-  <%= if(LiveHelpers.maybe_action(assigns) in [:edit, :new]) do %>
+    <%= Layout.text_input(f, [
+      field_name: :height,
+      id: @field_ids.height,
+      hidden: not("height" in @enabled_step_fields)
+    ]) %>
+
     <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
-  <% end %>
-</form>
+    <%= if @action == :edit do %>
+      <%= link "Delete",
+        to: "#",
+        phx_click: "delete",
+        phx_value_id: @changeset.data.id,
+        data: [confirm: "Are you sure?"],
+        phx_target: @myself.cid,
+        class: "button is-danger is-link"
+      %>
+    <%= end %>
+  </form>
