@@ -6,6 +6,9 @@ defmodule UserDocsWeb.ModalMenus do
   alias UserDocsWeb.ModalMenus
   alias UserDocsWeb.LiveHelpers
 
+  alias UserDocsWeb.VersionLive.FormComponent, as: VersionForm
+  alias UserDocsWeb.ProjectLive.FormComponent, as: ProjectForm
+  alias UserDocsWeb.ProcessLive.FormComponent, as: ProcessForm
   alias UserDocsWeb.StepLive.FormComponent, as: StepForm
 
   alias UserDocsWeb.ContentLive.FormComponent, as: ContentForm
