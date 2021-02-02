@@ -696,14 +696,10 @@ defmodule UserDocs.Automation do
     from(process in Process, where: process.id == ^id)
   end
 
-  defp maybe_preload_steps(object, nil, _), do: object
-  defp maybe_preload_steps(object, _, state) do
-    steps =
-      state.steps
-      |> Enum.filter(fn(s) -> s.process_id == object.id end)
-
-    object
-    |> Map.put(:steps, steps)
+  defp maybe_preload_process(processes, nil, _, _), do: processes
+  defp maybe_preload_process(processes, _preloads, state, opts) do
+    opts = Keyword.delete(opts, :filter)
+    StateHandlers.preload(state, processes, opts)
   end
 
 #TODO Remove
