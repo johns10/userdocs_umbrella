@@ -3,7 +3,6 @@ defmodule UserDocsWeb.ModalMenus do
   use Phoenix.HTML
 
 
-  alias UserDocsWeb.ModalMenus
   alias UserDocsWeb.LiveHelpers
 
   alias UserDocsWeb.VersionLive.FormComponent, as: VersionForm
