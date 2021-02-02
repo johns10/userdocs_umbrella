@@ -3,170 +3,157 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
 
   require Logger
 
-  alias UserDocs.Web
-  alias UserDocs.Users
-  alias UserDocs.Documents
-  alias UserDocs.Documents.Content
-  alias UserDocs.Projects
-  alias UserDocs.Users.User
-  alias UserDocs.Documents.ContentVersion
-
-  alias UserDocsWeb.DomainHelpers
-  alias UserDocsWeb.LiveHelpers
   alias UserDocsWeb.Layout
+  alias UserDocsWeb.ID
 
-  @impl true
-  def mount(socket) do
-    socket =
-      socket
-      |> assign(:enabled_fields, [])
+  alias UserDocs.Web
 
-    {:ok, socket}
+  def render(assigns) do
+    ~L"""
+      <%= form = form_for @changeset, "#",
+        id: @id,
+        phx_target: @myself.cid,
+        phx_change: "validate",
+        phx_submit: "save" %>
+
+        <%= render_fields(assigns, form) %>
+
+        <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
+
+      </form>
+    """
   end
 
+  def render_fields(assigns, form, prefix \\ "") do
+    ~L"""
+      <%= hidden_input(form, :id, [ value: form.data.id ]) %>
+
+      <%= hidden_input(form, :name, [
+        id: @field_ids.annotation.name,
+        value: Ecto.Changeset.get_field(@changeset, :name, "")
+      ]) %>
+
+      <div class="field is-grouped">
+
+        <%= Layout.select_input(form, :page_id, @select_lists.pages_select, [
+          selected: form.data.page_id || @default_page_id || "",
+          id: @field_ids.annotation.page_id,
+        ], "control") %>
+
+        <%= Layout.select_input(form, :annotation_type_id, @select_lists.annotation_types, [
+            placeholder: form.data.annotation_type_id || "",
+            id: ID.form_field(form.data, :annotation_type_id, prefix),
+          ], "control") %>
+
+      </div>
+      <div class="field is-grouped is-grouped-multiline">
+
+        <%= Layout.text_input(form, :label, [
+          id: @field_ids.annotation.label,
+          hidden: not("label" in @enabled_annotation_fields)
+        ], "control") %>
+
+        <%=
+          Layout.select_input(form, :x_orientation,
+            [{"None", ""}, { "Right", "R" }, {"Middle", "M"}, { "Left", "L" }], [
+              placeholder: form.data.x_orientation || "",
+              id: @field_ids.annotation.x_orientation,
+              hidden: "x_orientation" not in @enabled_annotation_fields
+            ], "control")
+        %>
+
+        <%=
+          Layout.select_input(form, :y_orientation,
+            [{"None", ""}, { "Top", "T" }, {"Middle", "M"}, { "Bottom", "B" }], [
+              placeholder: form.data.y_orientation || "",
+              id: @field_ids.annotation.y_orientation,
+              hidden: not("y_orientation" in @enabled_annotation_fields),
+            ], "control")
+        %>
+
+        <%= Layout.number_input(form, :size, [
+          id: @field_ids.annotation.size,
+          hidden: not("size" in @enabled_annotation_fields)
+        ], "control") %>
+
+        <%= Layout.text_input(form, :color, [
+          id: @field_ids.annotation.color,
+          hidden: not("color" in @enabled_annotation_fields)
+        ], "control") %>
+
+        <%= Layout.number_input(form, :thickness, [
+          id: @field_ids.annotation.thickness,
+          hidden: not("thickness" in @enabled_annotation_fields)
+        ], "control") %>
+
+        <%= Layout.number_input(form, :x_offset, [
+          id: @field_ids.annotation.x_offset,
+          hidden: not("x_offset" in @enabled_annotation_fields)
+        ], "control") %>
+
+        <%= Layout.number_input(form, :y_offset, [
+          id: @field_ids.annotation.y_offset,
+          hidden: not("y_offset" in @enabled_annotation_fields)
+        ], "control") %>
+
+        <%= Layout.text_input(form, [
+          field_name: :font_size,
+          id: @field_ids.annotation.font_size,
+          hidden: not("font_size" in @enabled_annotation_fields)
+        ]) %>
+
+      </div>
+
+      <%= label form, :content_id, class: "label" %>
+      <div class="field is-horizontal">
+        <div class="field-body">
+          <div class="field has-addons">
+
+            <%= Layout.new_item_button("new-content", [ button_class: :div ], "control") %>
+
+            <%= Layout.select_input(form, :content_id, @select_lists.content,
+              [
+                value: form.data.content_id,
+                id: @field_ids.annotation.content_id,
+                label: false
+              ]) %>
+
+          </div>
+        </div>
+      </div>
+    """
+  end
 
   @impl true
   def update(%{annotation: annotation} = assigns, socket) do
     changeset = Web.change_annotation(annotation)
-    maybe_parent_id = current_page_id(assigns, changeset)
 
-    annotation_id =
-      try do
-        annotation.id
-      rescue
-        _ -> nil
-      end
+    form_ids =
+      %{}
+      |> Map.put(:content, ID.prefix(annotation))
 
-      IO.puts("Updating annotation live form component for annotation #{annotation_id}")
-
-    team = team(assigns, assigns.current_user.default_team_id)
-
-    annotation_types = annotation_types(assigns)
-    annotation_types_select_options =
-      annotation_types
-      |> DomainHelpers.select_list_temp(:name, false)
-
-    contents = contents(assigns, team.id)
-    content_select_options =
-      contents
-      |> DomainHelpers.select_list_temp(:name, true)
-
-    current_content = current_content(assigns, annotation.content_id)
-
-    current_version = current_version(annotation_id, assigns)
-    versions_select_options =
-      all_content_versions(contents, annotation.content_id, assigns)
-      |> Enum.map(fn(cv) -> cv.version_id end)
-      |> Enum.uniq()
-      |> versions(assigns)
-      |> DomainHelpers.select_list_temp(:name, false)
-
-    content_versions = content_versions(assigns, current_content.id, current_version.id)
-    content_versions_select_options =
-      content_versions
-      |> Enum.map(&{&1.language_code.code, &1.id})
-
-    pages = pages(assigns, team.id)
-    pages_select_options =
-      pages
-      |> DomainHelpers.select_list_temp(:name, false)
-
-    enabled_fields =
-      LiveHelpers.enabled_fields(annotation_types, changeset.data.annotation_type_id)
-
-    # TODO FIX
-    annotation_type_name =
-      try do
-        annotation.annotation_type.name
-      rescue
-        _ -> ""
-      end
-
-    auto_gen_name = automatic_name(assigns, annotation_type_name)
-
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign(:annotation, annotation)
-     |> assign(:changeset, changeset)
-     |> assign(:enabled_fields, enabled_fields)
-     |> assign(:read_only, LiveHelpers.read_only?(assigns))
-     |> assign(:maybe_action, LiveHelpers.maybe_action(assigns))
-     |> assign(:maybe_parent_id, maybe_parent_id)
-     |> assign(:annotation_types_select_options, annotation_types_select_options)
-     |> assign(:content_select_options, content_select_options)
-     |> assign(:versions_select_options, versions_select_options)
-     |> assign(:pages_select_options, pages_select_options)
-     |> assign(:content_versions_select_options, content_versions_select_options)
-     |> assign(:current_version, current_version)
-     |> assign(:current_content, current_content)
-     |> assign(:auto_gen_name, auto_gen_name)
+    {
+      :ok,
+      socket
+      |> assign(assigns)
+      |> assign(:changeset, changeset)
+      |> assign(:field_ids, field_ids(annotation))
+      |> assign(:form_ids, form_ids)
     }
   end
 
   @impl true
   def handle_event("validate", %{"annotation" => annotation_params}, socket) do
-    enabled_fields =
-      LiveHelpers.enabled_fields(annotation_types(socket.assigns),
-        annotation_params["annotation_type_id"])
-
-
-    current_changes =
-      socket.assigns.annotation
-      |> Web.change_annotation(annotation_params)
-      |> Map.put(:action, :validate)
-
-    socket = handle_changes(current_changes.changes, socket)
-
-    { status, current_annotation } =
-      case Ecto.Changeset.apply_action(current_changes, :update) do
-        { :ok, current_annotation } -> { :ok, current_annotation }
-        { _, _ } -> { :nok, socket.assigns.current_annotation }
-      end
-
     changeset =
       socket.assigns.annotation
       |> Web.change_annotation(annotation_params)
       |> Map.put(:action, :validate)
 
-      socket =
-        socket
-        |> assign(:changeset, changeset)
-        |> assign(:enabled_fields, enabled_fields)
-
-    {:noreply, socket}
+    {:noreply, assign(socket, :changeset, changeset)}
   end
 
   def handle_event("save", %{"annotation" => annotation_params}, socket) do
     save_annotation(socket, socket.assigns.action, annotation_params)
-  end
-
-  defp handle_changes(%{annotation_type_id: annotation_type_id}, socket) do
-    IO.puts("Handling a change to step annotation id: #{annotation_type_id}")
-    annotation_type_name =
-      annotation_types(socket.assigns)
-      |> Enum.filter(fn(at) -> at.id == annotation_type_id end)
-      |> Enum.at(0)
-      |> Map.get(:name)
-
-    name = automatic_name(socket.assigns, annotation_type_name)
-
-    assign(socket, :auto_gen_name, name)
-  end
-
-  defp handle_changes(%{content_id: content_id}, socket) do
-    IO.puts("Handling a change to step content id: #{content_id}")
-    socket
-  end
-
-  defp handle_changes(%{content_version_id: content_version_id}, socket) do
-    IO.puts("Handling a change to step content version id: #{content_version_id}")
-    socket
-  end
-
-  defp handle_changes(_params, socket) do
-    IO.puts("No changes we need to respond to")
-    socket
   end
 
   defp save_annotation(socket, :edit, annotation_params) do
@@ -199,135 +186,34 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
     end
   end
 
-  defp current_page_id(assigns, changeset) do
-    try do
-      assigns.parent.id
-    rescue
-      KeyError -> changeset.data.page_id
-    end
+  def field_ids(annotation = %Web.Annotation{}) do
+    %{}
+    |> Map.put(:name, ID.form_field(annotation, :name))
+    |> Map.put(:page_id, ID.form_field(annotation, :page_id))
+    |> Map.put(:label, ID.form_field(annotation, :label))
+    |> Map.put(:x_orientation, ID.form_field(annotation, :x_orientation))
+    |> Map.put(:y_orientation, ID.form_field(annotation, :y_orientation))
+    |> Map.put(:size, ID.form_field(annotation, :size))
+    |> Map.put(:color, ID.form_field(annotation, :color))
+    |> Map.put(:thickness, ID.form_field(annotation, :thickness))
+    |> Map.put(:x_offset, ID.form_field(annotation, :x_offset))
+    |> Map.put(:y_offset, ID.form_field(annotation, :y_offset))
+    |> Map.put(:font_size, ID.form_field(annotation, :font_size))
+    |> Map.put(:content_id, ID.form_field(annotation, :content_id))
   end
-
-  defp annotation_types(assigns) do
-    try do
-      assigns.select_lists.available_annotation_types
-    rescue
-      _ ->
-        Logger.warn("AnnotationLive.FormComponent reverting to database for annotation types")
-        Web.list_annotation_types()
-    end
-  end
-
-  defp contents(assigns, team_id) do
-    try do
-      assigns.select_lists.available_content
-    rescue
-      _ ->
-        Logger.warn("AnnotationLive.FormComponent reverting to database for list_content")
-        Documents.list_content(%{content_versions: true}, %{team_id: team_id})
-    end
-  end
-
-  defp current_content(_, nil) do
-    %Content{}
-  end
-
-  defp current_content(assigns, content_id) do
-    try do
-      assigns.select_lists.available_content
-      |> Enum.filter(fn(c) -> c.id == content_id end)
-      |> Enum.at(0)
-    rescue
-      _ ->
-        Logger.warn("AnnotationLive.FormComponent reverting to database for individual content")
-        Documents.get_content!(content_id)
-    end
-  end
-
-  defp all_content_versions(_, nil, assigns) do
-    try do
-      assigns.select_lists.available_content_versions
-    rescue
-      _ ->
-        Logger.warn("AnnotationLive.FormComponent reverting to database for all content versions")
-        Documents.list_content_versions(%{language_code: true}, %{})
-    end
-  end
-  defp all_content_versions(contents, content_id, _assigns) when is_integer(content_id) do
-    contents
-    |> Enum.filter(fn(c) -> c.id == content_id end)
-    |> Enum.at(0)
-    |> Map.get(:content_versions)
-  end
-
-  def automatic_name(assigns, annotation_type_name) do
-    IO.puts("Automatic name for element")
-    label =
-      try do
-        assigns.current_step.annotation.label
-      rescue
-        _ -> Logger.error("FAIL")
-      end
-    element_name =
-      try do
-        assigns.related_element_name
-      rescue
-        _ -> ""
-      end
-
-    label <> ": "
-    <> annotation_type_name <> " "
-    <> element_name
-  end
-
-  # TODO: Probably busted, check
-  defp content_versions(assigns, content_id, version_id) do
-    try do
-      assigns.select_lists.available_content_versions
-      |> Enum.filter(fn(cv) -> cv.content_id == content_id end)
-      |> Enum.filter(fn(cv) -> cv.version_id == version_id end)
-    rescue
-      _ ->
-        Logger.warn("AnnotationLive.FormComponent reverting to database for content versions")
-        Documents.list_content_versions(%{language_code: true}, %{content_id: content_id, version_id: version_id})
-    end
-  end
-
-  defp versions(version_ids, assigns) do
-    try do
-      assigns.select_lists.available_versions
-      |> Enum.filter(fn(v) -> v.id in version_ids end)
-    rescue
-      _ ->
-        Logger.warn("AnnotationLive.FormComponent reverting to database for versions in #{version_ids}")
-        Projects.list_versions(%{}, %{version_ids: version_ids})
-    end
-  end
-
-  defp pages(assigns, team_id) do
-    try do
-      assigns.select_lists.available_pages
-    rescue
-      _ ->
-        Logger.warn("AnnotationLive.FormComponent reverting to database for pages")
-        Web.list_pages(%{}, %{team_id: team_id})
-    end
-  end
-
-  defp team(assigns, team_id) do
-    try do
-      assigns.current_team
-    rescue
-      _ ->
-        Logger.warn("AnnotationLive.FormComponent reverting to database for team")
-        Users.get_team!(team_id)
-    end
-  end
-
-  defp current_version(_, %{ current_version: current_version }) do
-    current_version
-  end
-  defp current_version(annotation_id, _) do
-    Logger.warn("AnnotationLive.FormComponent reverting to database for current_version")
-    Projects.get_annotation_version!(annotation_id)
+  def field_ids(_) do
+    %{}
+    |> Map.put(:name, "")
+    |> Map.put(:page_id, "")
+    |> Map.put(:label,  "")
+    |> Map.put(:x_orientation, "")
+    |> Map.put(:y_orientation, "")
+    |> Map.put(:size, "")
+    |> Map.put(:color, "")
+    |> Map.put(:thickness, "")
+    |> Map.put(:x_offset, "")
+    |> Map.put(:y_offset, "")
+    |> Map.put(:font_size, "")
+    |> Map.put(:content_id, "")
   end
 end
