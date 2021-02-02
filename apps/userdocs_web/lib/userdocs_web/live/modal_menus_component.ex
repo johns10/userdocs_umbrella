@@ -6,9 +6,7 @@ defmodule UserDocsWeb.ModalMenus do
   alias UserDocsWeb.ModalMenus
   alias UserDocsWeb.LiveHelpers
 
-  alias ProcessAdministratorWeb.VersionLive.FormComponent, as: VersionForm
-  alias ProcessAdministratorWeb.ProjectLive.FormComponent, as: ProjectForm
-  alias ProcessAdministratorWeb.ProcessLive.FormComponent, as: ProcessForm
+  alias UserDocsWeb.StepLive.FormComponent, as: StepForm
 
   alias UserDocsWeb.ContentLive.FormComponent, as: ContentForm
   alias UserDocsWeb.DocumentLive.FormComponent, as: DocumentForm
@@ -18,6 +16,7 @@ defmodule UserDocsWeb.ModalMenus do
   alias UserDocs.Project.Messages, as: ProjectMessage
   alias UserDocs.Version.Messages, as: VersionMessage
   alias UserDocs.Process.Messages, as: ProcessMessage
+  alias UserDocs.Automation.Step.Messages, as: StepMessage
   alias UserDocs.Document.Messages, as: DocumentMessage
   alias UserDocs.DocumentVersion.Messages, as: DocumentVersionMessage
   alias UserDocs.Docubit.Messages, as: DocubitMessage
@@ -110,6 +109,23 @@ defmodule UserDocsWeb.ModalMenus do
                       language_codes: @form_data.select_lists.language_codes,
                       content: @form_data.select_lists.content
                     }
+                :step ->
+                  LiveHelpers.live_modal @socket, StepForm,
+                  id: @form_data.object.id || :new,
+                    title: @form_data.title,
+                    action: @form_data.action,
+                    step: @form_data.object,
+                    parent_id: @form_data.parent_id,
+                    parent: @form_data.parent,
+                    state_opts: @form_data.state_opts,
+                    select_lists: %{
+                      processes: @form_data.select_lists.processes,
+                      step_types: @form_data.select_lists.step_types
+                    },
+                    data: %{
+                      step_types: @form_data.data.step_types,
+                      annotation_types: @form_data.data.annotation_types
+                    }
             end
           %>
         <% end %>
@@ -160,6 +176,14 @@ defmodule UserDocsWeb.ModalMenus do
     {
       :noreply,
       ProcessMessage.new_modal_menu(socket, params)
+      |> call_menu(socket)
+    }
+  end
+
+  def new_step(socket, params) do
+    {
+      :noreply,
+      StepMessage.new_modal_menu(socket, params)
       |> call_menu(socket)
     }
   end
