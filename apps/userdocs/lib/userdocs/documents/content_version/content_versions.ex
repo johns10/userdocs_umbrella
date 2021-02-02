@@ -32,7 +32,7 @@ defmodule UserDocs.Documents.ContentVersion.ContentVersions do
           |> Enum.map(&Documents.change_content_version(&1))
       end
     process =
-      Automation.get_process!(state.parent_id, %{}, %{}, state.data)
+      Automation.get_process!(state.parent_id, state, state.assigns.state_opts) #TEST
 
     content_versions =
       existing_content_versions
