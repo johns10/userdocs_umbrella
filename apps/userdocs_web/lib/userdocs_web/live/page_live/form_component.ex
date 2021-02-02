@@ -1,24 +1,67 @@
 defmodule UserDocsWeb.PageLive.FormComponent do
-  use UserDocsWeb, :live_component
+  use ProcessAdministratorWeb, :live_component
 
   alias UserDocs.Web
 
-  alias UserDocsWeb.LiveHelpers
-  alias UserDocsWeb.DomainHelpers
+  alias ProcessAdministratorWeb.LiveHelpers
   alias UserDocsWeb.Layout
+  alias UserDocsWeb.ID
+
+  def render(assigns) do
+    ~L"""
+      <%= form = form_for @changeset, "#",
+        id: @id,
+        phx_target: @myself.cid,
+        phx_change: "validate",
+        phx_submit: "save",
+        class: "form-horizontal" %>
+
+        <h4><%= @title %></h4>
+
+        <%= render_fields(assigns, form) %>
+
+        <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
+      </form>
+    """
+  end
+
+  def render_fields(assigns, form, opts \\ []) do
+    ~L"""
+      <div class="field is-grouped">
+        <%= Layout.select_input(form, :version_id, @select_lists.versions, [
+          # TODO: Still a little funky
+          selected: @current_version_id || "",
+          id: @field_ids.version_id || ""
+        ], "control") %>
+
+        <%= Layout.number_input(form, :order, [
+          id: @field_ids.order || ""
+        ], "control") %>
+
+        <%= Layout.text_input(form, [
+          field_name: :name,
+          id: @field_ids.name
+        ], "control is-expanded") %>
+
+      </div>
+
+      <%= Layout.text_input(form, [
+        field_name: :url,
+        id: @field_ids.url
+      ], "control is-expanded") %>
+    """
+  end
 
   @impl true
   def update(%{page: page} = assigns, socket) do
     changeset = Web.change_page(page)
-    maybe_parent_id = DomainHelpers.maybe_parent_id(assigns, :page_id)
 
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign(:read_only, LiveHelpers.read_only?(assigns))
-     |> assign(:changeset, changeset)
-     |> assign(:maybe_action, LiveHelpers.maybe_action(assigns))
-     |> assign(:maybe_parent_id, maybe_parent_id)}
+    {
+      :ok,
+      socket
+      |> assign(assigns)
+      |> assign(:changeset, changeset)
+    }
   end
 
   @impl true
@@ -59,5 +102,20 @@ defmodule UserDocsWeb.PageLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
+  end
+
+  def field_ids(page = %Web.Page{}) do
+    %{}
+    |> Map.put(:version_id, ID.form_field(page, :version_id))
+    |> Map.put(:order, ID.form_field(page, :order))
+    |> Map.put(:name, ID.form_field(page, :name))
+    |> Map.put(:url, ID.form_field(page, :url))
+  end
+  def field_ids(_) do
+    %{}
+    |> Map.put(:version_id, "")
+    |> Map.put(:order, "")
+    |> Map.put(:name, "")
+    |> Map.put(:url, "")
   end
 end
