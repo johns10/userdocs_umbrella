@@ -10,7 +10,7 @@ defmodule UserDocsWeb.StepLive.Runner do
     <a class="navbar-item"
       id="<%= @id %>"
       phx-click="execute_step"
-      phx-value-step-id="<%= @object.id %>"
+      phx-value-step-id="<%= @step.id %>"
       phx-hook="executeStep"
       phx-target="<%= @myself.cid %>"
       status="<%= @status %>"
@@ -35,7 +35,7 @@ defmodule UserDocsWeb.StepLive.Runner do
       type: "step",
       payload: %{
         process: %{
-          steps: [ Runner.parse(socket.assigns.object) ],
+          steps: [ Runner.parse(socket.assigns.step) ],
         },
         element_id: socket.assigns.id,
         status: "not_started",
