@@ -126,10 +126,16 @@ defmodule UserDocsWeb.Root do
   def handle_event("new-document", params, socket) do
     ModalMenus.new_document(socket, params)
   end
-  def handle_event("delete-docubit" = name, params, socket) do
+  def handle_event("new-process", params, socket) do
+    ModalMenus.new_process(socket, params)
+  end
+  def handle_event("new-step", params, socket) do
+    ModalMenus.new_step(socket, params)
+  end
+  def handle_event("delete-docubit", params, socket) do
     UserDocsWeb.DocubitLive.EventHandlers.handle_event("delete", params, socket)
   end
-  def handle_event("edit-docubit" = name, params, socket) do
+  def handle_event("edit-docubit", params, socket) do
     ModalMenus.edit_docubit(socket, params)
   end
   def handle_event("edit-content", params, socket) do
