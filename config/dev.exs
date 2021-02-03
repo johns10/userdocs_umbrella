@@ -42,33 +42,6 @@ url: [host: "user-docs.com"],
 config :userdocs_web,
   uploads_directory: "/media"
 
-config :process_administrator_web, ProcessAdministratorWeb.Endpoint,
-url: [host: "localhost"],
-  http: [
-    port: 4001
-  ],
-  https: [
-    port: 4003,
-    cipher_suite: :strong,
-    certfile: "priv/cert/user-docs.com.crt",
-    keyfile: "priv/cert/user-docs.com.key"
-  ],
-  debug_errors: true,
-  code_reloader: true,
-  check_origin: false,
-  watchers: [
-    node: [
-      "node_modules/webpack/bin/webpack.js",
-      "--mode",
-      "development",
-      "--watch-stdin",
-      cd: Path.expand("../apps/process_administrator_web/assets", __DIR__)
-    ]
-  ]
-
-config :process_administrator_web,
-  uploads_directory: "/media"
-
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed
