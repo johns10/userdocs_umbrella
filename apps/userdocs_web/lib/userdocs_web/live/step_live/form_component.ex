@@ -25,7 +25,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
         step.step_type_id
       rescue
         _ ->
-          assigns.step_types
+          assigns.data.step_types
           |> Enum.at(0)
           |> Map.get(:id)
       end
@@ -35,20 +35,20 @@ defmodule UserDocsWeb.StepLive.FormComponent do
         step.annotation.annotation_type_id
       rescue
         _ ->
-          assigns.annotation_types
+          assigns.data.annotation_types
           |> Enum.at(0)
           |> Map.get(:id)
       end
 
     enabled_step_fields =
       UserDocsWeb.LiveHelpers.enabled_fields(
-        assigns.step_types,
+        assigns.data.step_types,
         step_type_id
       )
 
     enabled_annotation_fields =
       UserDocsWeb.LiveHelpers.enabled_fields(
-        assigns.annotation_types,
+        assigns.data.annotation_types,
         annotation_type_id
       )
 
