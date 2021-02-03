@@ -26,7 +26,12 @@ defmodule StateHandlers.Broadcast do
   def broadcast(data, _, opts) do
     broadcaster = opts[:broadcast_function]
     channel = opts[:channel]
-    action = "upsert"
+    action =
+      case opts[:action] do
+        "create" -> "upsert"
+        "update" -> "upsert"
+        action -> action
+      end
     broadcaster.(channel, action, data)
     handle_associations(channel, action, data, opts)
   end
