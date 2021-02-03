@@ -54,5 +54,5 @@
     ]) %>
   </main>
 <% else %>
-  <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns, Routes.login_path(@socket, :new)) %>
+  <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns, "https://user-docs.com:4002/session") %>
 <% end %>
