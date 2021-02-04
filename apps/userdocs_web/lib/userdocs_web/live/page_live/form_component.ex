@@ -1,9 +1,9 @@
 defmodule UserDocsWeb.PageLive.FormComponent do
-  use ProcessAdministratorWeb, :live_component
+  use UserDocsWeb, :live_component
 
   alias UserDocs.Web
 
-  alias ProcessAdministratorWeb.LiveHelpers
+  alias UserDocsWeb.LiveHelpers
   alias UserDocsWeb.Layout
   alias UserDocsWeb.ID
 
