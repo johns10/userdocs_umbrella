@@ -175,6 +175,11 @@ defmodule UserDocsWeb.Router do
 
   end
 
+  scope "/" do
+    pipe_through :browser
+    pow_routes()
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", UserDocsWeb do
   #   pipe_through :api
@@ -192,7 +197,6 @@ defmodule UserDocsWeb.Router do
 
     scope "/" do
       pipe_through [:browser, :protected]
-      pow_routes()
       live_dashboard "/dashboard", metrics: UserDocsWeb.Telemetry
     end
   end
