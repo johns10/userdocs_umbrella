@@ -51,11 +51,12 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
         <%= ContentVersionForm.render_fields(assigns, fcv, "test") %>
 
       <% end %>
-
-      <a class="button" href="#" phx-click="add-content-version"
-        phx-target="<%= @myself.cid %>">
-        Add a content translation
-      </a>
+      <div class="control">
+        <a class="button" href="#" phx-click="add-content-version"
+          phx-target="<%= @myself.cid %>">
+          Add a content translation
+        </a>
+      </div>
     """
   end
 
