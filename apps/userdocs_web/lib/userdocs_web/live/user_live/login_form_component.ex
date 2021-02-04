@@ -4,6 +4,7 @@ defmodule UserDocsWeb.UserLive.LoginFormComponent do
   @impl true
   def render(assigns, path) do
     ~L"""
+      1
       <%= form_for @changeset, path, [as: :user], fn f -> %>
         <%= if @changeset.action do %>
           <div class="alert alert-danger">
