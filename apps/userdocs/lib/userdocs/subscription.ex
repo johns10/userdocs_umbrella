@@ -2,7 +2,7 @@ defmodule UserDocs.Subscription do
 
   require Logger
 
-  alias ProcessAdministratorWeb.Endpoint
+  alias UserDocsWeb.Endpoint
 
   def broadcast({ status, result }, type, operation) do
     Logger.debug("#{operation} broadcast triggered on #{type}")
@@ -22,19 +22,19 @@ defmodule UserDocs.Subscription do
     end
   end
 
-  def handle_event(socket, "create" = event, payload, opts) do
+  def handle_event(socket, "create" = _event, payload, opts) do
     #IO.puts("Handling Event")
     StateHandlers.create(socket, payload, opts)
   end
-  def handle_event(socket, "update" = event, payload, opts) do
+  def handle_event(socket, "update" = _event, payload, opts) do
     #IO.puts("Handling Update Event")
     StateHandlers.update(socket, payload, opts)
   end
-  def handle_event(socket, "delete" = event, payload, opts) do
+  def handle_event(socket, "delete" = _event, payload, opts) do
     #IO.puts("Handling Event")
     StateHandlers.delete(socket, payload, opts)
   end
-  def handle_event(socket, "upsert" = event, payload, opts) do
+  def handle_event(socket, "upsert" = _event, payload, opts) do
     #IO.puts("Handling Event")
     StateHandlers.upsert(socket, payload, opts)
   end
