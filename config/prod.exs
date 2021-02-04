@@ -12,7 +12,7 @@ use Mix.Config
 
 config :userdocs_web, UserDocsWeb.Endpoint,
   load_from_system_env: true,
-  url: [host: "app.user-docs.com", port: 443],
+  url: [host: "app.user-docs.com", port: 80],
   check_origin: false,
   cache_static_manifest: "priv/static/cache_manifest.json"
 
