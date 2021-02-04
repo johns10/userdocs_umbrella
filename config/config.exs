@@ -21,9 +21,7 @@ config :userdocs_web,
 
 # Configures the endpoint
 config :userdocs_web, UserDocsWeb.Endpoint,
-  url: [
-    host: "localhost"
-  ],
+  url: [ host: "localhost" ],
   secret_key_base: "uYNO0z5S7TuzLxe//ihPPyhDY+9/juUgfW4fFJkw+nKlP/omZmmVMmcIWuBolrzY",
   render_errors: [view: UserDocsWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: UserDocs.PubSub,
