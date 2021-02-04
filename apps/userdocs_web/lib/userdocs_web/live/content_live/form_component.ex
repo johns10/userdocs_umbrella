@@ -125,9 +125,7 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
   defp save_content(socket, :edit, content_params) do
     case Documents.update_content(socket.assigns.content, content_params) do
       {:ok, content} ->
-        message = %{ objects: content.content_versions }
-        UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "update", content)
-        UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "update", message)
+        send(self(), { :broadcast, "update", content })
         {
           :noreply,
           socket
@@ -144,9 +142,7 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
   defp save_content(socket, :new, content_params) do
     case Documents.create_content(content_params) do
       {:ok, content} ->
-        message = %{ objects: content.content_versions }
-        UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "create", content)
-        UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "update", message)
+        send(self(), { :broadcast, "create", content })
         send(self(), :close_modal)
         {
           :noreply,
