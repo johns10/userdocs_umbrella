@@ -19,7 +19,19 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
 
         <%= render_fields(assigns, form) %>
 
-        <%= submit "Save", phx_disable_with: "Saving..." %>z
+        <div class="control">
+          <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
+          <%= if @action == :edit do %>
+            <%= link "Delete",
+              to: "#",
+              phx_click: "delete",
+              phx_value_id: @changeset.data.id,
+              data: [confirm: "Are you sure?"],
+              class: "button is-danger is-link"
+            %>
+          <% end %>
+        </div>
+
       </form>
     """
   end
