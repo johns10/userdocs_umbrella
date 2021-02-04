@@ -7,9 +7,16 @@ defmodule UserDocsWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
-    plug :put_root_layout, {UserDocsWeb.LayoutView, :root}
+    plug :root_layout
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+  end
+
+  def root_layout(conn, _opts) do
+    case get_req_header(conn, "app") do
+      [ "chrome-extension" ] -> put_root_layout(conn, {ProcessAdministratorWeb.LayoutView, :chrome_root})
+      _ -> put_root_layout(conn, {ProcessAdministratorWeb.LayoutView, :root})
+    end
   end
 
   pipeline :api do
@@ -58,8 +65,8 @@ defmodule UserDocsWeb.Router do
 
     live "/automation", AutomationLive.Index, :index
     live "/process_administrator", ProcessAdministratorLive.Index, :index
+    live "/index.html", ProcessAdministratorLive.Index, :index
     live "/documents", DocumentLive.Index, :index
-    live "/process_administrator_extension.html", ProcessAdministratorLive.Index, :index
 
     # These routes are basically not part of the application:
     live "/content", ContentLive.Index, :index
