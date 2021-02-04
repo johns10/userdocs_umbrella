@@ -12,7 +12,8 @@ use Mix.Config
 
 config :userdocs_web, UserDocsWeb.Endpoint,
   load_from_system_env: true,
-  url: [host: "app.user-docs.com", port: 80],
+  url: [host: "*.user-docs.com", port: 80],
+  check_origin: ["//*.user-docs.com"],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # ## SSL Support
