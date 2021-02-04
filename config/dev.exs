@@ -19,12 +19,6 @@ config :userdocs, UserDocs.Repo,
 # with webpack to recompile .js and .css sources.
 config :userdocs_web, UserDocsWeb.Endpoint,
   http: [port: 4000],
-  https: [
-    port: 4002,
-    cipher_suite: :strong,
-    certfile: "priv/cert/user-docs.com.crt",
-    keyfile: "priv/cert/user-docs.com.key"
-  ],
   debug_errors: true,
   code_reloader: true,
   check_origin: ["https://app.user-docs.com"],
