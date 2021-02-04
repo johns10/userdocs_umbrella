@@ -18,7 +18,7 @@ config :userdocs, UserDocs.Repo,
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
 config :userdocs_web, UserDocsWeb.Endpoint,
-url: [host: "user-docs.com"],
+url: [host: "app.user-docs.com"],
   http: [port: 4000],
   https: [
     port: 4002,
