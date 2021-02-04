@@ -11,8 +11,19 @@ use Mix.Config
 # before starting your production server.
 
 config :userdocs_web, UserDocsWeb.Endpoint,
-  url: [host: "example.com", port: 80],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  http: [port: {:system, "PORT"}], # Possibly not needed, but doesn't hurt
+  url: [host: "app.user-docs.com", port: 443],
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
+  server: true
+
+config :userdocs_web, UserDocsWeb.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  url: System.get_env("DATABASE_URL"),
+  ssl: true,
+  pool_size: 1 # Free tier db only allows 1 connection
+
+config :logger, level: :info
 
 # ## SSL Support
 #
@@ -50,17 +61,7 @@ config :userdocs_web, UserDocsWeb.Endpoint,
 
 # Do not print debug messages in production
 
-config :userdocs_web, UserDocsWeb.Endpoint,
-  secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
-  server: true
 
-config :userdocs_web, UserDocsWeb.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  url: System.get_env("DATABASE_URL"),
-  ssl: true,
-  pool_size: 1 # Free tier db only allows 1 connection
-
-config :logger, level: :info
 
 # Finally import the config/prod.secret.exs which loads secrets
 # and configuration from environment variables.
