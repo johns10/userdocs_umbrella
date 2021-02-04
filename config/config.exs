@@ -22,7 +22,7 @@ config :userdocs_web,
 # Configures the endpoint
 config :userdocs_web, UserDocsWeb.Endpoint,
   url: [
-    host: "app.user-docs.com"
+    host: "localhost"
   ],
   secret_key_base: "uYNO0z5S7TuzLxe//ihPPyhDY+9/juUgfW4fFJkw+nKlP/omZmmVMmcIWuBolrzY",
   render_errors: [view: UserDocsWeb.ErrorView, accepts: ~w(html json), layout: false],
@@ -49,13 +49,11 @@ config :userdocs_web, :pow,
 
 config :cors_plug,
   origin: [
-    "https://userdocs.gigalixirapp.com",
+    "https://app.user-docs.com.gigalixirdns.com",
     "chrome-extension://iclibnblhjdakhhijcioglkmdihjelgg",
     "chrome-extension://ohmjkpckjphdcdophkflpmdmihpiaejf",
     "http://localhost",
-    "https://user-docs.com",
     "https://app.user-docs.com",
-    "https://www.user-docs.com"
   ],
   max_age: 86400,
   methods: ["GET", "PUT", "POST", "OPTIONS"]
