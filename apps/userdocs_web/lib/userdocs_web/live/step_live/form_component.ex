@@ -228,17 +228,11 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   end
 
   defp save_step(socket, :new, step_params) do
-    IO.inspect(step_params)
-    IO.inspect(
-      step_params["process_id"]
-    )
     case step_params["process_id"] do
       "" -> step_params
       id ->
         process_id = String.to_integer(id)
-        IO.inspect(process_id)
-        process = Automation.get_process!(id, socket, socket.assigns.state_opts)
-        IO.inspect(process)
+        Automation.get_process!(id, socket, socket.assigns.state_opts)
     end
     # recent_navigated_to_page(process, step, assigns)
     case Automation.create_step(step_params) do
@@ -342,8 +336,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   def nested_form_id(_, _), do: ""
 
   def recent_navigated_to_page(process, step, assigns) do
-    IO.inspect(process)
-    IO.inspect(step)
     case RecentPage.get(process, step, Web.list_pages(assigns, assigns.state_opts)) do
       %Page{} = page -> Map.get(page, :id, nil)
       nil -> ""
