@@ -11,8 +11,7 @@ use Mix.Config
 # before starting your production server.
 
 config :userdocs_web, UserDocsWeb.Endpoint,
-  load_from_system_env: true,
-  url: [host: "app.user-docs.com", port: 80],
+  url: [host: "example.com", port: 80],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # ## SSL Support
@@ -65,4 +64,4 @@ config :logger, level: :info
 
 # Finally import the config/prod.secret.exs which loads secrets
 # and configuration from environment variables.
-#import_config "prod.secret.exs"
+import_config "prod.secret.exs"
