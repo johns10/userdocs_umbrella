@@ -22,10 +22,10 @@ defmodule UserDocsWeb.DocubitLive.Renderers.P do
 
   def render(assigns) do
     ~L"""
-      <p>
-        <%= Base.maybe_render_prefix(@content) %>
-        <%= @content.body %>
-      </p>
+    <p>
+      <%= Base.maybe_render_prefix(@content) %>
+      <%= @content.body %>
+    </p>
     """
   end
 end
