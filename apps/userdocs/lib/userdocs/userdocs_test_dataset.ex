@@ -72,12 +72,12 @@ defmodule UserDocs.TestDataset do
     }
   ]
 
-  {:ok, %UserDocs.Web.Strategy{ name: "XPath Strategy", id: xpath_strategy_id}} =
+  {:ok, %UserDocs.Web.Strategy{ id: xpath_strategy_id}} =
     %Strategy{}
     |> Strategy.changeset(xpath_strategy)
     |> Repo.insert()
 
-    {:ok, %Strategy{ name: "CSS Strategy", id: css_strategy_id}} =
+    {:ok, %Strategy{ id: css_strategy_id}} =
       %Strategy{}
       |> Strategy.changeset(css_strategy)
       |> Repo.insert()
