@@ -14,8 +14,8 @@ defmodule UserDocsWeb.Router do
 
   def root_layout(conn, _opts) do
     case get_req_header(conn, "app") do
-      [ "chrome-extension" ] -> put_root_layout(conn, {ProcessAdministratorWeb.LayoutView, :chrome_root})
-      _ -> put_root_layout(conn, {ProcessAdministratorWeb.LayoutView, :root})
+      [ "chrome-extension" ] -> put_root_layout(conn, {UserDocsWeb.LayoutView, :chrome_root})
+      _ -> put_root_layout(conn, {UserDocsWeb.LayoutView, :root})
     end
   end
 
