@@ -35,6 +35,7 @@ defmodule UserDocsWeb do
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 1, get_flash: 2, view_module: 1]
+      import Phoenix.LiveView.Helpers
 
       # Include shared imports and aliases for views
       unquote(view_helpers())
@@ -46,6 +47,19 @@ defmodule UserDocsWeb do
       use Phoenix.LiveView,
         layout: {UserDocsWeb.LayoutView, "live.html"}
 
+
+      import Phoenix.LiveView.Helpers
+
+      unquote(view_helpers())
+    end
+  end
+
+  def live_slime_component do
+    quote do
+      use Phoenix.LiveComponent
+      import Phoenix.LiveView.Helpers, except: [sigil_L: 2]
+      import PhoenixSlime, only: [ sigil_L: 2 ]
+
       unquote(view_helpers())
     end
   end
@@ -53,6 +67,7 @@ defmodule UserDocsWeb do
   def live_component do
     quote do
       use Phoenix.LiveComponent
+      import Phoenix.LiveView.Helpers
 
       unquote(view_helpers())
     end
@@ -81,7 +96,6 @@ defmodule UserDocsWeb do
       use Phoenix.HTML
 
       # Import LiveView helpers (live_render, live_component, live_patch, etc)
-      import Phoenix.LiveView.Helpers
       import UserDocsWeb.LiveHelpers
 
       # Import basic rendering functionality (render, render_layout, etc)

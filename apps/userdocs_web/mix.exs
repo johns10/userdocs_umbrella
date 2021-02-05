@@ -56,6 +56,7 @@ defmodule UserDocsWeb.MixProject do
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:cors_plug, "~> 2.0"},
       {:pbkdf2_elixir, "~> 1.0"},
+      {:phoenix_slime, "~> 0.13.1"},
       {:userdocs, in_umbrella: true},
     ]
   end
