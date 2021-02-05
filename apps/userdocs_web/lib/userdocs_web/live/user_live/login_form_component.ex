@@ -1,18 +1,16 @@
 defmodule UserDocsWeb.UserLive.LoginFormComponent do
   use UserDocsWeb, :live_component
+  import Phoenix.LiveView.Helpers, only: [sigil_L: 2]
 
   @impl true
   def render(assigns, path) do
     ~L"""
-      1 test face
       <%= form_for @changeset, path, [as: :user], fn f -> %>
         <%= if @changeset.action do %>
           <div class="alert alert-danger">
             <p>Oops, something went wrong! Please check the errors below.</p>
           </div>
         <% end %>
-
-        email forealmail
 
         <%= label f, Pow.Ecto.Schema.user_id_field(@changeset) %>
         <%= text_input f, Pow.Ecto.Schema.user_id_field(@changeset) %>
@@ -23,7 +21,7 @@ defmodule UserDocsWeb.UserLive.LoginFormComponent do
         <%= error_tag f, :password %>
 
         <div>
-          <%= submit "Sign Whatever in" %>
+          <%= submit "Sign in" %>
         </div>
       <% end %>
     """
