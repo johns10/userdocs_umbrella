@@ -36,7 +36,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Li do
 
   def render(assigns) do
     ~L"""
-    <%= outer_tag(assigns) %>
+    <<%= outer_tag(assigns) %>
       <%= for {key, value} <- li_opts(@docubit) do %>
         <%= key %>="<%= value %>"
       <% end %>>
