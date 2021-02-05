@@ -9,6 +9,18 @@ defmodule UserDocsWeb.DocumentLive.Index do
   alias UserDocsWeb.Root
   alias UserDocsWeb.Defaults
 
+  defp base_opts() do
+    Defaults.state_opts()
+    |> Keyword.put(:location, :data)
+  end
+
+  defp state_opts(socket) do
+    base_opts()
+    |> Keyword.put(:broadcast, true)
+    |> Keyword.put(:channel, UserDocsWeb.Defaults.channel(socket))
+    |> Keyword.put(:broadcast_function, &UserDocsWeb.Endpoint.broadcast/3)
+  end
+
   @impl true
   def mount(_params, session, socket) do
     {
@@ -28,7 +40,8 @@ defmodule UserDocsWeb.DocumentLive.Index do
     |> load_documents()
     |> prepare_documents()
     |> projects_select_list()
-    |> StateHandlers.inspect(state_opts())
+    |> assign(:state_opts, state_opts(socket))
+    |> StateHandlers.inspect(state_opts(socket))
   end
   def initialize(socket), do: socket
 
@@ -70,20 +83,20 @@ defmodule UserDocsWeb.DocumentLive.Index do
     params =
       %{}
       |> Map.put(:document_id, String.to_integer(id))
-      |> Map.put(:team, UserDocs.Users.get_team!(socket.assigns.current_team_id, socket, state_opts()))
+      |> Map.put(:team, UserDocs.Users.get_team!(socket.assigns.current_team_id, socket, state_opts(socket)))
       |> Map.put(:projects, socket.assigns.data.projects)
       |> Map.put(:channel, Defaults.channel(socket))
-      |> Map.put(:opts, state_opts())
+      |> Map.put(:opts, state_opts(socket))
 
     Root.handle_event(n, params, socket)
   end
   def handle_event("new-document" = n, _params, socket) do
     params =
       %{}
-      |> Map.put(:team, UserDocs.Users.get_team!(socket.assigns.current_team_id, socket, state_opts()))
+      |> Map.put(:team, UserDocs.Users.get_team!(socket.assigns.current_team_id, socket, state_opts(socket)))
       |> Map.put(:projects, socket.assigns.data.projects)
       |> Map.put(:channel, Defaults.channel(socket))
-      |> Map.put(:opts, state_opts())
+      |> Map.put(:state_opts, state_opts(socket))
 
     Root.handle_event(n, params, socket)
   end
@@ -94,6 +107,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
       |> Map.put(:version_id, socket.assigns.current_version_id)
       |> Map.put(:documents, socket.assigns.data.documents)
       |> Map.put(:versions, socket.assigns.data.versions)
+      |> Map.put(:state_opts, state_opts(socket))
 
     Root.handle_event(n, params, socket)
   end
@@ -106,7 +120,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
       |> Map.put(:documents, socket.assigns.data.documents)
       |> Map.put(:document_versions, socket.assigns.data.document_versions)
       |> Map.put(:versions, socket.assigns.data.versions)
-      |> Map.put(:opts, state_opts())
+      |> Map.put(:opts, state_opts(socket))
 
     Root.handle_event(n, params, socket)
   end
@@ -130,7 +144,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
 
   defp load_documents(socket) do
     opts =
-      state_opts()
+      state_opts(socket)
       |> Keyword.put(:filters, %{project_id: socket.assigns.current_project_id})
 
     Documents.load_documents(socket, opts)
@@ -139,7 +153,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
   defp load_document_versions(socket) do
     IO.puts("Loading document versions")
     opts =
-      state_opts()
+      state_opts(socket)
       |> Keyword.put(:filters, %{team_id: socket.assigns.current_team_id})
 
     Documents.load_document_versions(socket, opts)
@@ -148,21 +162,17 @@ defmodule UserDocsWeb.DocumentLive.Index do
   defp prepare_documents(socket) do
     IO.puts("Preparing Document Versions")
     opts =
-      state_opts()
+      state_opts(socket)
       |> Keyword.put(:filter, { :project_id, socket.assigns.current_project_id })
       |> Keyword.put(:preloads, [ :document_versions, [ document_versions: :version ] ])
+      |> Keyword.put(:order, [ %{ field: :id, order: :asc } ])
 
     assign(socket, :documents, Documents.list_documents(socket, opts))
   end
 
   defp projects_select_list(socket) do
-    projects = Projects.list_projects(socket, state_opts())
+    projects = Projects.list_projects(socket, state_opts(socket))
     socket
     |> assign(:projects_select, UserDocs.Helpers.select_list(projects, :name, false))
-  end
-
-  defp state_opts() do
-    Defaults.state_opts()
-    |> Keyword.put(:location, :data)
   end
 end
