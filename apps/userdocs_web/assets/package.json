@@ -4,7 +4,9 @@
   "license": "MIT",
   "scripts": {
     "deploy": "webpack --mode production",
-    "watch": "webpack --mode development --watch"
+    "watch": "webpack --mode development --watch",
+    "watch_extension": "webpack js/chrome.js -o js/chrome_app.js --mode development --watch",
+    "watch_browser": "webpack js/browser.js -o js/browser_app.js --mode development --watch"
   },
   "dependencies": {
     "bulma": "^0.9.1",

@@ -21,30 +21,27 @@ import {Hooks} from "./hooks.js"
 
 let DOMAIN = "user-docs.com"
 let PORT = "4002"
+let PATH = "process_administrator"
 
-let APP_URL = "https://" + DOMAIN + ":" + PORT + "/"
+let APP_URL = "https://" + DOMAIN + ":" + PORT + "/" + PATH
 let WEBSOCKETS_URI = "wss://" + DOMAIN + ":" + PORT + "/live"
+let COOKIE_KEY = "_userdocs_web_key"
 
-try {
-  chrome.runtime.onMessage.addListener(
-    function(message, sender, sendResponse) {
-      console.log("Extension received message")
-      console.log(sender.tab ?
-                "from a content script:" + sender.tab.url :
-                "from the extension");
-              
-    console.log("handling message in the listener")
-    handle_message(message, { environment: 'extension' })
-  });
-} catch(e) {
-  console.log("Failed to add listener")
-  console.log(e)
-  console.log(chrome.runtime)
-}
+chrome.runtime.onMessage.addListener(
+	function(message, sender, sendResponse) {
+    console.log("Extension received message")
+		console.log(sender.tab ?
+							"from a content script:" + sender.tab.url :
+              "from the extension");
+            
+  console.log("handling message in the listener")
+  handle_message(message, { environment: 'extension' })
+});
 
 var xhr = new XMLHttpRequest();
 xhr.responseType = 'document';
 xhr.open('GET', APP_URL, true)
+xhr.setRequestHeader('app', 'chrome-extension')
 xhr.onload = function(e) {
   document.documentElement.replaceChild(this.response.head, document.head)
   document.documentElement.replaceChild(this.response.body, document.body)

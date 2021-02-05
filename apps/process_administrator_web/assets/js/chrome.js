@@ -20,7 +20,7 @@ import {handle_message} from "./commands.js"
 import {Hooks} from "./hooks.js"
 
 let DOMAIN = "user-docs.com"
-let PORT = "4003"
+let PORT = "4002"
 
 let APP_URL = "https://" + DOMAIN + ":" + PORT + "/"
 let WEBSOCKETS_URI = "wss://" + DOMAIN + ":" + PORT + "/live"
