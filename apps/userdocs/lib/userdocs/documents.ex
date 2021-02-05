@@ -105,7 +105,6 @@ defmodule UserDocs.Documents do
     %Content{}
     |> Content.changeset(attrs)
     |> Repo.insert()
-    |> Subscription.broadcast("content", "create")
   end
 
   @doc """
