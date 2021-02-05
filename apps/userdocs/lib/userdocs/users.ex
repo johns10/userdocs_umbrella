@@ -17,11 +17,14 @@ defmodule UserDocs.Users do
       [%TeamUser{}, ...]
 
   """
-  def list_users(params \\ %{}, _filters \\ %{}) do
+  def list_users(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
     base_users_query()
     |> maybe_filter_by_team(params[:team_id])
     |> maybe_preload_user_teams(params[:team])
     |> Repo.all()
+  end
+  def list_users(state, opts) when is_list(opts) do
+    StateHandlers.list(state, User, opts)
   end
 
   defp base_users_query(), do: from(users in User)
