@@ -1,6 +1,5 @@
 defmodule UserDocsWeb.ContentLive.Index do
   use UserDocsWeb, :live_view
-  import Phoenix.LiveView.Helpers, only: [sigil_L: 2]
   use UserdocsWeb.LiveViewPowHelper
 
   alias UserDocs.Users
