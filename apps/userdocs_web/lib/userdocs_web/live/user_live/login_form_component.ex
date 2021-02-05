@@ -1,29 +1,30 @@
 defmodule UserDocsWeb.UserLive.LoginFormComponent do
-  use UserDocsWeb, :live_component
-  import Phoenix.LiveView.Helpers, only: [sigil_L: 2]
-
+  use UserDocsWeb, :live_slime_component
   @impl true
   def render(assigns, path) do
     ~L"""
-      <%= form_for @changeset, path, [as: :user], fn f -> %>
-        <%= if @changeset.action do %>
-          <div class="alert alert-danger">
-            <p>Oops, something went wrong! Please check the errors below.</p>
-          </div>
-        <% end %>
-
-        <%= label f, Pow.Ecto.Schema.user_id_field(@changeset) %>
-        <%= text_input f, Pow.Ecto.Schema.user_id_field(@changeset) %>
-        <%= error_tag f, Pow.Ecto.Schema.user_id_field(@changeset) %>
-
-        <%= label f, :password %>
-        <%= password_input f, :password %>
-        <%= error_tag f, :password %>
-
-        <div>
-          <%= submit "Sign in" %>
-        </div>
-      <% end %>
+    section.hero.is-primary.is-fullheight
+      .hero-body
+        .container
+          .columns.is-centered
+            .column.is-10-tablet.is-8-desktop.is-6-widescreen
+              = form_for @changeset, path, [class: "box", as: :user], fn f ->
+                .field
+                = label f, Pow.Ecto.Schema.user_id_field(@changeset), class: "label"
+                  .control.has-icons-left
+                    = email_input f, Pow.Ecto.Schema.user_id_field(@changeset), class: "input"
+                    span.icon.is-small.is-left
+                      i.fa.fa-envelope
+                .field
+                  = label f, :password, class: "label"
+                  .control.has-icons-left
+                    = password_input f, :password, class: "input"
+                    = error_tag f, :password
+                    span.icon.is-small.is-left
+                      i.fa.fa-lock
+                .field
+                  = submit "Sign in", class: "button is-success"
+            </form>
     """
   end
 end
