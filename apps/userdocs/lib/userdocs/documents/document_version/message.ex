@@ -1,16 +1,17 @@
 defmodule UserDocs.DocumentVersion.Messages do
 
   alias UserDocs.Documents
+  alias UserDocs.Projects
   alias UserDocs.Documents.DocumentVersion
   alias UserDocs.Helpers
 
   def new_modal_menu(socket, params) do
-    required_keys = [ :document_id, :version_id, :documents, :versions, :channel]
+    required_keys = [ :document_id, :version_id, :documents, :versions, :channel, :state_opts]
     params = Helpers.validate_params(params, required_keys, __MODULE__)
 
     %{ target: "ModalMenus" }
     |> init(socket, params.document_id, params.version_id, params.documents, params.versions, params.channel)
-    |> new(socket)
+    |> new(socket, params.document_id, params.version_id, params.state_opts)
   end
 
   def edit_modal_menu(socket, params) do
@@ -28,9 +29,13 @@ defmodule UserDocs.DocumentVersion.Messages do
     |> Map.put(:title, "Edit Document Version")
   end
 
-  defp new(message, _socket) do
+  defp new(message, socket, document_id, version_id, state_opts) do
+    document = Documents.get_document!(document_id, socket, state_opts)
+    version = Projects.get_version!(version_id, socket, state_opts)
+    name = document.title <>" (" <> version.name <> ")"
+
     message
-    |> Map.put(:object, %DocumentVersion{})
+    |> Map.put(:object, %DocumentVersion{ name: name })
     |> Map.put(:action, :new)
     |> Map.put(:title, "New Document Version")
   end
