@@ -18,11 +18,6 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
   end
 
   def display_image(assigns, docubit) do
-    IO.inspect(docubit)
-    { status, docubit } =
-      { :ok, docubit }
-      |> maybe_file()
-
     content_tag(:img, "", handle_opts(assigns, docubit))
   end
 
