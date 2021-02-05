@@ -34,6 +34,7 @@ defmodule StateHandlers.StateFixtures do
     docubit_types = DocubitFixtures.create_docubit_types()
     dv1 = DocumentFixtures.document_version(document.id, v1.id)
     dv2 = DocumentFixtures.document_version(document.id, v2.id)
+    dv3 = DocumentFixtures.document_version(document.id, v2.id)
 
     %{}
     |> StateHandlers.initialize(opts)
@@ -44,7 +45,7 @@ defmodule StateHandlers.StateFixtures do
     |> StateHandlers.load([v1, v2], Version, opts)
     |> StateHandlers.load(docubit_types, DocubitType, opts)
     |> StateHandlers.load([document], Document, opts)
-    |> StateHandlers.load([dv1, dv2], DocumentVersion, opts)
+    |> StateHandlers.load([dv1, dv2, dv3], DocumentVersion, opts)
   end
 end
 
@@ -59,8 +60,19 @@ defmodule StateHandlersTest do
     alias UserDocs.ProjectsFixtures
     alias UserDocs.DocumentVersionFixtures, as: DocumentFixtures
     alias StateHandlers.StateFixtures
+    alias UserDocs.Documents
     alias UserDocs.Documents.Document
     alias UserDocs.Documents.DocumentVersion
+
+    def broadcaster(channel, action, data) do
+      IO.inspect("Broadcasting")
+      IO.inspect(channel)
+      IO.inspect(action)
+      case data do
+        [ object | _ ] -> IO.inspect(object.__meta__.schema)
+        object -> IO.inspect(object.__meta__.schema)
+      end
+    end
 
     test "StateHandlers.Initialize" do
       state_opts = [
@@ -169,6 +181,7 @@ defmodule StateHandlersTest do
       state = StateFixtures.state(opts)
       data = StateHandlers.list(state, Document, opts)
       test = StateHandlers.preload(state, data, opts[:preloads], opts)
+      assert state.data.document_versions == Enum.at(test, 0) |> Map.get(:document_versions)
     end
 
     test "StateHandlers.Preload loads BelongsTo has_one relationships" do
@@ -190,25 +203,23 @@ defmodule StateHandlersTest do
       assert result |> Enum.at(0) |> Map.get(:document_versions) == expected_result
     end
 
-    test "StateHandlers.List orders a result" do
-      users = [ user_one = UsersFixtures.user(), user_two = UsersFixtures.user() ]
-      opts = [ types: [User], data_type: :list, strategy: :by_type, order: [ %{ field: :id, order: :desc } ] ]
-      state = %{} |> StateHandlers.initialize(opts) |> StateHandlers.load(users, User, opts)
-      result = StateHandlers.list(state, User, opts)
-      assert result = [ user_two, user_one ]
-    end
-
     test "StateHandlers.Preload loads and orders nested relationships" do
       opts = [ data_type: :list, strategy: :by_type, location: :data,
-        preloads: [ :document_versions ],
-        order: [ %{ field: :id, order: :asc }, document_versions: %{ field: :id, order: :desc }]
+        preloads: [
+          :documents,
+          [ documents: :document_versions ],
+          ],
+        order: [
+          %{ field: :id, order: :asc },
+          documents: %{ field: :id, order: :desc },
+          documents: [ document_versions: %{ field: :id, order: :asc } ]
+        ]
       ]
       state = StateFixtures.state(opts)
       project_id = StateHandlers.list(state, Project, opts) |> Enum.at(0) |> Map.get(:id)
-      data = StateHandlers.list(state, Document, Keyword.put(opts, :filter, { :project_id, project_id }))
-      expected_result = StateHandlers.list(state, DocumentVersion, opts)
-      result = StateHandlers.preload(state, data, opts[:preloads], opts)
-      assert Enum.at(result, 0) |> Map.get(:document_versions) == Enum.reverse(expected_result)
+      data = StateHandlers.list(state, Project, opts)
+      test = StateHandlers.preload(state, data, opts[:preloads], opts)
+      IO.inspect(test)
     end
 
     test "StateHandlers.Preload ignores nested ordering for invalid preloads" do
@@ -272,5 +283,61 @@ defmodule StateHandlersTest do
         end
       )
     end
+
+    test "StateHandlers.List orders a result" do
+      users = [ user_one = UsersFixtures.user(), user_two = UsersFixtures.user() ]
+      opts = [ types: [User], data_type: :list, strategy: :by_type, order: [ %{ field: :id, order: :desc } ] ]
+      state = %{} |> StateHandlers.initialize(opts) |> StateHandlers.load(users, User, opts)
+      result = StateHandlers.list(state, User, opts)
+      assert result = [ user_two, user_one ]
+    end
+
+  test "StateHandlers.Upsert updates a record" do
+    list_data = Enum.map(1..2, fn(_) -> UsersFixtures.user() end)
+    opts = [ data_type: :list, strategy: :by_type ]
+    initial_state = %{ users: list_data }
+    user = StateHandlers.list(initial_state, User, opts) |> Enum.at(0) |> Map.put(:email, "test@test.com")
+    result = StateHandlers.upsert(initial_state, user, opts) |> Map.get(:users) |> Enum.at(0)
+    assert result.email == "test@test.com"
+  end
+
+  test "StateHandlers.Upsert creates a record" do
+    list_data = Enum.map(1..2, fn(_) -> UsersFixtures.user() end)
+    opts = [ data_type: :list, strategy: :by_type ]
+    initial_state = %{ users: list_data }
+    user = StateHandlers.list(initial_state, User, opts) |> Enum.at(0) |> Map.put(:email, "test@test.com")
+    result = StateHandlers.upsert(initial_state, user, opts) |> Map.get(:users) |> Enum.at(0)
+    assert result.email == "test@test.com"
+  end
+
+  test "StateHandlers broadcast" do
+    list_data = Enum.map(1..2, fn(_) -> UsersFixtures.user() end)
+    opts = [
+      data_type: :list,
+      strategy: :by_type,
+      broadcast: true,
+      action: "update",
+      broadcast_function: &broadcaster/3,
+      channel: :test_broadcast
+    ]
+    initial_state = %{ users: list_data }
+    user = StateHandlers.list(initial_state, User, opts) |> Enum.at(0) |> Map.put(:email, "test@test.com")
+    result = StateHandlers.broadcast(initial_state, user, opts)
+  end
+
+  test "StateHandlers broadcast related data" do
+    opts = [
+      data_type: :list,
+      strategy: :by_type,
+      broadcast: true,
+      broadcast_function: &broadcaster/3,
+      channel: :test_broadcast,
+      action: "update",
+      preloads: [ :document_versions ]
+    ]
+    state = StateFixtures.state(opts)
+    data = StateHandlers.list(state, Document, opts)
+    test = StateHandlers.preload(state, data, opts[:preloads], opts) |> Enum.at(0)
+    result = StateHandlers.broadcast(state, test, opts)
   end
 end
