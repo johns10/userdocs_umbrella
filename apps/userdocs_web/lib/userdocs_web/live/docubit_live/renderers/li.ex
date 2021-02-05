@@ -36,15 +36,15 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Li do
 
   def render(assigns) do
     ~L"""
-      <<%= outer_tag(assigns) %>
-        <%= for {key, value} <- li_opts(@docubit) do %>
-          <%= key %>="<%= value %>"
-        <% end %>>
-        <%= Base.maybe_render_prefix(@content) %>
-        <%= @content.body %>
-        <%= Base.render_inner_content(assigns) %>
-        <%= AddDocubitOptions.render(assigns) %>
-      </li>
+    <%= outer_tag(assigns) %>
+      <%= for {key, value} <- li_opts(@docubit) do %>
+        <%= key %>="<%= value %>"
+      <% end %>>
+      <%= Base.maybe_render_prefix(@content) %>
+      <%= @content.body %>
+      <%= Base.render_inner_content(assigns) %>
+      <%= AddDocubitOptions.render(assigns) %>
+    </li>
     """
   end
 
