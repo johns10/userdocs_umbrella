@@ -55,3 +55,8 @@ config :cors_plug,
   ],
   max_age: 86400,
   methods: ["GET", "PUT", "POST", "OPTIONS"]
+
+config :phoenix, :template_engines,
+  slim: PhoenixSlime.Engine,
+  slime: PhoenixSlime.Engine,
+  slimleex: PhoenixSlime.LiveViewEngine
