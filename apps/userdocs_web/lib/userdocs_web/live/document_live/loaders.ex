@@ -20,18 +20,18 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
     Documents.load_docubit_types(socket, opts)
   end
 
-  def load_pages(socket, opts) do
+  def load_pages(%{ assigns: %{ current_version_id: current_version_id }} = socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version: socket.assigns.current_version_id})
+      |> Keyword.put(:filters, %{version: current_version_id})
 
     Web.load_pages(socket, opts)
   end
 
-  def load_processes(socket, opts) do
+  def load_processes(%{ assigns: %{ current_version_id: current_version_id }} = socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version: socket.assigns.current_version_id})
+      |> Keyword.put(:filters, %{version: current_version_id})
 
     Automation.load_processes(socket, opts)
   end
