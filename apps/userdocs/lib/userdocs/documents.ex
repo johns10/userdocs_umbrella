@@ -295,6 +295,42 @@ defmodule UserDocs.Documents do
     |> Repo.one!()
   end
 
+  def prepare_document_version(id) do
+    DocumentVersion
+    |> where([ dv ], dv.id == ^id)
+    |> join(:left, [ dv ], d in UserDocs.Documents.Docubit, on: d.document_version_id == dv.id, as: :docubits)
+    |> join(:left, [ dv, docubits: d ], c in UserDocs.Documents.Content, on: d.content_id == c.id, as: :content)
+    |> join(:left, [ dv, content: c], cv in UserDocs.Documents.ContentVersion, on: cv.content_id == c.id, as: :content_versions)
+    |> join(:left, [ dv, docubits: d ], f in UserDocs.Media.File, on: d.file_id == f.id, as: :files)
+    |> join(:left, [ dv, docubits: d ], a in UserDocs.Web.Annotation, on: d.through_annotation_id == a.id, as: :annotations)
+    |> join(:left, [ dv, docubits: d ], s in UserDocs.Automation.Step, on: d.through_step_id == s.id, as: :steps)
+    |> join(:left, [ dv, docubits: d ], dt in UserDocs.Documents.DocubitType, on: d.docubit_type_id == dt.id, as: :docubit_types)
+    |> preload(
+      [
+        dv,
+        docubits: d,
+        content: c,
+        files: f,
+        annotations: a,
+        steps: s,
+        docubit_types: dt,
+        content_versions: cv
+      ],
+      [ docubits:
+        {
+          d,
+          content: {
+            c, content_versions: cv
+          },
+          file: f,
+          through_annotation: a,
+          through_step: s,
+          docubit_type: dt
+        }
+      ])
+    |> Repo.one!()
+  end
+
   defp maybe_preload_document_version(document_versions, nil, _, _), do: document_versions
   defp maybe_preload_document_version(document_versions, _preloads, state, opts) do
     opts = Keyword.delete(opts, :filter)
