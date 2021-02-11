@@ -240,17 +240,17 @@
     }
 
     n.r(t), n.d(t, "Channel", function () {
-      return A;
+      return _;
     }), n.d(t, "Serializer", function () {
-      return M;
-    }), n.d(t, "Socket", function () {
-      return J;
-    }), n.d(t, "LongPoll", function () {
       return H;
-    }), n.d(t, "Ajax", function () {
+    }), n.d(t, "Socket", function () {
+      return U;
+    }), n.d(t, "LongPoll", function () {
       return D;
+    }), n.d(t, "Ajax", function () {
+      return M;
     }), n.d(t, "Presence", function () {
-      return B;
+      return N;
     });
 
     var l = "undefined" != typeof self ? self : null,
@@ -265,21 +265,21 @@
         b = "joined",
         j = "joining",
         C = "leaving",
-        R = "phx_close",
-        S = "phx_error",
+        E = "phx_close",
+        R = "phx_error",
         T = "phx_join",
-        w = "phx_reply",
-        E = "phx_leave",
-        x = [R, S, T, w, E],
-        O = "longpoll",
-        P = "websocket",
-        L = function (e) {
+        S = "phx_reply",
+        w = "phx_leave",
+        A = [E, R, T, S, w],
+        L = "longpoll",
+        x = "websocket",
+        O = function (e) {
       if ("function" == typeof e) return e;
       return function () {
         return e;
       };
     },
-        _ = function () {
+        P = function () {
       function e(t, n, i, o) {
         c(this, e), this.channel = t, this.event = n, this.payload = i || function () {
           return {};
@@ -362,10 +362,10 @@
         }
       }]), e;
     }(),
-        A = function () {
+        _ = function () {
       function e(t, n, i) {
         var o = this;
-        c(this, e), this.state = g, this.topic = t, this.params = L(n || {}), this.socket = i, this.bindings = [], this.bindingRef = 0, this.timeout = this.socket.timeout, this.joinedOnce = !1, this.joinPush = new _(this, T, this.params, this.timeout), this.pushBuffer = [], this.stateChangeRefs = [], this.rejoinTimer = new I(function () {
+        c(this, e), this.state = g, this.topic = t, this.params = O(n || {}), this.socket = i, this.bindings = [], this.bindingRef = 0, this.timeout = this.socket.timeout, this.joinedOnce = !1, this.joinPush = new P(this, T, this.params, this.timeout), this.pushBuffer = [], this.stateChangeRefs = [], this.rejoinTimer = new J(function () {
           o.socket.isConnected() && o.rejoin();
         }, this.socket.rejoinAfterMs), this.stateChangeRefs.push(this.socket.onError(function () {
           return o.rejoinTimer.reset();
@@ -382,8 +382,8 @@
         }), this.onError(function (e) {
           o.socket.hasLogger() && o.socket.log("channel", "error ".concat(o.topic), e), o.isJoining() && o.joinPush.reset(), o.state = k, o.socket.isConnected() && o.rejoinTimer.scheduleTimeout();
         }), this.joinPush.receive("timeout", function () {
-          o.socket.hasLogger() && o.socket.log("channel", "timeout ".concat(o.topic, " (").concat(o.joinRef(), ")"), o.joinPush.timeout), new _(o, E, L({}), o.timeout).send(), o.state = k, o.joinPush.reset(), o.socket.isConnected() && o.rejoinTimer.scheduleTimeout();
-        }), this.on(w, function (e, t) {
+          o.socket.hasLogger() && o.socket.log("channel", "timeout ".concat(o.topic, " (").concat(o.joinRef(), ")"), o.joinPush.timeout), new P(o, w, O({}), o.timeout).send(), o.state = k, o.joinPush.reset(), o.socket.isConnected() && o.rejoinTimer.scheduleTimeout();
+        }), this.on(S, function (e, t) {
           o.trigger(o.replyEventName(t), e);
         });
       }
@@ -398,12 +398,12 @@
       }, {
         key: "onClose",
         value: function (e) {
-          this.on(R, e);
+          this.on(E, e);
         }
       }, {
         key: "onError",
         value: function (e) {
-          return this.on(S, function (t) {
+          return this.on(R, function (t) {
             return e(t);
           });
         }
@@ -434,7 +434,7 @@
         value: function (e, t) {
           var n = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : this.timeout;
           if (!this.joinedOnce) throw new Error("tried to push '".concat(e, "' to '").concat(this.topic, "' before joining. Use channel.join() before pushing events"));
-          var i = new _(this, e, function () {
+          var i = new P(this, e, function () {
             return t;
           }, n);
           return this.canPush() ? i.send() : (i.startTimeout(), this.pushBuffer.push(i)), i;
@@ -447,9 +447,9 @@
           this.rejoinTimer.reset(), this.joinPush.cancelTimeout(), this.state = C;
 
           var n = function () {
-            e.socket.hasLogger() && e.socket.log("channel", "leave ".concat(e.topic)), e.trigger(R, "leave");
+            e.socket.hasLogger() && e.socket.log("channel", "leave ".concat(e.topic)), e.trigger(E, "leave");
           },
-              i = new _(this, E, L({}), t);
+              i = new P(this, w, O({}), t);
 
           return i.receive("ok", function () {
             return n();
@@ -465,7 +465,7 @@
       }, {
         key: "isLifecycleEvent",
         value: function (e) {
-          return x.indexOf(e) >= 0;
+          return A.indexOf(e) >= 0;
         }
       }, {
         key: "isMember",
@@ -532,12 +532,21 @@
         }
       }]), e;
     }(),
-        M = {
+        H = {
+      HEADER_LENGTH: 1,
+      META_LENGTH: 4,
+      KINDS: {
+        push: 0,
+        reply: 1,
+        broadcast: 2
+      },
       encode: function (e, t) {
+        if (e.payload.constructor === ArrayBuffer) return t(this.binaryEncode(e));
         var n = [e.join_ref, e.ref, e.topic, e.event, e.payload];
         return t(JSON.stringify(n));
       },
       decode: function (e, t) {
+        if (e.constructor === ArrayBuffer) return t(this.binaryDecode(e));
         var n = r(JSON.parse(e), 5);
         return t({
           join_ref: n[0],
@@ -546,9 +555,106 @@
           event: n[3],
           payload: n[4]
         });
+      },
+      binaryEncode: function (e) {
+        var t = e.join_ref,
+            n = e.ref,
+            i = e.event,
+            o = e.topic,
+            r = e.payload,
+            s = this.META_LENGTH + t.length + n.length + o.length + i.length,
+            a = new ArrayBuffer(this.HEADER_LENGTH + s),
+            c = new DataView(a),
+            u = 0;
+        c.setUint8(u++, this.KINDS.push), c.setUint8(u++, t.length), c.setUint8(u++, n.length), c.setUint8(u++, o.length), c.setUint8(u++, i.length), Array.from(t, function (e) {
+          return c.setUint8(u++, e.charCodeAt(0));
+        }), Array.from(n, function (e) {
+          return c.setUint8(u++, e.charCodeAt(0));
+        }), Array.from(o, function (e) {
+          return c.setUint8(u++, e.charCodeAt(0));
+        }), Array.from(i, function (e) {
+          return c.setUint8(u++, e.charCodeAt(0));
+        });
+        var h = new Uint8Array(a.byteLength + r.byteLength);
+        return h.set(new Uint8Array(a), 0), h.set(new Uint8Array(r), a.byteLength), h.buffer;
+      },
+      binaryDecode: function (e) {
+        var t = new DataView(e),
+            n = t.getUint8(0),
+            i = new TextDecoder();
+
+        switch (n) {
+          case this.KINDS.push:
+            return this.decodePush(e, t, i);
+
+          case this.KINDS.reply:
+            return this.decodeReply(e, t, i);
+
+          case this.KINDS.broadcast:
+            return this.decodeBroadcast(e, t, i);
+        }
+      },
+      decodePush: function (e, t, n) {
+        var i = t.getUint8(1),
+            o = t.getUint8(2),
+            r = t.getUint8(3),
+            s = this.HEADER_LENGTH + this.META_LENGTH - 1,
+            a = n.decode(e.slice(s, s + i));
+        s += i;
+        var c = n.decode(e.slice(s, s + o));
+        s += o;
+        var u = n.decode(e.slice(s, s + r));
+        return s += r, {
+          join_ref: a,
+          ref: null,
+          topic: c,
+          event: u,
+          payload: e.slice(s, e.byteLength)
+        };
+      },
+      decodeReply: function (e, t, n) {
+        var i = t.getUint8(1),
+            o = t.getUint8(2),
+            r = t.getUint8(3),
+            s = t.getUint8(4),
+            a = this.HEADER_LENGTH + this.META_LENGTH,
+            c = n.decode(e.slice(a, a + i));
+        a += i;
+        var u = n.decode(e.slice(a, a + o));
+        a += o;
+        var h = n.decode(e.slice(a, a + r));
+        a += r;
+        var l = n.decode(e.slice(a, a + s));
+        a += s;
+        var f = e.slice(a, e.byteLength);
+        return {
+          join_ref: c,
+          ref: u,
+          topic: h,
+          event: S,
+          payload: {
+            status: l,
+            response: f
+          }
+        };
+      },
+      decodeBroadcast: function (e, t, n) {
+        var i = t.getUint8(1),
+            o = t.getUint8(2),
+            r = this.HEADER_LENGTH + 2,
+            s = n.decode(e.slice(r, r + i));
+        r += i;
+        var a = n.decode(e.slice(r, r + o));
+        return r += o, {
+          join_ref: null,
+          ref: null,
+          topic: s,
+          event: a,
+          payload: e.slice(r, e.byteLength)
+        };
       }
     },
-        J = function () {
+        U = function () {
       function e(t) {
         var n = this,
             i = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {};
@@ -557,13 +663,13 @@
           close: [],
           error: [],
           message: []
-        }, this.channels = [], this.sendBuffer = [], this.ref = 0, this.timeout = i.timeout || 1e4, this.transport = i.transport || d.WebSocket || H, this.defaultEncoder = M.encode, this.defaultDecoder = M.decode, this.closeWasClean = !1, this.unloaded = !1, this.binaryType = i.binaryType || "arraybuffer", this.transport !== H ? (this.encode = i.encode || this.defaultEncoder, this.decode = i.decode || this.defaultDecoder) : (this.encode = this.defaultEncoder, this.decode = this.defaultDecoder), f && f.addEventListener && f.addEventListener("unload", function (e) {
+        }, this.channels = [], this.sendBuffer = [], this.ref = 0, this.timeout = i.timeout || 1e4, this.transport = i.transport || d.WebSocket || D, this.defaultEncoder = H.encode.bind(H), this.defaultDecoder = H.decode.bind(H), this.closeWasClean = !1, this.unloaded = !1, this.binaryType = i.binaryType || "arraybuffer", this.transport !== D ? (this.encode = i.encode || this.defaultEncoder, this.decode = i.decode || this.defaultDecoder) : (this.encode = this.defaultEncoder, this.decode = this.defaultDecoder), f && f.addEventListener && f.addEventListener("unload", function (e) {
           n.conn && (n.unloaded = !0, n.abnormalClose("unloaded"));
         }), this.heartbeatIntervalMs = i.heartbeatIntervalMs || 3e4, this.rejoinAfterMs = function (e) {
           return i.rejoinAfterMs ? i.rejoinAfterMs(e) : [1e3, 2e3, 5e3][e - 1] || 1e4;
         }, this.reconnectAfterMs = function (e) {
           return n.unloaded ? 100 : i.reconnectAfterMs ? i.reconnectAfterMs(e) : [10, 50, 100, 150, 200, 250, 500, 1e3, 2e3][e - 1] || 5e3;
-        }, this.logger = i.logger || null, this.longpollerTimeout = i.longpollerTimeout || 2e4, this.params = L(i.params || {}), this.endPoint = "".concat(t, "/").concat(P), this.vsn = i.vsn || "2.0.0", this.heartbeatTimer = null, this.pendingHeartbeatRef = null, this.reconnectTimer = new I(function () {
+        }, this.logger = i.logger || null, this.longpollerTimeout = i.longpollerTimeout || 2e4, this.params = O(i.params || {}), this.endPoint = "".concat(t, "/").concat(x), this.vsn = i.vsn || "2.0.0", this.heartbeatTimer = null, this.pendingHeartbeatRef = null, this.reconnectTimer = new J(function () {
           n.teardown(function () {
             return n.connect();
           });
@@ -578,7 +684,7 @@
       }, {
         key: "endPointURL",
         value: function () {
-          var e = D.appendParams(D.appendParams(this.endPoint, this.params()), {
+          var e = M.appendParams(M.appendParams(this.endPoint, this.params()), {
             vsn: this.vsn
           });
           return "/" !== e.charAt(0) ? e : "/" === e.charAt(1) ? "".concat(this.protocol(), ":").concat(e) : "".concat(this.protocol(), "://").concat(location.host).concat(e);
@@ -592,7 +698,7 @@
         key: "connect",
         value: function (e) {
           var t = this;
-          e && (console && console.log("passing params to connect is deprecated. Instead pass :params to the Socket constructor"), this.params = L(e)), this.conn || (this.closeWasClean = !1, this.conn = new this.transport(this.endPointURL()), this.conn.binaryType = this.binaryType, this.conn.timeout = this.longpollerTimeout, this.conn.onopen = function () {
+          e && (console && console.log("passing params to connect is deprecated. Instead pass :params to the Socket constructor"), this.params = O(e)), this.conn || (this.closeWasClean = !1, this.conn = new this.transport(this.endPointURL()), this.conn.binaryType = this.binaryType, this.conn.timeout = this.longpollerTimeout, this.conn.onopen = function () {
             return t.onConnOpen();
           }, this.conn.onerror = function (e) {
             return t.onConnError(e);
@@ -698,7 +804,7 @@
         key: "triggerChanError",
         value: function () {
           this.channels.forEach(function (e) {
-            e.isErrored() || e.isLeaving() || e.isClosed() || e.trigger(S);
+            e.isErrored() || e.isLeaving() || e.isClosed() || e.trigger(R);
           });
         }
       }, {
@@ -742,7 +848,7 @@
         key: "channel",
         value: function (e) {
           var t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {},
-              n = new A(e, t, this);
+              n = new _(e, t, this);
           return this.channels.push(n), n;
         }
       }, {
@@ -789,7 +895,7 @@
       }, {
         key: "abnormalClose",
         value: function (e) {
-          this.closeWasClean = !1, this.conn.close(1e3, e);
+          this.closeWasClean = !1, this.conn.readyState === v && this.conn.close(1e3, e);
         }
       }, {
         key: "flushSendBuffer",
@@ -830,7 +936,7 @@
         }
       }]), e;
     }(),
-        H = function () {
+        D = function () {
       function e(t) {
         c(this, e), this.endPoint = null, this.token = null, this.skipHeartbeat = !0, this.onopen = function () {}, this.onerror = function () {}, this.onmessage = function () {}, this.onclose = function () {}, this.pollEndpoint = this.normalizeEndpoint(t), this.readyState = p, this.poll();
       }
@@ -838,12 +944,12 @@
       return h(e, [{
         key: "normalizeEndpoint",
         value: function (e) {
-          return e.replace("ws://", "http://").replace("wss://", "https://").replace(new RegExp("(.*)/" + P), "$1/" + O);
+          return e.replace("ws://", "http://").replace("wss://", "https://").replace(new RegExp("(.*)/" + x), "$1/" + L);
         }
       }, {
         key: "endpointURL",
         value: function () {
-          return D.appendParams(this.pollEndpoint, {
+          return M.appendParams(this.pollEndpoint, {
             token: this.token
           });
         }
@@ -861,7 +967,7 @@
         key: "poll",
         value: function () {
           var e = this;
-          this.readyState !== v && this.readyState !== p || D.request("GET", this.endpointURL(), "application/json", null, this.timeout, this.ontimeout.bind(this), function (t) {
+          this.readyState !== v && this.readyState !== p || M.request("GET", this.endpointURL(), "application/json", null, this.timeout, this.ontimeout.bind(this), function (t) {
             if (t) {
               var n = t.status,
                   i = t.token,
@@ -904,7 +1010,7 @@
         key: "send",
         value: function (e) {
           var t = this;
-          D.request("POST", this.endpointURL(), "application/json", e, this.timeout, this.onerror.bind(this, "timeout"), function (e) {
+          M.request("POST", this.endpointURL(), "application/json", e, this.timeout, this.onerror.bind(this, "timeout"), function (e) {
             e && 200 === e.status || (t.onerror(e && e.status), t.closeAndRetry());
           });
         }
@@ -915,7 +1021,7 @@
         }
       }]), e;
     }(),
-        D = function () {
+        M = function () {
       function e() {
         c(this, e);
       }
@@ -987,11 +1093,11 @@
       }]), e;
     }();
 
-    D.states = {
+    M.states = {
       complete: 4
     };
 
-    var B = function () {
+    var N = function () {
       function e(t) {
         var n = this,
             i = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {};
@@ -1135,7 +1241,7 @@
         }
       }]), e;
     }(),
-        I = function () {
+        J = function () {
       function e(t, n) {
         c(this, e), this.callback = t, this.timerCalc = n, this.timer = null, this.tries = 0;
       }
