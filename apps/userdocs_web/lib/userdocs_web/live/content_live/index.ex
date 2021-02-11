@@ -14,9 +14,12 @@ defmodule UserDocsWeb.ContentLive.Index do
   alias UserDocsWeb.Loaders
   alias UserDocsWeb.ModalMenus
 
+  @types [ Content, ContentVersion, LanguageCode ]
+
   defp base_opts() do
     Defaults.state_opts
     |> Keyword.put(:location, :data)
+    |> Keyword.put(:types, @types)
   end
 
   defp state_opts(socket) do
@@ -30,7 +33,6 @@ defmodule UserDocsWeb.ContentLive.Index do
   def mount(_params, session, socket) do
     opts =
       base_opts()
-      |> Keyword.put(:types, [  Content, ContentVersion, LanguageCode ])
 
     {:ok,
       socket
