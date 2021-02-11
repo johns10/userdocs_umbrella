@@ -59,9 +59,12 @@ defmodule StateHandlers.Broadcast do
     Logger.warn("Association Data nil")
   end
   def handle_association(channel, action, data, opts) do
-    Logger.debug("Handling Association #{data.__meta__.schema}")
     broadcaster = opts[:broadcast_function]
-    broadcaster.(channel, action, data)
+    case data do
+      [ _ | _ ] -> broadcaster.(channel, action, %{ objects: data })
+      data -> broadcaster.(channel, action, data)
+    end
+
   end
 
   def associations(object), do: object.__meta__.schema.__schema__(:associations)
