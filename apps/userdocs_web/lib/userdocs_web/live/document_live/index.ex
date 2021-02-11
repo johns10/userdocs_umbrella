@@ -9,9 +9,13 @@ defmodule UserDocsWeb.DocumentLive.Index do
   alias UserDocsWeb.Root
   alias UserDocsWeb.Defaults
 
+
+  @types [ UserDocs.Documents.Document, UserDocs.Documents.DocumentVersion ]
+
   defp base_opts() do
     Defaults.state_opts()
     |> Keyword.put(:location, :data)
+    |> Keyword.put(:types, @types)
   end
 
   defp state_opts(socket) do
@@ -34,8 +38,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
 
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
     socket
-    |> (&(assign(&1, :data, Map.put(&1.assigns.data, :documents, [])))).()
-    |> (&(assign(&1, :data, Map.put(&1.assigns.data, :document_versions, [])))).()
+    |> StateHandlers.initialize(base_opts())
     |> load_document_versions()
     |> load_documents()
     |> prepare_documents()
@@ -86,7 +89,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
       |> Map.put(:team, UserDocs.Users.get_team!(socket.assigns.current_team_id, socket, state_opts(socket)))
       |> Map.put(:projects, socket.assigns.data.projects)
       |> Map.put(:channel, Defaults.channel(socket))
-      |> Map.put(:opts, state_opts(socket))
+      |> Map.put(:state_opts, state_opts(socket))
 
     Root.handle_event(n, params, socket)
   end
