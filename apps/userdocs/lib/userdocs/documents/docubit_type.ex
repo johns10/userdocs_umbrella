@@ -40,7 +40,8 @@ defmodule UserDocs.Documents.DocubitType do
       ol_attrs(),
       img_attrs(),
       li_attrs(),
-      ul_attrs()
+      ul_attrs(),
+      info_attrs()
     ]
   end
 
