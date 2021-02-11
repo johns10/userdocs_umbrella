@@ -50,7 +50,7 @@ defmodule UserDocsWeb.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:pow, "~> 1.0.21"},
+      {:pow, "~> 1.0.22"},
       {:uuid, "~> 1.1"},
       {:dialyxir, "~> 0.5.0", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
