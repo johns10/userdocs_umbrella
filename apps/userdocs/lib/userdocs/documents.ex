@@ -123,7 +123,6 @@ defmodule UserDocs.Documents do
     content
     |> Content.changeset(attrs)
     |> Repo.update()
-    |> Subscription.broadcast("content", "update")
   end
 
   @doc """
@@ -516,7 +515,6 @@ defmodule UserDocs.Documents do
     %ContentVersion{}
     |> ContentVersion.changeset(attrs)
     |> Repo.insert()
-    |> Subscription.broadcast("content_version", "create")
   end
 
   @doc """
@@ -535,7 +533,6 @@ defmodule UserDocs.Documents do
     content_version
     |> ContentVersion.changeset(attrs)
     |> Repo.update()
-    |> Subscription.broadcast("content_version", "update")
   end
 
   @doc """
@@ -553,7 +550,6 @@ defmodule UserDocs.Documents do
   def delete_content_version(%ContentVersion{} = content_version) do
     content_version
     |> Repo.delete()
-    |> Subscription.broadcast("content_version", "delete")
   end
 
   @doc """
