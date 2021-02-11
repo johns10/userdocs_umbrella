@@ -14,37 +14,43 @@ defmodule UserDocsWeb.SessionController do
       {:ok, conn} ->
         conn
         |> put_flash(:info, "Welcome back!")
-        |> redirect(to: referer_path(conn))
+        |> redirect(to: maybe_referer_path(conn))
 
       {:error, conn} ->
         changeset = Pow.Plug.change_user(conn, conn.params["user"])
 
         conn
         |> put_flash(:info, "Invalid email or password")
-        |> redirect(to: referer_path(conn))
+        |> redirect(to: maybe_referer_path(conn))
     end
   end
 
   def delete(conn, _params) do
-    IO.inspect("Deleting")
     conn
     |> Pow.Plug.delete()
-    |> redirect(to: referer_path(conn))
+    |> redirect(to: maybe_referer_path(conn))
   end
 
-  def referer_path(conn) do
-    { "referer", url} =
+  def maybe_referer_path(conn) do
+    referers =
       conn
       |> Map.get(:req_headers)
       |> Enum.filter(fn({k,_}) -> k == "referer" end)
-      |> Enum.at(0)
 
-    { "origin", origin} =
+    origins =
       conn
       |> Map.get(:req_headers)
       |> Enum.filter(fn({k,_}) -> k == "origin" end)
-      |> Enum.at(0)
 
+    case referers do
+      [ _ | _ ] -> referer_path(referers, origins)
+      [] -> "/index.html"
+    end
+  end
+
+  def referer_path(referers, origins) do
+    { "referer", url } = Enum.at(referers, 0)
+    { "origin", origin } = Enum.at(origins, 0)
     String.replace(url, origin, "")
   end
 end
