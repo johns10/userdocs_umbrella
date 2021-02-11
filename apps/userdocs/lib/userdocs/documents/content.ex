@@ -7,6 +7,7 @@ defmodule UserDocs.Documents.Content do
 
   schema "content" do
     field :name, :string
+    field :title, :string
     field :team_id, :id
 
     has_many :annotation, Annotation
@@ -18,7 +19,7 @@ defmodule UserDocs.Documents.Content do
   @doc false
   def changeset(content, attrs) do
     content
-    |> cast(attrs, [:name, :team_id])
+    |> cast(attrs, [:name, :title, :team_id])
     |> cast_assoc(:content_versions)
     |> foreign_key_constraint(:team_id)
     |> validate_required([:name, :team_id])
