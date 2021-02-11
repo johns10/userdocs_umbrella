@@ -92,14 +92,13 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
   end
 
   defp maybe_name_prefix(current_content, %Context{ settings: %{ name_prefix: true } }, content) do
-    Map.put(current_content, :prefix, content.name)
+    Map.put(current_content, :prefix, content.title)
   end
   defp maybe_name_prefix(current_content, %Context{ settings: %{ name_prefix: false } }, _) do
     Map.put(current_content, :prefix, nil)
   end
 
   defp maybe_title(current_content, %Context{ settings: %{ show_title: true } }, content) do
-    IO.puts("show title true")
     Map.put(current_content, :title, content.name)
   end
   defp maybe_title(current_content, %Context{ settings: %{ show_title: false } }, _) do
