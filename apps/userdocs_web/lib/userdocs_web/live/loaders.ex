@@ -3,10 +3,10 @@ defmodule UserDocsWeb.Loaders do
 
   alias UserDocs.Documents
 
-  def load_content(socket, opts) do
+  def load_content(%{ assigns: %{ current_team_id: current_team_id }} = socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{team_id: socket.assigns.current_team_id})
+      |> Keyword.put(:filters, %{team_id: current_team_id})
       |> Keyword.put(:params, %{ content_versions: true })
 
 
