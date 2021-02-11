@@ -40,18 +40,22 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
   end
   def maybe_content_name(header, _), do: header
 
+  def display_content_header(assigns, %Docubit{content: %Content{ name: name, content_versions: []}}) do
+    ": " <> name
+  end
   def display_content_header(assigns, %Docubit{content: %Content{} = content}) do
-
     content.content_versions
     |> maybe_content_versions(assigns.current_version_id)
     |> maybe_language_code(assigns.current_language_code_id)
     |> maybe_header(to_string(content.name), assigns.current_version_id)
   end
 
+  def display_content(assigns, %Docubit{content: %Content{ name: name, content_versions: []}}) do
+    %{body: "No Content versions or translations have been added to the #{name} content.", prefix: nil, title: nil}
+  end
   def display_content(_, %Docubit{content: nil}) do
     %{body: "No Content has been loaded to this Docubit", prefix: nil, title: nil}
   end
-
   def display_content(assigns, %Docubit{content: %Content{} = content} = docubit) do
     content.content_versions
     |> maybe_content_versions(assigns.current_version_id)
