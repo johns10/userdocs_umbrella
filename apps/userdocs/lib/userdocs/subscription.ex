@@ -35,7 +35,7 @@ defmodule UserDocs.Subscription do
     StateHandlers.delete(socket, payload, opts)
   end
   def handle_event(socket, "upsert" = _event, payload, opts) do
-    #IO.puts("Handling Event")
+    # IO.puts("Handling upsert Event")
     StateHandlers.upsert(socket, payload, opts)
   end
 end
