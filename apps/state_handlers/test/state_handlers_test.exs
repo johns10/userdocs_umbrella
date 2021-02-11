@@ -218,8 +218,7 @@ defmodule StateHandlersTest do
       state = StateFixtures.state(opts)
       project_id = StateHandlers.list(state, Project, opts) |> Enum.at(0) |> Map.get(:id)
       data = StateHandlers.list(state, Project, opts)
-      test = StateHandlers.preload(state, data, opts[:preloads], opts)
-      IO.inspect(test)
+      StateHandlers.preload(state, data, opts[:preloads], opts)
     end
 
     test "StateHandlers.Preload ignores nested ordering for invalid preloads" do
