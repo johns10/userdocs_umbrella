@@ -215,7 +215,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     case Automation.update_step(socket.assigns.step, remove_empty_associations(step_params)) do
       {:ok, step} ->
         send(self(), { :broadcast, "update", step })
-        IO.inspect(step)
         {
           :noreply,
           socket
@@ -228,12 +227,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   end
 
   defp save_step(socket, :new, step_params) do
-    case step_params["process_id"] do
-      "" -> step_params
-      id ->
-        process_id = String.to_integer(id)
-        Automation.get_process!(id, socket, socket.assigns.state_opts)
-    end
     # recent_navigated_to_page(process, step, assigns)
     case Automation.create_step(step_params) do
       {:ok, step} ->
