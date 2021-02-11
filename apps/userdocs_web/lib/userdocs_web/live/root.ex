@@ -163,12 +163,23 @@ defmodule UserDocsWeb.Root do
   end
 
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
-    #Logger.debug("Root handling info on topic #{topic}, event #{event}")
-    {
-      :noreply,
-      socket
-      |> UserDocs.Subscription.handle_event(event, payload, socket.assigns.state_opts)
-    }
+    Logger.debug("Root handling info on topic #{topic}, event #{event}, view: #{socket.view}")
+    schema = case payload do
+      %{ objects: [ object | _ ]} -> object.__meta__.schema
+      object -> object.__meta__.schema
+    end
+
+    case Keyword.get(socket.assigns.state_opts, :types) do
+      nil -> raise(RuntimeError, "Types not populated in calling subscribed view")
+      stuff -> ""
+    end
+
+    socket =
+      case schema in socket.assigns.state_opts[:types] do
+        true -> UserDocs.Subscription.handle_event(socket, event, payload, socket.assigns.state_opts)
+        false -> socket
+      end
+    { :noreply, socket }
   end
   def handle_info({:update_form_data, form_data}, socket) do
     { :noreply, assign(socket, :form_data, form_data )}
