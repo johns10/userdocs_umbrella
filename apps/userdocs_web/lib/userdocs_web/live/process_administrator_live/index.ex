@@ -32,7 +32,7 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
     UserDocs.Web.Element
   ]
 
-  @types_to_initialize [
+  @types [
     UserDocs.Web.AnnotationType,
     UserDocs.Web.Strategy,
     UserDocs.Documents.LanguageCode,
@@ -46,13 +46,24 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
     UserDocs.Web.Page
   ]
 
+  defp base_opts() do
+    UserDocsWeb.Defaults.state_opts()
+    |> Keyword.put(:location, :data)
+    |> Keyword.put(:types, @types)
+  end
+
+  defp state_opts(socket) do
+    base_opts()
+    |> Keyword.put(:broadcast, true)
+    |> Keyword.put(:channel, UserDocsWeb.Defaults.channel(socket))
+    |> Keyword.put(:broadcast_function, &UserDocsWeb.Endpoint.broadcast/3)
+  end
+
   @impl true
   def mount(_params, session, socket) do
     # Get Data from the Database
     Logger.debug("DB operations")
-    opts =
-      base_opts()
-      |> Keyword.put(:types, @types_to_initialize)
+    opts = base_opts()
 
     socket =
       socket
@@ -140,7 +151,6 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
     }
   end
   def handle_event("new-step" = name, %{ "process-id" => process_id }, socket) do
-    IO.inspect("New step")
     process_id = String.to_integer(process_id)
     opts = Keyword.put(socket.assigns.state_opts, :preloads, [ :steps ])
     params =
@@ -190,17 +200,5 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
       |> Keyword.put(:order, order)
 
     assign(socket, :current_version, Projects.get_version!(socket.assigns.current_version_id, socket, opts))
-  end
-
-  defp base_opts() do
-    UserDocsWeb.Defaults.state_opts()
-    |> Keyword.put(:location, :data)
-  end
-
-  defp state_opts(socket) do
-    base_opts()
-    |> Keyword.put(:broadcast, true)
-    |> Keyword.put(:channel, UserDocsWeb.Defaults.channel(socket))
-    |> Keyword.put(:broadcast_function, &UserDocsWeb.Endpoint.broadcast/3)
   end
 end
