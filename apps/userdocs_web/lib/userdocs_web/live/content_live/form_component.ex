@@ -45,6 +45,9 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
 
         <%= Layout.text_input(form, :name, [
           ], "control is-expanded") %>
+
+        <%= Layout.text_input(form, :title, [
+          ], "control is-expanded") %>
       </div>
       <%= inputs_for form, :content_versions, fn fcv -> %>
 
