@@ -18,6 +18,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
             current_version_id: @current_version_id,
             component: false,
             editor: false,
+            role: @role,
             docubit: docubit,
             content: Base.display_content(assigns, docubit),
             img_path: @img_path

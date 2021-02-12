@@ -109,6 +109,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
         <%= live_component(@socket, @renderer, [
           editor: true,
           component: true,
+          role: :editor,
           current_language_code_id: @current_language_code_id,
           current_version_id: @current_version_id,
           docubit: @docubit,
