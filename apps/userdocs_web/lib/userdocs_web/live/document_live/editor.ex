@@ -181,6 +181,14 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
     { :noreply, socket }
   end
+  def handle_info(%{topic: _, event: _, payload: %{ objects: [ %ContentVersion{} | _ ]}} = sub_data, socket) do
+    { :noreply, socket } = Root.handle_info(sub_data, socket)
+    { :noreply, prepare_content(socket) }
+  end
+  def handle_info(%{topic: _, event: _, payload: %Content{}} = sub_data, socket) do
+    { :noreply, socket } = Root.handle_info(sub_data, socket)
+    { :noreply, prepare_content(socket) }
+  end
   def handle_info(%{topic: topic, event: event, payload: %Docubit{} = docubit}, socket) do
     IO.puts("Handling Docubit Subscription")
     { :noreply, _ } = Root.handle_info(%{ topic: topic, event: event, payload: docubit }, socket)
