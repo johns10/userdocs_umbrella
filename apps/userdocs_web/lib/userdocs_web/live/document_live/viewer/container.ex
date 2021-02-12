@@ -6,7 +6,7 @@ defmodule UserDocsWeb.DocubitLive.Viewer.Container do
   def render(assigns) do
     ~L"""
       <div class="container">
-        <%= @inner_content.([]) %>
+        <%= render_block(@inner_block, %{}) %>
       </div>
     """
   end
