@@ -1,5 +1,5 @@
 import getCssSelector from 'css-selector-generator';
-import {handle_message} from "../../../process_administrator_web/assets/js/commands.js";
+import {handle_message} from "./commands.js"
 
 const getCssSelectorOptions = {
   selectors: ["class", "tag", "attribute", "nthchild"]
