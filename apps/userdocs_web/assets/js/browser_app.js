@@ -369,6 +369,8 @@ function applyAnnotation(job, configuration, proceed) {
   console.log(annotations())
   */
 
+  console.log(name)
+
   var apply = annotations()[name];
 
   try {
