@@ -37,13 +37,26 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
   @allowed_step_types ["Full Screen Screenshot", "Element Screenshot", "Apply Annotation"]
 
+  @types [  Document, DocumentVersion, Page,
+  Process, Content, ContentVersion, Step, LanguageCode, Annotation,
+  Docubit, File, DocubitType, AnnotationType ]
+
+  defp base_opts() do
+    Defaults.state_opts()
+    |> Keyword.put(:location, :data)
+    |> Keyword.put(:types, @types)
+  end
+
+  defp state_opts(socket) do
+    base_opts()
+    |> Keyword.put(:broadcast, true)
+    |> Keyword.put(:channel, UserDocsWeb.Defaults.channel(socket))
+    |> Keyword.put(:broadcast_function, &UserDocsWeb.Endpoint.broadcast/3)
+  end
+
   @impl true
   def mount(_params, session, socket) do
-    opts =
-      state_opts()
-      |> Keyword.put(:types, [  Document, DocumentVersion, Page,
-        Process, Content, ContentVersion, Step, LanguageCode, Annotation,
-        Docubit, File, DocubitType, AnnotationType ])
+    opts = base_opts()
 
     {:ok,
       socket
@@ -51,7 +64,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       |> Root.authorize(session)
       |> Root.initialize()
       |> assign(:dragging, %{ type: nil, id: nil})
-      |> assign(:state_opts, state_opts())
+      |> assign(:state_opts, opts)
     }
   end
 
@@ -60,35 +73,37 @@ defmodule UserDocsWeb.DocumentLive.Editor do
     IO.puts("Opening editor")
     id = String.to_integer(id)
     document = Documents.get_document!(id, %{ document_versions: true })
+    opts = state_opts(socket)
     {
       :noreply,
       socket
-      |> Loaders.load_annotation_types(state_opts())
-      |> Loaders.load_docubit_types(state_opts())
-      |> Loaders.load_document(Documents.get_document!(id), state_opts())
-      |> Loaders.load_document_versions(id, state_opts())
-      |> Loaders.load_language_codes(state_opts())
-      |> Loaders.load_pages(state_opts())
-      |> Loaders.load_processes(state_opts())
-      |> Loaders.load_files(state_opts())
-      |> Loaders.load_content(state_opts())
-      |> Loaders.load_content_versions(state_opts())
-      |> Loaders.load_steps(state_opts())
-      |> SelectLists.process(state_opts())
+      |> Loaders.load_annotation_types(opts)
+      |> Loaders.load_docubit_types(opts)
+      |> Loaders.load_document(Documents.get_document!(id), opts)
+      |> Loaders.load_document_versions(id, opts)
+      |> Loaders.load_language_codes(opts)
+      |> Loaders.load_pages(opts)
+      |> Loaders.load_processes(opts)
+      |> Loaders.load_files(opts)
+      |> Loaders.load_content(opts)
+      |> Loaders.load_content_versions(opts)
+      |> Loaders.load_steps(opts)
+      |> SelectLists.process(opts)
       |> current_selections()
-      |> SelectLists.page(state_opts())
-      |> Loaders.load_annotations(state_opts())
-      |> SelectLists.language_code(state_opts())
+      |> SelectLists.page(opts)
+      |> Loaders.load_annotations(opts)
+      |> SelectLists.language_code(opts)
       |> prepare_document(document)
       |> prepare_content()
       |> prepare_annotations()
       |> default_language_code_id()
-      |> (&(Loaders.load_docubits(&1, default_document_version_id(&1, document), state_opts()))).()
+      |> (&(Loaders.load_docubits(&1, default_document_version_id(&1, document), opts))).()
       |> (&(prepare_document_version(&1, default_document_version_id(&1, document)))).()
-      |> SelectLists.versions(state_opts())
+      |> SelectLists.versions(opts)
       |> assign(:channel, Defaults.channel(socket))
       |> assign(:img_path, Routes.static_path(socket, "/images/"))
-      |> StateHandlers.inspect(state_opts())
+      |> assign(:state_opts, opts)
+      |> StateHandlers.inspect(opts)
     }
   end
   def handle_params(_, _, socket), do: { :noreply, socket }
@@ -128,7 +143,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
         [ _ | _ ] = docubits -> docubits |> Enum.at(-1) |> Map.get(:order, nil)
       end
 
-    docubit_type = Documents.get_docubit_type_by_name!(socket, type, state_opts())
+    docubit_type = Documents.get_docubit_type_by_name!(socket, type, state_opts(socket))
 
     new_docubit_attrs = %{
       docubit_type: convert_docubit_type_struct_to_map(docubit_type),
@@ -171,7 +186,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
     { :noreply, _ } = Root.handle_info(%{ topic: topic, event: event, payload: docubit }, socket)
   end
   def handle_info({ :close_all_dropdowns, exclude }, socket) do
-    Enum.each(Documents.list_docubits(socket, state_opts()),
+    Enum.each(Documents.list_docubits(socket, state_opts(socket)),
       fn(docubit) ->
         if docubit.id not in exclude do
           send_update(
@@ -211,7 +226,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   defp prepare_document_version(socket, document_version_id) do
     IO.puts("Preparing Document Version")
     opts =
-      state_opts()
+      state_opts(socket)
       |> Keyword.put(:preloads, [
           :body,
           :docubits,
@@ -239,7 +254,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
   defp prepare_content(socket) do
     opts =
-      state_opts()
+      state_opts(socket)
       |> Keyword.put(:preloads, [
         :content_versions,
         [ content_versions: :version ]
@@ -251,7 +266,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
   defp prepare_annotations(socket) do
     opts =
-      state_opts()
+      state_opts(socket)
       |> Keyword.put(:preloads, [
         :content,
         :annotation_type,
@@ -261,11 +276,6 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
     socket
     |> assign(:annotations, Web.list_annotations(socket, opts))
-  end
-
-  defp state_opts() do
-    Defaults.state_opts
-    |> Keyword.put(:location, :data)
   end
 
   defp assign_document_version(socket) do
@@ -282,8 +292,8 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   end
 
   defp current_selections(socket) do
-    process = Automation.list_processes(socket, state_opts()) |> Enum.at(0)
-    page = Web.list_pages(socket, state_opts()) |> Enum.at(0)
+    process = Automation.list_processes(socket, state_opts(socket)) |> Enum.at(0)
+    page = Web.list_pages(socket, state_opts(socket)) |> Enum.at(0)
 
     socket
     |> assign(:current_page, page)
@@ -294,7 +304,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   defp assign_current_version(socket) do
     version =
       socket.assigns.current_version_id
-      |> Projects.get_version!(socket, state_opts())
+      |> Projects.get_version!(socket, state_opts(socket))
 
     socket
     |> assign(:current_version, version)
@@ -303,7 +313,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   defp default_language_code_id(socket) do
     IO.puts("default_language_code_id")
     language_code_id =
-      Users.get_team!(socket.assigns.current_team_id, socket, state_opts())
+      Users.get_team!(socket.assigns.current_team_id, socket, state_opts(socket))
       |> Map.get(:default_language_code_id)
 
     socket
