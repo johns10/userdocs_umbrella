@@ -45,4 +45,5 @@ apps/userdocs_web/assets/js/chrome_app.js.map
 mix.lock
 
 # Ignore the files in tmp
+tmp/*
 apps/userdocs/tmp/*
