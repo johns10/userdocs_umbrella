@@ -1,12 +1,11 @@
-<div class="container">
-  <%= Docubit.renderer(@document_version.body).render(
-    %{
-      current_language_code_id: @current_language_code_id,
-      current_version_id: @current_version_id,
-      docubit: @document_version.body,
-      component: false,
-      editor: false,
-      content: Base.display_content(assigns, @document_version.body),
-      img_path: @img_path
-    }) %>
-</div>
+<%= Docubit.renderer(@document_version.body).render(
+  %{
+    current_language_code_id: @current_language_code_id,
+    current_version_id: @current_version_id,
+    docubit: @document_version.body,
+    component: false,
+    editor: false,
+    role: :viewer,
+    content: Base.display_content(assigns, @document_version.body),
+    img_path: @img_path
+  }) %>
