@@ -41,7 +41,7 @@ defmodule ProcessAdministratorWeb.Router do
     pipe_through :browser
 
     live "/", IndexLive, :index
-    live "index.html", ProcessAdministratorLive.Index, :index
+    live "/index.html", ProcessAdministratorLive.Index, :index
   end
 
   # Other scopes may use custom stacks.
