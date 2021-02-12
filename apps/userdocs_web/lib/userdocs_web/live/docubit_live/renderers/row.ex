@@ -5,6 +5,14 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Row do
 
   def header(_), do: "Row"
 
+  def render(%{ role: :html_export } = assigns) do
+    ~L"""
+    <div class="row">
+      <%= Base.render_inner_content(assigns) %>
+    </div>
+    """
+  end
+
   def render(assigns) do
     ~L"""
       <div class="is-flex is-flex-direction-row is-justify-content-space-between">

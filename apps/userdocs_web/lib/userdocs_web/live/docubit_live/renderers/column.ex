@@ -16,6 +16,15 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Column do
     }
   end
 
+  @impl true
+  def render(%{ role: :html_export } = assigns) do
+    ~L"""
+    <div class="column">
+      <%= Base.render_inner_content(assigns) %>
+    </div>
+    """
+  end
+
   def render(assigns) do
     ~L"""
       <div class="">

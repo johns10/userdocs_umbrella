@@ -9,6 +9,15 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
 
   def header(_), do: ""
 
+
+  @impl true
+  def render(%{ role: :html_export } = assigns) do
+    ~L"""
+    <img>
+    <%= display_image(assigns, @docubit) %>
+    """
+  end
+
   def render(assigns) do
     ~L"""
       <img>
@@ -23,18 +32,21 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
 
   def handle_opts(assigns, docubit) do
     []
-    |> handle_src(assigns.img_path, docubit)
+    |> handle_src(assigns.img_path, docubit, assigns.role)
     |> handle_alt(docubit)
     |> handle_border(docubit)
   end
 
-  def handle_src(opts, path, docubit) do
+  def handle_src(opts, path, docubit, role) do
     { status, docubit } = maybe_file({ :ok, docubit })
     case status do
-      :ok -> Keyword.put(opts, :src, path <> docubit.file.filename)
+      :ok -> Keyword.put(opts, :src, maybe_path(path, role) <> docubit.file.filename)
       :nofile -> Keyword.put(opts, :src, path)
     end
   end
+
+  def maybe_path(_path, :html_export), do: "images/"
+  def maybe_path(path, _), do: path
 
   def handle_alt(opts, docubit) do
     { status, docubit } = maybe_file({ :ok, docubit })
