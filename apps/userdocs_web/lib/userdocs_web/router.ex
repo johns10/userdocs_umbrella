@@ -68,6 +68,8 @@ defmodule UserDocsWeb.Router do
     live "/index.html", ProcessAdministratorLive.Index, :index
     live "/documents", DocumentLive.Index, :index
 
+    get "/document_versions/:id/download", DocumentVersionDownloadController, :show
+
     # These routes are basically not part of the application:
     live "/content", ContentLive.Index, :index
     live "/content/new", ContentLive.Index, :new
