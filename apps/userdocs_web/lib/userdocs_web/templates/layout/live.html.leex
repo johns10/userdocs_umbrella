@@ -32,7 +32,7 @@
             <a class="button is-primary">
               <%= "Sign In" %>
             </a>
-            <%= link "Sign out", to: "https://app.user-docs.com/session", method: :delete, class: "button is-light" %>
+            <%= link "Sign out", to: "https://user-docs.com:4002/session", method: :delete, class: "button is-light" %>
           </div>
         </div>
       </div>
@@ -54,5 +54,5 @@
     ]) %>
   </main>
 <% else %>
-  <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns, "https://app.user-docs.com/session") %>
+  <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns, "https://user-docs.com:4002/session") %>
 <% end %>
