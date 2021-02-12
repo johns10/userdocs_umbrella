@@ -20,7 +20,7 @@
     </div>
     <nav class="level"></nav>
     <div class="content">
-      <%= @inner_content.([]) %>
+        <%= render_block(@inner_block, %{}) %>
       <div class="card">
         <%= if @footer_action not in [:new] do %>
           <a

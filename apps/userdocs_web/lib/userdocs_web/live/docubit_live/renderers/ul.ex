@@ -9,7 +9,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Ul do
   def render(assigns) do
     ~L"""
       <ul>
-        <%= @inner_content.([]) %>
+        <%= render_block(@inner_block, %{}) %>
         <div class="is-justify-self-flex-center is-flex-grow-0">
           <%= AddDocubitButton.render(%{
             text: "+",

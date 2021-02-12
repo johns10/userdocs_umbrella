@@ -10,7 +10,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
   def render_inner_content(assigns) do
     ~L"""
       <%= if @component do %>
-        <%= @inner_content.([]) %>
+        <%= render_block(@inner_block, %{}) %>
       <% else %>
         <%= for docubit <- @docubit.docubits do %>
           <%= Docubit.renderer(docubit).render(%{
