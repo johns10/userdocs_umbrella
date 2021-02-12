@@ -37,7 +37,12 @@ Mnesia.nonode@nohost/LATEST.LOG
 *.png
 *.jpg
 *.zip
+
+# Ignore the builds
 apps/userdocs_web/assets/js/bundle.js
 apps/userdocs_web/assets/js/chrome_app.js
 apps/userdocs_web/assets/js/chrome_app.js.map
 mix.lock
+
+# Ignore the files in tmp
+apps/userdocs/tmp/*
