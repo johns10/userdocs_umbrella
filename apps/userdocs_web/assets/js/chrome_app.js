@@ -1408,13 +1408,13 @@
     var o = "http://www.w3.org/1999/xhtml",
         a = "undefined" == typeof document ? void 0 : document,
         u = !!a && "content" in a.createElement("template"),
-        c = !!a && a.createRange && "createContextualFragment" in a.createRange();
+        s = !!a && a.createRange && "createContextualFragment" in a.createRange();
 
-    function s(e) {
+    function c(e) {
       return e = e.trim(), u ? function (e) {
         var t = a.createElement("template");
         return t.innerHTML = e, t.content.childNodes[0];
-      }(e) : c ? function (e) {
+      }(e) : s ? function (e) {
         return i || (i = a.createRange()).selectNode(a.body), i.createContextualFragment(e).childNodes[0];
       }(e) : function (e) {
         var t = a.createElement("body");
@@ -1494,17 +1494,17 @@
         if (i || (i = {}), "string" == typeof n) if ("#document" === t.nodeName || "HTML" === t.nodeName || "BODY" === t.nodeName) {
           var r = n;
           (n = a.createElement("html")).innerHTML = r;
-        } else n = s(n);
+        } else n = c(n);
         var u = i.getNodeKey || y,
-            c = i.onBeforeNodeAdded || m,
+            s = i.onBeforeNodeAdded || m,
             d = i.onNodeAdded || m,
             b = i.onBeforeElUpdated || m,
             k = i.onElUpdated || m,
             w = i.onBeforeNodeDiscarded || m,
             E = i.onNodeDiscarded || m,
-            x = i.onBeforeElChildrenUpdated || m,
+            A = i.onBeforeElChildrenUpdated || m,
             S = !0 === i.childrenOnly,
-            A = Object.create(null),
+            x = Object.create(null),
             C = [];
 
         function P(e) {
@@ -1520,7 +1520,7 @@
           }(e, n));
         }
 
-        function T(e) {
+        function I(e) {
           d(e);
 
           for (var t = e.firstChild; t;) {
@@ -1528,20 +1528,20 @@
                 i = u(t);
 
             if (i) {
-              var r = A[i];
-              r && l(t, r) ? (t.parentNode.replaceChild(r, t), I(r, t)) : T(t);
-            } else T(t);
+              var r = x[i];
+              r && l(t, r) ? (t.parentNode.replaceChild(r, t), T(r, t)) : I(t);
+            } else I(t);
 
             t = n;
           }
         }
 
-        function I(t, n, i) {
+        function T(t, n, i) {
           var r = u(n);
 
-          if (r && delete A[r], !i) {
+          if (r && delete x[r], !i) {
             if (!1 === b(t, n)) return;
-            if (e(t, n), k(t), !1 === x(t, n)) return;
+            if (e(t, n), k(t), !1 === A(t, n)) return;
           }
 
           "TEXTAREA" !== t.nodeName ? function (e, t) {
@@ -1549,7 +1549,7 @@
                 i,
                 r,
                 o,
-                s,
+                c,
                 d = t.firstChild,
                 v = e.firstChild;
 
@@ -1564,7 +1564,7 @@
                 var m = v.nodeType,
                     y = void 0;
 
-                if (m === d.nodeType && (m === f ? (n ? n !== i && ((s = A[n]) ? r === s ? y = !1 : (e.insertBefore(s, v), i ? P(i) : L(v, e, !0), v = s) : y = !1) : i && (y = !1), (y = !1 !== y && l(v, d)) && I(v, d)) : m !== p && m != g || (y = !0, v.nodeValue !== d.nodeValue && (v.nodeValue = d.nodeValue))), y) {
+                if (m === d.nodeType && (m === f ? (n ? n !== i && ((c = x[n]) ? r === c ? y = !1 : (e.insertBefore(c, v), i ? P(i) : L(v, e, !0), v = c) : y = !1) : i && (y = !1), (y = !1 !== y && l(v, d)) && T(v, d)) : m !== p && m != g || (y = !0, v.nodeValue !== d.nodeValue && (v.nodeValue = d.nodeValue))), y) {
                   d = o, v = r;
                   continue e;
                 }
@@ -1572,9 +1572,9 @@
                 i ? P(i) : L(v, e, !0), v = r;
               }
 
-              if (n && (s = A[n]) && l(s, d)) e.appendChild(s), I(s, d);else {
-                var b = c(d);
-                !1 !== b && (b && (d = b), d.actualize && (d = d.actualize(e.ownerDocument || a)), e.appendChild(d), T(d));
+              if (n && (c = x[n]) && l(c, d)) e.appendChild(c), T(c, d);else {
+                var b = s(d);
+                !1 !== b && (b && (d = b), d.actualize && (d = d.actualize(e.ownerDocument || a)), e.appendChild(d), I(d));
               }
               d = o, v = r;
             }
@@ -1593,7 +1593,7 @@
         !function e(t) {
           if (t.nodeType === f || t.nodeType === v) for (var n = t.firstChild; n;) {
             var i = u(n);
-            i && (A[i] = n), e(n), n = n.nextSibling;
+            i && (x[i] = n), e(n), n = n.nextSibling;
           }
         }(t);
         var D = t,
@@ -1614,9 +1614,9 @@
         }
         if (D === n) E(t);else {
           if (n.isSameNode && n.isSameNode(D)) return;
-          if (I(D, n, S), C) for (var R = 0, O = C.length; R < O; R++) {
-            var H = A[C[R]];
-            H && L(H, H.parentNode, !1);
+          if (T(D, n, S), C) for (var R = 0, O = C.length; R < O; R++) {
+            var j = x[C[R]];
+            j && L(j, j.parentNode, !1);
           }
         }
         return !S && D !== t && t.parentNode && (D.actualize && (D = D.actualize(t.ownerDocument || a)), t.parentNode.replaceChild(D, t)), D;
@@ -1629,14 +1629,14 @@
           u = t.attributes;
 
       if (t.nodeType !== r && e.nodeType !== r) {
-        for (var c = u.length - 1; c >= 0; c--) i = (n = u[c]).name, o = n.namespaceURI, a = n.value, o ? (i = n.localName || i, e.getAttributeNS(o, i) !== a && ("xmlns" === n.prefix && (i = n.name), e.setAttributeNS(o, i, a))) : e.getAttribute(i) !== a && e.setAttribute(i, a);
+        for (var s = u.length - 1; s >= 0; s--) i = (n = u[s]).name, o = n.namespaceURI, a = n.value, o ? (i = n.localName || i, e.getAttributeNS(o, i) !== a && ("xmlns" === n.prefix && (i = n.name), e.setAttributeNS(o, i, a))) : e.getAttribute(i) !== a && e.setAttribute(i, a);
 
-        for (var s = e.attributes, l = s.length - 1; l >= 0; l--) i = (n = s[l]).name, (o = n.namespaceURI) ? (i = n.localName || i, t.hasAttributeNS(o, i) || e.removeAttributeNS(o, i)) : t.hasAttribute(i) || e.removeAttribute(i);
+        for (var c = e.attributes, l = c.length - 1; l >= 0; l--) i = (n = c[l]).name, (o = n.namespaceURI) ? (i = n.localName || i, t.hasAttributeNS(o, i) || e.removeAttributeNS(o, i)) : t.hasAttribute(i) || e.removeAttribute(i);
       }
     });
 
     function k(e) {
-      return I(e) || S(e) || D(e) || T();
+      return P(e) || S(e) || L(e) || C();
     }
 
     function w(e, t) {
@@ -1661,10 +1661,10 @@
       }) : e[t] = n, e;
     }
 
-    function x(e) {
+    function A(e) {
       return function (e) {
-        if (Array.isArray(e)) return _(e);
-      }(e) || S(e) || D(e) || function () {
+        if (Array.isArray(e)) return I(e);
+      }(e) || S(e) || L(e) || function () {
         throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
       }();
     }
@@ -1673,23 +1673,8 @@
       if ("undefined" != typeof Symbol && Symbol.iterator in Object(e)) return Array.from(e);
     }
 
-    function A(e, t) {
-      if (!(e instanceof t)) throw new TypeError("Cannot call a class as a function");
-    }
-
-    function C(e, t) {
-      for (var n = 0; n < t.length; n++) {
-        var i = t[n];
-        i.enumerable = i.enumerable || !1, i.configurable = !0, "value" in i && (i.writable = !0), Object.defineProperty(e, i.key, i);
-      }
-    }
-
-    function P(e, t, n) {
-      return t && C(e.prototype, t), n && C(e, n), e;
-    }
-
-    function L(e, t) {
-      return I(e) || function (e, t) {
+    function x(e, t) {
+      return P(e) || function (e, t) {
         if ("undefined" == typeof Symbol || !(Symbol.iterator in Object(e))) return;
         var n = [],
             i = !0,
@@ -1709,31 +1694,46 @@
         }
 
         return n;
-      }(e, t) || D(e, t) || T();
+      }(e, t) || L(e, t) || C();
     }
 
-    function T() {
+    function C() {
       throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
     }
 
-    function I(e) {
+    function P(e) {
       if (Array.isArray(e)) return e;
     }
 
-    function D(e, t) {
+    function L(e, t) {
       if (e) {
-        if ("string" == typeof e) return _(e, t);
+        if ("string" == typeof e) return I(e, t);
         var n = Object.prototype.toString.call(e).slice(8, -1);
-        return "Object" === n && e.constructor && (n = e.constructor.name), "Map" === n || "Set" === n ? Array.from(e) : "Arguments" === n || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n) ? _(e, t) : void 0;
+        return "Object" === n && e.constructor && (n = e.constructor.name), "Map" === n || "Set" === n ? Array.from(e) : "Arguments" === n || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n) ? I(e, t) : void 0;
       }
     }
 
-    function _(e, t) {
+    function I(e, t) {
       (null == t || t > e.length) && (t = e.length);
 
       for (var n = 0, i = new Array(t); n < t; n++) i[n] = e[n];
 
       return i;
+    }
+
+    function T(e, t) {
+      if (!(e instanceof t)) throw new TypeError("Cannot call a class as a function");
+    }
+
+    function D(e, t) {
+      for (var n = 0; n < t.length; n++) {
+        var i = t[n];
+        i.enumerable = i.enumerable || !1, i.configurable = !0, "value" in i && (i.writable = !0), Object.defineProperty(e, i.key, i);
+      }
+    }
+
+    function _(e, t, n) {
+      return t && D(e.prototype, t), n && D(e, n), e;
     }
 
     function N(e) {
@@ -1747,39 +1747,39 @@
     }
 
     n.d(t, "debug", function () {
-      return $;
+      return K;
     }), n.d(t, "Rendered", function () {
-      return te;
-    }), n.d(t, "LiveSocket", function () {
-      return ne;
-    }), n.d(t, "Browser", function () {
-      return ie;
-    }), n.d(t, "DOM", function () {
-      return re;
-    }), n.d(t, "View", function () {
       return ue;
+    }), n.d(t, "LiveSocket", function () {
+      return se;
+    }), n.d(t, "Browser", function () {
+      return ce;
+    }), n.d(t, "DOM", function () {
+      return le;
+    }), n.d(t, "View", function () {
+      return fe;
     });
 
     var R = [1e3, 3e3],
         O = "data-phx-view",
-        H = ["phx-click-loading", "phx-change-loading", "phx-submit-loading", "phx-keydown-loading", "phx-keyup-loading", "phx-blur-loading", "phx-focus-loading"],
-        j = "data-phx-component",
-        M = "data-phx-ref",
-        B = "[".concat(O, "]"),
-        U = ["text", "textarea", "number", "email", "password", "search", "tel", "url", "date", "time"],
+        j = ["phx-click-loading", "phx-change-loading", "phx-submit-loading", "phx-keydown-loading", "phx-keyup-loading", "phx-blur-loading", "phx-focus-loading"],
+        H = "data-phx-component",
+        F = "data-phx-ref",
+        M = "data-phx-upload-ref",
+        U = "[".concat(O, "]"),
+        B = ["text", "textarea", "number", "email", "password", "search", "tel", "url", "date", "time"],
         J = ["checkbox", "radio"],
-        F = "data-phx-static",
         V = 1,
-        q = "phx-",
-        W = {
+        W = "phx-",
+        q = {
       debounce: 300,
       throttle: 300
     },
-        K = function (e, t) {
+        z = function (e, t) {
       return console.error && console.error(e, t);
     };
 
-    var $ = function (e, t, n, i) {
+    var K = function (e, t, n, i) {
       e.liveSocket.isDebugEnabled() && console.log("".concat(e.id, " ").concat(t, ": ").concat(n, " - "), i);
     },
         X = function (e) {
@@ -1787,14 +1787,14 @@
         return e;
       };
     },
-        z = function (e) {
+        $ = function (e) {
       return JSON.parse(JSON.stringify(e));
     },
         G = function (e, t, n) {
       do {
         if (e.matches("[".concat(t, "]"))) return e;
         e = e.parentElement || e.parentNode;
-      } while (null !== e && 1 === e.nodeType && !(n && n.isSameNode(e) || e.matches(B)));
+      } while (null !== e && 1 === e.nodeType && !(n && n.isSameNode(e) || e.matches(U)));
 
       return null;
     },
@@ -1809,14 +1809,323 @@
         Z = function (e, t) {
       return e && t(e);
     },
-        ee = function (e) {
-      var t,
-          n = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {},
-          i = new FormData(e),
-          r = new URLSearchParams(),
-          o = function (e) {
+        ee = function () {
+      function e(t, n, i) {
+        T(this, e), this.ref = ie.genFileRef(n), this.fileEl = t, this.file = n, this.view = i, this.meta = null, this._isCancelled = !1, this._isDone = !1, this._progress = 0, this._onDone = function () {};
+      }
+
+      return _(e, null, [{
+        key: "isActive",
+        value: function (e, t) {
+          var n = void 0 === t._phxRef,
+              i = e.getAttribute("data-phx-active-refs").split(",").indexOf(ie.genFileRef(t)) >= 0;
+          return t.size > 0 && (n || i);
+        }
+      }, {
+        key: "isPreflighted",
+        value: function (e, t) {
+          var n = e.getAttribute("data-phx-preflighted-refs").split(",").indexOf(ie.genFileRef(t)) >= 0;
+          return n && this.isActive(e, t);
+        }
+      }]), _(e, [{
+        key: "metadata",
+        value: function () {
+          return this.meta;
+        }
+      }, {
+        key: "progress",
+        value: function (e) {
+          var t = this;
+          this._progress = Math.floor(e), this._progress >= 100 ? (this._progress = 100, this._isDone = !0, this.view.pushFileProgress(this.fileEl, this.ref, 100, function () {
+            ie.untrackFile(t.fileEl, t.file), t._onDone();
+          })) : this.view.pushFileProgress(this.fileEl, this.ref, this._progress);
+        }
+      }, {
+        key: "cancel",
+        value: function () {
+          this._isCancelled = !0, this._isDone = !0, this._onDone();
+        }
+      }, {
+        key: "isDone",
+        value: function () {
+          return this._isDone;
+        }
+      }, {
+        key: "error",
+        value: function () {
+          var e = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : "failed";
+          this.view.pushFileProgress(this.fileEl, this.ref, {
+            error: e
+          });
+        }
+      }, {
+        key: "onDone",
+        value: function (e) {
+          this._onDone = e;
+        }
+      }, {
+        key: "toPreflightPayload",
+        value: function () {
+          return {
+            last_modified: this.file.lastModified,
+            name: this.file.name,
+            size: this.file.size,
+            type: this.file.type,
+            ref: this.ref
+          };
+        }
+      }, {
+        key: "uploader",
+        value: function (e) {
+          if (this.meta.uploader) {
+            var t = e[this.meta.uploader] || z("no uploader configured for ".concat(this.meta.uploader));
+            return {
+              name: this.meta.uploader,
+              callback: t
+            };
+          }
+
+          return {
+            name: "channel",
+            callback: re
+          };
+        }
+      }, {
+        key: "zipPostFlight",
+        value: function (e) {
+          this.meta = e.entries[this.ref], this.meta || z("no preflight upload response returned with ref ".concat(this.ref), {
+            input: this.fileEl,
+            response: e
+          });
+        }
+      }]), e;
+    }(),
+        te = {
+      LiveFileUpload: {
+        preflightedRefs: function () {
+          return this.el.getAttribute("data-phx-preflighted-refs");
+        },
+        mounted: function () {
+          this.preflightedWas = this.preflightedRefs();
+        },
+        updated: function () {
+          var e = this.preflightedRefs();
+          this.preflightedWas !== e && (this.preflightedWas = e, "" === e && this.__view.cancelSubmit(this.el.form));
+        }
+      }
+    };
+
+    te.LiveImgPreview = {
+      mounted: function () {
+        var e = this;
+        this.ref = this.el.getAttribute("data-phx-entry-ref"), this.inputEl = document.getElementById(this.el.getAttribute(M)), ie.getEntryDataURL(this.inputEl, this.ref, function (t) {
+          return e.el.src = t;
+        });
+      }
+    };
+
+    var ne = 0,
+        ie = function () {
+      function e(t, n, i) {
+        T(this, e), this.view = n, this.onComplete = i, this._entries = Array.from(e.filesAwaitingPreflight(t) || []).map(function (e) {
+          return new ee(t, e, n);
+        }), this.numEntriesInProgress = this._entries.length;
+      }
+
+      return _(e, null, [{
+        key: "genFileRef",
+        value: function (e) {
+          var t = e._phxRef;
+          return void 0 !== t ? t : (e._phxRef = (ne++).toString(), e._phxRef);
+        }
+      }, {
+        key: "getEntryDataURL",
+        value: function (e, t, n) {
+          var i = this,
+              r = this.activeFiles(e).find(function (e) {
+            return i.genFileRef(e) === t;
+          }),
+              o = new FileReader();
+          o.onload = function (e) {
+            return n(e.target.result);
+          }, o.readAsDataURL(r);
+        }
+      }, {
+        key: "hasUploadsInProgress",
+        value: function (e) {
+          var t = 0;
+          return le.findUploadInputs(e).forEach(function (e) {
+            e.getAttribute("data-phx-preflighted-refs") !== e.getAttribute("data-phx-done-refs") && t++;
+          }), t > 0;
+        }
+      }, {
+        key: "serializeUploads",
+        value: function (e) {
+          var t = this,
+              n = {};
+          return this.activeFiles(e, "serialize").forEach(function (i) {
+            var r = {
+              path: e.name
+            },
+                o = e.getAttribute(M);
+            n[o] = n[o] || [], r.ref = t.genFileRef(i), r.name = i.name, r.type = i.type, r.size = i.size, n[o].push(r);
+          }), n;
+        }
+      }, {
+        key: "clearFiles",
+        value: function (e) {
+          e.value = null, le.putPrivate(e, "files", []);
+        }
+      }, {
+        key: "untrackFile",
+        value: function (e, t) {
+          le.putPrivate(e, "files", le.private(e, "files").filter(function (e) {
+            return !Object.is(e, t);
+          }));
+        }
+      }, {
+        key: "trackFiles",
+        value: function (e, t) {
+          var n = this;
+
+          if (null !== e.getAttribute("multiple")) {
+            var i = t.filter(function (t) {
+              return !n.activeFiles(e).find(function (e) {
+                return Object.is(e, t);
+              });
+            });
+            le.putPrivate(e, "files", this.activeFiles(e).concat(i)), e.value = null;
+          } else le.putPrivate(e, "files", t);
+        }
+      }, {
+        key: "activeFileInputs",
+        value: function (e) {
+          var t = this,
+              n = le.findUploadInputs(e);
+          return Array.from(n).filter(function (e) {
+            return e.files && t.activeFiles(e).length > 0;
+          });
+        }
+      }, {
+        key: "activeFiles",
+        value: function (e) {
+          return (le.private(e, "files") || []).filter(function (t) {
+            return ee.isActive(e, t);
+          });
+        }
+      }, {
+        key: "inputsAwaitingPreflight",
+        value: function (e) {
+          var t = this,
+              n = le.findUploadInputs(e);
+          return Array.from(n).filter(function (e) {
+            return t.filesAwaitingPreflight(e).length > 0;
+          });
+        }
+      }, {
+        key: "filesAwaitingPreflight",
+        value: function (e) {
+          return this.activeFiles(e).filter(function (t) {
+            return !ee.isPreflighted(e, t);
+          });
+        }
+      }]), _(e, [{
+        key: "entries",
+        value: function () {
+          return this._entries;
+        }
+      }, {
+        key: "initAdapterUpload",
+        value: function (e, t, n) {
+          var i = this;
+          this._entries = this._entries.map(function (t) {
+            return t.zipPostFlight(e), t.onDone(function () {
+              i.numEntriesInProgress--, 0 === i.numEntriesInProgress && i.onComplete();
+            }), t;
+          });
+
+          var r = this._entries.reduce(function (e, t) {
+            var i = t.uploader(n.uploaders),
+                r = i.name,
+                o = i.callback;
+            return e[r] = e[r] || {
+              callback: o,
+              entries: []
+            }, e[r].entries.push(t), e;
+          }, {});
+
+          for (var o in r) {
+            var a = r[o];
+            (0, a.callback)(a.entries, t, e, n);
+          }
+        }
+      }]), e;
+    }(),
+        re = function (e, t, n, i) {
+      e.forEach(function (e) {
+        new oe(e, n.config.chunk_size, i).upload();
+      });
+    },
+        oe = function () {
+      function e(t, n, i) {
+        T(this, e), this.liveSocket = i, this.entry = t, this.offset = 0, this.chunkSize = n, this.uploadChannel = i.channel("lvu:".concat(t.ref), {
+          token: t.metadata()
+        });
+      }
+
+      return _(e, [{
+        key: "upload",
+        value: function () {
+          var e = this;
+          this.uploadChannel.join().receive("ok", function (t) {
+            return e.readNextChunk();
+          }).receive("error", function (t) {
+            e.uploadChannel.leave(), e.entry.error();
+          });
+        }
+      }, {
+        key: "isDone",
+        value: function () {
+          return this.offset >= this.entry.file.size;
+        }
+      }, {
+        key: "readNextChunk",
+        value: function () {
+          var e = this,
+              t = new window.FileReader(),
+              n = this.entry.file.slice(this.offset, this.chunkSize + this.offset);
+          t.onload = function (t) {
+            if (null !== t.target.error) return z("Read error: " + t.target.error);
+            e.offset += t.target.result.byteLength, e.pushChunk(t.target.result);
+          }, t.readAsArrayBuffer(n);
+        }
+      }, {
+        key: "pushChunk",
+        value: function (e) {
+          var t = this;
+          this.uploadChannel.isJoined() && this.uploadChannel.push("chunk", e).receive("ok", function () {
+            t.entry.progress(t.offset / t.entry.file.size * 100), t.isDone() || setTimeout(function () {
+              return t.readNextChunk();
+            }, t.liveSocket.getLatencySim() || 0);
+          });
+        }
+      }]), e;
+    }(),
+        ae = function (e) {
+      var t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {},
+          n = new FormData(e),
+          i = [];
+      n.forEach(function (e, t, n) {
+        e instanceof File && i.push(t);
+      }), i.forEach(function (e) {
+        return n.delete(e);
+      });
+
+      var r,
+          o = new URLSearchParams(),
+          a = function (e) {
         if ("undefined" == typeof Symbol || null == e[Symbol.iterator]) {
-          if (Array.isArray(e) || (e = D(e))) {
+          if (Array.isArray(e) || (e = L(e))) {
             var t = 0,
                 n = function () {};
 
@@ -1863,31 +2172,31 @@
             }
           }
         };
-      }(i.entries());
+      }(n.entries());
 
       try {
-        for (o.s(); !(t = o.n()).done;) {
-          var a = L(t.value, 2),
-              u = a[0],
-              c = a[1];
-          r.append(u, c);
+        for (a.s(); !(r = a.n()).done;) {
+          var u = x(r.value, 2),
+              s = u[0],
+              c = u[1];
+          o.append(s, c);
         }
       } catch (e) {
-        o.e(e);
+        a.e(e);
       } finally {
-        o.f();
+        a.f();
       }
 
-      for (var s in n) r.append(s, n[s]);
+      for (var l in t) o.append(l, t[l]);
 
-      return r.toString();
+      return o.toString();
     },
-        te = function () {
+        ue = function () {
       function e(t, n) {
-        A(this, e), this.viewId = t, this.rendered = {}, this.mergeDiff(n);
+        T(this, e), this.viewId = t, this.rendered = {}, this.mergeDiff(n);
       }
 
-      return P(e, null, [{
+      return _(e, null, [{
         key: "extract",
         value: function (e) {
           var t = e.r,
@@ -1900,7 +2209,7 @@
             events: n || []
           };
         }
-      }]), P(e, [{
+      }]), _(e, [{
         key: "parentViewId",
         value: function () {
           return this.viewId;
@@ -1955,7 +2264,7 @@
               if ("number" == typeof a) {
                 for (; "number" == typeof a;) a = (o = a > 0 ? t[a] : n[-a]).s;
 
-                o = z(o), this.doRecursiveMerge(o, r), o.s = a;
+                o = $(o), this.doRecursiveMerge(o, r), o.s = a;
               } else o = n[i] || {}, o = this.recursiveMerge(o, r);
 
               t[i] = o;
@@ -2031,44 +2340,45 @@
         key: "recursiveCIDToString",
         value: function (e, t, n) {
           var i = this,
-              r = e[t] || K("no component for CID ".concat(t), e),
+              r = e[t] || z("no component for CID ".concat(t), e),
               o = document.createElement("template");
           o.innerHTML = this.recursiveToString(r, e, n);
           var a = o.content,
               u = n && !n.has(t),
-              c = L(Array.from(a.childNodes).reduce(function (e, n, r) {
-            var a = L(e, 2),
-                c = a[0],
-                s = a[1];
-            return n.nodeType === Node.ELEMENT_NODE ? n.getAttribute(j) ? [c, !0] : (n.setAttribute(j, t), n.id || (n.id = "".concat(i.parentViewId(), "-").concat(t, "-").concat(r)), u && (n.setAttribute("data-phx-skip", ""), n.innerHTML = ""), [!0, s]) : "" !== n.nodeValue.trim() ? (K("only HTML element tags are allowed at the root of components.\n\n" + 'got: "'.concat(n.nodeValue.trim(), '"\n\n') + "within:\n", o.innerHTML.trim()), n.replaceWith(i.createSpan(n.nodeValue, t)), [!0, s]) : (n.remove(), [c, s]);
+              s = x(Array.from(a.childNodes).reduce(function (e, n, r) {
+            var a = x(e, 2),
+                s = a[0],
+                c = a[1];
+            return n.nodeType === Node.ELEMENT_NODE ? n.getAttribute(H) ? [s, !0] : (n.setAttribute(H, t), n.id || (n.id = "".concat(i.parentViewId(), "-").concat(t, "-").concat(r)), u && (n.setAttribute("data-phx-skip", ""), n.innerHTML = ""), [!0, c]) : "" !== n.nodeValue.trim() ? (z("only HTML element tags are allowed at the root of components.\n\n" + 'got: "'.concat(n.nodeValue.trim(), '"\n\n') + "within:\n", o.innerHTML.trim()), n.replaceWith(i.createSpan(n.nodeValue, t)), [!0, c]) : (n.remove(), [s, c]);
           }, [!1, !1]), 2),
-              s = c[0],
-              l = c[1];
-          return s || l ? !s && l ? (K("expected at least one HTML element tag directly inside a component, but only subcomponents were found. A component must render at least one HTML tag directly inside itself.", o.innerHTML.trim()), o.innerHTML) : o.innerHTML : (K("expected at least one HTML element tag inside a component, but the component is empty:\n", o.innerHTML.trim()), this.createSpan("", t).outerHTML);
+              c = s[0],
+              l = s[1];
+          return c || l ? !c && l ? (z("expected at least one HTML element tag directly inside a component, but only subcomponents were found. A component must render at least one HTML tag directly inside itself.", o.innerHTML.trim()), o.innerHTML) : o.innerHTML : (z("expected at least one HTML element tag inside a component, but the component is empty:\n", o.innerHTML.trim()), this.createSpan("", t).outerHTML);
         }
       }, {
         key: "createSpan",
         value: function (e, t) {
           var n = document.createElement("span");
-          return n.innerText = e, n.setAttribute(j, t), n;
+          return n.innerText = e, n.setAttribute(H, t), n;
         }
       }]), e;
     }(),
-        ne = function () {
+        se = function () {
       function e(t, n) {
         var i = this,
             r = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : {};
-        if (A(this, e), this.unloaded = !1, !n || "Object" === n.constructor.name) throw new Error('\n      a phoenix Socket must be provided as the second argument to the LiveSocket constructor. For example:\n\n          import {Socket} from "phoenix"\n          import {LiveSocket} from "phoenix_live_view"\n          let liveSocket = new LiveSocket("/live", Socket, {...})\n      ');
-        this.socket = new n(t, r), this.bindingPrefix = r.bindingPrefix || q, this.opts = r, this.params = X(r.params || {}), this.viewLogger = r.viewLogger, this.metadataCallbacks = r.metadata || {}, this.defaults = Object.assign(z(W), r.defaults || {}), this.activeElement = null, this.prevActive = null, this.silenced = !1, this.main = null, this.linkRef = 0, this.roots = {}, this.href = window.location.href, this.pendingLink = null, this.currentLocation = z(window.location), this.hooks = r.hooks || {}, this.loaderTimeout = r.loaderTimeout || V, this.boundTopLevelEvents = !1, this.domCallbacks = r.dom || {
+        if (T(this, e), this.unloaded = !1, !n || "Object" === n.constructor.name) throw new Error('\n      a phoenix Socket must be provided as the second argument to the LiveSocket constructor. For example:\n\n          import {Socket} from "phoenix"\n          import {LiveSocket} from "phoenix_live_view"\n          let liveSocket = new LiveSocket("/live", Socket, {...})\n      ');
+        this.socket = new n(t, r), this.bindingPrefix = r.bindingPrefix || W, this.opts = r, this.params = X(r.params || {}), this.viewLogger = r.viewLogger, this.metadataCallbacks = r.metadata || {}, this.defaults = Object.assign($(q), r.defaults || {}), this.activeElement = null, this.prevActive = null, this.silenced = !1, this.main = null, this.linkRef = 0, this.roots = {}, this.href = window.location.href, this.pendingLink = null, this.currentLocation = $(window.location), this.hooks = r.hooks || {}, this.uploaders = r.uploaders || {}, this.loaderTimeout = r.loaderTimeout || V, this.boundTopLevelEvents = !1, this.domCallbacks = Object.assign({
+          onNodeAdded: X(),
           onBeforeElUpdated: X()
-        }, window.addEventListener("unload", function (e) {
+        }, r.dom || {}), window.addEventListener("unload", function (e) {
           i.unloaded = !0;
         }), this.socket.onOpen(function () {
           i.isUnloaded() && window.location.reload();
         });
       }
 
-      return P(e, [{
+      return _(e, [{
         key: "isProfileEnabled",
         value: function () {
           return "true" === sessionStorage.getItem("phx:live-socket:profiling");
@@ -2140,7 +2450,7 @@
         key: "triggerDOM",
         value: function (e, t) {
           var n;
-          (n = this.domCallbacks)[e].apply(n, x(t));
+          (n = this.domCallbacks)[e].apply(n, A(t));
         }
       }, {
         key: "time",
@@ -2154,15 +2464,15 @@
         key: "log",
         value: function (e, t, n) {
           if (this.viewLogger) {
-            var i = L(n(), 2),
+            var i = x(n(), 2),
                 r = i[0],
                 o = i[1];
             this.viewLogger(e, t, r, o);
           } else if (this.isDebugEnabled()) {
-            var a = L(n(), 2),
+            var a = x(n(), 2),
                 u = a[0],
-                c = a[1];
-            $(e, t, u, c);
+                s = a[1];
+            K(e, t, u, s);
           }
         }
       }, {
@@ -2178,48 +2488,56 @@
         }
       }, {
         key: "wrapPush",
-        value: function (e) {
-          var t = this.getLatencySim();
-          if (!t) return e();
-          console.log("simulating ".concat(t, "ms of latency from client to server"));
-          var n = {
+        value: function (e, t, n) {
+          var i = this,
+              r = this.getLatencySim(),
+              o = e.joinCount;
+          if (!r) return t.timeout ? n().receive("timeout", function () {
+            e.joinCount === o && i.reloadWithJitter(e, function () {
+              i.log(e, "timeout", function () {
+                return ["received timeout while communicating with server. Falling back to hard refresh for recovery"];
+              });
+            });
+          }) : n();
+          console.log("simulating ".concat(r, "ms of latency from client to server"));
+          var a = {
             receives: [],
             receive: function (e, t) {
               this.receives.push([e, t]);
             }
           };
           return setTimeout(function () {
-            n.receives.reduce(function (e, t) {
-              var n = L(t, 2),
+            a.receives.reduce(function (e, t) {
+              var n = x(t, 2),
                   i = n[0],
                   r = n[1];
               return e.receive(i, r);
-            }, e());
-          }, t), n;
+            }, n());
+          }, r), a;
         }
       }, {
         key: "reloadWithJitter",
-        value: function (e) {
-          var t = this;
+        value: function (e, t) {
+          var n = this;
           e.destroy(), this.disconnect();
-          var n = R[0],
-              i = R[1],
-              r = Math.floor(Math.random() * (i - n + 1)) + n,
-              o = ie.updateLocal(e.name(), "consecutive-reloads", 0, function (e) {
+          var i = R[0],
+              r = R[1],
+              o = Math.floor(Math.random() * (r - i + 1)) + i,
+              a = ce.updateLocal(e.name(), "consecutive-reloads", 0, function (e) {
             return e + 1;
           });
-          this.log(e, "join", function () {
-            return ["encountered ".concat(o, " consecutive reloads")];
-          }), o > 10 && (this.log(e, "join", function () {
+          t ? t() : this.log(e, "join", function () {
+            return ["encountered ".concat(a, " consecutive reloads")];
+          }), a > 10 && (this.log(e, "join", function () {
             return ["exceeded ".concat(10, " consecutive reloads. Entering failsafe mode")];
-          }), r = 3e4), setTimeout(function () {
-            t.hasPendingLink() ? window.location = t.pendingLink : window.location.reload();
-          }, r);
+          }), o = 3e4), setTimeout(function () {
+            n.hasPendingLink() ? window.location = n.pendingLink : window.location.reload();
+          }, o);
         }
       }, {
         key: "getHookCallbacks",
         value: function (e) {
-          return this.hooks[e];
+          return e && e.startsWith("Phoenix.") ? te[e.split(".")[1]] : this.hooks[e];
         }
       }, {
         key: "isUnloaded",
@@ -2251,7 +2569,7 @@
         value: function () {
           var e = this,
               t = !1;
-          return re.all(document, "".concat(B, ":not([").concat("data-phx-parent-id", "])"), function (n) {
+          return le.all(document, "".concat(U, ":not([").concat("data-phx-parent-id", "])"), function (n) {
             if (!e.getRootById(n.id)) {
               var i = e.joinRootView(n, e.getHref());
               e.root = e.root || i, n.getAttribute("data-phx-main") && (e.main = i);
@@ -2263,7 +2581,7 @@
       }, {
         key: "redirect",
         value: function (e, t) {
-          this.disconnect(), ie.redirect(e, t);
+          this.disconnect(), ce.redirect(e, t);
         }
       }, {
         key: "replaceMain",
@@ -2272,13 +2590,13 @@
               i = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : null,
               r = arguments.length > 3 && void 0 !== arguments[3] ? arguments[3] : this.setPendingLink(e),
               o = this.main.el;
-          this.main.showLoader(this.loaderTimeout), this.main.destroy(), ie.fetchPage(e, function (a, u) {
+          this.main.showLoader(this.loaderTimeout), this.main.destroy(), ce.fetchPage(e, function (a, u) {
             if (200 !== a) return n.redirect(e);
-            var c = document.createElement("template");
-            c.innerHTML = u;
-            var s = c.content.childNodes[0];
-            if (!s || !n.isPhxView(s)) return n.redirect(e);
-            n.joinRootView(s, e, t, function (e, t) {
+            var s = document.createElement("template");
+            s.innerHTML = u;
+            var c = s.content.childNodes[0];
+            if (!c || !n.isPhxView(c)) return n.redirect(e);
+            n.joinRootView(c, e, t, function (e, t) {
               1 === t && (n.commitPendingLink(r) ? (o.replaceWith(e.el), n.main = e, i && i()) : e.destroy());
             });
           });
@@ -2291,14 +2609,14 @@
       }, {
         key: "joinRootView",
         value: function (e, t, n, i) {
-          var r = new ue(e, this, null, t, n);
+          var r = new fe(e, this, null, t, n);
           return this.roots[r.id] = r, r.join(i), r;
         }
       }, {
         key: "owner",
         value: function (e, t) {
           var n = this,
-              i = Z(e.closest(B), function (e) {
+              i = Z(e.closest(U), function (e) {
             return n.getViewByEl(e);
           });
           i && t(i);
@@ -2375,7 +2693,7 @@
         key: "bindTopLevelEvents",
         value: function () {
           var e = this;
-          this.boundTopLevelEvents || (this.boundTopLevelEvents = !0, window.addEventListener("pageshow", function (t) {
+          this.boundTopLevelEvents || (this.boundTopLevelEvents = !0, document.body.addEventListener("click", function () {}), window.addEventListener("pageshow", function (t) {
             t.persisted && (e.withPageLoading({
               to: window.location.href,
               kind: "redirect"
@@ -2384,9 +2702,9 @@
             keyup: "keyup",
             keydown: "keydown"
           }, function (t, n, i, r, o, a, u) {
-            var c = r.getAttribute(e.binding("key")),
-                s = t.key && t.key.toLowerCase();
-            c && c.toLowerCase() !== s || i.pushKey(r, o, n, a, function (e) {
+            var s = r.getAttribute(e.binding("key")),
+                c = t.key && t.key.toLowerCase();
+            s && s.toLowerCase() !== c || i.pushKey(r, o, n, a, function (e) {
               for (var t = 1; t < arguments.length; t++) {
                 var n = null != arguments[t] ? arguments[t] : {};
                 t % 2 ? w(Object(n), !0).forEach(function (t) {
@@ -2410,6 +2728,18 @@
             focus: "focus"
           }, function (t, n, i, r, o, a, u) {
             u && "window" !== !u && i.pushEvent(n, r, o, a, e.eventMeta(n, t, r));
+          }), window.addEventListener("dragover", function (e) {
+            return e.preventDefault();
+          }), window.addEventListener("drop", function (t) {
+            t.preventDefault();
+            var n = Z(G(t.target, e.binding("drop-target")), function (t) {
+              return t.getAttribute(e.binding("drop-target"));
+            }),
+                i = n && document.getElementById(n),
+                r = Array.from(t.dataTransfer.files || []);
+            i && !i.disabled && 0 !== r.length && i.files instanceof FileList && (ie.trackFiles(i, r), i.dispatchEvent(new Event("input", {
+              bubbles: !0
+            })));
           }));
         }
       }, {
@@ -2452,7 +2782,7 @@
                 n.withinOwners(e.target, function (n, r) {
                   t(e, i, n, e.target, r, a, null);
                 });
-              }) : re.all(document, "[".concat(o, "]"), function (r) {
+              }) : le.all(document, "[".concat(o, "]"), function (r) {
                 var a = r.getAttribute(o);
                 n.debounce(r, e, function () {
                   n.withinOwners(r, function (n, o) {
@@ -2468,31 +2798,36 @@
       }, {
         key: "bindClicks",
         value: function () {
-          var e = this;
-          [!0, !1].forEach(function (t) {
-            var n = t ? e.binding("capture-click") : e.binding("click");
-            window.addEventListener("click", function (i) {
-              var r = null,
-                  o = (r = t ? i.target.matches("[".concat(n, "]")) ? i.target : i.target.querySelector("[".concat(n, "]")) : G(i.target, n)) && r.getAttribute(n);
-              o && ("#" === r.getAttribute("href") && i.preventDefault(), e.debounce(r, i, function () {
-                e.withinOwners(r, function (t, n) {
-                  t.pushEvent("click", r, n, o, e.eventMeta("click", i, r));
+          this.bindClick("click", "click", !1), this.bindClick("mousedown", "capture-click", !0);
+        }
+      }, {
+        key: "bindClick",
+        value: function (e, t, n) {
+          var i = this,
+              r = this.binding(t);
+          window.addEventListener(e, function (e) {
+            if (i.isConnected()) {
+              var t = null,
+                  o = (t = n ? e.target.matches("[".concat(r, "]")) ? e.target : e.target.querySelector("[".concat(r, "]")) : G(e.target, r)) && t.getAttribute(r);
+              o && ("#" === t.getAttribute("href") && e.preventDefault(), i.debounce(t, e, function () {
+                i.withinOwners(t, function (n, r) {
+                  n.pushEvent("click", t, r, o, i.eventMeta("click", e, t));
                 });
               }));
-            }, t);
-          });
+            }
+          }, n);
         }
       }, {
         key: "bindNav",
         value: function () {
           var e = this;
 
-          if (ie.canPushState()) {
+          if (ce.canPushState()) {
             history.scrollRestoration && (history.scrollRestoration = "manual");
             var t = null;
             window.addEventListener("scroll", function (e) {
               clearTimeout(t), t = setTimeout(function () {
-                ie.updateCurrentState(function (e) {
+                ce.updateCurrentState(function (e) {
                   return Object.assign(e, {
                     scroll: window.scrollY
                   });
@@ -2531,10 +2866,10 @@
       }, {
         key: "withPageLoading",
         value: function (e, t) {
-          re.dispatchEvent(window, "phx:page-loading-start", e);
+          le.dispatchEvent(window, "phx:page-loading-start", e);
 
           var n = function () {
-            return re.dispatchEvent(window, "phx:page-loading-stop", e);
+            return le.dispatchEvent(window, "phx:page-loading-stop", e);
           };
 
           return t ? t(n) : n;
@@ -2555,7 +2890,7 @@
       }, {
         key: "historyPatch",
         value: function (e, t) {
-          ie.pushState(t, {
+          ce.pushState(t, {
             type: "patch",
             id: this.main.id
           }, e), this.registerNewLocation(window.location);
@@ -2570,7 +2905,7 @@
             kind: "redirect"
           }, function (o) {
             i.replaceMain(e, n, function () {
-              ie.pushState(t, {
+              ce.pushState(t, {
                 type: "redirect",
                 id: i.main.id,
                 scroll: r
@@ -2581,7 +2916,7 @@
       }, {
         key: "replaceRootHistory",
         value: function () {
-          ie.pushState("replace", {
+          ce.pushState("replace", {
             root: !0,
             type: "patch",
             id: this.main.id
@@ -2591,7 +2926,7 @@
         key: "registerNewLocation",
         value: function (e) {
           var t = this.currentLocation;
-          return t.pathname + t.search !== e.pathname + e.search && (this.currentLocation = z(e), !0);
+          return t.pathname + t.search !== e.pathname + e.search && (this.currentLocation = $(e), !0);
         }
       }, {
         key: "bindForms",
@@ -2614,15 +2949,15 @@
               if (o && ("number" !== r.type || !r.validity || !r.validity.badInput)) {
                 var a = t;
                 t++;
-                var u = re.private(r, "prev-iteration") || {},
-                    c = u.at,
-                    s = u.type;
-                c === a - 1 && n !== s || (re.putPrivate(r, "prev-iteration", {
+                var u = le.private(r, "prev-iteration") || {},
+                    s = u.at,
+                    c = u.type;
+                s === a - 1 && n !== c || (le.putPrivate(r, "prev-iteration", {
                   at: a,
                   type: n
                 }), e.debounce(r, i, function () {
                   e.withinOwners(r.form, function (t, n) {
-                    re.putPrivate(r, "phx-has-focused", !0), re.isTextualInput(r) || e.setActiveElement(r), t.pushInput(r, n, o, i.target);
+                    le.putPrivate(r, "phx-has-focused", !0), le.isTextualInput(r) || e.setActiveElement(r), t.pushInput(r, n, o, i.target);
                   });
                 }));
               }
@@ -2636,7 +2971,7 @@
               r = this.binding("throttle"),
               o = this.defaults.debounce.toString(),
               a = this.defaults.throttle.toString();
-          re.debounce(e, t, i, o, r, a, n);
+          le.debounce(e, t, i, o, r, a, n);
         }
       }, {
         key: "silenceEvents",
@@ -2653,7 +2988,7 @@
         }
       }]), e;
     }(),
-        ie = {
+        ce = {
       canPushState: function () {
         return void 0 !== history.pushState;
       },
@@ -2711,7 +3046,7 @@
         return document.cookie.replace(new RegExp("(?:(?:^|.*;s*)".concat(e, "s*=s*([^;]*).*$)|^.*$")), "$1");
       },
       redirect: function (e, t) {
-        t && ie.setCookie("__phoenix_flash__", t + "; max-age=60000; path=/"), window.location = e;
+        t && ce.setCookie("__phoenix_flash__", t + "; max-age=60000; path=/"), window.location = e;
       },
       localKey: function (e, t) {
         return "".concat(e, "-").concat(t);
@@ -2721,9 +3056,9 @@
         if ("" !== t) return document.getElementById(t) || document.querySelector('a[name="'.concat(t, '"]'));
       }
     },
-        re = {
+        le = {
       byId: function (e) {
-        return document.getElementById(e) || K("no id found for ".concat(e));
+        return document.getElementById(e) || z("no id found for ".concat(e));
       },
       removeClass: function (e, t) {
         e.classList.remove(t), 0 === e.classList.length && e.removeAttribute("class");
@@ -2732,36 +3067,61 @@
         var i = Array.from(e.querySelectorAll(t));
         return n ? i.forEach(n) : i;
       },
+      childNodeLength: function (e) {
+        var t = document.createElement("template");
+        return t.innerHTML = e, t.content.childElementCount;
+      },
+      isUploadInput: function (e) {
+        return "file" === e.type && null !== e.getAttribute(M);
+      },
+      findUploadInputs: function (e) {
+        return this.all(e, 'input[type="file"]['.concat(M, "]"));
+      },
       findComponentNodeList: function (e, t) {
-        var n = this.all(e, B),
-            i = this.all(e, "[".concat(j, '="').concat(t, '"]'));
-        return 0 === n.length ? i : i.filter(function (e) {
-          return !n.some(function (t) {
-            return t.contains(e);
-          });
-        });
+        return this.filterWithinSameLiveView(this.all(e, "[".concat(H, '="').concat(t, '"]')), e);
+      },
+      isPhxDestroyed: function (e) {
+        return !(!e.id || !le.private(e, "destroyed"));
+      },
+      markPhxChildDestroyed: function (e) {
+        e.setAttribute("data-phx-session", ""), this.putPrivate(e, "destroyed", !0);
       },
       findPhxChildrenInFragment: function (e, t) {
         var n = document.createElement("template");
         return n.innerHTML = e, this.findPhxChildren(n.content, t);
       },
+      isIgnored: function (e, t) {
+        return "ignore" === (e.getAttribute(t) || e.getAttribute("data-phx-update"));
+      },
       isPhxUpdate: function (e, t, n) {
         return e.getAttribute && n.indexOf(e.getAttribute(t)) >= 0;
       },
       findPhxChildren: function (e, t) {
-        return this.all(e, "".concat(B, "[").concat("data-phx-parent-id", '="').concat(t, '"]'));
+        return this.all(e, "".concat(U, "[").concat("data-phx-parent-id", '="').concat(t, '"]'));
       },
       findParentCIDs: function (e, t) {
         var n = this,
             i = new Set(t);
         return t.reduce(function (t, i) {
-          var r = "[".concat(j, '="').concat(i, '"] [').concat(j, "]");
-          return n.all(e, r).map(function (e) {
-            return parseInt(e.getAttribute(j));
+          var r = "[".concat(H, '="').concat(i, '"] [').concat(H, "]");
+          return n.filterWithinSameLiveView(n.all(e, r), e).map(function (e) {
+            return parseInt(e.getAttribute(H));
           }).forEach(function (e) {
             return t.delete(e);
           }), t;
         }, i);
+      },
+      filterWithinSameLiveView: function (e, t) {
+        var n = this;
+        return t.querySelector(U) ? e.filter(function (e) {
+          return n.withinSameLiveView(e, t);
+        }) : e;
+      },
+      withinSameLiveView: function (e, t) {
+        for (; e = e.parentNode;) {
+          if (e.isSameNode(t)) return !0;
+          if (e.getAttribute(O)) return !1;
+        }
       },
       private: function (e, t) {
         return e.phxPrivate && e.phxPrivate[t];
@@ -2773,7 +3133,7 @@
         e.phxPrivate || (e.phxPrivate = {}), e.phxPrivate[t] = n;
       },
       copyPrivates: function (e, t) {
-        t.phxPrivate && (e.phxPrivate = z(t.phxPrivate));
+        t.phxPrivate && (e.phxPrivate = $(t.phxPrivate));
       },
       putTitle: function (e) {
         var t = document.querySelector("title").dataset,
@@ -2783,10 +3143,10 @@
       },
       debounce: function (e, t, n, i, r, o, a) {
         var u = this,
-            c = e.getAttribute(n),
-            s = e.getAttribute(r);
-        "" === c && (c = i), "" === s && (s = o);
-        var l = c || s;
+            s = e.getAttribute(n),
+            c = e.getAttribute(r);
+        "" === s && (s = i), "" === c && (c = o);
+        var l = s || c;
 
         switch (l) {
           case null:
@@ -2800,11 +3160,11 @@
           default:
             var d = parseInt(l),
                 h = this.incCycle(e, "debounce-trigger", function () {
-              return s ? u.deletePrivate(e, "throttled") : a();
+              return c ? u.deletePrivate(e, "throttled") : a();
             });
-            if (isNaN(d)) return K("invalid throttle/debounce value: ".concat(l));
+            if (isNaN(d)) return z("invalid throttle/debounce value: ".concat(l));
 
-            if (s) {
+            if (c) {
               var f = !1;
 
               if ("keydown" === t.type) {
@@ -2822,7 +3182,7 @@
 
             e.form && this.once(e.form, "bind-debounce") && e.form.addEventListener("submit", function (t) {
               Array.from(new FormData(e.form).entries(), function (t) {
-                var n = L(t, 2),
+                var n = x(t, 2),
                     i = n[0],
                     r = (n[1], e.form.querySelector('[name="'.concat(i, '"]')));
                 u.incCycle(r, "debounce-trigger"), u.deletePrivate(r, "throttled");
@@ -2833,7 +3193,7 @@
         }
       },
       triggerCycle: function (e, t, n) {
-        var i = L(this.private(e, t), 2),
+        var i = x(this.private(e, t), 2),
             r = i[0],
             o = i[1];
         n || (n = r), n === r && (this.incCycle(e, t), o());
@@ -2843,15 +3203,21 @@
       },
       incCycle: function (e, t) {
         var n = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : function () {},
-            i = L(this.private(e, t) || [0, n], 2),
+            i = x(this.private(e, t) || [0, n], 2),
             r = i[0];
         i[1];
         return r++, this.putPrivate(e, t, [r, n]), r;
       },
       discardError: function (e, t, n) {
         var i = t.getAttribute && t.getAttribute(n),
-            r = i && e.querySelector("#".concat(i));
+            r = i && e.querySelector('[id="'.concat(i, '"], [name="').concat(i, '"]'));
         r && (this.private(r, "phx-has-focused") || this.private(r.form, "phx-has-submitted") || t.classList.add("phx-no-feedback"));
+      },
+      showError: function (e, t) {
+        var n = this;
+        (e.id || e.name) && this.all(e.form, "[".concat(t, '="').concat(e.id, '"], [').concat(t, '="').concat(e.name, '"]'), function (e) {
+          n.removeClass(e, "phx-no-feedback");
+        });
       },
       isPhxChild: function (e) {
         return e.getAttribute && e.getAttribute("data-phx-parent-id");
@@ -2871,24 +3237,26 @@
         return n.innerHTML = t, n;
       },
       mergeAttrs: function (e, t) {
-        for (var n = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : [], i = t.attributes, r = i.length - 1; r >= 0; r--) {
-          var o = i[r].name;
-          n.indexOf(o) < 0 && e.setAttribute(o, t.getAttribute(o));
+        for (var n = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : {}, i = n.exclude || [], r = n.isIgnored, o = t.attributes, a = o.length - 1; a >= 0; a--) {
+          var u = o[a].name;
+          i.indexOf(u) < 0 && e.setAttribute(u, t.getAttribute(u));
         }
 
-        for (var a = e.attributes, u = a.length - 1; u >= 0; u--) {
-          var c = a[u].name;
-          t.hasAttribute(c) || e.removeAttribute(c);
+        for (var s = e.attributes, c = s.length - 1; c >= 0; c--) {
+          var l = s[c].name;
+          r ? l.startsWith("data-") && !t.hasAttribute(l) && e.removeAttribute(l) : t.hasAttribute(l) || e.removeAttribute(l);
         }
       },
       mergeFocusedInput: function (e, t) {
-        e instanceof HTMLSelectElement || re.mergeAttrs(e, t, ["value"]), t.readOnly ? e.setAttribute("readonly", !0) : e.removeAttribute("readonly");
+        e instanceof HTMLSelectElement || le.mergeAttrs(e, t, {
+          except: ["value"]
+        }), t.readOnly ? e.setAttribute("readonly", !0) : e.removeAttribute("readonly");
       },
       hasSelectionRange: function (e) {
         return e.setSelectionRange && ("text" === e.type || "textarea" === e.type);
       },
       restoreFocus: function (e, t, n) {
-        if (re.isTextualInput(e)) {
+        if (le.isTextualInput(e)) {
           var i = e.matches(":focus");
           e.readOnly && e.blur(), i || e.focus(), this.hasSelectionRange(e) && e.setSelectionRange(t, n);
         }
@@ -2900,33 +3268,35 @@
         e instanceof HTMLInputElement && J.indexOf(e.type.toLocaleLowerCase()) >= 0 && (e.checked = null !== e.getAttribute("checked"));
       },
       isTextualInput: function (e) {
-        return U.indexOf(e.type) >= 0;
+        return B.indexOf(e.type) >= 0;
       },
       isNowTriggerFormExternal: function (e, t) {
         return e.getAttribute && null !== e.getAttribute(t);
       },
       syncPendingRef: function (e, t, n) {
-        var i = e.getAttribute(M);
-        return null === i || (re.isFormInput(e) || null !== e.getAttribute(n) ? (re.putPrivate(e, M, t), !1) : (H.forEach(function (n) {
+        var i = e.getAttribute(F);
+        return null === i || (le.isFormInput(e) || null !== e.getAttribute(n) ? (le.isUploadInput(e) && le.mergeAttrs(e, t, {
+          isIgnored: !0
+        }), le.putPrivate(e, F, t), !1) : (j.forEach(function (n) {
           e.classList.contains(n) && t.classList.add(n);
-        }), t.setAttribute(M, i), !0));
+        }), t.setAttribute(F, i), !0));
       },
       cleanChildNodes: function (e, t) {
-        if (re.isPhxUpdate(e, t, ["append", "prepend"])) {
+        if (le.isPhxUpdate(e, t, ["append", "prepend"])) {
           var n = [];
           e.childNodes.forEach(function (e) {
-            e.id || (e.nodeType === Node.TEXT_NODE && "" === e.nodeValue.trim() || K("only HTML element tags with an id are allowed inside containers with phx-update.\n\n" + 'removing illegal node: "'.concat((e.outerHTML || e.nodeValue).trim(), '"\n\n')), n.push(e));
+            e.id || (e.nodeType === Node.TEXT_NODE && "" === e.nodeValue.trim() || z("only HTML element tags with an id are allowed inside containers with phx-update.\n\n" + 'removing illegal node: "'.concat((e.outerHTML || e.nodeValue).trim(), '"\n\n')), n.push(e));
           }), n.forEach(function (e) {
             return e.remove();
           });
         }
       }
     },
-        oe = function () {
+        de = function () {
       function e(t, n, i) {
-        A(this, e);
+        T(this, e);
         var r = new Set(),
-            o = new Set(x(n.children).map(function (e) {
+            o = new Set(A(n.children).map(function (e) {
           return e.id;
         })),
             a = [];
@@ -2938,15 +3308,15 @@
               previousElementId: t
             });
           }
-        }), this.containerId = n.id, this.updateType = i, this.elementsToModify = a, this.elementIdsToAdd = x(o).filter(function (e) {
+        }), this.containerId = n.id, this.updateType = i, this.elementsToModify = a, this.elementIdsToAdd = A(o).filter(function (e) {
           return !r.has(e);
         });
       }
 
-      return P(e, [{
+      return _(e, [{
         key: "perform",
         value: function () {
-          var e = re.byId(this.containerId);
+          var e = le.byId(this.containerId);
           this.elementsToModify.forEach(function (t) {
             t.previousElementId ? Z(document.getElementById(t.previousElementId), function (e) {
               Z(document.getElementById(t.elementId), function (t) {
@@ -2963,12 +3333,11 @@
         }
       }]), e;
     }(),
-        ae = function () {
+        he = function () {
       function e(t, n, i, r, o) {
-        A(this, e), this.view = t, this.liveSocket = t.liveSocket, this.container = n, this.id = i, this.rootID = t.root.id, this.html = r, this.targetCID = o, this.cidPatch = "number" == typeof this.targetCID, this.callbacks = {
+        T(this, e), this.view = t, this.liveSocket = t.liveSocket, this.container = n, this.id = i, this.rootID = t.root.id, this.html = r, this.targetCID = o, this.cidPatch = "number" == typeof this.targetCID, this.callbacks = {
           beforeadded: [],
           beforeupdated: [],
-          beforediscarded: [],
           beforephxChildAdded: [],
           afteradded: [],
           afterupdated: [],
@@ -2977,17 +3346,17 @@
         };
       }
 
-      return P(e, null, [{
+      return _(e, null, [{
         key: "patchEl",
         value: function (e, t, n) {
           b(e, t, {
             childrenOnly: !1,
             onBeforeElUpdated: function (e, t) {
-              if (n && n.isSameNode(e) && re.isFormInput(e)) return re.mergeFocusedInput(e, t), !1;
+              if (n && n.isSameNode(e) && le.isFormInput(e)) return le.mergeFocusedInput(e, t), !1;
             }
           });
         }
-      }]), P(e, [{
+      }]), _(e, [{
         key: "before",
         value: function (e, t) {
           this.callbacks["before".concat(e)].push(t);
@@ -3018,7 +3387,7 @@
       }, {
         key: "markPrunableContentForRemoval",
         value: function () {
-          re.all(this.container, "[phx-update=append] > *, [phx-update=prepend] > *", function (e) {
+          le.all(this.container, "[phx-update=append] > *, [phx-update=prepend] > *", function (e) {
             e.setAttribute("data-phx-remove", "");
           });
         }
@@ -3030,13 +3399,13 @@
               n = this.liveSocket,
               i = this.container,
               r = this.html,
-              o = this.isCIDPatch() ? this.targetCIDContainer() : i;
+              o = this.isCIDPatch() ? this.targetCIDContainer(r) : i;
 
           if (!this.isCIDPatch() || o) {
             var a = n.getActiveElement(),
-                u = a && re.hasSelectionRange(a) ? a : {},
-                c = u.selectionStart,
-                s = u.selectionEnd,
+                u = a && le.hasSelectionRange(a) ? a : {},
+                s = u.selectionStart,
+                c = u.selectionEnd,
                 l = n.binding("update"),
                 d = n.binding("feedback-for"),
                 h = n.binding("disable-with"),
@@ -3050,34 +3419,41 @@
             });
             return this.trackBefore("added", i), this.trackBefore("updated", i, i), n.time("morphdom", function () {
               b(o, y, {
-                childrenOnly: null === o.getAttribute(j),
+                childrenOnly: null === o.getAttribute(H),
+                getNodeKey: function (e) {
+                  return le.isPhxDestroyed(e) ? null : e.id;
+                },
                 onBeforeNodeAdded: function (t) {
-                  return re.discardError(o, t, d), e.trackBefore("added", t), t;
+                  return le.discardError(o, t, d), e.trackBefore("added", t), t;
                 },
                 onNodeAdded: function (n) {
-                  re.isNowTriggerFormExternal(n, f) && (m = n), re.isPhxChild(n) && t.ownsElement(n) && e.trackAfter("phxChildAdded", n), v.push(n);
+                  le.isNowTriggerFormExternal(n, f) && (m = n), le.isPhxChild(n) && t.ownsElement(n) && e.trackAfter("phxChildAdded", n), v.push(n);
                 },
                 onNodeDiscarded: function (t) {
-                  re.isPhxChild(t) && n.destroyViewByEl(t), e.trackAfter("discarded", t);
+                  le.isPhxChild(t) && n.destroyViewByEl(t), e.trackAfter("discarded", t);
                 },
                 onBeforeNodeDiscarded: function (t) {
-                  return !(!t.getAttribute || null === t.getAttribute("data-phx-remove")) || (null === t.parentNode || !re.isPhxUpdate(t.parentNode, l, ["append", "prepend"]) || !t.id) && !e.skipCIDSibling(t) && (e.trackBefore("discarded", t), !0);
+                  return !(!t.getAttribute || null === t.getAttribute("data-phx-remove")) || (null === t.parentNode || !le.isPhxUpdate(t.parentNode, l, ["append", "prepend"]) || !t.id) && !e.skipCIDSibling(t);
                 },
                 onElUpdated: function (e) {
-                  re.isNowTriggerFormExternal(e, f) && (m = e), p.push(e);
+                  le.isNowTriggerFormExternal(e, f) && (m = e), p.push(e);
                 },
                 onBeforeElUpdated: function (t, n) {
-                  if (re.cleanChildNodes(n, l), e.skipCIDSibling(n)) return !1;
-                  if ("ignore" === t.getAttribute(l)) return e.trackBefore("updated", t, n), re.mergeAttrs(t, n), p.push(t), !1;
+                  if (le.cleanChildNodes(n, l), e.skipCIDSibling(n)) return !1;
+                  if (le.isIgnored(t, l)) return e.trackBefore("updated", t, n), le.mergeAttrs(t, n, {
+                    isIgnored: !0
+                  }), p.push(t), !1;
                   if ("number" === t.type && t.validity && t.validity.badInput) return !1;
-                  if (!re.syncPendingRef(t, n, h)) return !1;
+                  if (!le.syncPendingRef(t, n, h)) return le.isUploadInput(t) && (e.trackBefore("updated", t, n), p.push(t)), !1;
 
-                  if (re.isPhxChild(n)) {
-                    var i = t.getAttribute(F);
-                    return re.mergeAttrs(t, n), t.setAttribute(F, i), t.setAttribute("data-phx-root-id", e.rootID), !1;
+                  if (le.isPhxChild(n)) {
+                    var i = t.getAttribute("data-phx-session");
+                    return le.mergeAttrs(t, n, {
+                      exclude: ["data-phx-static"]
+                    }), "" !== i && t.setAttribute("data-phx-session", i), t.setAttribute("data-phx-root-id", e.rootID), !1;
                   }
 
-                  return re.copyPrivates(n, t), re.discardError(o, n, d), a && t.isSameNode(a) && re.isFormInput(t) && !e.forceFocusedSelectUpdate(t, n) ? (e.trackBefore("updated", t, n), re.mergeFocusedInput(t, n), re.syncAttrsToProps(t), p.push(t), !1) : (re.isPhxUpdate(n, l, ["append", "prepend"]) && g.push(new oe(t, n, n.getAttribute(l))), re.syncAttrsToProps(n), e.trackBefore("updated", t, n), !0);
+                  return le.copyPrivates(n, t), le.discardError(o, n, d), a && t.isSameNode(a) && le.isFormInput(t) && !e.forceFocusedSelectUpdate(t, n) ? (e.trackBefore("updated", t, n), le.mergeFocusedInput(t, n), le.syncAttrsToProps(t), p.push(t), !1) : (le.isPhxUpdate(n, l, ["append", "prepend"]) && g.push(new de(t, n, n.getAttribute(l))), le.syncAttrsToProps(n), e.trackBefore("updated", t, n), !0);
                 }
               });
             }), n.isDebugEnabled() && function () {
@@ -3087,8 +3463,8 @@
                 return e.perform();
               });
             }), n.silenceEvents(function () {
-              return re.restoreFocus(a, c, s);
-            }), re.dispatchEvent(document, "phx:update"), v.forEach(function (t) {
+              return le.restoreFocus(a, s, c);
+            }), le.dispatchEvent(document, "phx:update"), v.forEach(function (t) {
               return e.trackAfter("added", t);
             }), p.forEach(function (t) {
               return e.trackAfter("updated", t);
@@ -3098,7 +3474,10 @@
       }, {
         key: "forceFocusedSelectUpdate",
         value: function (e, t) {
-          return !0 === e.multiple || e.innerHTML != t.innerHTML;
+          var n = ["select", "select-one", "select-multiple"].find(function (t) {
+            return t === e.type;
+          });
+          return !0 === e.multiple || n && e.innerHTML != t.innerHTML;
         }
       }, {
         key: "isCIDPatch",
@@ -3112,11 +3491,11 @@
         }
       }, {
         key: "targetCIDContainer",
-        value: function () {
+        value: function (e) {
           if (this.isCIDPatch()) {
-            var e = k(re.findComponentNodeList(this.container, this.targetCID)),
-                t = e[0];
-            return 0 === e.slice(1).length ? t : t && t.parentNode;
+            var t = k(le.findComponentNodeList(this.container, this.targetCID)),
+                n = t[0];
+            return 0 === t.slice(1).length && 1 === le.childNodeLength(e) ? n : n && n.parentNode;
           }
         }
       }, {
@@ -3124,28 +3503,28 @@
         value: function (e, t, n, i) {
           var r = this,
               o = this.isCIDPatch(),
-              a = o && i.getAttribute(j) === this.targetCID.toString();
+              a = o && i.getAttribute(H) === this.targetCID.toString();
           if (!o || a) return t;
           var u = null,
-              c = document.createElement("template");
-          u = re.cloneNode(i);
-          var s = k(re.findComponentNodeList(u, this.targetCID)),
-              l = s[0],
-              d = s.slice(1);
-          return c.innerHTML = t, d.forEach(function (e) {
+              s = document.createElement("template");
+          u = le.cloneNode(i);
+          var c = k(le.findComponentNodeList(u, this.targetCID)),
+              l = c[0],
+              d = c.slice(1);
+          return s.innerHTML = t, d.forEach(function (e) {
             return e.remove();
           }), Array.from(u.childNodes).forEach(function (e) {
-            e.id && e.nodeType === Node.ELEMENT_NODE && e.getAttribute(j) !== r.targetCID.toString() && (e.setAttribute("data-phx-skip", ""), e.innerHTML = "");
-          }), Array.from(c.content.childNodes).forEach(function (e) {
+            e.id && e.nodeType === Node.ELEMENT_NODE && e.getAttribute(H) !== r.targetCID.toString() && (e.setAttribute("data-phx-skip", ""), e.innerHTML = "");
+          }), Array.from(s.content.childNodes).forEach(function (e) {
             return u.insertBefore(e, l);
           }), l.remove(), u.outerHTML;
         }
       }]), e;
     }(),
-        ue = function () {
+        fe = function () {
       function e(t, n, i, r, o) {
         var a = this;
-        A(this, e), this.liveSocket = n, this.flash = o, this.parent = i, this.root = i ? i.root : this, this.el = t, this.id = this.el.id, this.view = this.el.getAttribute(O), this.ref = 0, this.childJoins = 0, this.loaderTimer = null, this.pendingDiffs = [], this.href = r, this.joinCount = this.parent ? this.parent.joinCount - 1 : 0, this.joinPending = !0, this.destroyed = !1, this.joinCallback = function () {}, this.stopCallback = function () {}, this.pendingJoinOps = this.parent ? null : [], this.viewHooks = {}, this.children = this.parent ? null : {}, this.root.children[this.id] = {}, this.channel = this.liveSocket.channel("lv:".concat(this.id), function () {
+        T(this, e), this.liveSocket = n, this.flash = o, this.parent = i, this.root = i ? i.root : this, this.el = t, this.id = this.el.id, this.view = this.el.getAttribute(O), this.ref = 0, this.childJoins = 0, this.loaderTimer = null, this.pendingDiffs = [], this.pruningCIDs = [], this.href = r, this.joinCount = this.parent ? this.parent.joinCount - 1 : 0, this.joinPending = !0, this.destroyed = !1, this.joinCallback = function () {}, this.stopCallback = function () {}, this.pendingJoinOps = this.parent ? null : [], this.viewHooks = {}, this.uploaders = {}, this.formSubmits = [], this.children = this.parent ? null : {}, this.root.children[this.id] = {}, this.channel = this.liveSocket.channel("lv:".concat(this.id), function () {
           return {
             url: a.href,
             params: a.connectParams(),
@@ -3156,7 +3535,7 @@
         }), this.showLoader(this.liveSocket.loaderTimeout), this.bindChannel();
       }
 
-      return P(e, [{
+      return _(e, [{
         key: "isMain",
         value: function () {
           return this.liveSocket.main === this;
@@ -3165,7 +3544,7 @@
         key: "connectParams",
         value: function () {
           var e = this.liveSocket.params(this.view),
-              t = re.all(document, "[".concat(this.binding("track-static"), "]")).map(function (e) {
+              t = le.all(document, "[".concat(this.binding("track-static"), "]")).map(function (e) {
             return e.src || e.href;
           }).filter(function (e) {
             return "string" == typeof e;
@@ -3190,7 +3569,7 @@
       }, {
         key: "getStatic",
         value: function () {
-          var e = this.el.getAttribute(F);
+          var e = this.el.getAttribute("data-phx-static");
           return "" === e ? null : e;
         }
       }, {
@@ -3201,10 +3580,10 @@
           this.destroyAllChildren(), this.destroyed = !0, delete this.root.children[this.id], this.parent && delete this.root.children[this.parent.id][this.id], clearTimeout(this.loaderTimer);
 
           var n = function () {
-            for (var n in t(), e.viewHooks) e.viewHooks[n].__trigger__("beforeDestroy"), e.destroyHook(e.viewHooks[n]);
+            for (var n in t(), e.viewHooks) e.destroyHook(e.viewHooks[n]);
           };
 
-          this.log("destroyed", function () {
+          le.markPhxChildDestroyed(this.el), this.log("destroyed", function () {
             return ["the child has been removed from the parent"];
           }), this.channel.leave().receive("ok", n).receive("error", n).receive("timeout", n);
         }
@@ -3226,7 +3605,7 @@
           if (clearTimeout(this.loaderTimer), e) this.loaderTimer = setTimeout(function () {
             return t.showLoader();
           }, e);else {
-            for (var n in this.viewHooks) this.viewHooks[n].__trigger__("disconnected");
+            for (var n in this.viewHooks) this.viewHooks[n].__disconnected();
 
             this.setContainerClasses("phx-disconnected");
           }
@@ -3239,7 +3618,7 @@
       }, {
         key: "triggerReconnected",
         value: function () {
-          for (var e in this.viewHooks) this.viewHooks[e].__trigger__("reconnected");
+          for (var e in this.viewHooks) this.viewHooks[e].__reconnected();
         }
       }, {
         key: "log",
@@ -3252,11 +3631,11 @@
           var n = this;
 
           if (/^(0|[1-9]\d*)$/.test(e)) {
-            var i = re.findComponentNodeList(this.el, e);
-            0 === i.length ? K("no component found matching phx-target of ".concat(e)) : t(this, i[0]);
+            var i = le.findComponentNodeList(this.el, e);
+            0 === i.length ? z("no component found matching phx-target of ".concat(e)) : t(this, i[0]);
           } else {
             var r = Array.from(document.querySelectorAll(e));
-            0 === r.length && K('nothing found matching the phx-target selector "'.concat(e, '"')), r.forEach(function (e) {
+            0 === r.length && z('nothing found matching the phx-target selector "'.concat(e, '"')), r.forEach(function (e) {
               return n.liveSocket.owner(e, function (n) {
                 return t(n, e);
               });
@@ -3267,14 +3646,14 @@
         key: "applyDiff",
         value: function (e, t, n) {
           this.log(e, function () {
-            return ["", z(t)];
+            return ["", $(t)];
           });
-          var i = te.extract(t),
+          var i = ue.extract(t),
               r = i.diff,
               o = i.reply,
               a = i.events,
               u = i.title;
-          return u && re.putTitle(u), n({
+          return u && le.putTitle(u), n({
             diff: r,
             reply: o,
             events: a
@@ -3285,14 +3664,14 @@
         value: function (e) {
           var t = this,
               n = e.rendered;
-          this.joinCount++, this.childJoins = 0, this.joinPending = !0, this.flash = null, ie.dropLocal(this.name(), "consecutive-reloads"), this.applyDiff("mount", n, function (n) {
+          this.childJoins = 0, this.joinPending = !0, this.flash = null, ce.dropLocal(this.name(), "consecutive-reloads"), this.applyDiff("mount", n, function (n) {
             var i = n.diff,
                 r = n.events;
-            t.rendered = new te(t.id, i);
+            t.rendered = new ue(t.id, i);
             var o = t.renderContainer(null, "join");
             t.dropPendingRefs();
             var a = t.formsForRecovery(o);
-            t.joinCount > 1 && a.length > 0 ? a.forEach(function (e, n) {
+            t.joinCount++, a.length > 0 ? a.forEach(function (e, n) {
               t.pushFormRecovery(e, function (e) {
                 n === a.length - 1 && t.onJoinComplete(e, o, r);
               });
@@ -3302,8 +3681,8 @@
       }, {
         key: "dropPendingRefs",
         value: function () {
-          re.all(this.el, "[".concat(M, "]"), function (e) {
-            return e.removeAttribute(M);
+          le.all(this.el, "[".concat(F, "]"), function (e) {
+            return e.removeAttribute(F);
           });
         }
       }, {
@@ -3312,10 +3691,10 @@
           var i = this,
               r = e.live_patch;
           if (this.joinCount > 1 || this.parent && !this.parent.isJoinPending()) return this.applyJoinPatch(r, t, n);
-          0 === re.findPhxChildrenInFragment(t, this.id).filter(function (e) {
+          0 === le.findPhxChildrenInFragment(t, this.id).filter(function (e) {
             var t = e.id && i.el.querySelector("#".concat(e.id)),
-                n = t && t.getAttribute(F);
-            return n && e.setAttribute(F, n), i.joinChild(e);
+                n = t && t.getAttribute("data-phx-static");
+            return n && e.setAttribute("data-phx-static", n), i.joinChild(e);
           }).length ? this.parent ? (this.root.pendingJoinOps.push([this, function () {
             return i.applyJoinPatch(r, t, n);
           }]), this.parent.ackJoin(this)) : (this.onAllChildJoinsComplete(), this.applyJoinPatch(r, t, n)) : this.root.pendingJoinOps.push([this, function () {
@@ -3325,13 +3704,13 @@
       }, {
         key: "attachTrueDocEl",
         value: function () {
-          this.el = re.byId(this.id), this.el.setAttribute("data-phx-root-id", this.root.id);
+          this.el = le.byId(this.id), this.el.setAttribute("data-phx-root-id", this.root.id);
         }
       }, {
         key: "dispatchEvents",
         value: function (e) {
           e.forEach(function (e) {
-            var t = L(e, 2),
+            var t = x(e, 2),
                 n = t[0],
                 i = t[1];
             window.dispatchEvent(new CustomEvent("phx:hook:".concat(n), {
@@ -3344,11 +3723,11 @@
         value: function (e, t, n) {
           var i = this;
           this.attachTrueDocEl();
-          var r = new ae(this, this.el, this.id, t, null);
+          var r = new he(this, this.el, this.id, t, null);
 
-          if (r.markPrunableContentForRemoval(), this.performPatch(r, !1), this.joinNewChildren(), re.all(this.el, "[".concat(this.binding("hook"), "]"), function (e) {
+          if (r.markPrunableContentForRemoval(), this.performPatch(r, !1), this.joinNewChildren(), le.all(this.el, "[".concat(this.binding("hook"), "], [data-phx-").concat("hook", "]"), function (e) {
             var t = i.addHook(e);
-            t && t.__trigger__("mounted");
+            t && t.__mounted();
           }), this.joinPending = !1, this.dispatchEvents(n), this.applyPendingUpdates(), e) {
             var o = e.kind,
                 a = e.to;
@@ -3362,15 +3741,10 @@
         value: function (e, t) {
           this.liveSocket.triggerDOM("onBeforeElUpdated", [e, t]);
           var n = this.getHook(e),
-              i = n && "ignore" === e.getAttribute(this.binding("update"));
+              i = n && le.isIgnored(e, this.binding("update"));
           if (n && !e.isEqualNode(t) && (!i || !function (e, t) {
             return JSON.stringify(e) === JSON.stringify(t);
-          }(e.dataset, t.dataset))) return n.__trigger__("beforeUpdate"), n;
-        }
-      }, {
-        key: "triggerUpdatedHook",
-        value: function (e) {
-          e.__trigger__("updated");
+          }(e.dataset, t.dataset))) return n.__beforeUpdate(), n;
         }
       }, {
         key: "performPatch",
@@ -3380,17 +3754,15 @@
               r = !1,
               o = new Set();
           return e.after("added", function (e) {
+            n.liveSocket.triggerDOM("onNodeAdded", [e]);
             var t = n.addHook(e);
-            t && t.__trigger__("mounted");
+            t && t.__mounted();
           }), e.after("phxChildAdded", function (e) {
             return r = !0;
           }), e.before("updated", function (e, t) {
             n.triggerBeforeUpdateHook(e, t) && o.add(e.id);
           }), e.after("updated", function (e) {
-            o.has(e.id) && n.triggerUpdatedHook(n.getHook(e));
-          }), e.before("discarded", function (e) {
-            var t = n.getHook(e);
-            t && t.__trigger__("beforeDestroy");
+            o.has(e.id) && n.getHook(e).__updated();
           }), e.after("discarded", function (e) {
             var t = n.componentID(e);
             "number" == typeof t && -1 === i.indexOf(t) && i.push(t);
@@ -3402,7 +3774,7 @@
         key: "joinNewChildren",
         value: function () {
           var e = this;
-          re.findPhxChildren(this.el, this.id).forEach(function (t) {
+          le.findPhxChildren(this.el, this.id).forEach(function (t) {
             return e.joinChild(t);
           });
         }
@@ -3443,7 +3815,7 @@
         key: "onAllChildJoinsComplete",
         value: function () {
           this.joinCallback(), this.pendingJoinOps.forEach(function (e) {
-            var t = L(e, 2),
+            var t = x(e, 2),
                 n = t[0],
                 i = t[1];
             n.isDestroyed() || i();
@@ -3460,12 +3832,12 @@
           this.rendered.mergeDiff(e);
           var i = !1;
           this.rendered.isComponentOnlyDiff(e) ? this.liveSocket.time("component patch complete", function () {
-            re.findParentCIDs(n.el, n.rendered.componentCIDs(e)).forEach(function (t) {
+            le.findParentCIDs(n.el, n.rendered.componentCIDs(e)).forEach(function (t) {
               n.componentPatch(n.rendered.getComponent(e, t), t) && (i = !0);
             });
           }) : Q(e) || this.liveSocket.time("full patch complete", function () {
             var t = n.renderContainer(e, "update"),
-                r = new ae(n, n.el, n.id, t, null);
+                r = new he(n, n.el, n.id, t, null);
             i = n.performPatch(r, !0);
           }), this.dispatchEvents(t), i && this.joinNewChildren();
         }
@@ -3475,7 +3847,7 @@
           var n = this;
           return this.liveSocket.time("toString diff (".concat(t, ")"), function () {
             var t = n.el.tagName,
-                i = e ? n.rendered.componentCIDs(e) : null,
+                i = e ? n.rendered.componentCIDs(e).concat(n.pruningCIDs) : null,
                 r = n.rendered.toString(i);
             return "<".concat(t, ">").concat(r, "</").concat(t, ">");
           });
@@ -3485,37 +3857,37 @@
         value: function (e, t) {
           if (Q(e)) return !1;
           var n = this.rendered.componentToString(t),
-              i = new ae(this, this.el, this.id, n, t);
+              i = new he(this, this.el, this.id, n, t);
           return this.performPatch(i, !0);
         }
       }, {
         key: "getHook",
         value: function (e) {
-          return this.viewHooks[se.elementID(e)];
+          return this.viewHooks[pe.elementID(e)];
         }
       }, {
         key: "addHook",
         value: function (e) {
-          if (!se.elementID(e) && e.getAttribute) {
-            var t = e.getAttribute(this.binding("hook"));
+          if (!pe.elementID(e) && e.getAttribute) {
+            var t = e.getAttribute("data-phx-".concat("hook")) || e.getAttribute(this.binding("hook"));
 
             if (!t || this.ownsElement(e)) {
               var n = this.liveSocket.getHookCallbacks(t);
 
               if (n) {
-                e.id || K('no DOM ID for hook "'.concat(t, '". Hooks require a unique ID on each element.'), e);
-                var i = new se(this, e, n);
-                return this.viewHooks[se.elementID(i.el)] = i, i;
+                e.id || z('no DOM ID for hook "'.concat(t, '". Hooks require a unique ID on each element.'), e);
+                var i = new pe(this, e, n);
+                return this.viewHooks[pe.elementID(i.el)] = i, i;
               }
 
-              null !== t && K('unknown hook found for "'.concat(t, '"'), e);
+              null !== t && z('unknown hook found for "'.concat(t, '"'), e);
             }
           }
         }
       }, {
         key: "destroyHook",
         value: function (e) {
-          e.__trigger__("destroyed"), e.__cleanup__(), delete this.viewHooks[se.elementID(e.el)];
+          e.__destroyed(), e.__cleanup__(), delete this.viewHooks[pe.elementID(e.el)];
         }
       }, {
         key: "applyPendingUpdates",
@@ -3560,8 +3932,8 @@
             return e.onLiveRedirect(t);
           }), this.channel.onError(function (t) {
             return e.onError(t);
-          }), this.channel.onClose(function () {
-            return e.onClose();
+          }), this.channel.onClose(function (t) {
+            return e.onClose(t);
           });
         }
       }, {
@@ -3611,7 +3983,9 @@
             kind: "initial"
           })), this.joinCallback = function () {
             return e && e(t, t.joinCount);
-          }, this.liveSocket.wrapPush(function () {
+          }, this.liveSocket.wrapPush(this, {
+            timeout: !1
+          }, function () {
             return t.channel.join().receive("ok", function (e) {
               return t.onJoin(e);
             }).receive("error", function (e) {
@@ -3632,23 +4006,23 @@
         }
       }, {
         key: "onClose",
-        value: function () {
+        value: function (e) {
           if (!this.isDestroyed()) {
-            if (this.isJoinPending() || this.liveSocket.hasPendingLink()) return this.liveSocket.reloadWithJitter(this);
+            if (this.isJoinPending() || this.liveSocket.hasPendingLink() && "leave" !== e) return this.liveSocket.reloadWithJitter(this);
             this.destroyAllChildren(), this.liveSocket.dropActiveElement(this), document.activeElement && document.activeElement.blur(), this.liveSocket.isUnloaded() && this.showLoader(200);
           }
         }
       }, {
         key: "onError",
         value: function (e) {
-          this.onClose(), this.log("error", function () {
+          this.onClose(e), this.log("error", function () {
             return ["view crashed", e];
           }), this.liveSocket.isUnloaded() || this.displayError();
         }
       }, {
         key: "displayError",
         value: function () {
-          this.isMain() && re.dispatchEvent(window, "phx:page-loading-start", {
+          this.isMain() && le.dispatchEvent(window, "phx:page-loading-start", {
             to: this.href,
             kind: "error"
           }), this.showLoader(), this.setContainerClasses("phx-disconnected", "phx-error");
@@ -3658,22 +4032,24 @@
         value: function (e, t, n) {
           var i = this,
               r = arguments.length > 3 && void 0 !== arguments[3] ? arguments[3] : function () {},
-              o = L(e ? e() : [null, []], 2),
+              o = x(e ? e() : [null, []], 2),
               a = o[0],
-              u = L(o[1], 1)[0],
-              c = function () {};
+              u = x(o[1], 1)[0],
+              s = function () {};
 
-          return u && null !== u.getAttribute(this.binding("page-loading")) && (c = this.liveSocket.withPageLoading({
+          return u && null !== u.getAttribute(this.binding("page-loading")) && (s = this.liveSocket.withPageLoading({
             kind: "element",
             target: u
-          })), "number" != typeof n.cid && delete n.cid, this.liveSocket.wrapPush(function () {
+          })), "number" != typeof n.cid && delete n.cid, this.liveSocket.wrapPush(this, {
+            timeout: !0
+          }, function () {
             return i.channel.push(t, n, 3e4).receive("ok", function (e) {
               var t = null;
               null !== a && i.undoRefs(a), e.diff && (t = i.applyDiff("update", e.diff, function (e) {
                 var t = e.diff,
                     n = e.events;
                 i.update(t, n);
-              })), e.redirect && i.onRedirect(e.redirect), e.live_patch && i.onLivePatch(e.live_patch), e.live_redirect && i.onLiveRedirect(e.live_redirect), c(), r(e, t);
+              })), e.redirect && i.onRedirect(e.redirect), e.live_patch && i.onLivePatch(e.live_patch), e.live_redirect && i.onLiveRedirect(e.live_redirect), s(), r(e, t);
             });
           });
         }
@@ -3681,17 +4057,17 @@
         key: "undoRefs",
         value: function (e) {
           var t = this;
-          re.all(this.el, "[".concat(M, '="').concat(e, '"]'), function (e) {
-            e.removeAttribute(M), null !== e.getAttribute("data-phx-readonly") && (e.readOnly = !1, e.removeAttribute("data-phx-readonly")), null !== e.getAttribute("data-phx-disabled") && (e.disabled = !1, e.removeAttribute("data-phx-disabled")), H.forEach(function (t) {
-              return re.removeClass(e, t);
+          le.all(this.el, "[".concat(F, '="').concat(e, '"]'), function (e) {
+            e.removeAttribute(F), null !== e.getAttribute("data-phx-readonly") && (e.readOnly = !1, e.removeAttribute("data-phx-readonly")), null !== e.getAttribute("data-phx-disabled") && (e.disabled = !1, e.removeAttribute("data-phx-disabled")), j.forEach(function (t) {
+              return le.removeClass(e, t);
             });
             var n = e.getAttribute("data-phx-disable-with-restore");
             null !== n && (e.innerText = n, e.removeAttribute("data-phx-disable-with-restore"));
-            var i = re.private(e, M);
+            var i = le.private(e, F);
 
             if (i) {
               var r = t.triggerBeforeUpdateHook(e, i);
-              ae.patchEl(e, i, t.liveSocket.getActiveElement()), r && t.triggerUpdatedHook(r), re.deletePrivate(e, M);
+              he.patchEl(e, i, t.liveSocket.getActiveElement()), r && r.__updated(), le.deletePrivate(e, F);
             }
           });
         }
@@ -3701,7 +4077,7 @@
           var n = this.ref++,
               i = this.binding("disable-with");
           return e.forEach(function (e) {
-            e.classList.add("phx-".concat(t, "-loading")), e.setAttribute(M, n);
+            e.classList.add("phx-".concat(t, "-loading")), e.setAttribute(F, n);
             var r = e.getAttribute(i);
             null !== r && (e.getAttribute("data-phx-disable-with-restore") || e.setAttribute("data-phx-disable-with-restore", e.innerText), e.innerText = r);
           }), [n, e];
@@ -3709,7 +4085,7 @@
       }, {
         key: "componentID",
         value: function (e) {
-          var t = e.getAttribute && e.getAttribute(j);
+          var t = e.getAttribute && e.getAttribute(H);
           return t ? parseInt(t) : null;
         }
       }, {
@@ -3721,14 +4097,17 @@
         key: "closestComponentID",
         value: function (e) {
           var t = this;
-          return e ? Z(e.closest("[".concat(j, "]")), function (e) {
+          return e ? Z(e.closest("[".concat(H, "]")), function (e) {
             return t.ownsElement(e) && t.componentID(e);
           }) : null;
         }
       }, {
         key: "pushHookEvent",
         value: function (e, t, n, i) {
-          var r = L(this.putRef([], "hook"), 2),
+          if (!this.isConnected()) return this.log("hook", function () {
+            return ["unable to push hook event. LiveView not connected", t, n];
+          }), !1;
+          var r = x(this.putRef([], "hook"), 2),
               o = r[0],
               a = r[1];
           return this.pushWithReply(function () {
@@ -3779,43 +4158,194 @@
           });
         }
       }, {
+        key: "pushFileProgress",
+        value: function (e, t, n) {
+          var i = arguments.length > 3 && void 0 !== arguments[3] ? arguments[3] : function () {};
+          this.liveSocket.withinOwners(e.form, function (r, o) {
+            r.pushWithReply(null, "progress", {
+              event: e.getAttribute(r.binding("progress")),
+              ref: e.getAttribute(M),
+              entry_ref: t,
+              progress: n,
+              cid: r.targetComponentID(e.form, o)
+            }, i);
+          });
+        }
+      }, {
         key: "pushInput",
         value: function (e, t, n, i, r) {
-          var o = this;
-          this.pushWithReply(function () {
+          var o = this,
+              a = this.targetComponentID(e.form, t),
+              u = function () {
             return o.putRef([e, e.form], "change");
-          }, "event", {
+          },
+              s = ae(e.form, {
+            _target: i.name
+          });
+
+          e.files && e.files.length > 0 && ie.trackFiles(e, Array.from(e.files));
+          var c = {
             type: "form",
             event: n,
-            value: ee(e.form, {
-              _target: i.name
-            }),
-            cid: this.targetComponentID(e.form, t)
-          }, r);
+            value: s,
+            uploads: ie.serializeUploads(e),
+            cid: a
+          };
+          this.pushWithReply(u, "event", c, function (n) {
+            if (le.showError(e, o.liveSocket.binding("feedback-for")), le.isUploadInput(e) && null !== e.getAttribute("data-phx-auto-upload")) {
+              if (ie.filesAwaitingPreflight(e).length > 0) {
+                var i = x(u(), 2),
+                    s = i[0];
+                i[1];
+                o.uploadFiles(e.form, t, s, a, function (t) {
+                  r && r(n), o.triggerAwaitingSubmit(e.form);
+                });
+              }
+            } else r && r(n);
+          });
+        }
+      }, {
+        key: "triggerAwaitingSubmit",
+        value: function (e) {
+          var t = this.getScheduledSubmit(e);
+
+          if (t) {
+            var n = x(t, 3),
+                i = (n[0], n[1], n[2]);
+            this.cancelSubmit(e), i();
+          }
+        }
+      }, {
+        key: "getScheduledSubmit",
+        value: function (e) {
+          return this.formSubmits.find(function (t) {
+            var n = x(t, 2),
+                i = n[0];
+            n[1];
+            return i.isSameNode(e);
+          });
+        }
+      }, {
+        key: "scheduleSubmit",
+        value: function (e, t, n) {
+          if (this.getScheduledSubmit(e)) return !0;
+          this.formSubmits.push([e, t, n]);
+        }
+      }, {
+        key: "cancelSubmit",
+        value: function (e) {
+          var t = this;
+          this.formSubmits = this.formSubmits.filter(function (n) {
+            var i = x(n, 3),
+                r = i[0],
+                o = i[1];
+            i[2];
+            return !r.isSameNode(e) || (t.undoRefs(o), !1);
+          });
         }
       }, {
         key: "pushFormSubmit",
         value: function (e, t, n, i) {
           var r = this,
               o = function (e) {
-            return !G(e, "".concat(r.binding("update"), "=ignore"), e.form);
-          };
-
-          this.pushWithReply(function () {
-            var t = re.all(e, "[".concat(r.binding("disable-with"), "]")),
-                n = re.all(e, "button").filter(o),
-                i = re.all(e, "input,textarea,select").filter(o);
-            return n.forEach(function (e) {
+            return !(G(e, "".concat(r.binding("update"), "=ignore"), e.form) || G(e, "data-phx-update=ignore", e.form));
+          },
+              a = function (e) {
+            return e.hasAttribute(r.binding("disable-with"));
+          },
+              u = function (e) {
+            return "BUTTON" == e.tagName;
+          },
+              s = function (e) {
+            return ["INPUT", "TEXTAREA", "SELECT"].includes(e.tagName);
+          },
+              c = function () {
+            var t = Array.from(e.elements),
+                n = t.filter(a),
+                i = t.filter(u).filter(o),
+                c = t.filter(s).filter(o);
+            return i.forEach(function (e) {
               e.setAttribute("data-phx-disabled", e.disabled), e.disabled = !0;
-            }), i.forEach(function (e) {
-              e.setAttribute("data-phx-readonly", e.readOnly), e.readOnly = !0;
-            }), e.setAttribute(r.binding("page-loading"), ""), r.putRef([e].concat(t).concat(n).concat(i), "submit");
-          }, "event", {
-            type: "form",
-            event: n,
-            value: ee(e),
-            cid: this.targetComponentID(e, t)
-          }, i);
+            }), c.forEach(function (e) {
+              e.setAttribute("data-phx-readonly", e.readOnly), e.readOnly = !0, e.files && (e.setAttribute("data-phx-disabled", e.disabled), e.disabled = !0);
+            }), e.setAttribute(r.binding("page-loading"), ""), r.putRef([e].concat(n).concat(i).concat(c), "submit");
+          },
+              l = this.targetComponentID(e, t);
+
+          if (ie.hasUploadsInProgress(e)) {
+            var d = x(c(), 2),
+                h = d[0];
+            d[1];
+            return this.scheduleSubmit(e, h, function () {
+              return r.pushFormSubmit(e, t, n, i);
+            });
+          }
+
+          if (ie.inputsAwaitingPreflight(e).length > 0) {
+            var f = x(c(), 2),
+                v = f[0],
+                p = f[1],
+                g = function () {
+              return [v, p];
+            };
+
+            this.uploadFiles(e, t, v, l, function (t) {
+              var o = ae(e, {});
+              r.pushWithReply(g, "event", {
+                type: "form",
+                event: n,
+                value: o,
+                cid: l
+              }, i);
+            });
+          } else {
+            var m = ae(e);
+            this.pushWithReply(c, "event", {
+              type: "form",
+              event: n,
+              value: m,
+              cid: l
+            }, i);
+          }
+        }
+      }, {
+        key: "uploadFiles",
+        value: function (e, t, n, i, r) {
+          var o = this,
+              a = this.joinCount;
+          ie.activeFileInputs(e).forEach(function (e) {
+            var i = new ie(e, o, r);
+            o.uploaders[e] = i;
+            var u = i.entries().map(function (e) {
+              return e.toPreflightPayload();
+            }),
+                s = {
+              ref: e.getAttribute(M),
+              entries: u,
+              cid: o.targetComponentID(e.form, t)
+            };
+            o.log("upload", function () {
+              return ["sending preflight request", s];
+            }), o.pushWithReply(null, "allow_upload", s, function (e) {
+              if (o.log("upload", function () {
+                return ["got preflight response", e];
+              }), e.error) {
+                o.undoRefs(n);
+                var t = x(e.error, 2),
+                    r = t[0],
+                    u = t[1];
+                o.log("upload", function () {
+                  return ["error for entry ".concat(r), u];
+                });
+              } else {
+                i.initAdapterUpload(e, function (e) {
+                  o.channel.onError(function () {
+                    o.joinCount === a && e();
+                  });
+                }, o.liveSocket);
+              }
+            });
+          });
         }
       }, {
         key: "pushFormRecovery",
@@ -3846,11 +4376,14 @@
       }, {
         key: "formsForRecovery",
         value: function (e) {
-          var t = this,
-              n = this.binding("change"),
+          var t = this;
+          if (0 === this.joinCount) return [];
+          var n = this.binding("change"),
               i = document.createElement("template");
-          return i.innerHTML = e, re.all(this.el, "form[".concat(n, "]")).filter(function (e) {
+          return i.innerHTML = e, le.all(this.el, "form[".concat(n, "]")).filter(function (e) {
             return t.ownsElement(e);
+          }).filter(function (e) {
+            return e.elements.length > 0;
           }).filter(function (e) {
             return "ignore" !== e.getAttribute(t.binding("auto-recover"));
           }).filter(function (e) {
@@ -3860,20 +4393,31 @@
       }, {
         key: "maybePushComponentsDestroyed",
         value: function (e) {
-          var t = this,
-              n = e.filter(function (e) {
-            return 0 === re.findComponentNodeList(t.el, e).length;
+          var t,
+              n = this,
+              i = e.filter(function (e) {
+            return 0 === le.findComponentNodeList(n.el, e).length;
           });
-          n.length > 0 && this.pushWithReply(null, "cids_destroyed", {
-            cids: n
+          i.length > 0 && ((t = this.pruningCIDs).push.apply(t, A(i)), this.pushWithReply(null, "cids_will_destroy", {
+            cids: i
           }, function () {
-            t.rendered.pruneCIDs(n);
-          });
+            n.pruningCIDs = n.pruningCIDs.filter(function (e) {
+              return -1 !== i.indexOf(e);
+            });
+            var e = i.filter(function (e) {
+              return 0 === le.findComponentNodeList(n.el, e).length;
+            });
+            e.length > 0 && n.pushWithReply(null, "cids_destroyed", {
+              cids: e
+            }, function (e) {
+              n.rendered.pruneCIDs(e.cids);
+            });
+          }));
         }
       }, {
         key: "ownsElement",
         value: function (e) {
-          return e.getAttribute("data-phx-parent-id") === this.id || Z(e.closest(B), function (e) {
+          return e.getAttribute("data-phx-parent-id") === this.id || Z(e.closest(U), function (e) {
             return e.id;
           }) === this.id;
         }
@@ -3881,7 +4425,7 @@
         key: "submitForm",
         value: function (e, t, n) {
           var i = this;
-          re.putPrivate(e, "phx-has-submitted", !0), this.liveSocket.blurActiveElement(this), this.pushFormSubmit(e, t, n, function () {
+          le.putPrivate(e, "phx-has-submitted", !0), this.liveSocket.blurActiveElement(this), this.pushFormSubmit(e, t, n, function () {
             i.liveSocket.restorePreviouslyActiveFocus();
           });
         }
@@ -3892,23 +4436,53 @@
         }
       }]), e;
     }(),
-        ce = 1,
-        se = function () {
+        ve = 1,
+        pe = function () {
       function e(t, n, i) {
-        for (var r in A(this, e), this.__view = t, this.__liveSocket = t.liveSocket, this.__callbacks = i, this.__listeners = new Set(), this.el = n, this.viewName = t.name(), this.el.phxHookId = this.constructor.makeID(), this.__callbacks) this[r] = this.__callbacks[r];
+        for (var r in T(this, e), this.__view = t, this.__liveSocket = t.liveSocket, this.__callbacks = i, this.__listeners = new Set(), this.__isDisconnected = !1, this.el = n, this.viewName = t.name(), this.el.phxHookId = this.constructor.makeID(), this.__callbacks) this[r] = this.__callbacks[r];
       }
 
-      return P(e, null, [{
+      return _(e, null, [{
         key: "makeID",
         value: function () {
-          return ce++;
+          return ve++;
         }
       }, {
         key: "elementID",
         value: function (e) {
           return e.phxHookId;
         }
-      }]), P(e, [{
+      }]), _(e, [{
+        key: "__mounted",
+        value: function () {
+          this.mounted && this.mounted();
+        }
+      }, {
+        key: "__updated",
+        value: function () {
+          this.updated && this.updated();
+        }
+      }, {
+        key: "__beforeUpdate",
+        value: function () {
+          this.beforeUpdate && this.beforeUpdate();
+        }
+      }, {
+        key: "__destroyed",
+        value: function () {
+          this.destroyed && this.destroyed();
+        }
+      }, {
+        key: "__reconnected",
+        value: function () {
+          this.__isDisconnected && (this.__isDisconnected = !1, this.reconnected && this.reconnected());
+        }
+      }, {
+        key: "__disconnected",
+        value: function () {
+          this.__isDisconnected = !0, this.disconnected && this.disconnected();
+        }
+      }, {
         key: "pushEvent",
         value: function (e) {
           var t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : {},
@@ -3948,16 +4522,10 @@
             return e.removeHandleEvent(t);
           });
         }
-      }, {
-        key: "__trigger__",
-        value: function (e) {
-          var t = this.__callbacks[e];
-          t && t.call(this);
-        }
       }]), e;
     }();
 
-    t.default = ne;
+    t.default = se;
   }, function (e, t) {
     var n;
 
