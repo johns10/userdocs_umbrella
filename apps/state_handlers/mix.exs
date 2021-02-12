@@ -25,7 +25,6 @@ defmodule StateHandlers.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:phoenix_live_view, "~> 0.14.7"}
     ]
   end
 end
