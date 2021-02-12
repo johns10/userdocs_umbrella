@@ -34,6 +34,9 @@
                   <%= document_version.version.name %>
                 </a>
                 <div class="is-flex is-flex-direction-row is-flex-grow-0">
+                  <%= link to: Routes.document_version_download_path(@socket, :show, document_version.id) do %>
+                    <i class="fa fa-lg fa-cloud-download"></i>
+                  <% end %>
                   <%= content_tag :a, phx_click: "delete-document-version",
                     phx_value_id: document_version.id do %>
                     <i class="fa fa-lg fa-minus-square"></i>
