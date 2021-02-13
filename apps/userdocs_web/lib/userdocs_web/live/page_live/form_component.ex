@@ -7,6 +7,7 @@ defmodule UserDocsWeb.PageLive.FormComponent do
   alias UserDocsWeb.Layout
   alias UserDocsWeb.ID
 
+  @impl true
   def render(assigns) do
     ~L"""
       <%= form = form_for @changeset, "#",
@@ -25,7 +26,7 @@ defmodule UserDocsWeb.PageLive.FormComponent do
     """
   end
 
-  def render_fields(assigns, form, opts \\ []) do
+  def render_fields(assigns, form, _opts \\ []) do
     ~L"""
       <div class="field is-grouped">
         <%= Layout.select_input(form, :version_id, @select_lists.versions, [
