@@ -127,7 +127,7 @@ defmodule UserDocs.TestDataset do
     |> AnnotationType.changeset(badge_blur)
     |> Repo.insert()
 
-  {:ok, %AnnotationType{id: badge_outline_id}} =
+  {:ok, %AnnotationType{id: _badge_outline_id}} =
     %AnnotationType{}
     |> AnnotationType.changeset(badge_outline)
     |> Repo.insert()
@@ -213,7 +213,7 @@ defmodule UserDocs.TestDataset do
     |> StepType.changeset(clear_annotations)
     |> Repo.insert()
 
-    {:ok, %StepType{id: element_screenshot_id}} =
+    {:ok, %StepType{id: _element_screenshot_id}} =
       %StepType{}
       |> StepType.changeset(element_screenshot)
       |> Repo.insert()
@@ -515,7 +515,7 @@ defmodule UserDocs.TestDataset do
       |> Element.changeset(setup_next)
       |> Repo.insert()
 
-    {:ok, %Element{id: operator_button_id}} =
+    {:ok, %Element{id: _operator_button_id}} =
       %Element{}
       |> Element.changeset(operator_button)
       |> Repo.insert()
@@ -867,11 +867,11 @@ defmodule UserDocs.TestDataset do
       |> LanguageCode.changeset(great_britain_language_code)
       |> Repo.insert()
 
-    {:ok, funnel_cloud_team = %Team{}} =
+    {:ok, _funnel_cloud_team = %Team{}} =
       funnel_cloud_team
       |> Users.update_team(%{default_language_code_id: english_language_code_id})
 
-    {:ok, loreline_team = %Team{}} =
+    {:ok, _loreline_team = %Team{}} =
       loreline_team
       |> Users.update_team(%{default_language_code_id: english_language_code_id})
 
@@ -961,7 +961,7 @@ defmodule UserDocs.TestDataset do
       document_id: document_id
     }
 
-    {:ok, %DocumentVersion{id: document_version_id}} =
+    {:ok, %DocumentVersion{id: _document_version_id}} =
       Documents.create_document_version(document_version)
 
   end

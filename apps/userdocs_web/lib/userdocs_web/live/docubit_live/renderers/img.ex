@@ -64,7 +64,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
   end
 
   def handle_border(opts,
-    %Docubit{ context: %Context{ settings: settings = %DocubitSettings{
+    %Docubit{ context: %Context{ settings: %DocubitSettings{
       img_border: true, border_color: border_color, border_width: border_width }}}
   ) do
     IO.puts("handle_border")

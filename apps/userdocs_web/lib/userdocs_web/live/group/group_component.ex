@@ -2,8 +2,6 @@ defmodule UserDocsWeb.GroupComponent do
   use UserDocsWeb, :live_component
   use Phoenix.HTML
 
-  alias UserDocsWeb.LiveHelpers
-
   @impl true
   def mount(socket) do
     {

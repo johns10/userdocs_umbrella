@@ -1,6 +1,4 @@
 defmodule UserDocs.Docubit.Messages do
-
-  alias UserDocs.Documents
   alias UserDocs.Helpers
 
   def edit_modal_menu(socket, params) do

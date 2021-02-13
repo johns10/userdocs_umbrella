@@ -2,7 +2,6 @@ defmodule UserDocsWeb.DocumentLive.FormComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocs.Documents
-  alias UserDocs.Documents.Document
   alias UserDocsWeb.Layout
 
   @impl true
