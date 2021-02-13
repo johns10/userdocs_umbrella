@@ -140,11 +140,6 @@ defmodule UserDocsWeb.DocumentLive.Index do
   end
   def handle_info(n, s), do: Root.handle_info(n, s)
 
-  defp document_versions(_document, document_versions) do
-    opts = [ data_type: :list, strategy: :by_item ]
-    StateHandlers.list(document_versions, DocumentVersion, opts)
-  end
-
   defp load_documents(socket) do
     opts =
       state_opts(socket)
