@@ -30,7 +30,9 @@ defmodule UserdocsWeb.LiveViewPowHelper do
     # Customise this for your app
     # You'll also need to replace the references to "app_name_auth"
     renewal_config      = [renew_session: true, interval: :timer.seconds(5)]
-    pow_config  = [otp_app: :userdocs_web, backend: Pow.Store.Backend.MnesiaCache]
+    pow_config =
+      Application.get_env(:userdocs_web, :pow)
+      |> Keyword.take([:otp_app, :backend])
 
     quote do
 
