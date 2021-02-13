@@ -27,7 +27,8 @@ defmodule UserDocsWeb.LiveHelpers do
       opts: opts
     ]
 
-    live_component(socket, UserDocsWeb.ModalComponent, modal_opts)
+    socket
+    |> live_component(UserDocsWeb.ModalComponent, modal_opts)
   end
 
   def live_modal_menus(socket, opts) do
@@ -36,115 +37,8 @@ defmodule UserDocsWeb.LiveHelpers do
       form_data: Keyword.fetch!(opts, :form_data),
     ]
 
-    live_component(socket, ModalMenus, picker_opts)
-  end
-
-  @spec live_footer(Phoenix.LiveView.Socket.t(), any, any) :: Phoenix.LiveView.Component.t()
-  def live_footer(socket, component, opts) do
-    type = Keyword.fetch!(opts, :type)
-    id = Keyword.fetch!(opts, :id)
-    title = Keyword.fetch!(opts, :title)
-    hidden = Keyword.fetch!(opts, :hidden)
-    action = Keyword.fetch!(opts, :action)
-    select_lists = Keyword.fetch!(opts, :select_lists)
-
-    current_user = try do
-      Keyword.fetch!(opts, :current_user)
-    rescue
-      _ -> None
-    end
-
-    current_team = try do
-      Keyword.fetch!(opts, :current_team)
-    rescue
-      _ -> None
-    end
-
-    current_version = try do
-      Keyword.fetch!(opts, :current_version)
-    rescue
-      _ -> None
-    end
-
-    _log_string =
-      "Creating live footer of type " <> Atom.to_string(type) <> "\n"
-      <> "  title: " <> title <> "\n"
-      <> "  form component: " <> Atom.to_string(component) <> "\n"
-      <> "  action: " <> Atom.to_string(action) <> "\n"
-
-    #Logger.debug(log_string)
-
-    footer_opts = [
-      id: id,
-      title: title,
-      hidden: hidden,
-      component: component,
-      select_lists: select_lists,
-      current_user: current_user,
-      current_team: current_team,
-      current_version: current_version,
-      opts: opts
-    ]
-    live_component(socket, UserDocsWeb.FooterComponent, footer_opts)
-  end
-
-  def live_group(socket, header, show_component, form_component, opts) do
-    type = Keyword.fetch!(opts, :type)
-    id = Keyword.fetch!(opts, :id)
-    parent_type = Keyword.fetch!(opts, :parent_type)
-    struct = Keyword.fetch!(opts, :struct)
-    objects = Keyword.fetch!(opts, :objects)
-    title = Keyword.fetch!(opts, :title)
-    parent = Keyword.fetch!(opts, :parent)
-    select_lists = Keyword.fetch!(opts, :select_lists)
-
-    current_user = try do
-      Keyword.fetch!(opts, :current_user)
-    rescue
-      _ -> None
-    end
-
-    current_team = try do
-      Keyword.fetch!(opts, :current_team)
-    rescue
-      _ -> None
-    end
-
-    current_version = try do
-      Keyword.fetch!(opts, :current_version)
-    rescue
-      _ -> None
-    end
-
-    _log_string =
-      "Creating live group of type " <> Atom.to_string(type) <> "\n"
-      <> "  parent_type: " <> Atom.to_string(parent_type) <> "\n"
-      <> "  parent_name: " <> parent.name <> "\n"
-      <> "  number of objects: " <> Integer.to_string(Enum.count(objects)) <> "\n"
-      <> "  title: " <> title <> "\n"
-      <> "  show component: " <> Atom.to_string(show_component) <> "\n"
-      <> "  form component: " <> Atom.to_string(form_component) <> "\n"
-
-    #Logger.debug(log_string)
-
-    group_opts = [
-      id: id,
-      type: type,
-      parent_type: parent_type,
-      struct: struct,
-      objects: objects,
-      title: title,
-      parent: parent,
-      show: show_component,
-      form: form_component,
-      header: header,
-      select_lists: select_lists,
-      current_user: current_user,
-      current_team: current_team,
-      current_version: current_version,
-      opts: opts
-    ]
-    live_component(socket, UserDocsWeb.GroupComponent, group_opts)
+    socket
+    |> live_component(ModalMenus, picker_opts)
   end
 
   def live_form(socket, form, opts) do
@@ -198,34 +92,8 @@ defmodule UserDocsWeb.LiveHelpers do
     ]
     |> Keyword.put(type, maybe_object(action, object, struct))
 
-    live_component(socket, form, form_opts)
-  end
-
-  def live_embedded_form(socket, form, opts) do
-    type = Keyword.fetch!(opts, :type)
-    title = Keyword.fetch!(opts, :title)
-    action = Keyword.fetch!(opts, :action)
-    id = Keyword.fetch!(opts, :id)
-    object = Keyword.fetch!(opts, :object)
-    struct = Keyword.fetch!(opts, :struct)
-    parent = Keyword.fetch!(opts, :parent)
-    select_lists = Keyword.fetch!(opts, :select_lists)
-
-    log_string =
-      "Creating embedded form"
-    Logger.debug(log_string)
-
-    form_opts = [
-      type: type,
-      title: title,
-      action: action,
-      id: id,
-      parent: parent,
-      select_lists: select_lists
-    ]
-    |> Keyword.put(type, maybe_object(action, object, struct))
-
-    live_component(socket, form, form_opts)
+    socket
+    |> live_component(form, form_opts)
   end
 
   def maybe_assign_opt(socket, target_key, source_key) do
