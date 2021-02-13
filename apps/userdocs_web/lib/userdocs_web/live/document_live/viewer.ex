@@ -116,12 +116,6 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   end
 
   @impl true
-  def handle_event("change-language", %{"language" => %{"id" => id}}, socket) do
-    { :noreply, assign(socket, :current_language_code_id, String.to_integer(id)) }
-  end
-  def handle_event("change-document-version", %{"document_version" => %{"id" => id}}, socket) do
-    { :noreply, assign_document_version(socket, String.to_integer(id)) }
-  end
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   def handle_info(%{topic: _, event: _, payload: %{ objects: [ %ContentVersion{} | _ ]}} = sub_data, socket) do
@@ -182,13 +176,6 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
     Map.put(docubit, :docubits, docubits)
   end
 
-  defp assign_document_version(socket, id) do
-    document_version = default_document_version(socket, id)
-    document = Map.put(socket.assigns.document, :document_version, document_version)
-    socket
-    |> assign(:document, document)
-  end
-
   defp current_selections(socket) do
     process = Automation.list_processes(socket, state_opts(socket)) |> Enum.at(0)
     page = Web.list_pages(socket, state_opts(socket)) |> Enum.at(0)
@@ -209,12 +196,12 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
     |> assign(:current_language_code_id, language_code_id)
   end
 
-  defp default_document_version_id(socket, document_or_id) do
-    default_document_version(socket, document_or_id)
-    |> Map.get(:id)
-  end
   defp default_document_version(_socket, %Document{} = document) do
     document.document_versions
     |> Enum.at(0)
+  end
+  defp default_document_version_id(socket, document_or_id) do
+    default_document_version(socket, document_or_id)
+    |> Map.get(:id)
   end
 end

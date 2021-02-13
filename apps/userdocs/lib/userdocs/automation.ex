@@ -225,11 +225,6 @@ defmodule UserDocs.Automation do
       order_by: step.order
     )
   end
-  defp maybe_filter_by_process(steps, nil, _), do: steps
-  defp maybe_filter_by_process(_steps, process_id, state) do
-    state.steps
-    |> Enum.filter(fn(s) -> s.process_id == process_id end)
-  end
 
   defp maybe_filter_steps_by_version(query, nil), do: query
   defp maybe_filter_steps_by_version(query, version_id) do
@@ -643,10 +638,11 @@ defmodule UserDocs.Automation do
       [%Process{}, ...]
 
   """
+  def list_processes(params \\ %{}, filters \\ %{})
   def list_processes(state, opts) when is_list(opts) do
     StateHandlers.list(state, Process, opts)
   end
-  def list_processes(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
+  def list_processes(params, filters) when is_map(params) and is_map(filters) do
     base_processes_query()
     |> maybe_filter_by_version(filters[:version_id])
     |> Repo.all()
@@ -657,11 +653,6 @@ defmodule UserDocs.Automation do
     from(process in query,
       where: process.version_id == ^version_id
     )
-  end
-  defp maybe_filter_by_version(steps, nil, _), do: steps
-  defp maybe_filter_by_version(_steps, version_id, state) do
-    state.steps
-    |> Enum.filter(fn(p) -> p.version_id == version_id end)
   end
 
 
