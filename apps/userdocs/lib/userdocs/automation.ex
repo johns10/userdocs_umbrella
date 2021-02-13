@@ -198,7 +198,8 @@ defmodule UserDocs.Automation do
       [%Step{}, ...]
 
   """
-  def list_steps(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
+  def list_steps(params \\ %{}, filters \\ %{})
+  def list_steps(params, filters) when is_map(params) and is_map(filters) do
     base_steps_query()
     |> maybe_filter_by_process(filters[:process_id])
     |> maybe_filter_steps_by_version(filters[:version_id])

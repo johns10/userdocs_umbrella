@@ -18,14 +18,12 @@ defmodule UserDocs.TestDataset do
   alias UserDocs.Documents.ContentVersion
   alias UserDocs.Documents.LanguageCode
 
-  alias UserDocs.Web
   alias UserDocs.Web.Page
   alias UserDocs.Web.AnnotationType
   alias UserDocs.Web.Annotation
   alias UserDocs.Web.Element
   alias UserDocs.Web.Strategy
 
-  alias UserDocs.Automation
   alias UserDocs.Automation.Step
   alias UserDocs.Automation.StepType
   alias UserDocs.Automation.Process
