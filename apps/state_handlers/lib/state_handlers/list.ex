@@ -32,11 +32,10 @@ defmodule StateHandlers.List do
   defp maybe_filter_by_field(data, { field, value }, :map), do: filter_map_by_field(data, { field, value})
   defp maybe_filter_by_field(data, { field, value }, :list), do: filter_list_by_field(data, { field, value})
 
-  """
-    Iterates over the existing order clauses and calls handle_order_clause on each,
-    if it's valid.  Passes if it's nil.  Should raise for an invalid order clause if
-    we don't get a list of order clauses
-  """
+  # Iterates over the existing order clauses and calls handle_order_clause on each,
+  # if it's valid.  Passes if it's nil.  Should raise for an invalid order clause if
+  # we don't get a list of order clauses
+
   defp maybe_handle_order_clauses(data, nil, _), do: data
   defp maybe_handle_order_clauses(data, [], _), do: data
   defp maybe_handle_order_clauses(data, [ _ | _ ] = clauses, type) do
@@ -44,23 +43,22 @@ defmodule StateHandlers.List do
   end
   defp maybe_handle_order_clauses(_, clauses, _), do: raise(RuntimeError, "maybe_handle_order_clauses was passed invalid order clauses: #{inspect(clauses)}")
 
-  """
-    Orders the data retreived from the state.  When there are no preloads, or nested
-    preloads, we pass, for example:
+  # Orders the data retreived from the state.  When there are no preloads, or nested
+  # preloads, we pass, for example:
 
-      maybe_order(data, nil, _)
-      maybe_order(data, {document_versions : %{ field: :id, order: :desc }})
+  #   maybe_order(data, nil, _)
+  #   maybe_order(data, {document_versions : %{ field: :id, order: :desc }})
 
-    When we pass with nested orders, they should get passed on the appropriate child in
-    preload.  If we pass in a order of the form %{ field: _, order: _}, we should order
-    the data according to the args.
+  # When we pass with nested orders, they should get passed on the appropriate child in
+  # preload.  If we pass in a order of the form %{ field: _, order: _}, we should order
+  # the data according to the args.
 
-    Only supports :asc and :desc, and assumes that elixir will do the right thing with
-    > and < for text.
+  # Only supports :asc and :desc, and assumes that elixir will do the right thing with
+  # > and < for text.
 
-    When we have an orders clause, we'll iterate and apply each option, because we might
-    have multiple order clauses
-  """
+  # When we have an orders clause, we'll iterate and apply each option, because we might
+  # have multiple order clauses
+
   defp handle_order_clause(data, nil, _), do: data
   defp handle_order_clause(data, { _, %{}}, _), do: data
   defp handle_order_clause(data, { _, [ _ ]}, _), do: data
