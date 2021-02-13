@@ -29,7 +29,6 @@ defmodule UserDocsWeb.Form do
   defp maybe_parent_id_from_changeset({ :ok, value }, _, _), do: { :ok, value }
   defp maybe_parent_id_from_changeset(_, _, _), do: { :nok, nil}
 
-  defp default_parent_id({ :ok, value }, _, _), do: { :ok, value }
   defp default_parent_id({:nok, _}), do: { :ok, 0 }
   defp default_parent_id(state), do: state
 

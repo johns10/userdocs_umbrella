@@ -3,7 +3,6 @@ defmodule UserDocsWeb.DocubitLive.Renderers.P do
   use Phoenix.HTML
 
   alias UserDocsWeb.DocubitLive.Renderers.Base
-  alias UserDocs.Documents.Docubit
 
   def update(%{ docubit: %{} = docubit} = assigns, socket) do
     content = Base.display_content(assigns, docubit)

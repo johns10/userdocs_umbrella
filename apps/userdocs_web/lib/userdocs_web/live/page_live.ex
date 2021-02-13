@@ -3,7 +3,7 @@ defmodule UserDocsWeb.PageLive do
   use UserDocsWeb, :live_view
 
   @impl true
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
     {:ok, assign(socket, query: "", results: %{})}
   end
 
