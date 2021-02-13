@@ -1,7 +1,6 @@
 defmodule UserDocsWeb.DocubitLive.Renderers.Column do
   use UserDocsWeb, :live_component
   use Phoenix.HTML
-  alias UserDocsWeb.DocubitLive.AddDocubitButton
   alias UserDocsWeb.DocubitLive.Renderers.Base
   alias UserDocsWeb.DocubitLive.AddDocubitOptions
 

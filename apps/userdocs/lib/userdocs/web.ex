@@ -13,9 +13,6 @@ defmodule UserDocs.Web do
     StateHandlers.load(state, list_pages(%{}, opts[:filters]), Page, opts)
   end
 
-  def list_pages(state, opts) when is_list(opts) do
-    StateHandlers.list(state, Page, opts)
-  end
 
   @doc """
   Returns the list of pages.
@@ -27,6 +24,9 @@ defmodule UserDocs.Web do
 
   """
   def list_pages(params \\ %{}, filters \\ %{})
+  def list_pages(state, opts) when is_list(opts) do
+    StateHandlers.list(state, Page, opts)
+  end
   def list_pages(params, filters) when is_map(params) and is_map(filters) do
     base_pages_query()
     |> maybe_preload_elements(params[:elements])
@@ -34,9 +34,6 @@ defmodule UserDocs.Web do
     |> maybe_filter_by_version(filters[:version_id])
     |> maybe_filter_pages_by_team_id(filters[:team_id])
     |> Repo.all()
-  end
-  def list_pages(state, opts) when is_list(opts) do
-    StateHandlers.list(state, Page, opts)
   end
 
   defp maybe_preload_elements(query, nil), do: query
