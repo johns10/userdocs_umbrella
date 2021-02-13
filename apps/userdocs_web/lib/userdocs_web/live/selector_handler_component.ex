@@ -1,6 +1,5 @@
 defmodule UserDocsWeb.SelectorHandler do
   use UserDocsWeb, :live_component
-  alias UserDocs.Media
 
   @impl true
   def render(assigns) do
