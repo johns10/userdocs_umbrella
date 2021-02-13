@@ -29,14 +29,14 @@ defmodule UserDocs.Documents.Docubit.Context do
     end
   end
 
+  def update_context(context, attrs \\ %{}) do
   def update_context(%Context{} = context, %Context{} = attrs) do
     #IO.puts("Internal update_context")
     context
     |> internal_changeset(attrs)
     |> apply_action(:update)
   end
-
-  def update_context(%Context{} = context, attrs \\ %{}) do
+  def update_context(%Context{} = context, attrs) do
     #IO.puts("update_context")
     changeset = changeset(context, attrs)
     changeset =
