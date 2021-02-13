@@ -26,5 +26,5 @@ defmodule StateHandlers.Create do
 
   def get(_, _, _, opts), do: raise(RuntimeError, "State.Update failed to find a matching clause with options #{inspect(opts)}")
 
-  def apply(_, _, opts), do: raise(RuntimeError, "State.Update.applya failed to find a matching clause with options #{inspect(opts)}")
+  def apply(_, _, opts), do: raise(RuntimeError, "State.Update.apply failed to find a matching clause with options #{inspect(opts)}")
 end
