@@ -26,7 +26,7 @@ defmodule UserDocs.Web do
       [%Page{}, ...]
 
   """
-  def list_pages(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
+  def list_pages(params \\ %{}, filters \\ %{})
   def list_pages(params, filters) when is_map(params) and is_map(filters) do
     base_pages_query()
     |> maybe_preload_elements(params[:elements])

@@ -6,11 +6,16 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
   alias UserDocs.Documents.Docubit.Context
   alias UserDocsWeb.DocubitLive.Renderers.Base
 
+  @impl true
+  def render(assigns) do
+    ~L"""
+    """
+  end
 
   def render_inner_content(assigns) do
     ~L"""
       <%= if @component do %>
-        <%= render_block(@inner_block, %{}) %>
+        <%= @inner_content.([]) %>
       <% else %>
         <%= for docubit <- @docubit.docubits do %>
           <%= Docubit.renderer(docubit).render(%{
@@ -41,7 +46,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
   end
   def maybe_content_name(header, _), do: header
 
-  def display_content_header(assigns, %Docubit{content: %Content{ name: name, content_versions: []}}) do
+  def display_content_header(_assigns, %Docubit{content: %Content{ name: name, content_versions: []}}) do
     ": " <> name
   end
   def display_content_header(assigns, %Docubit{content: %Content{} = content}) do
@@ -51,7 +56,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
     |> maybe_header(to_string(content.name), assigns.current_version_id)
   end
 
-  def display_content(assigns, %Docubit{content: %Content{ name: name, content_versions: []}}) do
+  def display_content(_assigns, %Docubit{content: %Content{ name: name, content_versions: []}}) do
     %{body: "No Content versions or translations have been added to the #{name} content.", prefix: nil, title: nil}
   end
   def display_content(_, %Docubit{content: nil}) do
