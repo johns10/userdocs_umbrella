@@ -8,6 +8,7 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
   alias UserDocsWeb.Layout
   alias UserDocsWeb.ID
 
+  @impl true
   def render(assigns) do
     ~L"""
       <%= form = form_for @changeset, "#",
