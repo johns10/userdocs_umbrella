@@ -2,9 +2,7 @@ defmodule StateHandlers.Load.Queries do
 
   alias UserDocs.Documents
   alias UserDocs.Automation
-  alias UserDocs.Projects
   alias UserDocs.Web
-  alias UserDocs.Users
 
 
   def processes(version_id) do

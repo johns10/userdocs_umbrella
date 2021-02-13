@@ -1,7 +1,6 @@
 defmodule UserDocsWeb.ScreenShotHandler do
   use UserDocsWeb, :live_component
   alias UserDocs.Media
-  alias UserDocs.Media.ScreenShot
 
 
 
@@ -21,7 +20,7 @@ defmodule UserDocsWeb.ScreenShotHandler do
   @impl true
   def handle_event("create_screenshot", payload, socket) do
     IO.puts("Creating a screenshot")
-    {status, result} = Media.create_file_and_screenshot(payload)
+    {status, _result} = Media.create_file_and_screenshot(payload)
     case status do
       :ok ->
         IO.puts("Created File")

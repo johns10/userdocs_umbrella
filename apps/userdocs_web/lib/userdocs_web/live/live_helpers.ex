@@ -20,7 +20,7 @@ defmodule UserDocsWeb.LiveHelpers do
         team_user: @team_user,
         return_to: Routes.team_user_index_path(@socket, :index) %>
   """
-  def live_modal(socket, component, opts) do
+  def live_modal(_socket, component, opts) do
     modal_opts = [
       id: :modal,
       component: component,
@@ -30,7 +30,7 @@ defmodule UserDocsWeb.LiveHelpers do
     live_component(socket, UserDocsWeb.ModalComponent, modal_opts)
   end
 
-  def live_modal_menus(socket, opts) do
+  def live_modal_menus(_socket, opts) do
     picker_opts = [
       id: Keyword.fetch!(opts, :id),
       form_data: Keyword.fetch!(opts, :form_data),
@@ -40,7 +40,7 @@ defmodule UserDocsWeb.LiveHelpers do
   end
 
   @spec live_footer(Phoenix.LiveView.Socket.t(), any, any) :: Phoenix.LiveView.Component.t()
-  def live_footer(socket, component, opts) do
+  def live_footer(_socket, component, opts) do
     type = Keyword.fetch!(opts, :type)
     id = Keyword.fetch!(opts, :id)
     title = Keyword.fetch!(opts, :title)
@@ -66,7 +66,7 @@ defmodule UserDocsWeb.LiveHelpers do
       _ -> None
     end
 
-    log_string =
+    _log_string =
       "Creating live footer of type " <> Atom.to_string(type) <> "\n"
       <> "  title: " <> title <> "\n"
       <> "  form component: " <> Atom.to_string(component) <> "\n"
@@ -88,7 +88,7 @@ defmodule UserDocsWeb.LiveHelpers do
     live_component(socket, UserDocsWeb.FooterComponent, footer_opts)
   end
 
-  def live_group(socket, header, show_component, form_component, opts) do
+  def live_group(_socket, header, show_component, form_component, opts) do
     type = Keyword.fetch!(opts, :type)
     id = Keyword.fetch!(opts, :id)
     parent_type = Keyword.fetch!(opts, :parent_type)
@@ -116,7 +116,7 @@ defmodule UserDocsWeb.LiveHelpers do
       _ -> None
     end
 
-    log_string =
+    _log_string =
       "Creating live group of type " <> Atom.to_string(type) <> "\n"
       <> "  parent_type: " <> Atom.to_string(parent_type) <> "\n"
       <> "  parent_name: " <> parent.name <> "\n"
@@ -147,7 +147,7 @@ defmodule UserDocsWeb.LiveHelpers do
     live_component(socket, UserDocsWeb.GroupComponent, group_opts)
   end
 
-  def live_show(socket, header, show, form, opts) do
+  def live_show(_socket, header, show, form, opts) do
     type = Keyword.fetch!(opts, :type)
     object = Keyword.fetch!(opts, :object)
     select_lists = Keyword.fetch!(opts, :select_lists)
@@ -195,7 +195,7 @@ defmodule UserDocsWeb.LiveHelpers do
     live_component(socket, UserDocsWeb.ShowComponent, show_opts)
   end
 
-  def live_form(socket, form, opts) do
+  def live_form(_socket, form, opts) do
     type = Keyword.fetch!(opts, :type)
     title = Keyword.fetch!(opts, :title)
     action = Keyword.fetch!(opts, :action)
@@ -223,7 +223,7 @@ defmodule UserDocsWeb.LiveHelpers do
       _ -> None
     end
 
-    log_string =
+    _log_string =
       "Creating live form of type " <> Atom.to_string(type) <> "\n"
       <> "  title: " <> title <> "\n"
       <> "  form component: " <> Atom.to_string(form) <> "\n"
@@ -249,7 +249,7 @@ defmodule UserDocsWeb.LiveHelpers do
     live_component(socket, form, form_opts)
   end
 
-  def live_embedded_form(socket, form, opts) do
+  def live_embedded_form(_socket, form, opts) do
     type = Keyword.fetch!(opts, :type)
     title = Keyword.fetch!(opts, :title)
     action = Keyword.fetch!(opts, :action)

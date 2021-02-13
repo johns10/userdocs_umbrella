@@ -14,7 +14,7 @@ defmodule StateHandlers.Update do
 
     do_update(state, data, schema, opts)
   end
-  def do_update(state, %{ objects: []}, opts) do
+  def do_update(_state, %{ objects: []}, _opts) do
     raise(RuntimeError, "Objects empty")
   end
   def do_update(state, data, schema, opts) do
