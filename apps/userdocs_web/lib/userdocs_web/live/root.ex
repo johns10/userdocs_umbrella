@@ -90,10 +90,12 @@ defmodule UserDocsWeb.Root do
     try do
       case maybe_assign_current_user(socket, session) do
         %{ assigns: %{ current_user: nil }} ->
+          IO.puts("nil user")
           socket
           |> assign(:auth_state, :not_logged_in)
           |> assign(:changeset, Users.change_user(%User{}))
         %{ assigns: %{ current_user: _ }} ->
+          IO.puts("a user")
           socket
           |> maybe_assign_current_user(session)
           |> assign(:auth_state, :logged_in)
@@ -159,7 +161,7 @@ defmodule UserDocsWeb.Root do
     end
   end
   def handle_event(name, _payload, _socket) do
-    raise(FunctionClauseError, "Event #{inspect(name)} not implemented by Root")
+    raise(FunctionClauseError, message: "Event #{inspect(name)} not implemented by Root")
   end
 
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
@@ -171,7 +173,7 @@ defmodule UserDocsWeb.Root do
 
     case Keyword.get(socket.assigns.state_opts, :types) do
       nil -> raise(RuntimeError, "Types not populated in calling subscribed view")
-      stuff -> ""
+      _ -> ""
     end
 
     socket =
@@ -195,6 +197,6 @@ defmodule UserDocsWeb.Root do
   end
   def handle_info(:close_modal, socket), do: { :noreply, ModalMenus.close(socket) }
   def handle_info(name, _socket) do
-    raise(FunctionClauseError, "Subscription #{inspect(name)} not implemented by Root")
+    raise(FunctionClauseError, message: "Subscription #{inspect(name)} not implemented by Root")
   end
 end

@@ -20,8 +20,6 @@ defmodule UserDocs.Documents.Docubit do
   alias UserDocs.Web.Annotation
   alias UserDocs.Automation.Step
 
-  @valid_settings [ :li_value, :name_prefix ]
-
   schema "docubits" do
     field :order, :integer
     field :address, { :array, :integer }
@@ -170,7 +168,7 @@ defmodule UserDocs.Documents.Docubit do
       try do
         docubit.docubit_type.name
       rescue
-        _ -> docubit.type_id
+        _ -> docubit.docubit_type_id
       end
 
     children =
@@ -199,7 +197,7 @@ defmodule UserDocs.Documents.Docubit do
   end
 
   defp type(docubit) do
-    Type.types()
+    Documents.list_docubit_types()
     |> Enum.filter(fn(t) -> t.id == docubit.type_id end)
     |> Enum.at(0)
   end

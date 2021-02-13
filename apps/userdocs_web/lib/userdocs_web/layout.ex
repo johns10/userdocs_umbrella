@@ -184,33 +184,6 @@ defmodule UserDocsWeb.Layout do
     end
   end
 
-  def card(assigns \\ %{}, do: block) do
-    assigns =
-      if Map.has_key?(assigns, :id) do
-        assigns
-      else
-        Map.put(assigns, :id, UUID.uuid4())
-      end
-    render_template("card.html", assigns, block)
-  end
-  def card_header(assigns \\ %{}, do: block), do: render_template("card_header.html", assigns, block)
-  def card_body(assigns, do: block) do
-    assigns =
-      assigns
-      |> Map.put(:hide_class, is_expanded?(assigns.expanded))
-
-    render_template("card_body.html", assigns, block)
-  end
-
-  defp render_template(template, assigns, block) do
-    assigns =
-      assigns
-      |> Map.new()
-      |> Map.put(:inner_content, block)
-
-    ProcessAdministratorWeb.SharedView.render(template, assigns)
-  end
-
   defp wrapper(opts, class, content) do
     wrapper_opts =
       []

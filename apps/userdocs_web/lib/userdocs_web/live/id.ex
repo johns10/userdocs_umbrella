@@ -38,10 +38,6 @@ defmodule UserDocsWeb.ID do
     <> Atom.to_string(action)
   end
 
-  def nested_form(object, prefix) do
-
-  end
-
   def form_field(data, name, %{}), do: form_field(data,name)
   def form_field(data, name, prefix), do: nested_form_field(data,name,prefix)
   def form_field(data, name) do

@@ -3,8 +3,6 @@ defmodule UserDocs.Documents.DocubitType do
   import Ecto.Changeset
 
   alias UserDocs.Documents.DocubitType
-  alias UserDocs.Documents.DocubitSetting
-  alias UserDocs.Documents.Docubit.Context
   alias UserDocs.Documents.Docubit
 
   @valid_data [

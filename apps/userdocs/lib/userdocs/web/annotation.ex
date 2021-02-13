@@ -9,6 +9,7 @@ defmodule UserDocs.Web.Annotation do
   alias UserDocs.Documents.Content
   alias UserDocs.Documents.ContentVersion
   alias UserDocs.Web.Annotation.Name
+  alias UserDocs.Web.Element
 
   @derive {Jason.Encoder, only: [:name, :label, :x_orientation, :y_orientation,
     :size, :color, :thickness, :x_offset, :y_offset, :font_size, :font_color, :page,
@@ -104,6 +105,6 @@ defmodule UserDocs.Web.Annotation do
   end
 
   def name(annotation = %UserDocs.Web.Annotation{}) do
-    Name.execute(annotation)
+    Name.execute(annotation, Map.get(annotation, :element, %Element{}))
   end
 end
