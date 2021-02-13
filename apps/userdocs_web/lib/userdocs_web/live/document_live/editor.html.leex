@@ -122,7 +122,7 @@
         ])
       %>
 
-      <span><%= live_patch "Edit", to: Routes.document_show_path(@socket, :edit, @document), class: "button" %></span>
+      <span><%= live_patch "Edit", to: Routes.document_editor_path(@socket, :edit, @document), class: "button" %></span>
       <span><%= live_redirect "Back", to: Routes.document_index_path(@socket, :index) %></span>
     </div>
   </div>
