@@ -286,12 +286,6 @@ defmodule UserDocsWeb.DocumentLive.Editor do
     |> assign(:annotations, Web.list_annotations(socket, opts))
   end
 
-  defp assign_document_version(socket) do
-    document_version = socket.assigns.document.document_versions |> Enum.at(0)
-    document = Map.put(socket.assigns.document, :document_version, document_version)
-    socket
-    |> assign(:document, document)
-  end
   defp assign_document_version(socket, id) do
     document_version = default_document_version(socket, id)
     document = Map.put(socket.assigns.document, :document_version, document_version)
@@ -339,19 +333,6 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   defp default_document_version(socket, _document_id) do
     socket.assigns.document.document_versions
     |> Enum.at(0)
-  end
-  defp document_version(document_versions, document_version_id) do
-    document_versions
-    |> Enum.filter(fn(dv) -> dv.id == document_version_id end)
-    |> Enum.at(0)
-  end
-
-  defp channel(socket) do
-    Defaults.channel(socket)
-  end
-
-  defp local_channel(socket) do
-    "document-version-" <> Integer.to_string(socket.assigns.document_version)
   end
 
   defp process_steps(process_id, steps) when is_integer(process_id) do
