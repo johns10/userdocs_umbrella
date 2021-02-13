@@ -100,11 +100,6 @@ defmodule UserDocsWeb.Layout do
   def text_input(form, opts, wrapper_class) when is_list(opts) and is_bitstring(wrapper_class) do
     wrapper(opts, wrapper_class, Layout.text_input(form, opts))
   end
-  def text_input(form, opts) when is_list(opts) do
-    # Required Options
-    field_name = opts[:field_name]
-    Layout.text_input(form, field_name, opts)
-  end
   def text_input(form, name, opts) when is_atom(name) and is_list(opts) do
     # Required Options
     input_opts = input_opts(opts)
@@ -125,6 +120,11 @@ defmodule UserDocsWeb.Layout do
         ErrorHelpers.error_tag(form, name)
       ]
     end
+  end
+  def text_input(form, opts) when is_list(opts) do
+    # Required Options
+    field_name = opts[:field_name]
+    Layout.text_input(form, field_name, opts)
   end
 
   def maybe_opt(opts, source, key, default) do
@@ -156,11 +156,6 @@ defmodule UserDocsWeb.Layout do
   def number_input(form, opts, wrapper_class) when is_list(opts) and is_bitstring(wrapper_class) do
     wrapper(opts, wrapper_class, Layout.number_input(form, opts))
   end
-  def number_input(form, opts) when is_list(opts) do
-    # Required Options
-    field_name = opts[:field_name]
-    Layout.number_input(form, field_name, opts)
-  end
   def number_input(form, name, opts) when is_atom(name) and is_list(opts) do
     # Required Options
     input_opts = input_opts(opts)
@@ -174,6 +169,11 @@ defmodule UserDocsWeb.Layout do
         ErrorHelpers.error_tag(form, name)
       ]
     end
+  end
+  def number_input(form, opts) when is_list(opts) do
+    # Required Options
+    field_name = opts[:field_name]
+    Layout.number_input(form, field_name, opts)
   end
 
   def form_row(content) do
