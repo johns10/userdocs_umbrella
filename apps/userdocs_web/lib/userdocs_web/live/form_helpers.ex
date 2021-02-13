@@ -71,7 +71,7 @@ defmodule UserDocsWeb.Form do
       available_items
   end
 
-  def maybe_select_list_from_assigns({ :nok, list }, assigns, key, _filter) do
+  def maybe_select_list_from_assigns({ :nok, _list }, assigns, key, _filter) do
     try do
       result =
         Map.get(assigns.select_lists, key)

@@ -1,6 +1,11 @@
 defmodule UserDocsWeb.UserLive.LoginFormComponent do
   use UserDocsWeb, :live_slime_component
 
+  @impl true
+  def render(assigns) do
+    render(assigns, "https://app.user-docs.com")
+  end
+
   def render(assigns, path) do
     ~L"""
     section.hero.is-primary.is-fullheight

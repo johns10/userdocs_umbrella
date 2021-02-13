@@ -239,46 +239,6 @@ defmodule UserDocsWeb.Layout do
   defp id_or_new(:edit, f), do: "_" <> Integer.to_string(f.data.id)
   defp id_or_new(:new, _f), do: "_new"
 
-  """
-  def card_header(name, target, expand_event) do
-    content_tag(:header, [ class: "card-header" ]) do
-      [
-        content_tag(:p, [
-          class: "card-header-title",
-          style: "margin-bottom:0px;"
-        ]) do
-          name || "No Name"
-        end,
-        content_tag(:a, [
-          class: "card-header-icon",
-          phx_click: expand_event,
-          phx_target: target,
-          aria_label: "expand"
-        ]) do
-          content_tag(:span, [ class: "icon" ]) do
-            content_tag(:i, [
-              class: "fa fa-angle-down",
-              aria_hidden: "true"
-            ]) do
-              ""
-            end
-          end
-        end
-      ]
-    end
-  end
-
-  def card_body(expanded, content) do
-    content_tag(:div, [
-      class: "card-content" <> is_expanded?(expanded)
-    ]) do
-      content_tag(:div, [ class: "content" ]) do
-        content
-      end
-    end
-  end
-  """
-
   def is_expanded?(false), do: " is-hidden"
   def is_expanded?(true), do: ""
 end

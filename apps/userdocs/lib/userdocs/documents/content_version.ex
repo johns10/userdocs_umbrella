@@ -1,12 +1,4 @@
 defmodule UserDocs.Documents.ContentVersion do
-
-  """
-  mix phx.gen.live Documents ContentVersion content_versions
-    language_code:string
-    name:string body:string
-    content_id:references:content
-    version_id:references:versions
-  """
   alias UserDocs.Documents.Content
   alias UserDocs.Documents.LanguageCode
   alias UserDocs.Projects.Version

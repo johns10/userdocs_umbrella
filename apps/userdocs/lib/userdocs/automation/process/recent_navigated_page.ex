@@ -27,9 +27,7 @@ defmodule UserDocs.Automation.Process.RecentPage do
       end
   end
 
-  """
-  Takes a list of steps, returns the most recent step of type "Navigate"
-  """
+  # Takes a list of steps, returns the most recent step of type "Navigate"
   defp recent_navigation_step(step, steps) do
     navigation_steps = Enum.filter(steps,
       fn(s) ->
