@@ -6,7 +6,12 @@ defmodule UserDocsWeb.DocumentVersionDownloadController do
   alias UserDocsWeb.DocumentLive.Viewer
   alias UserDocsWeb.DocubitLive.Renderers.Base
 
-  def show(conn, %{"id" => id} = params) do
+  def render(assigns) do
+    ~L"""
+    """
+  end
+
+  def show(conn, %{"id" => id}) do
     document_version = UserDocs.Documents.prepare_document_version(id)
 
     body =

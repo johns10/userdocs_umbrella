@@ -29,7 +29,7 @@ defmodule UserDocs.Web.Page do
   end
 
   def safe(page, handlers \\ %{})
-  def safe(page = %UserDocs.Web.Page{}, handlers) do
+  def safe(page = %UserDocs.Web.Page{}, _handlers) do
     base_safe(page)
   end
   def safe(nil, _), do: nil
