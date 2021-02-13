@@ -17,8 +17,6 @@ defmodule UserDocsWeb.SessionController do
         |> redirect(to: maybe_referer_path(conn))
 
       {:error, conn} ->
-        changeset = Pow.Plug.change_user(conn, conn.params["user"])
-
         conn
         |> put_flash(:info, "Invalid email or password")
         |> redirect(to: maybe_referer_path(conn))
