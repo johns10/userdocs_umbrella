@@ -6,8 +6,8 @@ defmodule UserDocsWeb.TeamLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    socket = 
-      socket 
+    socket =
+      socket
       |> assign(:teams, list_teams())
 
     {:ok, socket}
@@ -26,7 +26,7 @@ defmodule UserDocsWeb.TeamLive.Index do
   end
 
   defp apply_action(socket, :new, _params) do
-    team = 
+    team =
       %Team{}
       |> Map.put(:users, [])
 

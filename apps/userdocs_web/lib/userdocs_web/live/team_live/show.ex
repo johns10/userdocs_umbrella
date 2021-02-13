@@ -5,11 +5,11 @@ defmodule UserDocsWeb.TeamLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-    socket = 
-      socket 
+    socket =
+      socket
       |> assign(:teams, Users.list_teams())
       |> assign(:users, Users.list_users())
-      
+
     {:ok, socket}
   end
 
