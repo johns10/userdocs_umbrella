@@ -147,54 +147,6 @@ defmodule UserDocsWeb.LiveHelpers do
     live_component(socket, UserDocsWeb.GroupComponent, group_opts)
   end
 
-  def live_show(socket, header, show, form, opts) do
-    type = Keyword.fetch!(opts, :type)
-    object = Keyword.fetch!(opts, :object)
-    select_lists = Keyword.fetch!(opts, :select_lists)
-    title = Keyword.fetch!(opts, :title)
-    struct = Keyword.fetch!(opts, :struct)
-    parent = Keyword.fetch!(opts, :parent)
-
-    current_user = try do
-      Keyword.fetch!(opts, :current_user)
-    rescue
-      _ -> None
-    end
-
-    current_team = try do
-      Keyword.fetch!(opts, :current_team)
-    rescue
-      _ -> None
-    end
-
-    current_version = try do
-      Keyword.fetch!(opts, :current_version)
-    rescue
-      _ -> None
-    end
-
-    show_opts = [
-      id: Keyword.fetch!(opts, :id),
-      title: title,
-      name: object.name,
-      show: show,
-      form: form,
-      select_lists: select_lists,
-      parent: parent,
-      type: type,
-      struct: struct,
-      object: object,
-      header: header,
-      current_user: current_user,
-      current_team: current_team,
-      current_version: current_version,
-      opts: [ {type, object} | opts ]
-    ]
-    |> Keyword.put(type, object)
-
-    live_component(socket, UserDocsWeb.ShowComponent, show_opts)
-  end
-
   def live_form(socket, form, opts) do
     type = Keyword.fetch!(opts, :type)
     title = Keyword.fetch!(opts, :title)
