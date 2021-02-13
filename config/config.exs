@@ -39,11 +39,21 @@ config :phoenix, :json_library, Jason
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
 
-config :userdocs_web, :pow,
-  user: UserDocs.Users.User,
-  repo: UserDocs.Repo,
-  cache_store_backend: Pow.Store.Backend.MnesiaCache,
-  routes_backend: UserDocsWeb.Pow.Routes
+if Mix.env() in [:dev, :test] do
+  config :userdocs_web, :pow,
+    user: UserDocs.Users.User,
+    repo: UserDocs.Repo,
+    cache_store_backend: Pow.Store.Backend.EtsCache,
+    backend: Pow.Store.Backend.EtsCache,
+    routes_backend: UserDocsWeb.Pow.Routes
+else
+  config :userdocs_web, :pow,
+    user: UserDocs.Users.User,
+    repo: UserDocs.Repo,
+    cache_store_backend: Pow.Store.Backend.MnesiaCache,
+    backend: Pow.Store.Backend.MnesiaCache,
+    routes_backend: UserDocsWeb.Pow.Routes
+end
 
 config :cors_plug,
   origin: [
