@@ -12,7 +12,6 @@ defmodule UserDocs.Media do
   alias UserDocs.Repo
 
   alias UserDocs.Media.File
-  alias UserDocs.Media.FileHelpers
   alias UserDocs.Media.ScreenshotHelpers
 
 
@@ -75,7 +74,7 @@ defmodule UserDocs.Media do
     |> Repo.insert()
   end
 
-  def create_file_and_screenshot(payload = %{ "encoded_image" => raw_encoded_image, "id" => step_id,
+  def create_file_and_screenshot(%{ "encoded_image" => raw_encoded_image, "id" => step_id,
     "step_type" => %{ "name" => step_type_name }, "element" => element
     }) do
       IO.puts("create_file_and_screenshot")
