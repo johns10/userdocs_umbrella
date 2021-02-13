@@ -27,9 +27,21 @@ defmodule UserDocsWeb.StepLive.Runner do
     """
   end
 
+
+  @impl true
+  def mount(socket) do
+    socket =
+      socket
+      |> assign(:status, :ok)
+      |> assign(:error, "")
+
+    {:ok, socket}
+  end
+
+
+  @impl true
   def handle_event("execute_step", %{"step-id" => step_id}, socket) do
     _log_string = "Executing step " <> step_id
-    IO.puts(_log_string)
 
     payload =  %{
       type: "step",
@@ -45,19 +57,6 @@ defmodule UserDocsWeb.StepLive.Runner do
 
     {:noreply, push_event(socket, "message", payload)}
   end
-
-  @impl true
-  def mount(socket) do
-    socket =
-      socket
-      |> assign(:status, :ok)
-      |> assign(:error, "")
-
-    {:ok, socket}
-  end
-
-
-  @impl true
   def handle_event("update_job_status", %{ "status" => "failed" } = payload, socket) do
 
     socket =
