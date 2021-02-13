@@ -21,10 +21,11 @@ defmodule UserDocs.Projects do
       [%Project{}, ...]
 
   """
+  def list_projects(params \\ %{}, filters \\ %{})
   def list_projects(state, opts) when is_list(opts) do
     StateHandlers.list(state, Project, opts)
   end
-  def list_projects(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
+  def list_projects(params, filters) when is_map(params) and is_map(filters) do
     base_projects_query()
     |> maybe_filter_by_team(filters[:team_id])
     |> maybe_filter_projects_by_user(filters[:user_id])
@@ -154,7 +155,8 @@ defmodule UserDocs.Projects do
       [%Version{}, ...]
 
   """
-  def list_versions(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
+  def list_versions(params \\ %{}, filters \\ %{})
+  def list_versions(params, filters) when is_map(params) and is_map(filters) do
     base_versions_query()
     |> maybe_filter_by_project(filters[:project_id])
     |> maybe_filter_version_by_team(filters[:team_id])
@@ -219,11 +221,12 @@ defmodule UserDocs.Projects do
       ** (Ecto.NoResultsError)
 
   """
+  def get_version!(id, params \\ %{}, filters \\ %{})
   def get_version!(id, state, opts) when is_integer(id) and is_list(opts) do
     StateHandlers.get(state, id, Version, opts)
     |> maybe_preload_version(opts[:preloads], state, opts)
   end
-  def get_version!(id, params \\ %{}, _filters \\ %{}) when is_integer(id) and is_map(params) do
+  def get_version!(id, params, _filters) when is_integer(id) and is_map(params) do
     base_version_query(id)
     |> maybe_preload_pages(params[:pages])
     |> Repo.one!()

@@ -274,10 +274,11 @@ defmodule UserDocs.Users do
       [%Team{}, ...]
 
   """
+  def list_teams(params \\ %{}, filters \\ %{})
   def list_teams(state, opts) when is_list(opts) do
     StateHandlers.list(state, Team, opts)
   end
-  def list_teams(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
+  def list_teams(params, filters) when is_map(params) and is_map(filters) do
     base_teams_query()
     |> maybe_filter_team_by_user(filters[:user_id])
     |> maybe_filter_by_ids(filters[:ids])

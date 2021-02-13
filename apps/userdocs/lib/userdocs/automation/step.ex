@@ -61,7 +61,7 @@ defmodule UserDocs.Automation.Step do
     |> handle_params()
   end
 
-  def change_to_new_foreign_key(step, attrs) do
+  def change_to_new_foreign_key(step, _attrs) do
     step
     |> foreign_key_constraint(:page)
     |> foreign_key_constraint(:element)
@@ -101,13 +101,13 @@ defmodule UserDocs.Automation.Step do
     # Logger.debug("Original Params: #{inspect(changeset.params)}")
     updated_params =
       case changeset.changes do
-        %{ element_id: element_id } ->
+        %{ element_id: _element_id } ->
           Logger.debug("Removing element params")
           Map.delete(changeset.params, "element")
-        %{ annotation_id: annotation_id } ->
+        %{ annotation_id: _annotation_id } ->
           Logger.debug("Removing annotation params")
           Map.delete(changeset.params, "annotation")
-        %{ page_id: page_id } ->
+        %{ page_id: _page_id } ->
           Logger.debug("Removing page params")
           Map.delete(changeset.params, "page")
         _ ->

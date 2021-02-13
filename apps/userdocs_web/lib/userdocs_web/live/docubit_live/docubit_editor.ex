@@ -149,10 +149,10 @@ defmodule UserDocsWeb.DocubitEditorLive do
     end
   end
 
-  def handle_event(socket, "delete" = event, payload, state_opts) do
+  def handle_event(socket, "delete", payload, state_opts) do
     StateHandlers.delete(socket, payload, state_opts)
   end
-
+  @impl true
   def handle_event("delete-docubit", %{"id" => id }, socket) do
     id = String.to_integer(id)
 

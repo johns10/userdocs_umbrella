@@ -3,7 +3,6 @@ defmodule UserDocsWeb.DocubitLive.EventHandlers do
   alias UserDocs.Documents
   alias UserDocsWeb.Defaults
 
-  @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     docubit = Documents.get_docubit!(id)
     {:ok, deleted_docubit } = Documents.delete_docubit(docubit)

@@ -2,8 +2,6 @@ defmodule UserDocs.Documents.DocubitSetting do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias UserDocs.Documents.DocubitSetting, as: DocubitSettings
-
   @fields [
     :li_value,
     :name_prefix,
@@ -42,7 +40,7 @@ defmodule UserDocs.Documents.DocubitSetting do
       fn({key, value}, changeset) ->
         case value do
           nil -> delete_change(changeset, key)
-          value -> changeset
+          _ -> changeset
         end
       end
     )

@@ -27,6 +27,7 @@ defmodule UserDocs.Web do
 
   """
   def list_pages(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
+  def list_pages(params, filters) when is_map(params) and is_map(filters) do
     base_pages_query()
     |> maybe_preload_elements(params[:elements])
     |> maybe_preload_annotations(params[:annotations])
@@ -271,7 +272,8 @@ defmodule UserDocs.Web do
       [%Element{}, ...]
 
   """
-  def list_elements(params \\ %{}, filters \\ %{}) when is_map(params) and is_map(filters) do
+  def list_elements(params \\ %{}, filters \\ %{})
+  def list_elements(params, filters) when is_map(params) and is_map(filters) do
     base_elements_query()
     |> maybe_filter_element_by_page(filters[:page_id])
     |> maybe_filter_by_version_id(filters[:team_id])
@@ -444,7 +446,7 @@ defmodule UserDocs.Web do
   end
 
   defp maybe_preload_annotation(annotation, nil, _, _), do: annotation
-  defp maybe_preload_annotation(annotation, preloads, state, opts) do
+  defp maybe_preload_annotation(annotation, _preloads, state, opts) do
     opts = Keyword.delete(opts, :filter)
     StateHandlers.preload(state, annotation, opts)
   end
