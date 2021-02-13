@@ -7,7 +7,7 @@ defmodule EctoAddress do
     IO.puts("Casting struct EctoAddress")
     { :ok, address }
   end
-  def cast(address = %{ docubit_id: docubit_id, body: body }) when is_integer(docubit_id) and is_map(body) do
+  def cast(%{ docubit_id: docubit_id, body: body }) when is_integer(docubit_id) and is_map(body) do
     IO.puts("Casting map EctoAddress")
     { :ok, %{ docubit_id: docubit_id, body: Kernel.struct(Address, body) } }
   end
