@@ -1,7 +1,4 @@
 defmodule UserDocs.Documents.Docubit.Hydrate do
-
-  import Ecto.Changeset
-
   require Logger
 
   alias UserDocs.Documents
@@ -42,19 +39,6 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
   ) do
     hydrate_with_content(docubit, content)
   end
-  def hydrate_with_content(docubit = %Docubit{}, content = %Content{}) do
-    attrs = %{
-      content_id: content.id,
-      content: content
-    }
-    with {:ok, docubit} <- Documents.update_docubit(docubit, attrs),
-      docubit <- Map.put(docubit, :content, content)
-    do
-      { :ok, docubit }
-    else
-      { :error, changeset } -> changeset
-    end
-  end
   def hydrate(
     %Docubit{ docubit_type: %DocubitType{ name: "p" }} = docubit,
     %Annotation{} = annotation
@@ -67,20 +51,6 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
   ) do
     hydrate_with_annotation(docubit, annotation)
   end
-  def hydrate_with_annotation(docubit = %Docubit{}, annotation = %Annotation{}) do
-    attrs = %{
-      through_annotation_id: annotation.id,
-      content_id: annotation.content_id
-    }
-    with {:ok, docubit} <- Documents.update_docubit(docubit, attrs),
-      docubit <- Map.put(docubit, :content, annotation.content),
-      docubit <- Map.put(docubit, :through_annotation, annotation)
-    do
-      { :ok, docubit }
-    else
-      { :error, changeset } -> changeset
-    end
-  end
   def hydrate(
     %Docubit{ docubit_type: %DocubitType{ name: "li" }} = docubit,
     %Step{} = step
@@ -92,23 +62,6 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
     %Step{} = step
   ) do
     hydrate_with_step(docubit, step)
-  end
-  def hydrate_with_step(docubit = %Docubit{}, step = %Step{}) do
-    IO.puts("Hydrating with step")
-    attrs = %{
-      through_step_id: step.id,
-      through_annotation_id: step.annotation.id,
-      content_id: step.annotation.content_id,
-    }
-    with {:ok, docubit} <- Documents.update_docubit(docubit, attrs),
-      docubit <- Map.put(docubit, :content, step.annotation.content),
-      docubit <- Map.put(docubit, :through_annotation, step.annotation),
-      docubit <- Map.put(docubit, :through_step, step)
-    do
-      { :ok, docubit }
-    else
-      { :error, changeset } -> changeset
-    end
   end
   def hydrate(
     %Docubit{ docubit_type: %DocubitType{ name: "img" }} = docubit,
@@ -132,6 +85,51 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
   end
   def hydrate(%Docubit{ docubit_type: %DocubitType{ name: docubit_type }}, object) do
     { :hydrate, "Hydrate Not Implemented for this combination: #{docubit_type} and #{inspect(object.__struct__)}"}
+  end
+
+  def hydrate_with_content(docubit = %Docubit{}, content = %Content{}) do
+    attrs = %{
+      content_id: content.id,
+      content: content
+    }
+    with {:ok, docubit} <- Documents.update_docubit(docubit, attrs),
+      docubit <- Map.put(docubit, :content, content)
+    do
+      { :ok, docubit }
+    else
+      { :error, changeset } -> changeset
+    end
+  end
+  def hydrate_with_annotation(docubit = %Docubit{}, annotation = %Annotation{}) do
+    attrs = %{
+      through_annotation_id: annotation.id,
+      content_id: annotation.content_id
+    }
+    with {:ok, docubit} <- Documents.update_docubit(docubit, attrs),
+      docubit <- Map.put(docubit, :content, annotation.content),
+      docubit <- Map.put(docubit, :through_annotation, annotation)
+    do
+      { :ok, docubit }
+    else
+      { :error, changeset } -> changeset
+    end
+  end
+  def hydrate_with_step(docubit = %Docubit{}, step = %Step{}) do
+    IO.puts("Hydrating with step")
+    attrs = %{
+      through_step_id: step.id,
+      through_annotation_id: step.annotation.id,
+      content_id: step.annotation.content_id,
+    }
+    with {:ok, docubit} <- Documents.update_docubit(docubit, attrs),
+      docubit <- Map.put(docubit, :content, step.annotation.content),
+      docubit <- Map.put(docubit, :through_annotation, step.annotation),
+      docubit <- Map.put(docubit, :through_step, step)
+    do
+      { :ok, docubit }
+    else
+      { :error, changeset } -> changeset
+    end
   end
 
   def precheck(docubit, data) do

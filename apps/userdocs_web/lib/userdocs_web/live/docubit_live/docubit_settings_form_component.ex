@@ -2,7 +2,6 @@ defmodule UserDocsWeb.DocubitSettingsLive.FormComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocsWeb.Layout
-  alias UserDocs.Documents
   alias UserDocs.Documents.DocubitSetting, as: DocubitSettings
 
   def render_fields(assigns, form) do
@@ -82,7 +81,7 @@ defmodule UserDocsWeb.DocubitSettingsLive.FormComponent do
   end
 
   @impl true
-  def update(%{document: document} = assigns, socket) do
+  def update(%{document: _document}, socket) do
     { :ok, socket }
   end
 
