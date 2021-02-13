@@ -27,7 +27,7 @@ defmodule UserDocs.Automation.Step.Name do
     name
   end
 
-  def generate("Apply Annotation" = name, %Ecto.Changeset{} = step_changeset) do
+  def generate("Apply Annotation", %Ecto.Changeset{} = step_changeset) do
     annotation =
       case Ecto.Changeset.get_field(step_changeset, :annotation, "") do
         %Annotation{} = annotation -> annotation
@@ -45,7 +45,7 @@ defmodule UserDocs.Automation.Step.Name do
     |> maybe_field(step, [:annotation, :name], "")
   end
 
-  def generate("Navigate" = name, %Ecto.Changeset{} = step_changeset) do
+  def generate("Navigate", %Ecto.Changeset{} = step_changeset) do
     page = page_or_empty_page(step_changeset)
 
     order = order_name(step_changeset)
@@ -61,7 +61,7 @@ defmodule UserDocs.Automation.Step.Name do
     |> maybe_field(step, [:page, :name], "")
   end
 
-  def generate("Set Size Explicit" = name, %Ecto.Changeset{} = step_changeset) do
+  def generate("Set Size Explicit", %Ecto.Changeset{} = step_changeset) do
     width = Ecto.Changeset.get_field(step_changeset, :width, "")
     height = Ecto.Changeset.get_field(step_changeset, :height, "")
 
@@ -78,7 +78,7 @@ defmodule UserDocs.Automation.Step.Name do
     |> maybe_field(step, :height, "")
   end
 
-  def generate("Element Screenshot" = name, %Ecto.Changeset{} = step_changeset) do
+  def generate("Element Screenshot", %Ecto.Changeset{} = step_changeset) do
     element = element_or_empty_element(step_changeset)
 
     order_name(step_changeset)
@@ -92,7 +92,7 @@ defmodule UserDocs.Automation.Step.Name do
     |> maybe_field(step, [:element, :name], "")
   end
 
-  def generate("Clear Annotations" = name, %Ecto.Changeset{} = step_changeset) do
+  def generate("Clear Annotations", %Ecto.Changeset{} = step_changeset) do
     order_name(step_changeset)
   end
   def generate("Clear Annotations" = name, %Step{} = step) do
@@ -102,7 +102,7 @@ defmodule UserDocs.Automation.Step.Name do
     |> field(name, " ")
   end
 
-  def generate("Wait" = name, %Ecto.Changeset{} = step_changeset) do
+  def generate("Wait", %Ecto.Changeset{} = step_changeset) do
     element = element_or_empty_element(step_changeset)
     order_name(step_changeset) <> " for "
 
@@ -116,7 +116,7 @@ defmodule UserDocs.Automation.Step.Name do
     |> maybe_field(step, [:element, :name], "")
   end
 
-  def generate("Click" = name, %Ecto.Changeset{} = step_changeset) do
+  def generate("Click", %Ecto.Changeset{} = step_changeset) do
     element = element_or_empty_element(step_changeset)
 
     order_name(step_changeset) <> " on "
@@ -130,7 +130,7 @@ defmodule UserDocs.Automation.Step.Name do
     |> maybe_field(step, [:element, :name], "")
   end
 
-  def generate("Fill Field" = name, %Ecto.Changeset{} = step_changeset) do
+  def generate("Fill Field", %Ecto.Changeset{} = step_changeset) do
     element = element_or_empty_element(step_changeset)
     text = Ecto.Changeset.get_field(step_changeset, :text, "")
 
@@ -147,10 +147,10 @@ defmodule UserDocs.Automation.Step.Name do
     |> maybe_field(step, :text, ". ")
   end
 
-  def generate("Full Screen Screenshot" = name, %Ecto.Changeset{} = step_changeset) do
+  def generate("Full Screen Screenshot", %Ecto.Changeset{} = step_changeset) do
     order_name(step_changeset)
   end
-  def generate("Full Screen Screenshot" = name, %Step{} = step) do
+  def generate("Full Screen Screenshot" = name, %Step{}) do
     Logger.debug("Automatic name generation: #{name}")
     name
   end
@@ -158,10 +158,6 @@ defmodule UserDocs.Automation.Step.Name do
   def generate(name, _step) do
     Logger.debug("Unhandled automatic name generation: #{name}") #TODO: Change back to error
     name
-  end
-  def generate(_, _) do
-    Logger.warn("Generating an automatic name with no current_step")
-    ""
   end
 
   def order_name(changeset) do
