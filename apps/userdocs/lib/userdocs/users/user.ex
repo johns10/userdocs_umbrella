@@ -34,7 +34,7 @@ defmodule UserDocs.Users.User do
     teams(user.id, teams, team_users)
   end
   def teams(user_id, teams, team_users) when is_integer(user_id) do
-    teams_users =
+    _teams_users =
       Enum.filter(team_users, fn(tu) -> tu.user_id == user_id end)
 
     team_ids =

@@ -61,7 +61,7 @@ defmodule UserDocs.TestDataset do
 
   def create() do
 
-  strategies = [
+  _strategies = [
     xpath_strategy = %{
       name: "xpath"
     },
