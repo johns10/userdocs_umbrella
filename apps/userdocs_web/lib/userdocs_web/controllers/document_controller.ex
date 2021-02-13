@@ -56,10 +56,15 @@ defmodule UserDocsWeb.DocumentVersionDownloadController do
     old_path = File.cwd!
     base_path = File.cwd! <> "/tmp/"
     File.cd!(base_path)
-    :zip.create(tmp_folder_name <> ".zip", [ String.to_charlist(tmp_folder_name) ], [{:cwd, base_path}])
+    :zip.create(
+      tmp_folder_name <> ".zip",
+      [ String.to_charlist(tmp_folder_name) ],
+      [{:cwd, base_path}]
+    )
     File.cd!(old_path)
 
-    send_download(conn, { :file, base_path <> tmp_folder_name <> ".zip" }, filename: "hello.zip")
+    conn
+    |> send_download({ :file, base_path <> tmp_folder_name <> ".zip" }, filename: tmp_folder_name <> ".zip")
   end
 
 end
