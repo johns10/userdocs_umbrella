@@ -1,6 +1,4 @@
 defmodule UserDocsWeb.Form do
-  import Phoenix.LiveView.Helpers
-
   alias UserDocsWeb.DomainHelpers
 
   require Logger
@@ -74,7 +72,7 @@ defmodule UserDocsWeb.Form do
       available_items
   end
 
-  def maybe_select_list_from_assigns({ :nok, list }, assigns, key, filter) do
+  def maybe_select_list_from_assigns({ :nok, list }, assigns, key, _filter) do
     try do
       result =
         Map.get(assigns.select_lists, key)
