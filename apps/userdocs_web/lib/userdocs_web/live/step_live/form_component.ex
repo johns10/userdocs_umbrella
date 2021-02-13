@@ -3,8 +3,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   require Logger
 
-  alias UserDocsWeb.LiveHelpers
-
   alias UserDocsWeb.AnnotationLive
   alias UserDocsWeb.ElementLive
   alias UserDocsWeb.PageLive

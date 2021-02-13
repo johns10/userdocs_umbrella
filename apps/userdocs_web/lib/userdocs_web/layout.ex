@@ -7,7 +7,7 @@ defmodule UserDocsWeb.Layout do
 
   def checkbox(form,
     name \\ :default,
-    select_options \\ [ { None, ""}],
+    _select_options \\ [ { None, ""}],
     placeholder \\ None,
     id \\ "checkbox-input",
     readonly \\ false,
@@ -237,7 +237,7 @@ defmodule UserDocsWeb.Layout do
   end
 
   defp id_or_new(:edit, f), do: "_" <> Integer.to_string(f.data.id)
-  defp id_or_new(:new, f), do: "_new"
+  defp id_or_new(:new, _f), do: "_new"
 
   """
   def card_header(name, target, expand_event) do

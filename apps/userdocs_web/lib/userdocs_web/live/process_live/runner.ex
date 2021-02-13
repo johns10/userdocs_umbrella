@@ -42,8 +42,6 @@ defmodule UserDocsWeb.ProcessLive.Runner do
 
     {:noreply, push_event(socket, "message", payload)}
   end
-
-  @impl true
   def handle_event("update_status", %{ "status" => status } = payload, socket) do
 
     socket =
