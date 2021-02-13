@@ -95,7 +95,7 @@ defmodule StateHandlers.Helpers do
       end
     )
   end
-  def socket_or_state([ { state, _, :state } ], loader) do
+  def socket_or_state([ { state, _, :state } ], _loader) do
     #IO.puts("It's the state")
     state
   end

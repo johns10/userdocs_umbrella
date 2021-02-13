@@ -14,7 +14,6 @@ defmodule StateHandlers do
   """
   def load(state, data, schema, opts), do: StateHandlers.Load.apply(state, data, schema, opts)
   def load(state, data, opts), do: StateHandlers.Load.apply(state, data, opts)
-  def get(state, id, opts), do: StateHandlers.Get.apply(state, id, opts)
   def get(state, id, schema, opts), do: StateHandlers.Get.apply(state, id, schema, opts)
   def preload(state, data, preloads, opts), do: StateHandlers.Preload.apply(state, data, preloads, opts)
   def preload(state, data, opts), do: StateHandlers.Preload.apply(state, data, opts)

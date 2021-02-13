@@ -38,7 +38,7 @@ defmodule StateHandlers.Load do
         Map.put(s, k, v)
       end)
   end
-  def load_data(state, data, :list, :by_type) do
+  def load_data(_state, data, :list, :by_type) do
     #IO.puts("Loading List Data by type")
     data
   end

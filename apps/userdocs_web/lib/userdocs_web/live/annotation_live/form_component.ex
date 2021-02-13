@@ -8,6 +8,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
 
   alias UserDocs.Web
 
+  @impl true
   def render(assigns) do
     ~L"""
       <%= form = form_for @changeset, "#",

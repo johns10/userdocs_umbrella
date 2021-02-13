@@ -88,6 +88,4 @@ defmodule StateHandlers.List do
   def cast_by_type(data, :list), do: data
   def cast_by_type(data, nil), do: data
   def cast_by_type(data, :map), do: Enum.map(data, fn({_, v}) -> v end)
-
-  def apply(_, _, _), do: raise(RuntimeError, "State.Get failed to find a matching clause")
 end

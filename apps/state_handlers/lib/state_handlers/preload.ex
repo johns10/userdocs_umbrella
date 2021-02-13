@@ -21,7 +21,7 @@ defmodule StateHandlers.Preload do
     #Logger.error("State.Preload called with nil data")
     nil
   end
-  def apply(_state, data, _preloads, _opts) do
+  def apply(_state, _data, _preloads, _opts) do
     raise(RuntimeError, "State.Preload failed to find a matching clause")
   end
 
@@ -38,7 +38,7 @@ defmodule StateHandlers.Preload do
     tuple: This means there's a nested preload so we just call the original preload function and
     apply the preloads to the data.
   """
-  defp handle_preload(state, nil, preload, opts), do: nil
+  defp handle_preload(_state, nil, _preload, _opts), do: nil
   defp handle_preload(state, data, preload, opts) when is_atom(preload) do
     #IO.puts("handle_preload Atom #{inspect(preload)}")
     schema = data.__meta__.schema
@@ -81,7 +81,7 @@ defmodule StateHandlers.Preload do
     Keyword.put(opts, :order, updated_order_clause)
   end
 
-  def handle_order_option(order_opts, %{field: _, order: _} = opt_to_ignore, _fields, _preload) do
+  def handle_order_option(order_opts, %{field: _, order: _}, _fields, _preload) do
     #IO.puts("Rejecting order option")
     order_opts
   end
@@ -94,11 +94,11 @@ defmodule StateHandlers.Preload do
         order_opts
     end
   end
-  def handle_order_option(order_opts, {association, [ _ ] = order_opt}, _associations, _preload) do
+  def handle_order_option(order_opts, {_association, [ _ ] = order_opt}, _associations, _preload) do
     #IO.puts("Handling Order Option for a deeply nested order call: #{association}, #{inspect(order_opt)}")
     order_opts ++ order_opt
   end
-  def handle_order_option(order_opts, {association, order_opt}, _associations, _preload) do
+  def handle_order_option(order_opts, {_association, order_opt}, _associations, _preload) do
     #IO.puts("Handling Order Option for a nested order call: #{association}: #{inspect(order_opt)}")
     [ order_opt | order_opts ]
   end

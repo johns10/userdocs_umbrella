@@ -15,6 +15,7 @@ defmodule StateHandlers.Delete do
     |> Helpers.maybe_put_in_location(opts[:location])
     |> Helpers.socket_or_state(loader)
   end
+  def apply(_, _, opts), do: raise(RuntimeError, "State.Update.apply failed to find a matching clause with options #{inspect(opts)}")
 
   def delete([ { state, key, state_type } | breadcrumb ], data, data_type) do
     IO.puts("delete state parser")
@@ -30,5 +31,4 @@ defmodule StateHandlers.Delete do
 
   def get(_, _, _, opts), do: raise(RuntimeError, "State.Update failed to find a matching clause with options #{inspect(opts)}")
 
-  def apply(_, _, opts), do: raise(RuntimeError, "State.Update.apply failed to find a matching clause with options #{inspect(opts)}")
 end
