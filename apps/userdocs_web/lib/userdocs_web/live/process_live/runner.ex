@@ -29,7 +29,6 @@ defmodule UserDocsWeb.ProcessLive.Runner do
   @impl true
   def handle_event("execute_job", %{"process-id" => process_id}, socket) do
     _log_string = "Executing process " <> process_id
-    IO.puts(_log_string)
 
     payload =  %{
       type: "process",

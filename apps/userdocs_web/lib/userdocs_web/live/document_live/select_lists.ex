@@ -4,6 +4,11 @@ defmodule UserDocsWeb.DocumentLive.SelectLists do
   alias UserDocs.Automation
   alias UserDocs.Web
 
+  def render(assigns) do
+    ~L"""
+    """
+  end
+
   def process(socket, opts) do
     processes = Automation.list_processes(socket, opts)
     socket

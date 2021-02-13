@@ -34,6 +34,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Li do
     |> Base.maybe_content_header(assigns)
   end
 
+  @impl true
   def render(assigns) do
     ~L"""
     <<%= outer_tag(assigns) %>
