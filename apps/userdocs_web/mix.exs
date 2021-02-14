@@ -25,7 +25,7 @@ defmodule UserDocsWeb.MixProject do
   def application do
     [
       mod: {UserDocsWeb.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :mnesia]
     ]
   end
 

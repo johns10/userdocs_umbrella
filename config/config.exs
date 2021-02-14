@@ -35,26 +35,6 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# Import environment specific config. This must remain at the bottom
-# of this file so it overrides the configuration defined above.
-import_config "#{Mix.env()}.exs"
-
-if Mix.env() in [:dev, :test] do
-  config :userdocs_web, :pow,
-    user: UserDocs.Users.User,
-    repo: UserDocs.Repo,
-    cache_store_backend: Pow.Store.Backend.EtsCache,
-    backend: Pow.Store.Backend.EtsCache,
-    routes_backend: UserDocsWeb.Pow.Routes
-else
-  config :userdocs_web, :pow,
-    user: UserDocs.Users.User,
-    repo: UserDocs.Repo,
-    cache_store_backend: Pow.Store.Backend.MnesiaCache,
-    backend: Pow.Store.Backend.MnesiaCache,
-    routes_backend: UserDocsWeb.Pow.Routes
-end
-
 config :cors_plug,
   origin: [
     "https://app.user-docs.com.gigalixirdns.com",
@@ -70,3 +50,17 @@ config :phoenix, :template_engines,
   slim: PhoenixSlime.Engine,
   slime: PhoenixSlime.Engine,
   slimleex: PhoenixSlime.LiveViewEngine
+
+config :userdocs_web, :pow,
+  user: UserDocs.Users.User,
+  repo: UserDocs.Repo,
+  cache_store_backend: Pow.Store.Backend.MnesiaCache,
+  backend: Pow.Store.Backend.MnesiaCache,
+  routes_backend: UserDocsWeb.Pow.Routes
+
+# Import environment specific config. This must remain at the bottom
+# of this file so it overrides the configuration defined above.
+import_config "#{Mix.env()}.exs"
+
+if Mix.env() in [:dev, :test] do
+end
