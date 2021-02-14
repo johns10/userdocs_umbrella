@@ -37,9 +37,7 @@ config :phoenix, :json_library, Jason
 
 config :cors_plug,
   origin: [
-    "https://app.user-docs.com.gigalixirdns.com",
-    "chrome-extension://iclibnblhjdakhhijcioglkmdihjelgg",
-    "chrome-extension://ohmjkpckjphdcdophkflpmdmihpiaejf",
+    "chrome-extension://mkbbhaeofgjbbhopopbjnjjjfbbnaone",
     "http://localhost",
     "https://app.user-docs.com",
   ],
