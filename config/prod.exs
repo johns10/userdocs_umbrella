@@ -16,7 +16,11 @@ config :userdocs_web, UserDocsWeb.Endpoint,
   check_origin: [
     "chrome-extension://mkbbhaeofgjbbhopopbjnjjjfbbnaone",
     "https://app.user-docs.com",
+<<<<<<< HEAD
   ],
+=======
+  ],
+>>>>>>> ba2315589adb3c1307ff298daad4c04c0e55ba49
   cache_static_manifest: "priv/static/cache_manifest.json",
   secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
   server: true
