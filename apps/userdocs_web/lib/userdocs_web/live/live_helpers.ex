@@ -20,6 +20,10 @@ defmodule UserDocsWeb.LiveHelpers do
         team_user: @team_user,
         return_to: Routes.team_user_index_path(@socket, :index) %>
   """
+  def which_app(conn) do
+    %{ "app_name" => Atom.to_string(conn.assigns.app_name) }
+  end
+
   def live_modal(socket, component, opts) do
     modal_opts = [
       id: :modal,
