@@ -32,7 +32,11 @@
             <a class="button is-primary">
               <%= "Sign In" %>
             </a>
-            <%= link "Sign out", to: Routes.login_path(@socket, :delete), method: :delete, class: "button is-light" %>
+            <%= if @app_name == "web" do %>
+              <%= link "Sign out", to: Routes.logout_path(@socket, :delete), method: :delete, class: "button is-light" %>
+            <% else %>
+              <%= link "Sign out", to: URI.merge(@uri, Routes.login_path(@uri, :new)) |> to_string(), method: :delete, class: "button is-light" %>
+            <% end %>
           </div>
         </div>
       </div>
@@ -54,5 +58,10 @@
     ]) %>
   </main>
 <% else %>
-  <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns, Routes.login_path(@socket, :new)) %>
+  <%= if @app_name == "web" do %>
+    <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns, Routes.login_path(@socket, :new)) %>
+  <% else %>
+    <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns, URI.merge(@uri, Routes.login_path(@uri, :new)) |> to_string()) %>
+  <% end %>
+
 <% end %>
