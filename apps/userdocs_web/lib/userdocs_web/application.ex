@@ -10,7 +10,8 @@ defmodule UserDocsWeb.Application do
       # Start the Telemetry supervisor
       UserDocsWeb.Telemetry,
       # Start the Endpoint (http/https)
-      UserDocsWeb.Endpoint
+      UserDocsWeb.Endpoint,
+      Pow.Store.Backend.MnesiaCache
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
