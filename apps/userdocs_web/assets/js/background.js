@@ -10,23 +10,6 @@ chrome.tabs.onUpdated.addListener(function(tabId) {
 chrome.tabs.getSelected(null, function(tab) {
 	chrome.pageAction.show(tab.id);
 });
-/*
-chrome.runtime.onMessage.addListener(
-	function(request, sender, sendResponse) {
-		console.log(sender.tab ?
-							"from a content script: " + sender.tab.url :
-							"from the extension");
-	if (request.command == "setSelector") {
-		console.log(request);
-		chrome.storage.local.get(['extensionTabId'], function(result) {
-			chrome.tabs.sendMessage(result.extensionTabId, request);
-		});
-		sendResponse({farewell: "goodbye"});
-	} else if (request.command == "register") {
-		sendResponse({result: "registered"});
-	}
-});
-	*/
 // This is where you set opening the extension
 chrome.pageAction.onClicked.addListener(function(tab) {
 	console.log(tab)
