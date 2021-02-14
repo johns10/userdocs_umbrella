@@ -13,6 +13,10 @@ use Mix.Config
 config :userdocs_web, UserDocsWeb.Endpoint,
   http: [port: {:system, "PORT"}], # Possibly not needed, but doesn't hurt
   url: [host: "app.user-docs.com", port: 443],
+  check_origin: [
+    "chrome-extension://mkbbhaeofgjbbhopopbjnjjjfbbnaone",
+    "https://app.user-docs.com",
+  ]
   cache_static_manifest: "priv/static/cache_manifest.json",
   secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
   server: true
