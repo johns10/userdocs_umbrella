@@ -1,4 +1,4 @@
 
-import {main} from "./browser_main.js"
+import {main} from "./browser/browser_main.js"
 
 main()
