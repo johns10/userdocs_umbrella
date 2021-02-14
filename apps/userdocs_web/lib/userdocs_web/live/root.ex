@@ -30,6 +30,7 @@ defmodule UserDocsWeb.Root do
   def authorize(socket, session) do
     socket
     |> validate_logged_in(session)
+    |> put_app_name(session)
   end
 
   def initialize(socket, opts \\ state_opts())
@@ -111,6 +112,18 @@ defmodule UserDocsWeb.Root do
         |> assign(:auth_state, :not_logged_in)
         |> assign(:changeset, Users.change_user(%User{}))
     end
+  end
+
+  def put_app_name(socket, %{ "app_name" => app_name }) do
+    uri =
+      if Mix.env() in [:dev, :test] do
+        URI.parse("https://user-docs.com:4002")
+      else
+        URI.parse("https://app.user-docs.com")
+      end
+    socket
+    |> assign(:app_name, app_name)
+    |> assign(:uri, uri)
   end
 
   def handle_event("delete-document-version", p, s) do
