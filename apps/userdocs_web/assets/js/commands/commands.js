@@ -27,19 +27,21 @@ function handle_job(job, configuration) {
   const log_string = "handling job " + job.id + " step " + job.current_step_id + " sequence " + job.current_sequence + " status " + status
   console.log(log_string)
 
+
   if (status === 'not_started') {
     start_job(job, configuration, handle_job)
-    updateJobStatus(job)
+    updateJobStatus(job, configuration)
   } else if (status == 'running') {
     run_current_step(job, configuration, handle_job)
+    updateJobStatus(job, configuration)
   } else if (status == 'failed') {
     const step = current_step(job)
-    updateStepStatus(step)
-    updateJobStatus(job)
+    updateStepStatus(step, configuration)
+    updateJobStatus(job, configuration)
   } else if (status == 'complete') {
     const step = current_step(job)
-    updateStepStatus(step)
-    updateJobStatus(job)
+    updateStepStatus(step, configuration)
+    updateJobStatus(job, configuration)
   }
 }
 
@@ -53,10 +55,10 @@ function handle_step(job, configuration) {
     run_current_step(job, configuration, handle_step)
   } else if (status == 'failed') {
     const step = current_step(job)
-    updateStepStatus(step)
+    updateStepStatus(step, configuration)
   } else if (status == 'complete') {
     const step = current_step(job)
-    updateStepStatus(step)
+    updateStepStatus(step, configuration)
   }
 }
 
@@ -105,34 +107,36 @@ function success(job, configuration, proceed) {
   proceed(job, configuration)
 }
 
-function updateStepStatus(step) {
+function updateStepStatus(step, configuration) {
   // # TODO: Remove this convention and replace with something I pass in
   console.log("Updating step status")
   const step_element_id = "step-" + step.id + "-runner"
   var step_element = document.getElementById(step_element_id)
   
-  step.element_id = step_element_id
-
-  console.log(step)
-
-  step_element.dispatchEvent(new CustomEvent("message", {
-    bubbles: false,
-    detail: step
-  }))
+  // TODO: Refactor based on environment
+  if(configuration.environment == 'extenstion') {
+    step.element_id = step_element_id
+    step_element.dispatchEvent(new CustomEvent("message", {
+      bubbles: false,
+      detail: step
+    }))
+  }
 }
 
-function updateJobStatus(job) {
+function updateJobStatus(job, configuration) {
   // # TODO: Remove this convention and replace with something I pass in
   console.log("Updating Job Status")
   const job_element_id = "process-" + job.process.id + "-runner"
   var job_element = document.getElementById(job_element_id)
 
-  job.element_id = job_element_id
 
-  job_element.dispatchEvent(new CustomEvent("message", {
-    bubbles: false,
-    detail: job
-  }))
+  if(configuration.environment == 'extenstion') {
+    job.element_id = job_element_id
+    job_element.dispatchEvent(new CustomEvent("message", {
+      bubbles: false,
+      detail: job
+    }))
+  }
 }
 
 function failStep(job, error, configuration, proceed) {
