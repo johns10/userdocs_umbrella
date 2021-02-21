@@ -6,7 +6,7 @@ defmodule UserDocsWeb.AuthErrorHandler do
   def call(conn, :not_authenticated) do
     conn
     |> put_flash(:error, "You've got to be authenticated first")
-    |> redirect(to: Routes.pow_session_path(conn, :new))
+    |> redirect(to: Routes.session_path(conn, :new))
   end
   def call(conn, :already_authenticated) do
     conn
