@@ -63,6 +63,7 @@
         ])
       do %>
         <%= for step <- process.steps do %>
+
           <%= live_component(@socket, CollapsableFormComponent,
             [
               id: ID.collapsable_form("step", step.id),
@@ -107,8 +108,11 @@
                       :name, true),
                   elements_select:
                     UserDocs.Helpers.select_list(
-                      Enum.filter(@data.elements, fn(e) -> e.page_id == step.page_id end),
-                      :name, true) ,
+                      Enum.filter(@data.elements,
+                        fn(e) ->
+                          e.page_id == recent_page_id(process, step, @data.pages)
+                        end),
+                      :name, true),
                   content: UserDocs.Helpers.select_list(@data.content, :name, true),
                   content_versions: UserDocs.Helpers.select_list(@data.content_versions, :name, false),
                   versions: UserDocs.Helpers.select_list(@data.versions, :name, false),
@@ -136,4 +140,46 @@
     <%= live_component(@socket, UserDocsWeb.SelectorHandler, [ id: "selector-handler" ]) %>
     <div id="selector-tester" phx-hook="testSelector"></div>
   <% end %>
+
+  <nav class="navbar is-fixed-bottom" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <div class="field is-grouped">
+          <%= f = form_for :current_strategy, "#", phx_change: "update_current_strategy"%>
+            <div class="control">
+              <div class="select">
+                <%= select f, :strategy_id,
+                  UserDocs.Helpers.select_list(@data.strategies, :name, false),
+                  value: @current_strategy.id,
+                  id: "current-strategy",
+                  phx_hook: "configure"
+                %>
+              </div>
+            </div>
+          </form>
+          <%= f = form_for :selected, "#" %>
+            <div>
+              <div class="select">
+                <%= select f, :strategy_transfer_field,
+                  UserDocs.Helpers.select_list(@data.strategies, :name, false),
+                  value: @transferred_strategy.id,
+                  id: "strategy-transfer-field",
+                  disabled: true
+                %>
+              </div>
+            </div>
+          </form>
+          <p class="control">
+            <input
+              class="input"
+              type="text"
+              placeholder="Selector"
+              id="selector-transfer-field"
+              value="<%= @transferred_selector %>"
+            >
+          </p>
+        </div>
+      </div>
+    </div>
+  </nav>
 </main>
