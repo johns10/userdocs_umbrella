@@ -336,6 +336,9 @@ defmodule UserDocs.Web do
     UserDocs.State.get!(state, id, :elements, Element)
     |> maybe_preload_strategy(params[:strategy], state)
   end
+  def get_element!(id, state, opts) when is_list(opts) do
+    StateHandlers.get(state, id, Element, opts)
+  end
 
 
   def get_content!(id, params, _filters, state) do
