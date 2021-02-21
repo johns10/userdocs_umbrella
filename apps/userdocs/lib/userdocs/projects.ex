@@ -66,14 +66,25 @@ defmodule UserDocs.Projects do
       ** (Ecto.NoResultsError)
 
   """
-  def get_project!(id), do: Repo.get!(Project, id)
-  @spec get_project!(maybe_improper_list | map, any) :: any
-  def get_project!(state, id) do
-    UserDocs.State.get!(state, id, :projects, UserDocs.Projects.Project)
+  def get_project!(id, params \\ %{}) when is_map(params) do
+    base_project_query(id)
+    |> maybe_preload_versions(params[:versions])
+    |> maybe_preload_default_version(params[:default_version])
+    |> Repo.one!()
   end
   def get_project!(id, state, opts) when is_list(opts) do
     StateHandlers.get(state, id, Project, opts)
   end
+
+  defp base_project_query(id) do
+    from(project in Project, where: project.id == ^id)
+  end
+
+  defp maybe_preload_versions(query, nil), do: query
+  defp maybe_preload_versions(query, _), do: from(item in query, preload: [:versions])
+
+  defp maybe_preload_default_version(query, nil), do: query
+  defp maybe_preload_default_version(query, _), do: from(item in query, preload: [:default_version])
 
   @doc """
   Creates a project.
