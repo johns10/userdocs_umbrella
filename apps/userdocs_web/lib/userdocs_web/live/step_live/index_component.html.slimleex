@@ -1,0 +1,55 @@
+= if @live_action in [:edit, :new] do
+  = live_modal @socket, UserDocsWeb.StepLive.FormComponent,
+    id: @step.id || :new,
+    parent_id: @process.id,
+    title: @page_title,
+    action: @live_action,
+    step: @step,
+    state_opts: @state_opts,
+    select_lists: @select_lists,
+    data: @data,
+    app_name: @app_name,
+    default_page_id: nil,
+    return_to: Routes.step_index_path(@socket, :index, @team.id, @project.id, @version.id, @process.id)
+
+= for step <- @process.steps do
+  .card
+    header.card-header
+      p.card-header-title style="margin-bottom:0px;"
+        = step.name
+      = live_component(@socket, Runner, 
+        [ id: "step-" <> Integer.to_string(step.id) <> "-runner",
+        step: step,
+        step_type_name: step.step_type.name])
+      = content_tag :a, class: "card-header-icon",
+        phx_click: "expand",
+        phx_value_id: step.id,
+        aria_label: "expand" do
+        span.icon
+          i.fa.fa-angle-down aria-hidden="true"
+    div class="card-content <%= is_expanded?(@expanded, step.id) %>"
+      .content
+        = live_component(@socket, StepForm,
+          [ id: "step-" <> Integer.to_string(step.id),
+          action: :edit,
+          step: step,
+          parent: @process,
+          parent_id: @process.id,
+          type: Step,
+          current_version_id: @version.id,
+          state_opts: @state_opts,
+          default_page_id: RecentPage.get_id(@process, step, @data.pages),
+          data: %{ step_types: @data.step_types,
+            strategies: @data.strategies,
+            annotations: @data.annotations,
+            elements: @data.elements,
+            annotation_types: @data.annotation_types },
+          select_lists: @select_lists ])
+
+
+= if @app_name == "web" do 
+  = live_patch to: Routes.step_index_path(@socket, :new, @team.id, @project.id, @version.id, @process.id) do
+    button.button.is-primary New Step
+- else
+  = link to: "#", phx_click: "new-step" do
+    button.button.is-primary New Step
