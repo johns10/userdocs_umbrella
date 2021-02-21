@@ -1,0 +1,15 @@
+div.py-2
+  h1.is-size-3
+    = "Project " <> @project.name
+div.py-2
+  h2.is-size-4 Versions
+  ul
+    = for version <- @project.versions do
+      li = version.name
+div.py-2
+  h3.is-size-5 Default Version
+  = @project.default_version.name
+
+.buttons
+  = live_redirect to: Routes.project_index_path(@socket, :index, @team_id) do
+    button.button.mr-1 Back
