@@ -1,0 +1,18 @@
+= ComposableBreadCrumb.render([ items: [ %{ to: Routes.team_index_path(@socket, :index), name: "Teams"} ], 
+  last_item: %{ to: Routes.team_show_path(@socket, :show, @team), name: @team.name } ])
+  
+div.py-2
+  h1.is-size-3
+    = "Team " <> @team.name
+div.py-2
+  h2.is-size-4 Users
+  ul
+    = for user <- @team.users do
+      li = user.email
+div.py-2
+  h3.is-size-5 Default Project
+  = @team.default_project.name
+
+.buttons
+  = live_redirect to: Routes.team_index_path(@socket, :index) do
+    button.button.mr-1 Back
