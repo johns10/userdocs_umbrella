@@ -100,20 +100,23 @@ Hooks.executeStep = {
 Hooks.CopySelector = {
   mounted: function mounted() {
     this.el.addEventListener("click", function (e) {
+
       console.log("Copying Selector");
       console.log(e.srcElement.attributes)
+      
+      var element = e.target.closest('button');
 
       const selector = document.getElementById("selector-transfer-field").value;
       const strategy = document.getElementById("strategy-transfer-field").value;
 
-      const selectorId = e.srcElement.attributes["selector"].value;
-      const strategyId = e.srcElement.attributes["strategy"].value;
+      const selectorFieldId = element.attributes["selector"].value;
+      const strategyFieldId = element.attributes["strategy"].value;
 
-      const selectorField = document.getElementById(selectorId);
-      const strategyField = document.getElementById(strategyId);
+      const targetSelectorField = document.getElementById(selectorFieldId);
+      const targetStrategyField = document.getElementById(strategyFieldId);
 
-      selectorField.value = selector;
-      strategyField.value = strategy;
+      targetSelectorField.value = selector;
+      targetStrategyField.value = strategy;
     });
   }
 };
