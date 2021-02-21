@@ -31,8 +31,12 @@ defmodule UserDocsWeb.ModalComponent do
   end
 
   @impl true
-  def handle_event("close", _, socket) do
-    send(self(), :close_modal)
-    {:noreply, socket}
+  def handle_event("close", _, %{ assigns: %{ opts: opts } } = socket) do
+    if opts[:return_to] != nil && opts[:app_name] == "web" do
+      { :noreply, push_patch(socket, to: opts[:return_to])}
+    else
+      send(self(), :close_modal)
+      {:noreply, socket}
+    end
   end
 end
