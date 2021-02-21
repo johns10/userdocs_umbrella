@@ -49,3 +49,4 @@ mix.lock
 # Ignore the files in tmp
 tmp/*
 apps/userdocs/tmp/*
+apps/userdocs_web/assets/package-lock.json
