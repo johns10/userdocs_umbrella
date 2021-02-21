@@ -691,7 +691,7 @@ defmodule UserDocs.Automation do
     |> maybe_preload_versions(params[:versions])
     |> Repo.one!()
   end
-  def get_process!(id, state, opts) when is_integer(id) do
+  def get_process!(id, state, opts) when is_list(opts) do
     StateHandlers.get(state, id, Process, opts)
     |> maybe_preload_process(opts[:preloads], state, opts)
   end
