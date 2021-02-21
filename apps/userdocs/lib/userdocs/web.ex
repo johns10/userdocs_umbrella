@@ -619,8 +619,15 @@ defmodule UserDocs.Web do
   @doc """
   Returns the list of strategies.
   """
+  def list_strategies(state, opts) when is_list(opts) do
+    StateHandlers.list(state, Strategy, opts)
+  end
   def list_strategies do
     Repo.all(Strategy)
+  end
+
+  def get_strategy!(id, state, opts) do
+    StateHandlers.get(state, id, Strategy, opts)
   end
 
   def create_strategy(attrs \\ %{}) do
