@@ -10,7 +10,9 @@ defmodule UserDocs.Projects do
   alias UserDocs.Projects.Project
 
   def load_projects(state, opts) do
-    StateHandlers.load(state, list_projects(%{}, opts[:filters]), Project, opts)
+    filters = Keyword.get(opts, :filters, %{})
+    preloads = Keyword.get(opts, :preloads, %{})
+    StateHandlers.load(state, list_projects(preloads, filters), Project, opts)
   end
   @doc """
   Returns the list of projects.
