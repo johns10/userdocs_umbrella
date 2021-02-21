@@ -228,11 +228,13 @@ function commands() {
     },
     "Set Selector": {
       1: sendToExtension,
-      2: setSelector
+      2: setSelector,
+      3: completeStep
     },
     "Test Selector": {
       1: sendToBrowser,
-      2: testSelector
+      2: testSelector,
+      3: completeStep
     }
   }
 }
