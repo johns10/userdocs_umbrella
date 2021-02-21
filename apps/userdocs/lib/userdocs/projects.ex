@@ -235,7 +235,7 @@ defmodule UserDocs.Projects do
 
   """
   def get_version!(id, params \\ %{}, filters \\ %{})
-  def get_version!(id, state, opts) when is_integer(id) and is_list(opts) do
+  def get_version!(id, state, opts) when is_list(opts) do
     StateHandlers.get(state, id, Version, opts)
     |> maybe_preload_version(opts[:preloads], state, opts)
   end
