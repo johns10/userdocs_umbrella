@@ -129,6 +129,7 @@ function updateJobStatus(job, configuration) {
   const job_element_id = "process-" + job.process.id + "-runner"
   var job_element = document.getElementById(job_element_id)
 
+  chrome.storage.local.set({job: job}, function() {});
 
   if(configuration.environment == 'extenstion') {
     job.element_id = job_element_id
