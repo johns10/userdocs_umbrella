@@ -645,6 +645,7 @@ defmodule UserDocs.Automation do
   def list_processes(params, filters) when is_map(params) and is_map(filters) do
     base_processes_query()
     |> maybe_filter_by_version(filters[:version_id])
+    |> maybe_filter_processes_by_user_id(filters[:user_id])
     |> Repo.all()
   end
 
@@ -652,6 +653,17 @@ defmodule UserDocs.Automation do
   defp maybe_filter_by_version(query, version_id) do
     from(process in query,
       where: process.version_id == ^version_id
+    )
+  end
+
+  defp maybe_filter_processes_by_user_id(query, nil), do: query
+  defp maybe_filter_processes_by_user_id(query, user_id) do
+    from(process in query,
+      left_join: version in assoc(process, :version),
+      left_join: project in assoc(version, :project),
+      left_join: team in assoc(project, :team),
+      left_join: user in assoc(team, :users),
+      where: user.id == ^user_id
     )
   end
 
