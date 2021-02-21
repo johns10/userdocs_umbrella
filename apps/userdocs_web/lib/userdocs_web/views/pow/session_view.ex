@@ -1,3 +1,3 @@
-defmodule UserDocsWeb.Pow.SessionView do
+defmodule UserDocsWeb.SessionView do
   use UserDocsWeb, :view
 end
