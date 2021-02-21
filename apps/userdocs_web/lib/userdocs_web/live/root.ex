@@ -184,11 +184,12 @@ defmodule UserDocsWeb.Root do
   end
 
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
-    Logger.debug("Root handling info on topic #{topic}, event #{event}, view: #{socket.view}")
     schema = case payload do
       %{ objects: [ object | _ ]} -> object.__meta__.schema
       object -> object.__meta__.schema
     end
+    Logger.debug("Root handling info on topic #{topic}, event #{event}, view: #{socket.view}, type: #{schema}")
+
 
     case Keyword.get(socket.assigns.state_opts, :types) do
       nil -> raise(RuntimeError, "Types not populated in calling subscribed view")
