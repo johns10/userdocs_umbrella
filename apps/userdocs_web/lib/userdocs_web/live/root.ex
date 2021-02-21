@@ -116,7 +116,7 @@ defmodule UserDocsWeb.Root do
   def put_app_name(socket, %{ "app_name" => app_name }) do
     uri =
       if Mix.env() in [:dev, :test] do
-        URI.parse("https://user-docs.com:4002")
+        URI.parse("https://dev.user-docs.com:4002")
       else
         URI.parse("https://app.user-docs.com")
       end
