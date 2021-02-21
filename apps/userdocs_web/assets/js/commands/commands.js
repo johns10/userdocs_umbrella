@@ -540,11 +540,14 @@ function startStep(job, configuration, proceed) {
   step.status = "running"
   step.element_id = step_element_id
 
-  try {
+  if(configuration.environment == 'extension') {
     step_element.dispatchEvent(new CustomEvent("message", {
       bubbles: false,
       detail: step
     }))
+  }
+
+  try {
     steps[step_index] = step
     success(job, configuration, proceed)
   } catch(error) {
