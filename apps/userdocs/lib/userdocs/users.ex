@@ -59,6 +59,7 @@ defmodule UserDocs.Users do
   """
   def get_user!(id, params \\ %{}, _filters \\ %{}) do
     base_user_query(id)
+    |> maybe_preload_default_team_project_version(params[:team_project_version])
     |> maybe_preload_user_teams(params[:teams])
     |> Repo.one!()
   end
@@ -66,6 +67,18 @@ defmodule UserDocs.Users do
   def get_user!(id, params, _filters, state, opts) do
     StateHandlers.get(state, id, User, opts)
     |> maybe_preload_user_teams(params[:teams], state, opts)
+  end
+
+  defp maybe_preload_default_team_project_version(query, nil), do: query
+  defp maybe_preload_default_team_project_version(query, preloads) do
+    from(user in query,
+      left_join: team in assoc(user, :default_team),
+      left_join: project in assoc(team, :default_project),
+      left_join: version in assoc(project, :default_version),
+      preload: [ default_team: team ],
+      preload: [ default_team: { team, default_project: project } ],
+      preload: [ default_team: { team, default_project: { project, default_version: version } } ]
+    )
   end
 
   defp maybe_preload_user_teams(query, nil), do: query
