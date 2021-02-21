@@ -48,6 +48,7 @@ defmodule UserDocsWeb.ProjectLive.FormComponent do
           :noreply,
           socket
           |> put_flash(:info, "Project updated successfully")
+          |> push_redirect(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -62,6 +63,7 @@ defmodule UserDocsWeb.ProjectLive.FormComponent do
           :noreply,
           socket
           |> put_flash(:info, "Project created successfully")
+          |> push_redirect(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
