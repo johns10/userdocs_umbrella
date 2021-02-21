@@ -30,10 +30,12 @@ defmodule UserDocsWeb.UserLive.FormComponent do
   defp save_user(socket, :edit, user_params) do
     case Users.update_user(socket.assigns.user, user_params) do
       {:ok, _user} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "User updated successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "User updated successfully")
+          |> push_redirect(to: socket.assigns.return_to)
+        }
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
@@ -43,10 +45,12 @@ defmodule UserDocsWeb.UserLive.FormComponent do
   defp save_user(socket, :new, user_params) do
     case Users.create_user(user_params) do
       {:ok, _user} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "User created successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "User created successfully")
+          |> push_redirect(to: socket.assigns.return_to)
+        }
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
