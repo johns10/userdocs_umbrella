@@ -10,7 +10,7 @@ defmodule UserDocs.Users.Team do
     field :name, :string
 
     belongs_to :default_language_code, LanguageCode
-    field :default_project_id, :integer
+    belongs_to :default_project, Project
     has_many :projects, Project
 
     many_to_many :users,
