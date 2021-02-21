@@ -14,8 +14,10 @@
 
     <div id="navbar" class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item">Home</a>
-        <a class="navbar-item">Documentation</a>
+        <%= if @app_name == "web" do %>
+          <a class="navbar-item">Home</a>
+          <a class="navbar-item">Documentation</a>
+        <%= end %>
         <%= live_component(@socket, UserDocsWeb.VersionPicker, [
           current_user: @current_user,
           users: @data.users,
@@ -35,7 +37,7 @@
             <%= if @app_name == "web" do %>
               <%= link "Sign out", to: Routes.logout_path(@socket, :delete), method: :delete, class: "button is-light" %>
             <% else %>
-              <%= link "Sign out", to: URI.merge(@uri, Routes.login_path(@uri, :new)) |> to_string(), method: :delete, class: "button is-light" %>
+              <%= link "Sign out", to: URI.merge(@uri, Routes.session_path(@uri, :new)) |> to_string(), method: :delete, class: "button is-light" %>
             <% end %>
           </div>
         </div>
@@ -59,9 +61,9 @@
   </main>
 <% else %>
   <%= if @app_name == "web" do %>
-    <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns, Routes.login_path(@socket, :new)) %>
+    <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns, Routes.session_path(@socket, :new)) %>
   <% else %>
-    <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns, URI.merge(@uri, Routes.login_path(@uri, :new)) |> to_string()) %>
+    <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns, URI.merge(@uri, Routes.session_path(@uri, :new)) |> to_string()) %>
   <% end %>
 
 <% end %>
