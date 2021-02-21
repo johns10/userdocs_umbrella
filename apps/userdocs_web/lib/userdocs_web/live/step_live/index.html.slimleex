@@ -1,0 +1,24 @@
+= ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
+  %{ to: Routes.project_index_path(@socket, :index, @team.id), name: @team.name },
+  %{ to: Routes.version_index_path(@socket, :index, @team.id, @project.id), name: @project.name },
+  %{ to: Routes.process_index_path(@socket, :index, @team.id, @project.id, @version.id), name: @version.name }],
+  last_item: %{ to: Routes.step_index_path(@socket, :index, @team.id, @project.id, @version.id, @process.id), name: @process.name } ])
+
+div.py-2
+  h1.is-size-3
+    = @process.name
+
+= live_component(@socket, UserDocsWeb.StepLive.IndexComponent,
+  [ live_action: @live_action,
+  app_name: @app_name,
+  state_opts: @state_opts,
+  process: @process,
+  project: @project,
+  version: @version,
+  team: @team,
+  data: @data,
+  expanded: @expanded,
+  page_title: @page_title,
+  data: @data,
+  step: @step,
+  select_lists: @select_lists ])
