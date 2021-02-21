@@ -712,10 +712,10 @@ function setSelector(job, configuration, proceed) {
 
   const payload = {
     selector: step.selector,
-    strategy: step.strategy
+    strategy: step.strategy.name
   }
 
-  console.log("Setting Strategy to " + payload.strategy + " and Selector to " + payload.selector)
+  console.log("Setting Strategy to " + payload.strategy.name + " and Selector to " + payload.selector)
 
   document
     .getElementById("selector-handler")
