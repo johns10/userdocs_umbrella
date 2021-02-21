@@ -1,8 +1,11 @@
 import {handle_job, handle_message} from "../commands/commands.js"
+import {finder} from '@medv/finder'
 
-const getCssSelectorOptions = {
-  selectors: ["class", "tag", "attribute", "nthchild"]
-}
+
+var selector = ""
+
+var mouseX = null
+var mouseY = null
 
 var XPATH = null
 var CSSS = null
@@ -32,23 +35,18 @@ function main() {
     handle_message(request, { environment: 'browser'})
   });
   
-  document.onmouseover = function(event) {
-    // const el =  event.target;
-  
-    // console.log(el)
-    // console.log(getCssSelector(el, getCssSelectorOptions))
-    // CSSS = getCssSelector(el, getCssSelectorOptions);
-    // XPATH = getPathTo(event.target);
+  document.onmousemove = function(event) {
+    mouseX = event.clientX;
+    mouseY = event.clientY;
   }
   
   document.onkeydown = function(event) {
     const x = event.keyCode;
     if (x === 67) {
-      chrome.storage.local.get(['strategy'], function (result) {
-        console.log("Retreived configuration value")
-        console.log(result.strategy);
-
-        var selector
+      chrome.storage.local.get(['strategy'], function (result) {  
+        console.log("Retreived config from storage")
+        const elementMouseIsOver = document.elementFromPoint(mouseX, mouseY);
+        console.log(elementMouseIsOver)
   
         const configuration = {
           environment: 'browser',
@@ -58,7 +56,7 @@ function main() {
         if (result.strategy.name === 'xpath') {
           selector = XPATH
         } else if (result.strategy.name === 'css') {
-          selector = CSSS
+          selector = finder(elementMouseIsOver);
         }
   
         const message = {
