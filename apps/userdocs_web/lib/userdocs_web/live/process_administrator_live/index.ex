@@ -120,7 +120,6 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
   def handle_info(%{topic: _, event: _, payload: payload} = sub_data, socket) do
     case is_in_list(payload, @subscribed_types) do
       true ->
-        IO.inspect("Preparing version")
         { :noreply, socket } = Root.handle_info(sub_data, socket)
         { :noreply, prepare_version(socket) }
       false ->
@@ -129,7 +128,6 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
     end
   end
   def handle_info({ :transfer_selector, %{ "selector" => selector, "strategy" => strategy } }, socket) do
-    IO.inspect("transfer_selector")
     strategy =
       Web.list_strategies
       |> Enum.filter(fn(s) -> s.name == strategy end)
@@ -235,8 +233,6 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
       Web.list_strategies()
       |> Enum.filter(fn(s) -> s.id == id end)
       |> Enum.at(0)
-
-    IO.inspect("send_default_strategy")
 
     message = %{
       type: "configuration",

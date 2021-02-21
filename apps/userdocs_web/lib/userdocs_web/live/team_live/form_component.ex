@@ -16,7 +16,6 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
       Users.list_users(assigns, assigns.state_opts)
       |> Helpers.select_list(:email, false)
 
-    IO.inspect(users_select)
     {
       :ok,
       socket

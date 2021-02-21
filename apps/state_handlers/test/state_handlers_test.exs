@@ -66,8 +66,6 @@ defmodule StateHandlersTest do
 
     def broadcaster(channel, action, data) do
       IO.inspect("Broadcasting")
-      IO.inspect(channel)
-      IO.inspect(action)
       case data do
         [ object | _ ] -> IO.inspect(object.__meta__.schema)
         object -> IO.inspect(object.__meta__.schema)
