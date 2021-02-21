@@ -32,7 +32,7 @@ defmodule UserDocsWeb.Root do
     |> put_app_name(session)
   end
 
-  def initialize(socket, opts \\ state_opts())
+  def initialize(socket, opts)
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket, opts) do
     types_to_initialize = [ User, TeamUser, Team, Project, Version ] ++ Keyword.get(opts, :types, [])
 
