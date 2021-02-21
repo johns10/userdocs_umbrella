@@ -60,8 +60,8 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
                 class="button"
                 type="button"
                 id="<%= ID.strategy_field(form.data.page_id, form.data.id) %>"
-                selector="<%= ID.form_field(form.data, :strategy_id, prefix) %>"
-                strategy="<%= ID.form_field(form.data, :selector, prefix) %>"
+                selector="<%= prefix <> @field_ids.selector %>"
+                strategy="<%= prefix <> @field_ids.strategy_id %>"
                 phx-hook="CopySelector"
               >
                 <span class="icon" >
@@ -158,11 +158,12 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
     |> Map.put(:selector, ID.form_field(element, :selector))
   end
   def field_ids(_) do
+    temp_id = UUID.uuid4()
     %{}
     |> Map.put(:page_id, "")
     |> Map.put(:order, "")
     |> Map.put(:name, "")
-    |> Map.put(:strategy_id, "")
-    |> Map.put(:selector, "")
+    |> Map.put(:strategy_id, "element-" <> temp_id <> "-strategy-id")
+    |> Map.put(:selector, "element-" <> temp_id <> "-selector")
   end
 end
