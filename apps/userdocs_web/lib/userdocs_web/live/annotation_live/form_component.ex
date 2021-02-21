@@ -27,7 +27,6 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
 
   def render_fields(assigns, form, prefix \\ "") do
     ~L"""
-      <%= hidden_input(form, :id, [ value: form.data.id ]) %>
 
       <%= hidden_input(form, :name, [
         id: @field_ids.annotation.name,
