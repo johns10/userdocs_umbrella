@@ -134,9 +134,11 @@ defmodule UserDocs.Automation.Step.Name do
     element = element_or_empty_element(step_changeset)
     text = Ecto.Changeset.get_field(step_changeset, :text, "")
 
+    element_name = element.name || ""
+    guarded_text = Ecto.Changeset.get_field(step_changeset, :text, "") || ""
     order_name(step_changeset)
-    <> (element.name || "") <> " with "
-    <> text
+    <> element_name <> " with "
+    <> guarded_text
   end
   def generate("Fill Field" = name, %Step{} = step) do
     Logger.debug("Automatic name generation: #{name}")
