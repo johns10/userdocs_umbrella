@@ -94,7 +94,7 @@ function current_step_index(job) {
 
 function current_sequence(job, step) {
   const log_string = "Locating current sequence of " + step.step_type.name
-  console.log(step)
+  console.log(log_string)
   const step_type_name = step.step_type.name
   const sequence_id = job.current_sequence
 
