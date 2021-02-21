@@ -524,6 +524,9 @@ defmodule UserDocs.Web do
     UserDocs.State.get!(state, id, :annotations, Annotation)
     |> maybe_preload_annotation_type(params[:annotation_type], state)
   end
+  def get_annotation!(id, state, opts) when is_list(opts) do
+    StateHandlers.get(state, id, Annotation, opts)
+  end
 
   @doc """
   Creates a annotation.
