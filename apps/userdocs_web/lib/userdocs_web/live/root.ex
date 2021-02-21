@@ -24,7 +24,6 @@ defmodule UserDocsWeb.Root do
 
   def state_opts() do
     Defaults.state_opts()
-    |> Keyword.put(:location, :data)
   end
 
   def authorize(socket, session) do
