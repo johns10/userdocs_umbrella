@@ -44,6 +44,7 @@ defmodule UserDocsWeb.VersionLive.FormComponent do
           :noreply,
           socket
           |> put_flash(:info, "Version updated successfully")
+          |> push_redirect(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -58,6 +59,7 @@ defmodule UserDocsWeb.VersionLive.FormComponent do
           :noreply,
           socket
           |> put_flash(:info, "Version created successfully")
+          |> push_redirect(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
