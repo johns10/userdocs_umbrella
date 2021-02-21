@@ -29,5 +29,5 @@ chrome.pageAction.onClicked.addListener(function(tab) {
 				chrome.storage.local.set({extensionTabId: window.tabs[0].id}, function() {
           console.log('extensionTabId is set to ' + window.tabs[0].id);
         });
-			});
+	});
 });
