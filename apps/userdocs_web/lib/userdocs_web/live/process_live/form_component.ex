@@ -46,6 +46,7 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
   defp save_process(socket, :edit, process_params) do
     case Automation.update_process(socket.assigns.process, process_params) do
       {:ok, process} ->
+        send(self(), :close_modal)
         send(self(), { :broadcast, "update", process })
         {
           :noreply,
