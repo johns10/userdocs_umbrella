@@ -12,39 +12,29 @@ defmodule UserDocsWeb.DocumentLive.Index do
 
   @types [ UserDocs.Documents.Document, UserDocs.Documents.DocumentVersion ]
 
-  defp base_opts() do
-    Defaults.state_opts()
-    |> Keyword.put(:location, :data)
-    |> Keyword.put(:types, @types)
-  end
-
-  defp state_opts(socket) do
-    base_opts()
-    |> Keyword.put(:broadcast, true)
-    |> Keyword.put(:channel, UserDocsWeb.Defaults.channel(socket))
-    |> Keyword.put(:broadcast_function, &UserDocsWeb.Endpoint.broadcast/3)
-  end
-
   @impl true
   def mount(_params, session, socket) do
+    opts = Defaults.opts(socket, @types)
     {
       :ok,
       socket
+      |> assign(:state_opts, opts)
       |> Root.authorize(session)
-      |> Root.initialize()
+      |> Root.initialize(opts)
       |> initialize()
     }
   end
 
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
+    opts = Defaults.opts(socket, @types)
     socket
-    |> StateHandlers.initialize(base_opts())
+    |> StateHandlers.initialize(opts)
     |> load_document_versions()
     |> load_documents()
     |> prepare_documents()
     |> projects_select_list()
-    |> assign(:state_opts, state_opts(socket))
-    |> StateHandlers.inspect(state_opts(socket))
+    |> assign(:state_opts, opts)
+    |> StateHandlers.inspect(opts)
   end
   def initialize(socket), do: socket
 
@@ -83,38 +73,42 @@ defmodule UserDocsWeb.DocumentLive.Index do
     { :noreply, prepare_documents(socket) }
   end
   def handle_event("edit-document" = n, %{ "id" => id }, socket) do
+    opts = socket.assigns.state_opts
     params =
       %{}
       |> Map.put(:document_id, String.to_integer(id))
-      |> Map.put(:team, UserDocs.Users.get_team!(socket.assigns.current_team_id, socket, state_opts(socket)))
+      |> Map.put(:team, UserDocs.Users.get_team!(socket.assigns.current_team_id, socket, opts))
       |> Map.put(:projects, socket.assigns.data.projects)
       |> Map.put(:channel, Defaults.channel(socket))
-      |> Map.put(:state_opts, state_opts(socket))
+      |> Map.put(:state_opts, opts)
 
     Root.handle_event(n, params, socket)
   end
   def handle_event("new-document" = n, _params, socket) do
+    opts = socket.assigns.state_opts
     params =
       %{}
-      |> Map.put(:team, UserDocs.Users.get_team!(socket.assigns.current_team_id, socket, state_opts(socket)))
+      |> Map.put(:team, UserDocs.Users.get_team!(socket.assigns.current_team_id, socket, opts))
       |> Map.put(:projects, socket.assigns.data.projects)
       |> Map.put(:channel, Defaults.channel(socket))
-      |> Map.put(:state_opts, state_opts(socket))
+      |> Map.put(:state_opts, opts)
 
     Root.handle_event(n, params, socket)
   end
   def handle_event("new-document-version" = n, %{ "document-id" => id }, socket) do
+    opts = socket.assigns.state_opts
     params =
       %{}
       |> Map.put(:document_id, String.to_integer(id))
       |> Map.put(:version_id, socket.assigns.current_version_id)
       |> Map.put(:documents, socket.assigns.data.documents)
       |> Map.put(:versions, socket.assigns.data.versions)
-      |> Map.put(:state_opts, state_opts(socket))
+      |> Map.put(:state_opts, opts)
 
     Root.handle_event(n, params, socket)
   end
   def handle_event("edit-document-version" = n, %{ "id" => id }, socket) do
+    opts = socket.assigns.state_opts
     params =
       %{}
       |> Map.put(:document_id, String.to_integer(id))
@@ -123,7 +117,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
       |> Map.put(:documents, socket.assigns.data.documents)
       |> Map.put(:document_versions, socket.assigns.data.document_versions)
       |> Map.put(:versions, socket.assigns.data.versions)
-      |> Map.put(:opts, state_opts(socket))
+      |> Map.put(:opts, opts)
 
     Root.handle_event(n, params, socket)
   end
@@ -141,26 +135,20 @@ defmodule UserDocsWeb.DocumentLive.Index do
   def handle_info(n, s), do: Root.handle_info(n, s)
 
   defp load_documents(socket) do
-    opts =
-      state_opts(socket)
-      |> Keyword.put(:filters, %{project_id: socket.assigns.current_project_id})
+    opts = Keyword.put(socket.assigns.state_opts, :filters, %{project_id: socket.assigns.current_project_id})
 
     Documents.load_documents(socket, opts)
   end
 
   defp load_document_versions(socket) do
-    IO.puts("Loading document versions")
-    opts =
-      state_opts(socket)
-      |> Keyword.put(:filters, %{team_id: socket.assigns.current_team_id})
+    opts = Keyword.put(socket.assigns.state_opts, :filters, %{team_id: socket.assigns.current_team_id})
 
     Documents.load_document_versions(socket, opts)
   end
 
   defp prepare_documents(socket) do
-    IO.puts("Preparing Document Versions")
     opts =
-      state_opts(socket)
+      socket.assigns.state_opts
       |> Keyword.put(:filter, { :project_id, socket.assigns.current_project_id })
       |> Keyword.put(:preloads, [ :document_versions, [ document_versions: :version ] ])
       |> Keyword.put(:order, [ %{ field: :id, order: :asc } ])
@@ -169,7 +157,7 @@ defmodule UserDocsWeb.DocumentLive.Index do
   end
 
   defp projects_select_list(socket) do
-    projects = Projects.list_projects(socket, state_opts(socket))
+    projects = Projects.list_projects(socket, socket.assigns.state_opts)
     socket
     |> assign(:projects_select, UserDocs.Helpers.select_list(projects, :name, false))
   end
