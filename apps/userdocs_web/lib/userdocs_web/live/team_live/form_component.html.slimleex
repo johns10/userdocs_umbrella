@@ -1,0 +1,22 @@
+h2.title = @title
+
+= f = form_for @changeset, "#",
+  id: "team-form",
+  phx_target: @myself.cid,
+  phx_change: "validate",
+  phx_submit: "save"
+
+  = label f, :users, class: "label"
+  .select.is-multiple
+    = multiple_select(f, :users,
+      @users_select_options,
+      selected: Enum.map(@changeset.data.users, &(&1.id)))
+    = error_tag f, :users
+
+  = Layout.text_input(f, :name, [], "control")
+
+  = Layout.select_input(f, :default_project_id, @projects_select_options, [], "control")
+
+  = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
+
+</form>
