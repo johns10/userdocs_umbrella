@@ -20,11 +20,13 @@
         <%= end %>
         <%= live_component(@socket, UserDocsWeb.VersionPicker, [
           current_user: @current_user,
-          users: @data.users,
-          teams: @data.teams,
-          team_users: @data.team_users,
-          projects: @data.projects,
-          versions: @data.versions
+            data: %{
+            users: @data.users,
+            teams: @data.teams,
+            team_users: @data.team_users,
+            projects: @data.projects,
+            versions: @data.versions
+          }
         ]) %>
       </div>
 
