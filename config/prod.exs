@@ -14,6 +14,7 @@ config :userdocs_web, UserDocsWeb.Endpoint,
   http: [port: {:system, "PORT"}], # Possibly not needed, but doesn't hurt
   url: [host: "app.user-docs.com", port: 443],
   check_origin: [
+    "chrome-extension://hanghhicicijhmpofndpemhlfojfdnfj",
     "chrome-extension://mkbbhaeofgjbbhopopbjnjjjfbbnaone",
     "https://app.user-docs.com",
     ],
