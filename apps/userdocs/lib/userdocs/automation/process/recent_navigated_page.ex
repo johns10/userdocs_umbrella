@@ -2,6 +2,7 @@ defmodule UserDocs.Automation.Process.RecentPage do
 
   require Logger
 
+  alias UserDocs.Web.Page
 
   @doc """
   Takes a process, with steps preloaded, and a list of available pages.
@@ -9,7 +10,15 @@ defmodule UserDocs.Automation.Process.RecentPage do
 
     RecentPage.get(page, socket.assigns.data.pages)
   """
-  def get(process, current_step, pages) do
+  def get_id(process, current_step, [ %Page{} | _ ] = pages) do
+    case get(process, current_step, [ %Page{} | _ ] = pages) do
+      nil -> nil
+      %Page{} = page ->
+        Map.get(page, :id)
+    end
+  end
+
+  def get(process, current_step, [ %Page{} | _ ] = pages) do
     steps = process.steps
 
     _step =
@@ -22,7 +31,7 @@ defmodule UserDocs.Automation.Process.RecentPage do
           # Logger.debug("Fetched most recent navigation step, page_id: #{step.page_id}")
           _page =
             pages
-            |> Enum.filter(fn(page) -> step.page_id == page.id end)
+            |> Enum.filter(fn(page) -> page.id == step.page_id end)
             |> Enum.at(0)
       end
   end
