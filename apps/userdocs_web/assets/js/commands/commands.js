@@ -568,9 +568,9 @@ function completeStep(job, configuration, proceed) {
   console.log(log_string)
 
   step.status = "complete"
-
+  // TODO: Fix based on environment
   try {
-    step_element.dispatchEvent(event)
+    if (step_element != null) { step_element.dispatchEvent(event) }
     var next_step = steps[step_index + 1]
     console.log(next_step)
     if (next_step) {
