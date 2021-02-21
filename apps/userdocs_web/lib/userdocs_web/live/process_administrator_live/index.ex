@@ -13,12 +13,14 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
   alias UserDocsWeb.ModalMenus, as: ModalMenus
 
   alias UserDocs.Automation.Step
+  alias UserDocs.Users
   alias UserDocs.Web
   alias UserDocs.Web.Strategy
   alias UserDocs.Automation
   alias UserDocs.Projects
   alias UserDocs.Projects.Select
   alias UserDocs.Documents
+  alias UserDocs.Documents.Content
   alias UserDocs.Projects.Select
 
   alias UserDocsWeb.CollapsableFormComponent
@@ -29,7 +31,8 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
     UserDocs.Automation.Process,
     UserDocs.Automation.Step,
     UserDocs.Web.Annotation,
-    UserDocs.Web.Element
+    UserDocs.Web.Element,
+    UserDocs.Web.Page
   ]
 
   @types [
@@ -89,6 +92,7 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
     |> Loaders.content(opts)
     |> Loaders.content_versions(opts)
     |> Select.assign_default_strategy_id(&assign/3, opts)
+    |> send_default_strategy()
     |> Loaders.processes(opts)
     |> Loaders.steps(opts)
     |> Loaders.annotations(opts)
@@ -100,15 +104,43 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
   end
   def initialize(socket), do: socket
   @impl true
+  def handle_info(%{topic: _, event: _, payload: %Content{}} = sub_data, socket) do
+    opts = state_opts(socket)
+
+    { :noreply, socket } =
+      Root.handle_info(sub_data, socket)
+
+    {
+      :noreply,
+      socket
+      |> Loaders.content(opts)
+      |> Loaders.content_versions(opts)
+    }
+  end
   def handle_info(%{topic: _, event: _, payload: payload} = sub_data, socket) do
     case is_in_list(payload, @subscribed_types) do
       true ->
+        IO.inspect("Preparing version")
         { :noreply, socket } = Root.handle_info(sub_data, socket)
         { :noreply, prepare_version(socket) }
       false ->
         { :noreply, socket }
 
     end
+  end
+  def handle_info({ :transfer_selector, %{ "selector" => selector, "strategy" => strategy } }, socket) do
+    IO.inspect("transfer_selector")
+    strategy =
+      Web.list_strategies
+      |> Enum.filter(fn(s) -> s.name == strategy end)
+      |> Enum.at(0)
+
+    {
+      :noreply,
+      socket
+      |> assign(:transferred_strategy, strategy)
+      |> assign(:transferred_selector, selector)
+    }
   end
   def handle_info(n, s), do: Root.handle_info(n, s)
 
@@ -138,16 +170,24 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
   def content_class(_), do: "content"
 
   @impl true
-  def handle_event("edit-project", _, socket), do: ModalMenus.edit_project(socket)
-  def handle_event("new-project", _, socket), do: ModalMenus.new_project(socket)
-  def handle_event("edit-version", _, socket), do: ModalMenus.edit_version(socket)
-  def handle_event("new-version", _, socket), do: ModalMenus.new_version(socket)
-  def handle_event("update_current_strategy", %{"current_strategy" => %{ "strategy_id" => _id }}, socket) do
-    IO.puts("Updating Current Strategy")
+  def handle_event("update_current_strategy", %{"current_strategy" => %{ "strategy_id" => id }}, socket) do
+    strategy =
+      socket.assigns.data.strategies
+      |> Enum.filter(fn(s) -> s.id == String.to_integer(id) end)
+      |> Enum.at(0)
+
+    message = %{
+      type: "configuration",
+      payload: %{
+        strategy: Strategy.safe(strategy)
+      }
+    }
 
     {
       :noreply,
       socket
+      |> push_event("configure", message)
+      |> assign(:current_strategy, strategy)
     }
   end
   def handle_event("new-step" = name, %{ "process-id" => process_id }, socket) do
@@ -172,6 +212,42 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
       |> Map.put(:versions, Projects.list_versions(socket, socket.assigns.state_opts))
 
     Root.handle_event(name, params, socket)
+  end
+  def handle_event("new-content" = n, _params, socket) do
+    team = Users.get_team!(socket.assigns.current_team_id, socket, state_opts(socket))
+    params =
+      %{}
+      |> Map.put(:version_id, socket.assigns.current_version_id)
+      |> Map.put(:teams, socket.assigns.data.teams)
+      |> Map.put(:language_codes, Documents.list_language_codes(socket, state_opts(socket)))
+      |> Map.put(:team, team)
+      |> Map.put(:versions, socket.assigns.data.versions)
+      |> Map.put(:content, socket.assigns.data.content)
+      |> Map.put(:channel, UserDocsWeb.Defaults.channel(socket))
+      |> Map.put(:state_opts, state_opts(socket))
+
+    Root.handle_event(n, params, socket)
+  end
+
+  def send_default_strategy(%{ assigns: %{ current_strategy_id: id }} = socket) do
+    #TODO: Use state
+    strategy =
+      Web.list_strategies()
+      |> Enum.filter(fn(s) -> s.id == id end)
+      |> Enum.at(0)
+
+    IO.inspect("send_default_strategy")
+
+    message = %{
+      type: "configuration",
+      payload: %{
+        strategy: Strategy.safe(strategy)
+      }
+    }
+
+    socket
+    |> push_event("configure", message)
+    |> assign(:current_strategy, strategy)
   end
 
   def prepare_version(socket) do
@@ -200,5 +276,36 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
       |> Keyword.put(:order, order)
 
     assign(socket, :current_version, Projects.get_version!(socket.assigns.current_version_id, socket, opts))
+  end
+
+  def recent_page_id(process, step, pages) do
+    case maybe_step_page_id(step) |> maybe_recent_page_id(process, step, pages) do
+      { :ok, result } -> result
+      { :nok, _ } -> nil
+    end
+  end
+
+  def maybe_step_page_id(%Step{ page_id: nil } = step) do
+    #IO.puts("page id nul")
+    { :nok, step }
+  end
+  def maybe_step_page_id(%Step{ page_id: page_id }) do
+    #IO.puts("page id")
+    { :ok, page_id }
+  end
+
+  def maybe_recent_page_id({ :ok, result }, _, _, _) do
+    #IO.puts("maybe_recent_page_id ok")
+    { :ok, result }
+  end
+  def maybe_recent_page_id({ :nok, result }, process, step, pages) do
+    case UserDocs.Automation.Process.RecentPage.get(process, step, pages) do
+      nil ->
+        #IO.inspect("Nil recent page id")
+        { :nok, result }
+      page ->
+        #IO.inspect("Got recent page id")
+        { :ok, Map.get(page, :id) }
+    end
   end
 end
