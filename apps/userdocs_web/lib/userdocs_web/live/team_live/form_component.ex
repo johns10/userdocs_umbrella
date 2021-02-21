@@ -1,16 +1,29 @@
 defmodule UserDocsWeb.TeamLive.FormComponent do
   use UserDocsWeb, :live_component
 
+  use UserdocsWeb.LiveViewPowHelper
+  alias UserDocsWeb.Layout
+
   alias UserDocs.Users
+  alias UserDocs.Helpers
+
 
   @impl true
   def update(%{team: team} = assigns, socket) do
+    IO.puts("update")
     changeset = Users.change_team(team)
+    users_select =
+      Users.list_users(assigns, assigns.state_opts)
+      |> Helpers.select_list(:email, false)
 
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign(:changeset, changeset)}
+    IO.inspect(users_select)
+    {
+      :ok,
+      socket
+      |> assign(assigns)
+      |> assign(:changeset, changeset)
+      |> assign(:users_select_options, users_select)
+    }
   end
 
   @impl true
