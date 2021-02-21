@@ -330,25 +330,32 @@ defmodule UserDocs.Users do
 
   """
   def get_team!(id, params \\ %{}) do
-    try do
-      base_team_query(id)
-      |> maybe_preload_team_users(params[:users])
-      |> Repo.one!()
-    rescue
-      Ecto.NoResultsError -> nil
-      e -> e
-    end
+    preloads = Map.get(params, :preloads, [])
+    base_team_query(id)
+    |> maybe_preload_team_users(preloads[:users])
+    |> maybe_preload_default_project(preloads[:default_project])
+    |> maybe_preload_projects(preloads[:projects])
+    |> Repo.one!()
   end
-  def get_team!(id, state, opts) when is_integer(id) and is_list(opts) do
+  def get_team!(id, state, opts) when is_list(opts) do
+    IO.inspect(opts[:preloads])
     StateHandlers.get(state, id, Team, opts)
+    |> maybe_preload(opts[:preloads], state, opts)
+  end
+
+  defp maybe_preload(object, nil, _, _), do: object
+  defp maybe_preload(object, preloads, state, opts) do
+    StateHandlers.preload(state, object, preloads, opts)
   end
 
   defp maybe_preload_team_users(query, nil), do: query
-  defp maybe_preload_team_users(query, _) do
-    from(team in query,
-      left_join: users in assoc(team, :users)
-    )
-  end
+  defp maybe_preload_team_users(query, _), do: from(items in query, preload: [:users])
+
+  defp maybe_preload_default_project(query, nil), do: query
+  defp maybe_preload_default_project(query, _), do: from(items in query, preload: [:default_project])
+
+  defp maybe_preload_projects(query, nil), do: query
+  defp maybe_preload_projects(query, _), do: from(items in query, preload: [:projects])
 
   defp base_team_query(id) do
     from(team in Team, where: team.id == ^id)
