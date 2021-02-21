@@ -38,8 +38,8 @@ defmodule UserDocsWeb.Router do
   scope "/", UserDocsWeb do
     pipe_through [:browser, :not_authenticated]
 
-    get "/session", SessionController, :new, as: :login
-    post "/session", SessionController, :create, as: :login
+    get "/session", SessionController, :new
+    post "/session", SessionController, :create
   end
 
   scope "/", UserDocsWeb do
@@ -51,10 +51,62 @@ defmodule UserDocsWeb.Router do
   scope "/", UserDocsWeb do
     pipe_through :browser
 
+    live "/processes", ProcessLive.SPA, :index,
+      session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/index.html", ProcessLive.SPA, :index,
+      session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
+
+    live "/teams", TeamLive.Index, :index,
+      session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:id", TeamLive.Show, :show,
+      session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:id/edit", TeamLive.Index, :edit,
+      session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
+    live "/teams/:team_id/projects", ProjectLive.Index, :index,
+      session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:team_id/projects/:id/edit", ProjectLive.Index, :edit,
+      session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:team_id/projects/new", ProjectLive.Index, :new,
+      session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:team_id/projects/:id", ProjectLive.Show, :show,
+      session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
+    live "/teams/:team_id/projects/:project_id/versions",
+      VersionLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:team_id/projects/:project_id/versions/new",
+      VersionLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:team_id/projects/:project_id/versions/:id",
+      VersionLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:team_id/projects/:project_id/versions/:id/edit",
+      VersionLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
+    live "/teams/:team_id/projects/:project_id/versions/:version_id/processes",
+      ProcessLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:team_id/projects/:project_id/versions/:version_id/processes/new",
+      ProcessLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:team_id/projects/:project_id/versions/:version_id/processes/:id",
+      ProcessLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:team_id/projects/:project_id/versions/:version_id/processes/:id/edit",
+      ProcessLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
+    live "/teams/:team_id/projects/:project_id/versions/:version_id/processes/:id/steps",
+      StepLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:team_id/projects/:project_id/versions/:version_id/processes/:id/steps/new",
+      StepLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
     live "/documents", DocumentLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/process_administrator", ProcessAdministratorLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/documents/:id/editor", DocumentLive.Editor, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/documents/:id/viewer", DocumentLive.Viewer, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
+    live "/content", ContentLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/content/new", ContentLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/content/:id/edit", ContentLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/content/:id", ContentLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/content/:id/show/edit", ContentLive.Show, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
+    live "/processes", ProcessLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
   end
 
   scope "/", UserDocsWeb do
@@ -63,21 +115,10 @@ defmodule UserDocsWeb.Router do
 
     live "/", PageLive, :index
 
-    live "/index.html", ProcessAdministratorLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/process_administrator", ProcessAdministratorLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
 
     get "/document_versions/:id/download", DocumentVersionDownloadController, :show
-
-    live "/content", ContentLive.Index, :index
-    live "/content/new", ContentLive.Index, :new
-    live "/content/:id/edit", ContentLive.Index, :edit
-    live "/content/:id", ContentLive.Show, :show
-    live "/content/:id/show/edit", ContentLive.Show, :edit
-
-    live "/teams", TeamLive.Index, :index
-    live "/teams/new", TeamLive.Index, :new
-    live "/teams/:id/edit", TeamLive.Index, :edit
-    live "/teams/:id", TeamLive.Show, :show
-    live "/teams/:id/show/edit", TeamLive.Show, :edit
 
     live "/users", UserLive.Index, :index
     live "/users/new", UserLive.Index, :new
@@ -87,6 +128,12 @@ defmodule UserDocsWeb.Router do
 
 
   end
+
+  scope "/" do
+    pipe_through :browser
+    pow_routes()
+  end
+
 
   _commented_code = """
   scope "/", UserDocsWeb do
