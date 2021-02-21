@@ -1,5 +1,5 @@
 {
-	"name": "Process Administrator",
+	"name": "Process Administrator Dev",
 	"manifest_version": 2,
 	"description": "Userdocs Process Administrator chrome extension",
 	"version": "0.0",
@@ -21,16 +21,15 @@
 	],
 	"permissions": [
 		"cookies",
-		"<all_urls>",
 		"activeTab",
-		"tabs",
 		"storage",
 		"desktopCapture"
 	],
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self' 'unsafe-eval'; script-src-elem 'self' 'unsafe-eval'",
 	"web_accessible_resources": [
+		"app.css",
 		"index.html",
-		"css/app.css",
-		"chrome_app.js"
+		"chrome_app.js",
+		"chrome_app.js.map"
   ]
 }
