@@ -17,6 +17,10 @@ defmodule UserDocs.Users do
       [%TeamUser{}, ...]
 
   """
+  def load_users(state, opts) do
+    StateHandlers.load(state, list_users(), User, opts)
+  end
+
   def list_users(params \\ %{}, filters \\ %{})
   def list_users(state, opts) when is_list(opts) do
     StateHandlers.list(state, User, opts)
