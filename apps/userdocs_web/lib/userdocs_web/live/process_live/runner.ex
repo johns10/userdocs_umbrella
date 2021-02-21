@@ -6,8 +6,7 @@ defmodule UserDocsWeb.ProcessLive.Runner do
   @impl true
   def render(assigns) do
     ~L"""
-    <a class="navbar-item"
-      id="<%= @id %>"
+    <a id="<%= @id %>"
       phx-click="execute_job"
       phx-value-process-id="<%= @process.id %>"
       phx-target="<%= @myself.cid %>"
@@ -16,10 +15,10 @@ defmodule UserDocsWeb.ProcessLive.Runner do
     >
       <span class="icon">
         <%= case @status do
-          :ok -> content_tag(:i, "", [class: "fa fa-play-circle", aria_hidden: "true"])
-          :failed -> content_tag(:i, "", [class: "fa fa-times", aria_hidden: "true"])
-          :running -> content_tag(:i, "", [class: "fa fa-spinner", aria_hidden: "true"])
-          :complete -> content_tag(:i, "", [class: "fa fa-check", aria_hidden: "true"])
+          :ok -> content_tag(:i, "", [class: "fa fa-2x fa-play-circle", aria_hidden: "true"])
+          :failed -> content_tag(:i, "", [class: "fa fa-2x fa-times", aria_hidden: "true"])
+          :running -> content_tag(:i, "", [class: "fa fa-2x fa-spinner", aria_hidden: "true"])
+          :complete -> content_tag(:i, "", [class: "fa fa-2x fa-check", aria_hidden: "true"])
         end %>
       </span>
     </a>
