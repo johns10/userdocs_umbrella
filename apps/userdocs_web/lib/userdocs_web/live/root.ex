@@ -170,6 +170,9 @@ defmodule UserDocsWeb.Root do
       {
         :noreply,
         socket
+        |> assign(:team, team)
+        |> assign(:project, project)
+        |> assign(:version, version)
         |> assign(:current_team_id, team.id)
         |> assign(:current_project_id, project.id)
         |> assign(:current_version_id, version.id)
