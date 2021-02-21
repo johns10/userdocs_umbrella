@@ -1,5 +1,4 @@
-import getCssSelector from 'css-selector-generator';
-import {handle_message} from "../commands/commands.js"
+import {handle_job, handle_message} from "../commands/commands.js"
 
 const getCssSelectorOptions = {
   selectors: ["class", "tag", "attribute", "nthchild"]
@@ -15,6 +14,17 @@ function main() {
   console.log("Initializing Browser stuff")
   
   window.active_annotations = []
+
+  window.onload = function(event) {
+    console.log("Re-establishing runner")
+    chrome.storage.local.get(['job', 'configuration'], function (result) {
+      if (result == null) {
+        console.log("No job found, not resuming runner")
+      } else {
+        handle_job(result.job, { environment: 'browser'})
+      }
+    })
+  };
   
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     var logSuffix = sender.tab ? "from a content script:" + sender.tab.url : "from the extension"
