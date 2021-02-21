@@ -10,7 +10,7 @@ defmodule UserDocs.Users.User do
   schema "users" do
     pow_user_fields()
 
-    field :default_team_id, :integer
+    belongs_to :default_team, Team
 
     many_to_many :teams,
       Team,
