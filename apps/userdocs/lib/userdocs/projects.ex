@@ -242,6 +242,7 @@ defmodule UserDocs.Projects do
   def get_version!(id, params, filters) when is_map(filters) and is_map(params) do
     base_version_query(id)
     |> maybe_preload_pages(params[:pages])
+    |> maybe_preload_strategy(params[:strategy])
     |> Repo.one!()
   end
 
