@@ -746,4 +746,4 @@ function testSelector(job, configuration, proceed) {
   }
 }
 
-export {handle_message}
+export {handle_job, handle_message}
