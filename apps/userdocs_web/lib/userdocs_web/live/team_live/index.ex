@@ -1,17 +1,41 @@
 defmodule UserDocsWeb.TeamLive.Index do
   use UserDocsWeb, :live_view
 
+  use UserdocsWeb.LiveViewPowHelper
+
   alias UserDocs.Users
   alias UserDocs.Users.Team
+  alias UserDocs.Helpers
+  alias UserDocsWeb.Defaults
+  alias UserDocsWeb.Root
+  alias UserDocsWeb.ComposableBreadCrumb
+
+  @types [
+    UserDocs.Users.Team
+  ]
 
   @impl true
-  def mount(_params, _session, socket) do
-    socket =
+  def mount(_params, session, socket) do
+    opts = Defaults.base_opts(@types)
+    {
+      :ok,
       socket
-      |> assign(:teams, list_teams())
-
-    {:ok, socket}
+      |> Root.authorize(session)
+      |> Root.initialize(opts)
+      |> initialize()
+    }
   end
+
+  def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
+    opts = Defaults.state_opts(socket)
+
+    socket
+    |> assign(:modal_action, :show)
+    |> assign(:state_opts, opts)
+    |> prepare_teams()
+    |> Users.load_users(opts)
+  end
+  def initialize(socket), do: socket
 
   @impl true
   def handle_params(params, _url, socket) do
@@ -19,20 +43,18 @@ defmodule UserDocsWeb.TeamLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
+    team = Users.get_team!(id, %{ preloads: [ users: true, default_project: true, projects: true ] })
     socket
     |> assign(:page_title, "Edit Team")
-    |> assign(:users, list_users())
-    |> assign(:team, Users.get_team!(id))
+    |> assign(:team, team)
+    |> assign(:projects_select_options, Helpers.select_list(team.projects, :name, false))
   end
 
   defp apply_action(socket, :new, _params) do
-    team =
-      %Team{}
-      |> Map.put(:users, [])
-
     socket
     |> assign(:page_title, "New Team")
-    |> assign(:team, team)
+    |> assign(:team, %Team{})
+    |> assign(:projects_select_options, [])
   end
 
   defp apply_action(socket, :index, _params) do
@@ -46,14 +68,14 @@ defmodule UserDocsWeb.TeamLive.Index do
     team = Users.get_team!(id)
     {:ok, _} = Users.delete_team(team)
 
-    {:noreply, assign(socket, :teams, list_teams())}
+    { :noreply, socket }
   end
 
-  defp list_teams do
-    Users.list_teams()
+  defp prepare_teams(socket) do
+    socket
+    |> assign(:teams, Users.list_teams(socket, socket.assigns.state_opts))
   end
 
-  defp list_users do
-    Users.list_users()
-  end
+  @impl true
+  def handle_info(n, s), do: Root.handle_info(n, s)
 end

@@ -1,0 +1,29 @@
+= ComposableBreadCrumb.render([ items: [], 
+  last_item: %{ to: Routes.team_index_path(@socket, :index), name: "Teams"} ])
+
+= if @live_action in [:edit, :new] do
+  = live_modal @socket, UserDocsWeb.TeamLive.FormComponent,
+    id: @team.id || :new,
+    title: @page_title,
+    action: @live_action,
+    team: @team,
+    state_opts: @state_opts,
+    projects_select_options: @projects_select_options,
+    data: %{ users: @data.users },
+    return_to: Routes.team_index_path(@socket, :index)
+
+aside.menu
+  p.menu-label Teams
+  ul.menu-list
+    = for team <- @teams do
+      li class=""
+        .is-flex
+          = link to: Routes.project_index_path(@socket, :index, team), class: "is-flex-grow-1" do
+            = team.name
+          .is-flex.is-flex-direction-row.is-flex-grow-0
+            = live_redirect to: Routes.team_show_path(@socket, :show, team) do
+              i.fa.fa-lg.fa-search
+            = live_patch to: Routes.team_index_path(@socket, :edit, team) do
+              i.fa.fa-lg.fa-edit
+            = link to: "#", phx_click: "delete", phx_value_id: team.id, data: [confirm: "Are you sure?"] do
+              i.fa.fa-lg.fa-trashproject_show_path
