@@ -152,6 +152,10 @@ defmodule UserDocsWeb.Root do
   def handle_event("edit-docubit", params, socket) do
     ModalMenus.edit_docubit(socket, params)
   end
+  def handle_event("new-content", params, socket) do
+    IO.puts("Root making new Content")
+    { :noreply, ModalMenus.new_content(socket, params) }
+  end
   def handle_event("edit-content", params, socket) do
     IO.puts("Root handling Content")
     { :noreply, ModalMenus.edit_content(socket, params) }
