@@ -10,7 +10,7 @@ defmodule UserDocs.Projects.Project do
     field :base_url, :string
     field :name, :string
 
-    field :default_version_id, :integer
+    belongs_to :default_version, Version
 
     belongs_to :team, Team
 
