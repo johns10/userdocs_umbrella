@@ -24,7 +24,6 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
 
   def render_fields(assigns, form, prefix \\ "") do
     ~L"""
-      <%= hidden_input(form, :id, [ value: form.data.id ]) %>
 
       <div class="field is-grouped">
 
