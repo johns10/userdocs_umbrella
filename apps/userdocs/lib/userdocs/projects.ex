@@ -71,7 +71,7 @@ defmodule UserDocs.Projects do
   def get_project!(state, id) do
     UserDocs.State.get!(state, id, :projects, UserDocs.Projects.Project)
   end
-  def get_project!(id, state, opts) when is_integer(id) and is_list(opts) do
+  def get_project!(id, state, opts) when is_list(opts) do
     StateHandlers.get(state, id, Project, opts)
   end
 
