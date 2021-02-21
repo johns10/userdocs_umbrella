@@ -19,9 +19,31 @@ import {LiveSocket} from "phoenix_live_view"
 import {handle_message} from "./commands/commands.js"
 import {Hooks} from "./hooks/hooks.js"
 
-let DOMAIN = "user-docs.com"
+
+// Give the correspondent route (template) or fail
+let resolveRoute = (route) => {
+  console.log('resolveroute')
+  try {
+   return routes[route];
+  } catch (error) {
+      throw new Error("The route is not defined");
+  }
+};
+// The actual router, get the current URL and generate the corresponding template
+let router = (evt) => {
+  console.log('router')
+  const url = window.location.hash.slice(1) || "/";
+  const routeResolved = resolveRoute(url);
+  routeResolved();
+};
+// For first load or when routes are changed in browser url box.
+
+window.addEventListener('load', router);
+window.addEventListener('hashchange', router);
+
+let DOMAIN = "dev.user-docs.com"
 let PORT = "4002"
-let PATH = "process_administrator"
+let PATH = "processes"
 
 let APP_URL = "https://" + DOMAIN + ":" + PORT + "/" + PATH
 let WEBSOCKETS_URI = "wss://" + DOMAIN + ":" + PORT + "/live"
