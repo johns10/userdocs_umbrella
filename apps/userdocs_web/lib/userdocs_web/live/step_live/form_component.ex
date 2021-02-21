@@ -7,35 +7,32 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   alias UserDocsWeb.ElementLive
   alias UserDocsWeb.PageLive
   alias UserDocsWeb.ID
-
   alias UserDocsWeb.Layout
+  alias UserDocsWeb.Defaults
+
   alias UserDocs.Automation
-  alias UserDocs.Automation.Process.RecentPage
   alias UserDocs.Web
-  alias UserDocs.Web.Page
+  alias UserDocs.Web.Annotation
+  alias UserDocs.Helpers
 
   @impl true
   def update(%{step: step} = assigns, socket) do
-    changeset = Automation.change_step(step)
-
-    step_type_id =
-      try do
-        step.step_type_id
-      rescue
-        _ ->
-          assigns.data.step_types
-          |> Enum.at(0)
-          |> Map.get(:id)
+    changeset =
+      case Map.get(socket.assigns, :changeset, nil) do
+        nil -> Automation.change_step(step)
+        changeset ->
+          Automation.change_step(step)
+          |> Map.put(:changes, Map.get(changeset, :changes))
       end
 
+    step_type_id = Map.get(step, :step_type_id, nil)
+
     annotation_type_id =
-      try do
-        step.annotation.annotation_type_id
-      rescue
-        _ ->
-          assigns.data.annotation_types
-          |> Enum.at(0)
-          |> Map.get(:id)
+      step
+      |> Map.get(:annotation, nil)
+      |> case do
+        nil -> nil
+        annotation -> Map.get(annotation, :annotation_type_id, nil)
       end
 
     enabled_step_fields =
@@ -72,6 +69,24 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       |> Map.put(:page, nested_form_id(step, step.page))
       |> Map.put(:annotation, nested_form_id(step, step.annotation))
 
+      IO.inspect(assigns.state_opts)
+
+    select_lists =
+      assigns.select_lists
+      |> Map.put(:annotations, Helpers.select_list(assigns.data.annotations, :name, true))
+      |> Map.put(:elements, elements_select(assigns, step.page_id || assigns.default_page_id))
+
+    nested_element_expanded =
+      case { Ecto.Changeset.get_field(changeset, :element_id), Ecto.Changeset.get_change(changeset, :element) } do
+        { nil, nil } -> false
+        { _, _ } -> true
+      end
+
+    nested_annotation_expanded =
+      case { Ecto.Changeset.get_field(changeset, :annotation_id), Ecto.Changeset.get_change(changeset, :annotation) } do
+        { nil, nil } -> false
+        { _, _ } -> true
+      end
     {
       :ok,
       socket
@@ -80,46 +95,105 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       |> assign(:current_object, step)
       |> assign(:enabled_step_fields, enabled_step_fields)
       |> assign(:enabled_annotation_fields, enabled_annotation_fields)
-      |> assign(:nested_element_expanded, false)
-      |> assign(:nested_annotation_expanded, false)
-      |> assign(:nested_annotation_content_expanded, false)
+      |> assign(:nested_element_expanded, nested_element_expanded)
+      |> assign(:nested_annotation_expanded, nested_annotation_expanded)
       |> assign(:field_ids, step_field_ids)
       |> assign(:form_ids, form_ids)
-      |> assign(:default_page_id, recent_navigated_to_page(assigns.parent, step, assigns))
+      |> assign(:select_lists, select_lists)
+      |> assign(:disable_element_fields, false)
+      |> assign(:disable_annotation_fields, false)
+      |> assign(:state_opts, assigns.state_opts)
     }
   end
 
   @impl true
   def handle_event("validate", %{"step" => step_params}, socket) do
     changeset =
-      Automation.change_step_with_nested_data(
-        socket.assigns.step, step_params, socket.assigns)
+      Automation.change_step(socket.assigns.step, step_params)
 
-    step_type_id = Ecto.Changeset.get_field(changeset, :step_type_id)
-
-    annotation_type_id =
-      case Ecto.Changeset.get_field(changeset, :annotation, nil) do
-        nil -> nil
-        annotation -> annotation.annotation_type_id
+    { changeset, socket } =
+      case Ecto.Changeset.get_change(changeset, :element_id, nil) do
+        nil -> { changeset, socket }
+        element_id ->
+          { :ok, step } = Automation.update_step(socket.assigns.step, %{ element_id: element_id })
+          element = Web.get_element!(element_id)
+          step = Map.put(step, :element, element)
+          {
+            Automation.change_step(step, Map.delete(step_params, "element")),
+            socket
+            |> assign(:step, step)
+          }
       end
 
+    { changeset, socket } =
+      case Ecto.Changeset.get_change(changeset, :annotation_id, nil) do
+        nil -> { changeset, socket }
+        annotation_id ->
+          { :ok, step } = Automation.update_step(socket.assigns.step, %{ annotation_id: annotation_id })
+          annotation = Web.get_annotation!(annotation_id)
+          step = Map.put(step, :annotation, annotation)
+
+          {
+            Automation.change_step(step, Map.delete(step_params, "element")),
+            socket
+            |> assign(:step, step)
+          }
+      end
+
+      { changeset, socket } =
+        case Ecto.Changeset.get_change(changeset, :page_id, nil) do
+          nil -> { changeset, socket }
+          page_id ->
+            { :ok, step } = Automation.update_step(socket.assigns.step, %{ page_id: page_id })
+            page = Web.get_page!(page_id)
+            step = Map.put(step, :page, page)
+            select_lists =
+              socket.assigns.select_lists
+              |> Map.put(:elements, elements_select(socket.assigns, page_id))
+
+            {
+              step
+              |> Automation.change_step(Map.delete(step_params, "page")),
+              socket
+              |> assign(:step, step)
+              |> assign(:select_lists, select_lists)
+            }
+        end
+
+
     enabled_step_fields =
-      UserDocsWeb.LiveHelpers.enabled_fields(
-        Automation.list_step_types(socket, socket.assigns.state_opts),
-        step_type_id
-      )
+      case socket.assigns.action do
+        :new -> []
+        :edit ->
+          UserDocsWeb.LiveHelpers.enabled_fields(
+            Automation.list_step_types(socket, socket.assigns.state_opts),
+            Ecto.Changeset.get_field(changeset, :step_type_id)
+          )
+      end
 
     enabled_annotation_fields =
-      UserDocsWeb.LiveHelpers.enabled_fields(
-        Web.list_annotation_types(socket, socket.assigns.state_opts),
-        annotation_type_id
-      )
+      case socket.assigns.action do
+        :new -> []
+        :edit ->
+          annotation_type_id =
+            changeset
+            |> Ecto.Changeset.get_field(:annotation)
+            |> case do
+              nil -> nil
+              %Annotation{} = annotation -> Map.get(annotation, :annotation_type_id)
+            end
+
+          UserDocsWeb.LiveHelpers.enabled_fields(
+            Web.list_annotation_types(socket, socket.assigns.state_opts),
+            annotation_type_id
+          )
+    end
+
 
     {
       :noreply,
       socket
       |> assign(:changeset, changeset)
-      |> assign(:step, changeset.data)
       |> assign(:enabled_step_fields, enabled_step_fields)
       |> assign(:enabled_annotation_fields, enabled_annotation_fields)
     }
@@ -131,10 +205,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   end
 
   @impl true
-  def handle_event("expand-annotation", _, socket), do: {:noreply, expand(socket, :nested_annotation_expanded)}
-  def handle_event("expand-element", _, socket), do: {:noreply, expand(socket, :nested_element_expanded)}
-  def handle_event("expand-annotation-content", _, socket), do: {:noreply, expand(socket, :nested_annotation_content_expanded)}
-
   def handle_event("test_selector", %{ "element-id" => element_id }, socket) do
     element_id = String.to_integer(element_id)
     element = UserDocs.Web.get_element!(element_id, %{ strategy: true }, %{}, socket.assigns.data)
@@ -166,7 +236,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       |> push_event("test_selector", payload)
     }
   end
-
   def handle_event("new-element", _, socket) do
     changeset = Automation.new_step_element(
       socket.assigns.step, socket.assigns.changeset)
@@ -178,7 +247,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       |> assign(:step, changeset.data)
     }
   end
-
   def handle_event("new-page", _, socket) do
     changeset = Automation.new_step_page(
       socket.assigns.step, socket.assigns.changeset)
@@ -212,6 +280,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   defp save_step(socket, :edit, step_params) do
     case Automation.update_step(socket.assigns.step, remove_empty_associations(step_params)) do
       {:ok, step} ->
+        send(self(), :close_modal)
         send(self(), { :broadcast, "update", step })
         {
           :noreply,
@@ -228,6 +297,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     # recent_navigated_to_page(process, step, assigns)
     case Automation.create_step(step_params) do
       {:ok, step} ->
+        send(self(), :close_modal)
         send(self(), { :broadcast, "create", step })
         {
           :noreply,
@@ -326,18 +396,18 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   end
   def nested_form_id(_, _), do: ""
 
-  def recent_navigated_to_page(process, step, assigns) do
-    case RecentPage.get(process, step, Web.list_pages(assigns, assigns.state_opts)) do
-      %Page{} = page -> Map.get(page, :id, nil)
-      nil -> ""
-    end
-  end
-
   def page_reference(changeset) do
     Ecto.Changeset.get_field(changeset, :page_reference, nil)
   end
 
   def name(changeset) do
     Ecto.Changeset.get_field(changeset, :name, nil)
+  end
+
+  def elements_select(%{ state_opts: state_opts } = socket, page_id) do
+    IO.puts("elements_select")
+    opts = Keyword.put(state_opts, :filter, { :page_id, page_id })
+    Web.list_elements(socket, opts)
+    |> Helpers.select_list(:name, true)
   end
 end
