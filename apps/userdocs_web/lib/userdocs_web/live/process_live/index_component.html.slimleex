@@ -1,0 +1,44 @@
+= if @live_action in [:edit, :new] do
+  = live_modal @socket, UserDocsWeb.ProcessLive.FormComponent,
+    id: @process.id || :new,
+    parent_id: @version.id,
+    title: @page_title,
+    action: @live_action,
+    process: @process,
+    state_opts: @state_opts,
+    select_lists: @select_lists,
+    app_name: @app_name,
+    return_to: Routes.process_index_path(@socket, :index, @team.id, @project.id, @version.id)
+
+aside.menu
+  p.menu-label Processes
+  ul.menu-list
+    = for process <- @processes do
+      li class=""
+        .is-flex
+          = if @app_name == "web" do 
+            = link to: Routes.step_index_path(@socket, :index, @team.id, 
+              @project.id, @version.id, process.id), class: "is-flex-grow-1" do
+              = process.name
+            .is-flex.is-flex-direction-row.is-flex-grow-0
+              = live_redirect to: Routes.process_show_path(@socket, :show, @team.id, @project.id, @version.id, process.id) do
+                i.fa.fa-lg.fa-search
+              = live_patch to: Routes.process_index_path(@socket, :edit, @team.id, @project.id, @version.id, process.id) do
+                i.fa.fa-lg.fa-edit
+              = link to: "#", phx_click: "delete", phx_value_id: process.id, data: [confirm: "Are you sure?"] do
+                i.fa.fa-lg.fa-trash
+          - else 
+            = link to: "#", phx_click: "select-process", phx_value_id: process.id, class: "is-flex-grow-1" do
+              = process.name
+            .is-flex.is-flex-direction-row.is-flex-grow-0
+              = link to: "#", phx_click: "edit-process", phx_value_id: process.id do 
+                i.fa.fa-lg.fa-edit
+              = link to: "#", phx_click: "delete-process", phx_value_id: process.id do 
+                i.fa.fa-lg.fa-trash
+
+= if @app_name == "web" do 
+  = live_patch to: Routes.process_index_path(@socket, :new, @team.id, @project.id, @version.id) do
+    button.button.is-primary New Process
+- else
+  = link to: "#", phx_click: "new-process" do
+    button.button.is-primary New Process
