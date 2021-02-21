@@ -2,7 +2,6 @@ defmodule UserDocsWeb.ComposableBreadCrumb do
   import PhoenixSlime, only: [ sigil_L: 2 ]
 
   def render(assigns) do
-    IO.inspect(assigns)
     ~L"""
     nav.breadcrumb aria-label="breadcrumbs"
       ul

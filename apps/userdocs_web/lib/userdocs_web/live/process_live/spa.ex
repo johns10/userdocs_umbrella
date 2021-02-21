@@ -41,7 +41,6 @@ defmodule UserDocsWeb.ProcessLive.SPA do
 
   @impl true
   def mount(_params, session, socket) do
-    IO.inspect("Mounting SPA")
     opts = Defaults.opts(socket, subscribed_types() ++ extra_types())
     {
       :ok,
@@ -55,8 +54,6 @@ defmodule UserDocsWeb.ProcessLive.SPA do
   def initialize(%{ assigns: %{ auth_state: :not_logged_in }} = socket), do: socket
   def initialize(socket) do
     opts = Defaults.opts(socket, subscribed_types() ++ extra_types())
-    IO.puts("Logged in")
-    IO.inspect(socket.assigns.app_name)
 
     socket
     |> assign(:modal_action, :show)
@@ -188,7 +185,6 @@ defmodule UserDocsWeb.ProcessLive.SPA do
     { :noreply, assign(socket, :live_action, :show) }
   end
   def handle_info(%{ topic: _, event: _, payload: payload } = sub_data, socket) do
-    IO.inspect("Hnadling info")
     schema =
       case payload do
         %{ objects: [ object | _ ]} -> object.__meta__.schema
@@ -196,8 +192,6 @@ defmodule UserDocsWeb.ProcessLive.SPA do
       end
 
     { :noreply, socket } = Root.handle_info(sub_data, socket)
-
-    IO.inspect(schema in subscribed_types())
 
     case schema in subscribed_types() do
       true ->
@@ -209,7 +203,6 @@ defmodule UserDocsWeb.ProcessLive.SPA do
     end
   end
   def handle_info({ :transfer_selector, %{ "selector" => selector, "strategy" => strategy } }, socket) do
-    IO.inspect("transfer_selector")
     strategy =
       Web.list_strategies
       |> Enum.filter(fn(s) -> s.name == strategy end)

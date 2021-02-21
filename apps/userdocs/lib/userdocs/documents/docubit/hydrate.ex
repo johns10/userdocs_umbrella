@@ -224,7 +224,6 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
     { :precheck, Keyword.put(errors, :file, "File not found in Screenshot") }
   end
   def screenshot_has_file?({ :precheck, errors }, _) do
-    IO.inspect(errors)
     { :precheck, errors }
   end
 

@@ -351,7 +351,6 @@ defmodule UserDocs.Users do
     |> Repo.one!()
   end
   def get_team!(id, state, opts) when is_list(opts) do
-    IO.inspect(opts[:preloads])
     StateHandlers.get(state, id, Team, opts)
     |> maybe_preload(opts[:preloads], state, opts)
   end

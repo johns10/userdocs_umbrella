@@ -69,8 +69,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       |> Map.put(:page, nested_form_id(step, step.page))
       |> Map.put(:annotation, nested_form_id(step, step.annotation))
 
-      IO.inspect(assigns.state_opts)
-
     select_lists =
       assigns.select_lists
       |> Map.put(:annotations, Helpers.select_list(assigns.data.annotations, :name, true))
@@ -405,7 +403,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   end
 
   def elements_select(%{ state_opts: state_opts } = socket, page_id) do
-    IO.puts("elements_select")
     opts = Keyword.put(state_opts, :filter, { :page_id, page_id })
     Web.list_elements(socket, opts)
     |> Helpers.select_list(:name, true)

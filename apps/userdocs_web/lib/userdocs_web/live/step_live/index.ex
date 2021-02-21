@@ -178,7 +178,6 @@ defmodule UserDocsWeb.StepLive.Index do
   def pages_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
     Web.list_pages(socket, state_opts)
     |> Helpers.select_list(:name, :true)
-    |> IO.inspect()
   end
   def pages_select(_), do: []
 
