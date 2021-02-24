@@ -247,7 +247,7 @@ defmodule UserDocsWeb.ProcessLive.SPA do
       socket.assigns.state_opts
       |> Keyword.put(:preloads, preloads)
       |> Keyword.put(:order, order)
-      |> Keyword.put(:filter, {:version_id, socket.assigns.version.id})
+      |> Keyword.put(:filter, {:version_id, socket.assigns.current_version.id})
 
     socket
     |> assign(:processes, Automation.list_processes(socket, opts))
