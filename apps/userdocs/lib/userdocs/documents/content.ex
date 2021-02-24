@@ -4,11 +4,13 @@ defmodule UserDocs.Documents.Content do
 
   alias UserDocs.Documents.ContentVersion
   alias UserDocs.Web.Annotation
+  alias UserDocs.Users.Team
 
   schema "content" do
     field :name, :string
     field :title, :string
-    field :team_id, :id
+
+    belongs_to :team, Team
 
     has_many :annotation, Annotation
     has_many :content_versions, ContentVersion
