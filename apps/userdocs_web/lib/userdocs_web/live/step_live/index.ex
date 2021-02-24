@@ -214,6 +214,7 @@ defmodule UserDocsWeb.StepLive.Index do
 
   def prepare_process(%{ assigns: %{ process: %{ id: id }}} = socket), do: prepare_process(socket, id)
   def prepare_process(socket, process_id) do
+    IO.inspect("Preparing process")
     preloads =
       [
         :steps,
@@ -232,6 +233,9 @@ defmodule UserDocsWeb.StepLive.Index do
       |> Keyword.put(:preloads, preloads)
       |> Keyword.put(:order, order)
 
-    assign(socket, :process, Automation.get_process!(process_id, socket, opts))
+    process = Automation.get_process!(process_id, socket, opts)
+    IO.inspect("Process name #{process.name}")
+
+    assign(socket, :process, process)
   end
 end
