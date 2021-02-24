@@ -16,7 +16,7 @@ defmodule StateHandlers.Create do
     |> Helpers.socket_or_state(loader)
   end
   def apply(_, _, opts) do
-    raise(RuntimeError, "State.Update.apply failed to find a matching clause with options #{inspect(opts)}")
+    raise("State.Update.apply failed to find a matching clause with options #{inspect(opts)}")
   end
   def create([ { state, key, state_type } | breadcrumb ], data, data_type) do
     IO.puts("create state parser")
