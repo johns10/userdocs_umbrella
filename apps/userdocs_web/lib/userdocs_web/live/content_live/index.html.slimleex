@@ -1,0 +1,36 @@
+= ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
+  %{ to: Routes.project_index_path(@socket, :index, @team.id), name: @team.name }], 
+  last_item: %{ to: "", name: "Content" } ])
+  
+= if @live_action in [:edit, :new] do
+  = live_modal @socket, UserDocsWeb.ContentLive.FormComponent,
+    id: @content.id || :new,
+    title: @page_title,
+    action: @live_action,
+    content: @content,
+    state_opts: @state_opts,
+    select_lists: @select_lists,
+    app_name: @app_name,
+    team: @team,
+    return_to: Routes.content_index_path(@socket, :index, @team.id)
+
+aside.menu
+  p.menu-label Content
+  ul.menu-list
+    = for content <- @contents do
+      li class=""
+        .is-flex
+          = link to: "", class: "is-flex-grow-1" do 
+            = content.name
+          .is-flex.is-flex-direction-row.is-flex-grow-0
+            = live_patch to: Routes.content_index_path(@socket, :edit, @team.id, content.id) do 
+              i.fa.fa-lg.fa-edit
+        = if content.content_versions != [] do
+          ul
+            = for content_version <- content.content_versions do
+              li class=""
+                = link to: "", class: "is-flex-grow-1" do 
+                  = content_version.version.name 
+
+= live_patch to: Routes.content_index_path(@socket, :new, @team.id) do
+  button.button.is-primary New Content
