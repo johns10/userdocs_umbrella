@@ -62,8 +62,16 @@ defmodule UserDocs.Automation.Step.Name do
   end
 
   def generate("Set Size Explicit", %Ecto.Changeset{} = step_changeset) do
-    width = Ecto.Changeset.get_field(step_changeset, :width, "")
-    height = Ecto.Changeset.get_field(step_changeset, :height, "")
+    width =
+      case Ecto.Changeset.get_field(step_changeset, :width, "") do
+        nil -> ""
+        width -> width
+      end
+    height =
+      case Ecto.Changeset.get_field(step_changeset, :height, "") do
+        nil -> ""
+        height -> height
+      end
 
     order_name(step_changeset)
     <> Integer.to_string(width) <> "X"
