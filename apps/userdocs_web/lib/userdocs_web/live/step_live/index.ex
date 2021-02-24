@@ -238,7 +238,6 @@ defmodule UserDocsWeb.StepLive.Index do
         nil ->
           process_ids =
             Automation.list_processes(socket, opts)
-            |> Enum.map(fn(p) -> p.id end)
           raise("No process, available ids are #{process_ids}")
         process -> process
       end
