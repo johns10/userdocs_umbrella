@@ -27,8 +27,8 @@ defmodule UserDocs.Automation.Step do
     has_one :screenshot, Screenshot
     belongs_to :page, Page
     belongs_to :process, Process
-    belongs_to :element, Element
-    belongs_to :annotation, Annotation
+    belongs_to :element, Element, on_replace: :update
+    belongs_to :annotation, Annotation, on_replace: :update
     belongs_to :step_type, StepType
 
     timestamps()
