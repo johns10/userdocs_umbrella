@@ -16,6 +16,7 @@ config :userdocs_web, UserDocsWeb.Endpoint,
   check_origin: [
     "chrome-extension://hanghhicicijhmpofndpemhlfojfdnfj",
     "chrome-extension://mkbbhaeofgjbbhopopbjnjjjfbbnaone",
+    "chrome-extension://dieemmbgjkifojmoegfgiekpbodeidcd",
     "https://app.user-docs.com",
     ],
   cache_static_manifest: "priv/static/cache_manifest.json",
