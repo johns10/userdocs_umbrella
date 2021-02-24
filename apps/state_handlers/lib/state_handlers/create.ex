@@ -5,7 +5,7 @@ defmodule StateHandlers.Create do
   def apply(state, data, opts) when is_struct(data) do
     IO.puts("Creating an opbect")
     loader = opts[:loader] || &Map.put/3
-    schema = "data.__meta__.schema"
+    schema = data.__meta__.schema
     state
     |> Helpers.maybe_access_assigns()
     |> Helpers.maybe_access_location(opts[:location])
@@ -14,9 +14,6 @@ defmodule StateHandlers.Create do
     |> Helpers.maybe_put_in_type(opts[:strategy])
     |> Helpers.maybe_put_in_location(opts[:location])
     |> Helpers.socket_or_state(loader)
-  end
-  def apply(_, _, opts) do
-    raise("State.Update.apply failed to find a matching clause with options #{inspect(opts)}")
   end
   def create([ { state, key, state_type } | breadcrumb ], data, data_type) do
     IO.puts("create state parser")
