@@ -111,6 +111,7 @@ defmodule UserDocsWeb.ProcessLive.SPA do
   def handle_event("select-process", %{ "id" => id }, socket) do
     IO.puts("select-process #{id}")
     process = Automation.get_process!(String.to_integer(id), socket, socket.assigns.state_opts)
+    IO.inspect(process)
     {
       :noreply,
       socket
