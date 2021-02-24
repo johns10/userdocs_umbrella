@@ -38,8 +38,9 @@ defmodule UserDocsWeb.BreadCrumb do
 
   @impl true
   def update(assigns, socket) do
-    team = Users.get_team!(assigns.current_team_id, assigns, Defaults.state_opts())
-    project = Projects.get_project!(assigns.current_project_id, assigns, Defaults.state_opts())
+    opts = assigns.state_opts
+    team = Users.get_team!(assigns.current_team_id, assigns, opts)
+    project = Projects.get_project!(assigns.current_project_id, assigns, opts)
     {
       :ok,
       socket
