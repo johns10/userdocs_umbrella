@@ -10,7 +10,7 @@
     data: @data,
     app_name: @app_name,
     default_page_id: nil,
-    return_to: Routes.step_index_path(@socket, :index, @team.id, @project.id, @version.id, @process.id)
+    return_to: Routes.step_index_path(@socket, :index, @process.id)
 
 = for step <- @process.steps do
   .card
@@ -48,7 +48,7 @@
 
 
 = if @app_name == "web" do 
-  = live_patch to: Routes.step_index_path(@socket, :new, @team.id, @project.id, @version.id, @process.id) do
+  = live_patch to: Routes.step_index_path(@socket, :new, @process.id) do
     button.button.is-primary New Step
 - else
   = link to: "#", phx_click: "new-step" do

@@ -45,29 +45,32 @@ defmodule UserDocsWeb.ProjectLive.Index do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
-  defp apply_action(socket, :edit, %{ "team_id" => team_id, "id" => id }) do
+  defp apply_action(socket, :edit, %{ "id" => id }) do
     socket
-    |> assign(:team_name, team_name(team_id))
     |> prepare_edit(id)
-    |> prepare_index(team_id)
+    |> prepare_index(socket.assigns.current_team_id)
   end
 
-  defp apply_action(socket, :new, %{ "team_id" => team_id }) do
+  defp apply_action(socket, :new, _params) do
     user = Users.get_user!(socket.assigns.current_user.id, %{ teams: true }, %{})
     socket
     |> assign(:page_title, "New Project")
     |> assign(:project, %Project{})
     |> assign(:teams_select_options, Helpers.select_list(user.teams, :name, false))
-    |> assign(:team_name, team_name(team_id))
-    |> prepare_index(team_id)
+    |> prepare_index(socket.assigns.current_team_id)
   end
 
-  defp apply_action(socket, :index, %{ "team_id" => team_id }) do
+  defp apply_action(socket, :index, %{ "team_id" => team_id}) do
     socket
     |> assign(:page_title, "Listing Projects")
     |> assign(:project, nil)
-    |> assign(:team_name, team_name(team_id))
     |> prepare_index(team_id)
+  end
+  defp apply_action(socket, :index, _params) do
+    socket
+    |> assign(:page_title, "Listing Projects")
+    |> assign(:project, nil)
+    |> prepare_index(socket.assigns.current_team_id)
   end
 
   @impl true
@@ -81,10 +84,8 @@ defmodule UserDocsWeb.ProjectLive.Index do
     }
   end
 
-  def team_name(team_id) do
-    Users.get_team!(team_id)
-    |> Map.get(:name)
-  end
+  @imple true
+  def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   defp prepare_index(socket, team_id) do
     Logger.debug("#{__MODULE__}.prepare_index issuing list_projects query")

@@ -72,23 +72,20 @@ defmodule UserDocsWeb.StepLive.Index do
 
   @impl true
   def handle_params(_, _, %{ assigns: %{ auth_state: :not_logged_in }} = socket), do: { :noreply, socket }
-  def handle_params(%{ "id" => id, "team_id" => team_id, "project_id" => project_id, "version_id" => version_id } = params, _, socket) do
+  def handle_params(%{ "id" => id } = params, _, socket) do
     IO.puts("handle_params")
     {
       :noreply,
       socket
-      |> do_handle_params(team_id, project_id, version_id, id)
+      |> do_handle_params(id)
       |> apply_action(socket.assigns.live_action, params)
     }
   end
 
-  def do_handle_params(socket, team_id, project_id, version_id, process_id) do
+  def do_handle_params(socket, process_id) do
     opts = Defaults.opts(socket, @subscribed_types)
     process = Automation.get_process!(String.to_integer(process_id))
     socket
-    |> assign(:team, Users.get_team!(team_id))
-    |> assign(:project, Projects.get_project!(project_id))
-    |> assign(:version, Projects.get_version!(version_id))
     |> assign(:process, process)
     |> Loaders.content(opts)
     |> Loaders.content_versions(opts)
@@ -193,7 +190,7 @@ defmodule UserDocsWeb.StepLive.Index do
   end
 
 
-  def assign_strategy_id(%{ assigns: %{ version: version }} = socket) do
+  def assign_strategy_id(%{ assigns: %{ current_version: version }} = socket) do
     assign(socket, :strategy_id, version.strategy_id)
   end
 

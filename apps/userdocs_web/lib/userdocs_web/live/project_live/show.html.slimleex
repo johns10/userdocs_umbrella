@@ -1,15 +1,21 @@
+= ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
+  %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name }], 
+  last_item: %{ to: Routes.version_index_path(@socket, :index), name: @project.name } ])
+  
+
 div.py-2
   h1.is-size-3
     = "Project " <> @project.name
 div.py-2
-  h2.is-size-4 Versions
-  ul
-    = for version <- @project.versions do
-      li = version.name
-div.py-2
   h3.is-size-5 Default Version
   = @project.default_version.name
 
-.buttons
-  = live_redirect to: Routes.project_index_path(@socket, :index, @team_id) do
-    button.button.mr-1 Back
+= live_component(@socket, UserDocsWeb.VersionLive.IndexComponent,
+  [ live_action: @live_action,
+  state_opts: @state_opts,
+  versions: @project.versions,
+  page_title: @page_title,
+  project: @project,
+  team: @current_team,
+  app_name: @app_name,
+  data: @data ])

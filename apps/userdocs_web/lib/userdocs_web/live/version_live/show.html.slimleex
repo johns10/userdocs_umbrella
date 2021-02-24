@@ -1,7 +1,7 @@
 = ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
-  %{ to: Routes.project_index_path(@socket, :index, @team.id), name: @team.name },
-  %{ to: Routes.version_index_path(@socket, :index, @team.id, @project.id), name: @project.name }], 
-  last_item: %{ to: "", name: ""} ])
+  %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name },
+  %{ to: Routes.version_index_path(@socket, :index), name: @current_project.name }], 
+  last_item: %{ to: "", name: @version.name } ])
   
 
 div.py-2
@@ -14,12 +14,12 @@ div.py-2
 aside.menu
   p.menu-label Processes
   ul.menu-list
-    = for process <- @processes do
+    = for process <- @version.processes do
       li class=""
         .is-flex
-          = link to: Routes.process_index_path(@socket, :index, @team.id, @project.id, @version), class: "is-flex-grow-1" do
+          = link to: Routes.process_index_path(@socket, :index), class: "is-flex-grow-1" do
             = process.name
 
 .buttons
-  = live_redirect to: Routes.version_index_path(@socket, :index, @team.id, @project.id) do
+  = live_redirect to: Routes.version_index_path(@socket, :index) do
     button.button.mr-1 Back
