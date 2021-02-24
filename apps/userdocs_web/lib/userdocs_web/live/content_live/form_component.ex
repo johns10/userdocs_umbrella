@@ -50,16 +50,17 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
           ], "control is-expanded") %>
       </div>
       <%= inputs_for form, :content_versions, fn fcv -> %>
-
         <%= ContentVersionForm.render_fields(assigns, fcv, "test") %>
-
       <% end %>
-      <div class="control">
-        <a class="button" href="#" phx-click="add-content-version"
-          phx-target="<%= @myself.cid %>">
-          Add a content translation
-        </a>
-      </div>
+
+      <%= if form.data.id do %>
+        <div class="control">
+          <a class="button" href="#" phx-click="add-content-version"
+            phx-target="<%= @myself.cid %>">
+            Add a content translation
+          </a>
+        </div>
+      <% end %>
     """
   end
 
