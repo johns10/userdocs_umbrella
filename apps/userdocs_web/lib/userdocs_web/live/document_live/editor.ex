@@ -41,28 +41,16 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   Process, Content, ContentVersion, Step, LanguageCode, Annotation,
   Docubit, File, DocubitType, AnnotationType ]
 
-  defp base_opts() do
-    Defaults.state_opts()
-    |> Keyword.put(:location, :data)
-    |> Keyword.put(:types, @types)
-  end
-
-  defp state_opts(socket) do
-    base_opts()
-    |> Keyword.put(:broadcast, true)
-    |> Keyword.put(:channel, UserDocsWeb.Defaults.channel(socket))
-    |> Keyword.put(:broadcast_function, &UserDocsWeb.Endpoint.broadcast/3)
-  end
-
   @impl true
   def mount(_params, session, socket) do
-    opts = base_opts()
+    opts = Defaults.opts(socket, @types)
 
-    {:ok,
+    {
+      :ok,
       socket
       |> StateHandlers.initialize(opts)
       |> Root.authorize(session)
-      |> Root.initialize()
+      |> Root.initialize(opts)
       |> assign(:dragging, %{ type: nil, id: nil})
       |> assign(:state_opts, opts)
     }
@@ -73,7 +61,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
     IO.puts("Opening editor")
     id = String.to_integer(id)
     document = Documents.get_document!(id, %{ document_versions: true })
-    opts = state_opts(socket)
+    opts = Defaults.opts(socket, @types)
     {
       :noreply,
       socket
@@ -143,7 +131,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
         [ _ | _ ] = docubits -> docubits |> Enum.at(-1) |> Map.get(:order, nil)
       end
 
-    docubit_type = Documents.get_docubit_type_by_name!(socket, type, state_opts(socket))
+    docubit_type = Documents.get_docubit_type_by_name!(socket, type, socket.assigns.state_opts)
 
     new_docubit_attrs = %{
       docubit_type: convert_docubit_type_struct_to_map(docubit_type),
@@ -194,7 +182,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
     { :noreply, _ } = Root.handle_info(%{ topic: topic, event: event, payload: docubit }, socket)
   end
   def handle_info({ :close_all_dropdowns, exclude }, socket) do
-    Enum.each(Documents.list_docubits(socket, state_opts(socket)),
+    Enum.each(Documents.list_docubits(socket, socket.assigns.state_opts),
       fn(docubit) ->
         if docubit.id not in exclude do
           send_update(
@@ -234,7 +222,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   defp prepare_document_version(socket, document_version_id) do
     IO.puts("Preparing Document Version")
     opts =
-      state_opts(socket)
+      socket.assigns.state_opts
       |> Keyword.put(:preloads, [
           :body,
           :docubits,
@@ -262,7 +250,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
   defp prepare_content(socket) do
     opts =
-      state_opts(socket)
+      socket.assigns.state_opts
       |> Keyword.put(:preloads, [
         :content_versions,
         [ content_versions: :version ]
@@ -274,7 +262,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
   defp prepare_annotations(socket) do
     opts =
-      state_opts(socket)
+      socket.assigns.state_opts
       |> Keyword.put(:preloads, [
         :content,
         :annotation_type,
@@ -294,8 +282,9 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   end
 
   defp current_selections(socket) do
-    process = Automation.list_processes(socket, state_opts(socket)) |> Enum.at(0)
-    page = Web.list_pages(socket, state_opts(socket)) |> Enum.at(0)
+    opts = socket.assigns.state_opts
+    process = Automation.list_processes(socket, opts) |> Enum.at(0)
+    page = Web.list_pages(socket, opts) |> Enum.at(0)
 
     socket
     |> assign(:current_page, page)
@@ -306,7 +295,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   defp assign_current_version(socket) do
     version =
       socket.assigns.current_version_id
-      |> Projects.get_version!(socket, state_opts(socket))
+      |> Projects.get_version!(socket, socket.assigns.state_opts)
 
     socket
     |> assign(:current_version, version)
@@ -315,7 +304,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   defp default_language_code_id(socket) do
     IO.puts("default_language_code_id")
     language_code_id =
-      Users.get_team!(socket.assigns.current_team_id, socket, state_opts(socket))
+      Users.get_team!(socket.assigns.current_team_id, socket, socket.assigns.state_opts)
       |> Map.get(:default_language_code_id)
 
     socket
