@@ -110,14 +110,11 @@ defmodule UserDocsWeb.ProcessLive.SPA do
   end
   def handle_event("select-process", %{ "id" => id }, socket) do
     IO.puts("select-process #{id}")
-    process = Automation.get_process!(String.to_integer(id), socket, socket.assigns.state_opts)
-    IO.inspect(process)
     {
       :noreply,
       socket
       |> assign(:mode, :steps)
-      |> assign(:process, process)
-      |> StepLive.Index.prepare_process()
+      |> StepLive.Index.prepare_process(String.to_integer(id))
     }
   end
   def handle_event("processes", _params, socket) do
