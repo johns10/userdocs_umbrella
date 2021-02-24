@@ -3,14 +3,19 @@ defmodule UserDocs.Users.User do
   use Pow.Ecto.Schema
   import Ecto.Changeset
 
-
   alias UserDocs.Users.Team
   alias UserDocs.Users.TeamUser
+  alias UserDocs.Projects.Project
+  alias UserDocs.Projects.Version
 
   schema "users" do
     pow_user_fields()
 
     belongs_to :default_team, Team
+
+    belongs_to :selected_team, Team
+    belongs_to :selected_project, Project
+    belongs_to :selected_version, Version
 
     many_to_many :teams,
       Team,
@@ -24,7 +29,7 @@ defmodule UserDocs.Users.User do
   def changeset(user, attrs) do
     user
     |> pow_changeset(attrs)
-    |> cast(attrs, [:default_team_id])
+    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id])
   end
 
   def preload_teams(user = %UserDocs.Users.User{}, %{ teams: teams, team_users: team_users }) do
