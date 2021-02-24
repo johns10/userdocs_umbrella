@@ -94,12 +94,13 @@ defmodule UserDocsWeb.Root do
           socket
           |> assign(:auth_state, :not_logged_in)
           |> assign(:changeset, Users.change_user(%User{}))
-        %{ assigns: %{ current_user: _ }} ->
+        %{ assigns: %{ current_user: current_user }} ->
           IO.puts("a user")
           socket
           |> maybe_assign_current_user(session)
           |> assign(:auth_state, :logged_in)
-          |> (&(assign(&1, :changeset, Users.change_user(&1.assigns.current_user)))).()
+          |> assign_selections()
+          |> (assign(:changeset, Users.change_user(current_user)))
         error ->
           IO.puts("Error")
           Logger.error(error)
@@ -113,7 +114,40 @@ defmodule UserDocsWeb.Root do
     end
   end
 
+  def assign_selections(socket) do
+    user = Users.get_user!(socket.assigns.current_user.id, %{
+      team_project_version: true,
+      selected_team: true,
+      selected_project: true,
+      selected_version: true
+    })
+    default_team = user.default_team
+    default_project = user.default_team.default_project
+    default_version = default_project.default_version
+    team =
+      case user.selected_team_id do
+        nil -> default_team
+        _ -> user.selected_team
+      end
+    project =
+      case user.selected_project_id do
+        nil -> default_project
+        _ -> user.selected_project
+      end
+    version =
+      case user.selected_version_id do
+        nil -> default_version
+        _ -> user.selected_version
+      end
+
+    socket
+    |> assign(:current_team,  team)
+    |> assign(:current_project,  project)
+    |> assign(:current_version,  version)
+  end
+
   def put_app_name(socket, %{ "app_name" => app_name }) do
+    IO.inspect("Putting app name #{app_name}")
     uri =
       if Mix.env() in [:dev, :test] do
         URI.parse("https://dev.user-docs.com:4002")
@@ -167,12 +201,22 @@ defmodule UserDocsWeb.Root do
       project <- UserDocs.Projects.get_project!(version.project_id, socket, opts),
       team <- UserDocs.Users.get_team!(project.team_id, socket, opts)
     do
+      changes = %{
+        selected_team_id: team.id,
+        selected_project_id: project.id,
+        selected_version_id: version.id
+      }
+
+      { :ok, _ } =
+        Ecto.Changeset.change(socket.assigns.current_user, changes)
+        |> UserDocs.Repo.update()
+
       {
         :noreply,
         socket
-        |> assign(:team, team)
-        |> assign(:project, project)
-        |> assign(:version, version)
+        |> assign(:current_team, team)
+        |> assign(:current_project, project)
+        |> assign(:current_version, version)
         |> assign(:current_team_id, team.id)
         |> assign(:current_project_id, project.id)
         |> assign(:current_version_id, version.id)
