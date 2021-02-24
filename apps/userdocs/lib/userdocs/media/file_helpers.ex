@@ -3,7 +3,8 @@ defmodule UserDocs.Media.FileHelpers do
   import ImageBase64Handler
 
 
-  @path "apps/userdocs_web/assets/static/images/"
+  @dev_path "apps/userdocs_web/assets/static/images/"
+  @prod_path "/apps/userdocs_web/priv/static"
 
   def encode_hash_save_file(raw, file_name \\ nil) do
     prepare_image_map(raw)
@@ -55,8 +56,15 @@ defmodule UserDocs.Media.FileHelpers do
   end
 
   defp save_file(image, file_name) do
+    path =
+      if Mix.env() in [:dev, :test] do
+        @dev_path
+      else
+        @prod_path
+      end
+
     image
-    |> base64ToImage(@path <> file_name)
+    |> base64ToImage(path <> file_name)
   end
 
   defp add_hash_to_map(image) do
@@ -64,7 +72,14 @@ defmodule UserDocs.Media.FileHelpers do
   end
 
   defp hash(file_name) do
-    Elixir.File.stream!(@path <> file_name, [], 2048)
+    path =
+      if Mix.env() in [:dev, :test] do
+        @dev_path
+      else
+        @prod_path
+      end
+
+    Elixir.File.stream!(path <> file_name, [], 2048)
     |> sha256()
   end
 
@@ -73,7 +88,14 @@ defmodule UserDocs.Media.FileHelpers do
   end
 
   defp size(file_name) do
-    {:ok, file_stats} = Elixir.File.stat(@path <> file_name)
+    path =
+      if Mix.env() in [:dev, :test] do
+        @dev_path
+      else
+        @prod_path
+      end
+
+    {:ok, file_stats} = Elixir.File.stat(path <> file_name)
     file_stats.size
   end
 
