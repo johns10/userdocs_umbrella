@@ -10,6 +10,7 @@
     content: @content,
     state_opts: @state_opts,
     select_lists: @select_lists,
+    current_version: @current_version,
     app_name: @app_name,
     team: @team,
     return_to: Routes.content_index_path(@socket, :index, @team.id)
