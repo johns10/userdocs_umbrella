@@ -1,0 +1,34 @@
+h1 Listing Documents
+
+aside.menu
+  p.menu-label Documents 
+  ul.menu-list
+    = for document <- @documents do
+      li class=""
+        div.is-flex
+          a.is-flex-grow-1
+            = document.name
+          div.is-flex.is-flex-direction-row.is-flex-grow-0
+            = live_patch to: Routes.document_editor_path(@socket, :edit, document) do
+              i.fa.fa-lg.fa-search
+            = content_tag :a, to: "#", phx_click: "new-document-version", phx_value_document_id: document.id do
+              i.fa.fa-lg.fa-plus-square
+            = content_tag :a, to: "#", phx_click: "delete", phx_value_id: document.id do
+              i.fa.fa-lg.fa-minus-square
+            = content_tag :a, to: "#", phx_click: "edit-document", phx_value_id: document.id do
+              i.fa.fa-lg.fa-edit
+        ul
+          = for document_version <- document.document_versions do
+            li.is-flex
+              a.is-flex-grow-1
+                = document_version.version.name
+              div.is-flex.is-flex-direction-row.is-flex-grow-0
+                = link to: Routes.document_version_download_path(@socket, :show, document_version.id) do
+                  i.fa.fa-lg.fa-cloud-download
+                = content_tag :a, phx_click: "delete-document-version", phx_value_id: document_version.id do
+                  i.fa.fa-lg.fa-minus-square
+                = content_tag :a, phx_click: "edit-document-version", phx_value_id: document_version.id do
+                  i.fa.fa-lg.fa-edit 
+
+= link to: "#", phx_click: "new-document" do
+  button.button.is-primary New Document
