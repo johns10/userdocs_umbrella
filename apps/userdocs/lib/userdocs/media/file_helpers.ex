@@ -4,7 +4,7 @@ defmodule UserDocs.Media.FileHelpers do
 
 
   @dev_path "apps/userdocs_web/assets/static/images/"
-  @prod_path "/apps/userdocs_web/priv/static"
+  @prod_path "apps/userdocs_web/priv/static"
 
   def encode_hash_save_file(raw, file_name \\ nil) do
     prepare_image_map(raw)
