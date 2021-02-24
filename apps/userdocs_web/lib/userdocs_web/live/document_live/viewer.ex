@@ -35,29 +35,16 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   Process, Content, ContentVersion, Step, LanguageCode, Annotation,
   Docubit, File, DocubitType ]
 
-  defp base_opts() do
-    Defaults.state_opts
-    |> Keyword.put(:location, :data)
-    |> Keyword.put(:types, @types)
-  end
-
-  defp state_opts(socket) do
-    base_opts()
-    |> Keyword.put(:broadcast, true)
-    |> Keyword.put(:channel, UserDocsWeb.Defaults.channel(socket))
-    |> Keyword.put(:broadcast_function, &UserDocsWeb.Endpoint.broadcast/3)
-  end
-
   @impl true
   def mount(_params, session, socket) do
-    opts = base_opts()
+    opts = Defaults.opts(socket, @types)
 
     {
       :ok,
       socket
       |> StateHandlers.initialize(opts)
       |> Root.authorize(session)
-      |> Root.initialize()
+      |> Root.initialize(opts)
       |> assign(:state_opts, opts)
     }
   end
@@ -66,7 +53,7 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   def handle_params(%{"id" => id}, _, %{ assigns: %{ auth_state: :logged_in }} = socket) do
     id = String.to_integer(id)
     document = Documents.get_document!(id, %{ document_versions: true })
-    opts = state_opts(socket)
+    opts = Defaults.opts(socket, @types)
     {
       :noreply,
       socket
@@ -87,33 +74,11 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
       |> default_language_code_id()
       |> (&(Loaders.load_docubits(&1, default_document_version_id(&1, document), opts))).()
       |> (&(prepare_document_version(&1, default_document_version_id(&1, document)))).()
+      |> assign(:state_opts, opts)
       |> assign(:img_path, Routes.static_path(socket, "/images/"))
     }
   end
   def handle_params(_, _, socket), do: { :noreply, socket }
-
-  def render_body(document_version) do
-    Docubit.renderer(document_version.body).render(
-      [
-        docubit: document_version.body
-      ]
-    )
-  end
-
-  def render_docubit(%{ docubits: [ _ | _ ] = docubits } = docubit) when is_list(docubits) do
-    docubit.renderer.render(
-      docubit,
-      Enum.map(docubits, fn(d) -> render_docubit(d) end),
-      :editor
-    )
-  end
-  def render_docubit(%{ docubits: [ ]} = docubit) do
-    docubit.renderer.render(
-      docubit,
-      [],
-      :editor
-    )
-  end
 
   @impl true
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
@@ -133,8 +98,9 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   end
 
   def prepare_document_version(socket, document_version_id) do
+    IO.puts("prepare_document_version")
     opts =
-      state_opts(socket)
+      socket.assigns.state_opts
       |> Keyword.put(:preloads, [
           :body,
           :docubits,
@@ -148,6 +114,7 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
           [ docubits: [ content: :annotation ] ],
           [ docubits: [ content: [ content_versions: :version ]]]
         ])
+      |> Keyword.put(:order, docubits: %{ field: :id, order: :asc })
 
     document_version = Documents.get_document_version!(document_version_id, socket, opts)
 
@@ -163,6 +130,8 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   end
 
   def prepare_docubit(docubit, all_docubits) do
+    IO.puts("prepare_docubit")
+    IO.inspect(docubit.address)
     docubits =
       all_docubits
       |> Enum.filter(fn(d) -> d.docubit_id == docubit.id end)
@@ -177,9 +146,9 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   end
 
   defp current_selections(socket) do
-    process = Automation.list_processes(socket, state_opts(socket)) |> Enum.at(0)
-    page = Web.list_pages(socket, state_opts(socket)) |> Enum.at(0)
-    version = Projects.get_version!(socket.assigns.current_version_id, socket, state_opts(socket))
+    process = Automation.list_processes(socket, socket.assigns.state_opts) |> Enum.at(0)
+    page = Web.list_pages(socket, socket.assigns.state_opts) |> Enum.at(0)
+    version = Projects.get_version!(socket.assigns.current_version_id, socket, socket.assigns.state_opts)
 
     socket
     |> assign(:current_page, page)
@@ -189,7 +158,7 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
 
   defp default_language_code_id(socket) do
     language_code_id =
-      Users.get_team!(socket.assigns.current_team_id, socket, state_opts(socket))
+      Users.get_team!(socket.assigns.current_team_id, socket, socket.assigns.state_opts)
       |> Map.get(:default_language_code_id)
 
     socket
