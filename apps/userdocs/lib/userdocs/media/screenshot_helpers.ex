@@ -7,7 +7,7 @@ defmodule UserDocs.Media.ScreenshotHelpers do
   alias UserDocs.Media.FileHelpers
 
   @dev_path "apps/userdocs_web/assets/static/images/"
-  @prod_path "/apps/userdocs_web/priv/static"
+  @prod_path "apps/userdocs_web/priv/static"
 
   def handle_screenshot_upsert_results(state = { :nok, %{ id: nil } }) do
     # Logger.debug("The screenshot upsert failed")
