@@ -7,7 +7,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   def content(socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{team_id: socket.assigns.team.id})
+      |> Keyword.put(:filters, %{team_id: socket.assigns.current_team.id})
       |> Keyword.put(:params, %{})
 
     Documents.load_content(socket, opts)
@@ -16,7 +16,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   def content_versions(socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{team_id: socket.assigns.team.id})
+      |> Keyword.put(:filters, %{team_id: socket.assigns.current_team.id})
 
     Documents.load_content_versions(socket, opts)
   end
@@ -24,7 +24,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   def processes(socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version_id: socket.assigns.version.id})
+      |> Keyword.put(:filters, %{version_id: socket.assigns.current_version.id})
 
     Automation.load_processes(socket, opts)
   end
@@ -32,7 +32,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   def steps(socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version_id: socket.assigns.version.id})
+      |> Keyword.put(:filters, %{version_id: socket.assigns.current_version.id})
       |> Keyword.put(:params, %{})
 
     Automation.load_steps(socket, opts)
@@ -41,7 +41,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   def annotations(socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version_id: socket.assigns.version.id})
+      |> Keyword.put(:filters, %{version_id: socket.assigns.current_version.id})
       |> Keyword.put(:params, %{})
 
     Web.load_annotations(socket, opts)
@@ -50,7 +50,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   def elements(socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version_id: socket.assigns.version.id})
+      |> Keyword.put(:filters, %{version_id: socket.assigns.current_version.id})
       |> Keyword.put(:params, %{})
 
     Web.load_elements(socket, opts)
@@ -59,7 +59,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   def pages(socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version_id: socket.assigns.version.id})
+      |> Keyword.put(:filters, %{version_id: socket.assigns.current_version.id})
 
     Web.load_pages(socket, opts)
   end

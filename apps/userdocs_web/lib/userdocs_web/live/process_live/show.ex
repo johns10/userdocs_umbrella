@@ -105,6 +105,9 @@ defmodule UserDocsWeb.ProcessLive.Show do
     { :noreply, assign(socket, :expanded, expanded) }
   end
 
+  @imple true
+  def handle_event(n, p, s), do: Root.handle_event(n, p, s)
+
   @impl true
   def handle_info(%{topic: _, event: _, payload: %Step{}} = sub_data, socket) do
     { :noreply, socket } = Root.handle_info(sub_data, socket)

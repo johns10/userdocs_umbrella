@@ -37,21 +37,23 @@ defmodule UserDocsWeb.VersionLive.Show do
   def initialize(socket), do: socket
 
   @impl true
-  def handle_params(%{ "id" => id, "team_id" => team_id, "project_id" => project_id }, _, socket) do
+  def handle_params(%{ "id" => id }, _, socket) do
     version = Projects.get_version!(String.to_integer(id), %{ processes: true, strategy: true })
     {
       :noreply,
       socket
       |> assign(:page_title, page_title(socket.assigns.live_action))
       |> assign(:version, version)
-      |> assign(:team, Users.get_team!(team_id))
-      |> assign(:project, Projects.get_project!(project_id))
     }
   end
+
+  @imple true
+  def handle_event(n, p, s), do: Root.handle_event(n, p, s)
+
+  @impl true
+  def handle_info(n, s), do: Root.handle_info(n, s)
 
   defp page_title(:show), do: "Show Project"
   defp page_title(:edit), do: "Edit Project"
 
-  @impl true
-  def handle_info(n, s), do: Root.handle_info(n, s)
 end

@@ -8,7 +8,7 @@
     state_opts: @state_opts,
     select_lists: @select_lists,
     app_name: @app_name,
-    return_to: Routes.process_index_path(@socket, :index, @team.id, @project.id, @version.id)
+    return_to: Routes.process_index_path(@socket, :index)
 
 aside.menu
   p.menu-label Processes
@@ -17,13 +17,12 @@ aside.menu
       li class=""
         .is-flex
           = if @app_name == "web" do 
-            = link to: Routes.step_index_path(@socket, :index, @team.id, 
-              @project.id, @version.id, process.id), class: "is-flex-grow-1" do
+            = link to: Routes.step_index_path(@socket, :index, process.id), class: "is-flex-grow-1" do
               = process.name
             .is-flex.is-flex-direction-row.is-flex-grow-0
-              = live_redirect to: Routes.process_show_path(@socket, :show, @team.id, @project.id, @version.id, process.id) do
+              = live_redirect to: Routes.process_show_path(@socket, :show, process.id) do
                 i.fa.fa-lg.fa-search
-              = live_patch to: Routes.process_index_path(@socket, :edit, @team.id, @project.id, @version.id, process.id) do
+              = live_patch to: Routes.process_index_path(@socket, :edit,process.id) do
                 i.fa.fa-lg.fa-edit
               = link to: "#", phx_click: "delete", phx_value_id: process.id, data: [confirm: "Are you sure?"] do
                 i.fa.fa-lg.fa-trash
@@ -37,7 +36,7 @@ aside.menu
                 i.fa.fa-lg.fa-trash
 
 = if @app_name == "web" do 
-  = live_patch to: Routes.process_index_path(@socket, :new, @team.id, @project.id, @version.id) do
+  = live_patch to: Routes.process_index_path(@socket, :new) do
     button.button.is-primary New Process
 - else
   = link to: "#", phx_click: "new-process" do

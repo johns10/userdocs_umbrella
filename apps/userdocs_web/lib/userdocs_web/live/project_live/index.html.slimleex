@@ -1,16 +1,16 @@
 = ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"}], 
-  last_item: %{ to: Routes.project_index_path(@socket, :index, @team_id), name: @team_name } ])
+  last_item: %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name } ])
   
 = if @live_action in [:edit, :new] do
   = live_modal @socket, UserDocsWeb.ProjectLive.FormComponent,
     id: @project.id || :new,
-    parent_id: @team_id,
+    parent_id: @current_team.id,
     title: @page_title,
     action: @live_action,
     project: @project,
     select_lists: %{ teams: @teams_select_options },
     state_opts: @state_opts,
-    return_to: Routes.project_index_path(@socket, :index, @team_id)
+    return_to: Routes.project_index_path(@socket, :index)
 
 aside.menu
   p.menu-label Projects
@@ -18,16 +18,16 @@ aside.menu
     = for project <- @projects do
       li class=""
         .is-flex
-          = link to: Routes.version_index_path(@socket, :index, @team_id, project), class: "is-flex-grow-1" do
+          = link to: Routes.version_index_path(@socket, :index, project.id), class: "is-flex-grow-1" do
             = project.name
           .is-flex.is-flex-direction-row.is-flex-grow-0
-            = live_redirect to: Routes.project_show_path(@socket, :show, @team_id, project) do
+            = live_redirect to: Routes.project_show_path(@socket, :show, project) do
               i.fa.fa-lg.fa-search
-            = live_patch to: Routes.project_index_path(@socket, :edit, @team_id, project) do
+            = live_patch to: Routes.project_index_path(@socket, :edit, project) do
               i.fa.fa-lg.fa-edit
             = link to: "#", phx_click: "delete", phx_value_id: project.id, data: [confirm: "Are you sure?"] do
               i.fa.fa-lg.fa-trash
 
 
-= live_patch to: Routes.project_index_path(@socket, :new, @team_id) do
+= live_patch to: Routes.project_index_path(@socket, :new) do
   button.button.is-primary New Project

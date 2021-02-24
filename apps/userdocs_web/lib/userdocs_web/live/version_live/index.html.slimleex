@@ -1,34 +1,18 @@
 = ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
-  %{ to: Routes.project_index_path(@socket, :index, @team.id), name: @team.name }], 
-  last_item: %{ to: Routes.version_index_path(@socket, :index, @team.id, @project.id), name: @project.name } ])
+  %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name }], 
+  last_item: %{ to: "", name: @current_project.name } ])
   
-= if @live_action in [:edit, :new] do
-  = live_modal @socket, UserDocsWeb.VersionLive.FormComponent,
-    id: @version.id || :new,
-    parent_id: @project_id,
-    title: @page_title,
-    action: @live_action,
-    version: @version,
-    state_opts: @state_opts,
-    select_lists: @select_lists,
-    return_to: Routes.version_index_path(@socket, :index, @team.id, @project.id)
+= live_component(@socket, UserDocsWeb.VersionLive.IndexComponent,
+  [ live_action: @live_action,
+  version: @version,
+  state_opts: @state_opts,
+  versions: @versions,
+  page_title: @page_title,
+  project: @current_project,
+  team: @current_team,
+  app_name: @app_name,
+  select_lists: @select_lists,
+  data: @data ])
 
-aside.menu
-  p.menu-label Versions
-  ul.menu-list
-    = for version <- @versions do
-      li class=""
-        .is-flex
-          = link to: Routes.process_index_path(@socket, :index, @team.id, @project.id, version), class: "is-flex-grow-1" do
-            = version.name
-          .is-flex.is-flex-direction-row.is-flex-grow-0
-            = live_redirect to: Routes.version_show_path(@socket, :show, @team.id, @project.id, version) do
-              i.fa.fa-lg.fa-search
-            = live_patch to: Routes.version_index_path(@socket, :edit, @team.id, @project.id, version) do
-              i.fa.fa-lg.fa-edit
-            = link to: "#", phx_click: "delete", phx_value_id: version.id, data: [confirm: "Are you sure?"] do
-              i.fa.fa-lg.fa-trash
-
-
-= live_patch to: Routes.version_index_path(@socket, :new, @team.id, @project.id) do
+= live_patch to: Routes.version_index_path(@socket, :new) do
   button.button.is-primary New Project

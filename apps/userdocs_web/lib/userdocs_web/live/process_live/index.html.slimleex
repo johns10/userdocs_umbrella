@@ -1,7 +1,7 @@
 = ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
-  %{ to: Routes.project_index_path(@socket, :index, @team.id), name: @team.name },
-  %{ to: Routes.version_index_path(@socket, :index, @team.id, @project.id), name: @project.name }],
-  last_item: %{ to: Routes.process_index_path(@socket, :index, @team.id, @project.id, @version.id), name: @version.name } ])
+  %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name },
+  %{ to: Routes.version_index_path(@socket, :index), name: @current_project.name }],
+  last_item: %{ to: Routes.process_index_path(@socket, :index), name: @current_version.name } ])
 
 = live_component(@socket, UserDocsWeb.ProcessLive.IndexComponent,
   [ live_action: @live_action,
@@ -10,8 +10,8 @@
   process: @process,
   page_title: @page_title,
   select_lists: @select_lists,
-  project: @project,
-  version: @version,
-  team: @team,
+  project: @current_project,
+  version: @current_version,
+  team: @current_team,
   app_name: @app_name,
   data: @data ])

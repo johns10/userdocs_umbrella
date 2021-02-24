@@ -70,6 +70,7 @@ defmodule UserDocsWeb.TeamLive.Index do
 
     { :noreply, socket }
   end
+  def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   defp prepare_teams(socket) do
     socket

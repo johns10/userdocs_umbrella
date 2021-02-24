@@ -31,44 +31,56 @@ defmodule UserDocsWeb.VersionLive.Index do
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
     socket
     |> assign(:modal_action, :show)
+    |> assign(:select_lists, %{})
     |> assign(:state_opts, Defaults.opts(socket, @types))
     |> load_versions()
   end
   def initialize(socket), do: socket
 
   @impl true
-  def handle_params(_, _, %{ assigns: %{ auth_state: :not_logged_in }} = socket) , do: {:noreply, socket}
-  def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  def handle_params(%{ "project_id" => project_id } = params, url, socket) do
+    do_handle_params(params, url, socket, String.to_integer(project_id))
+  end
+  def handle_params(params, url, socket) do
+    do_handle_params(params, url, socket, socket.assigns.current_project_id)
+  end
+  def do_handle_params(params, _url, socket, project_id) do
+    {
+      :noreply,
+      socket
+      |> assign(:select_lists, select_lists(socket.assigns.current_team.id))
+      |> prepare_versions(project_id)
+      |> apply_action(socket.assigns.live_action, params)
+    }
   end
 
-  defp apply_action(socket, :edit, %{ "team_id" => team_id, "project_id" => project_id, "id" => id }) do
+  @impl true
+  def handle_event(n, p, s), do: Root.handle_event(n, p, s)
+
+  defp apply_action(socket, :edit, %{ "id" => id }) do
+    IO.inspect("AA")
+    IO.inspect(Projects.get_version!(String.to_integer(id), socket, socket.assigns.state_opts))
     socket
     |> assign(:page_title, "Edit Process")
     |> assign(:version, Projects.get_version!(String.to_integer(id), socket, socket.assigns.state_opts))
-    |> assign(:select_lists, select_lists(team_id))
-    |> assign(:team, Users.get_team!(team_id))
-    |> assign(:project, Projects.get_project!(project_id))
-    |> prepare_versions()
   end
 
-  defp apply_action(socket, :new, %{ "team_id" => team_id, "project_id" => project_id }) do
+  defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Version")
     |> assign(:version, %Version{})
-    |> assign(:select_lists, select_lists(team_id))
-    |> assign(:team, Users.get_team!(team_id))
-    |> assign(:project, Projects.get_project!(project_id))
-    |> prepare_versions()
   end
 
-  defp apply_action(socket, :index, %{ "team_id" => team_id, "project_id" => project_id }) do
+  defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Listing Versions")
     |> assign(:version, nil)
-    |> assign(:team, Users.get_team!(team_id))
-    |> assign(:project, Projects.get_project!(project_id))
-    |> prepare_versions()
+  end
+
+  defp apply_action(socket, :index, _params) do
+    socket
+    |> assign(:page_title, "Listing Versions")
+    |> assign(:version, nil)
   end
 
   defp select_lists(team_id) do
@@ -82,8 +94,9 @@ defmodule UserDocsWeb.VersionLive.Index do
     }
   end
 
-  def prepare_versions(socket) do
-    versions = Projects.list_versions(socket, socket.assigns.state_opts)
+  def prepare_versions(socket, project_id) do
+    opts = Keyword.put(socket.assigns.state_opts, :filter, { :project_id, project_id })
+    versions = Projects.list_versions(socket, opts)
     socket
     |> assign(:versions, versions)
   end

@@ -7,11 +7,12 @@ defmodule UserDocsWeb.TeamLive.Show do
 
   alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.Defaults
+  alias UserDocsWeb.Loaders
   alias UserDocsWeb.Root
-  alias UserDocs.Helpers
 
   @types [
-    UserDocs.Users.Team
+    UserDocs.Users.Team,
+    UserDocs.Documents.Content
   ]
 
   @impl true
@@ -36,7 +37,8 @@ defmodule UserDocsWeb.TeamLive.Show do
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
-    team = Users.get_team!(id, %{ preloads: [ users: true, default_project: true ] })
+    team = Users.get_team!(id, %{ preloads: [ users: true, default_project: true, content: true ] })
+    IO.inspect(team)
     {
       :noreply,
       socket
@@ -50,4 +52,5 @@ defmodule UserDocsWeb.TeamLive.Show do
 
   @impl true
   def handle_info(n, s), do: Root.handle_info(n, s)
+  def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 end

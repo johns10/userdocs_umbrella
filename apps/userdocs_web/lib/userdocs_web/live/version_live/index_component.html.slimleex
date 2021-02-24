@@ -1,0 +1,27 @@
+= if @live_action in [:edit, :new] do
+  = live_modal @socket, UserDocsWeb.VersionLive.FormComponent,
+    id: @version.id || :new,
+    parent_id: @project.id,
+    title: @page_title,
+    action: @live_action,
+    version: @version,
+    state_opts: @state_opts,
+    select_lists: @select_lists,
+    app_name: @app_name,
+    return_to: Routes.version_index_path(@socket, :index)
+
+aside.menu
+  p.menu-label Versions
+  ul.menu-list
+    = for version <- @versions do
+      li class=""
+        .is-flex
+          = link to: Routes.process_index_path(@socket, :index, version.id), class: "is-flex-grow-1" do
+            = version.name
+          .is-flex.is-flex-direction-row.is-flex-grow-0
+            = live_redirect to: Routes.version_show_path(@socket, :show, version) do
+              i.fa.fa-lg.fa-search
+            = live_patch to: Routes.version_index_path(@socket, :edit, version) do
+              i.fa.fa-lg.fa-edit
+            = link to: "#", phx_click: "delete", phx_value_id: version.id, data: [confirm: "Are you sure?"] do
+              i.fa.fa-lg.fa-trash
