@@ -15,7 +15,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
   def render_inner_content(assigns) do
     ~L"""
       <%= if @component do %>
-        <%= @inner_content.([]) %>
+        <%= render_block(@inner_block, %{}) %>
       <% else %>
         <%= for docubit <- @docubit.docubits do %>
           <%= Docubit.renderer(docubit).render(%{
@@ -105,6 +105,9 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
     Map.put(current_content, :prefix, content.title)
   end
   defp maybe_name_prefix(current_content, %Context{ settings: %{ name_prefix: false } }, _) do
+    Map.put(current_content, :prefix, nil)
+  end
+  defp maybe_name_prefix(current_content, %Context{ settings: _ }, _) do
     Map.put(current_content, :prefix, nil)
   end
 
