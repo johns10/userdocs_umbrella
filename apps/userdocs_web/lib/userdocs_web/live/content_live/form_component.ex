@@ -95,7 +95,7 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
     content_version = %ContentVersion{
       temp_id: UserDocs.ID.temp_id(),
       content_id: socket.assigns.content.id,
-      version_id: socket.assigns.version_id,
+      version_id: socket.assigns.current_version.id,
       body: ""
     }
 
