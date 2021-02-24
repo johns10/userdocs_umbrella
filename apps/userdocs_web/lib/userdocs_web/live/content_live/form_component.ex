@@ -40,7 +40,7 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
     ~L"""
       <div class="field is-grouped">
         <%= Layout.select_input(form, :team_id, @select_lists.teams, [
-            value: form.data.team_id || @current_team.id
+            value: form.data.team_id || @team.id
           ], "control") %>
 
         <%= Layout.text_input(form, :name, [
