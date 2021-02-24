@@ -233,8 +233,15 @@ defmodule UserDocsWeb.StepLive.Index do
       |> Keyword.put(:preloads, preloads)
       |> Keyword.put(:order, order)
 
-    process = Automation.get_process!(process_id, socket, opts)
-    IO.inspect("Process name #{process.name}")
+    process =
+      case Automation.get_process!(process_id, socket, opts) do
+        nil ->
+          process_ids =
+            Automation.list_processes(socket, opts)
+            |> Enum.map(fn(p) -> p.id end)
+          raise("No process, available ids are #{process_ids}")
+        process -> process
+      end
 
     assign(socket, :process, process)
   end
