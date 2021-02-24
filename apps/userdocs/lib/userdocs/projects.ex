@@ -243,6 +243,7 @@ defmodule UserDocs.Projects do
     base_version_query(id)
     |> maybe_preload_pages(params[:pages])
     |> maybe_preload_strategy(params[:strategy])
+    |> maybe_preload_processes(params[:processes])
     |> Repo.one!()
   end
 
@@ -261,6 +262,9 @@ defmodule UserDocs.Projects do
   defp base_version_query(id) do
     from(version in Version, where: version.id == ^id)
   end
+
+  defp maybe_preload_processes(query, nil), do: query
+  defp maybe_preload_processes(query, _), do: from(version in query, preload: [:processes])
 
   defp maybe_preload_pages(query, nil), do: query
   defp maybe_preload_pages(query, _), do: from(version in query, preload: [:pages])
