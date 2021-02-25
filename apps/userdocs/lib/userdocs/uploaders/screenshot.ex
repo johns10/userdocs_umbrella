@@ -1,4 +1,4 @@
-defmodule UserDocsWeb.ScreenshotUploader do
+defmodule UserDocs.ScreenshotUploader do
   use Waffle.Definition
   use Waffle.Ecto.Definition
 
