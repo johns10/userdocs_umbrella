@@ -27,7 +27,7 @@ defmodule UserDocsWeb.VersionPicker do
   def render(assigns) do
     ~L"""
     <div class="navbar-item has-dropdown is-hoverable">
-      <a class="navbar-link">Version</a>
+      <a class="navbar-link"><%= @current_version.name %></a>
       <div class="navbar-dropdown">
         <%= for team <- @current_user.teams do %>
           <%= dropdown_trigger(assigns, team.name) do %>
