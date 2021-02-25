@@ -1,6 +1,7 @@
 defmodule UserDocs.Media.Screenshot do
   use Ecto.Schema
   import Ecto.Changeset
+  use Waffle.Ecto.Schema
 
   alias UserDocs.Automation.Step
   alias UserDocs.Media.File
@@ -10,6 +11,8 @@ defmodule UserDocs.Media.Screenshot do
 
     belongs_to :file, File
     belongs_to :step, Step
+
+    field :file, UserDocsWeb.ScreenshotUploader.Type
 
     timestamps()
   end
