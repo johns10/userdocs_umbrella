@@ -195,6 +195,7 @@ defmodule UserDocsWeb.Root do
     { :noreply, ModalMenus.edit_content(socket, params) }
   end
   def handle_event("select-version", %{"select-version" => version_id_param} = _payload, socket) do
+    IO.puts("Changing current version to #{version_id_param}")
     opts = Map.get(socket.assigns, :state_opts, state_opts())
     with  version_id <- String.to_integer(version_id_param),
       version <- UserDocs.Projects.get_version!(version_id, socket, opts),
@@ -207,13 +208,14 @@ defmodule UserDocsWeb.Root do
         selected_version_id: version.id
       }
 
-      { :ok, _ } =
+      { :ok, user } =
         Ecto.Changeset.change(socket.assigns.current_user, changes)
         |> UserDocs.Repo.update()
 
       {
         :noreply,
         socket
+        |> assign(:current_user, user)
         |> assign(:current_team, team)
         |> assign(:current_project, project)
         |> assign(:current_version, version)
