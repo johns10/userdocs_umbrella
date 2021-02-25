@@ -12,15 +12,17 @@ defmodule UserDocs.Media.Screenshot do
     belongs_to :file, File
     belongs_to :step, Step
 
-    field :file, UserDocsWeb.ScreenshotUploader.Type
+    field :aws_file, UserDocs.ScreenshotUploader.Type
 
     timestamps()
   end
 
   @doc false
   def changeset(screenshot, attrs) do
+    IO.inspect(attrs)
     screenshot
     |> cast(attrs, [:name, :file_id, :step_id])
+    |> cast_attachments(attrs, [:aws_file], allow_paths: true)
     |> foreign_key_constraint(:file_id)
     |> foreign_key_constraint(:step_id)
     |> unique_constraint(:step_id)
