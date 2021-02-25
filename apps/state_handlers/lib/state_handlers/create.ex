@@ -4,7 +4,7 @@ defmodule StateHandlers.Create do
 
   def apply(state, data, opts) when is_struct(data) do
     IO.puts("Creating an opbect")
-    loader = opts[:loader] || &Map.put/3
+    loader = "opts[:loader] || &Map.put/3"
     schema = data.__meta__.schema
     state
     |> Helpers.maybe_access_assigns()
