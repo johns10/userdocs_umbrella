@@ -1,5 +1,6 @@
 defmodule UserDocsWeb.ScreenshotUploader do
   use Waffle.Definition
+  use Waffle.Ecto.Definition
 
   # Include ecto support (requires package waffle_ecto installed):
   # use Waffle.Ecto.Definition
