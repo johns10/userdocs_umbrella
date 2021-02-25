@@ -4,6 +4,7 @@ defmodule UserDocs.Media.ScreenshotHelpers do
   alias Mogrify
   alias UserDocs.Media.File
   alias UserDocs.Media
+  alias UserDocs.Media.Screenshot
   alias UserDocs.Media.FileHelpers
 
   @dev_path "apps/userdocs_web/assets/static/images/"
@@ -13,7 +14,7 @@ defmodule UserDocs.Media.ScreenshotHelpers do
     # Logger.debug("The screenshot upsert failed")
     state
   end
-  def handle_screenshot_upsert_results({ :ok, %{ id: nil, step_id: step_id } }) do
+  def handle_screenshot_upsert_results({ :ok, %Screenshot{ id: nil, step_id: step_id } }) do
     # Logger.debug("Screenshot #{step_id} exists, so we retreive it")
     screenshot =
       Media.list_screenshots(%{file: true}, %{step_id: step_id})
@@ -28,12 +29,17 @@ defmodule UserDocs.Media.ScreenshotHelpers do
 
   def handle_screenshots_file({ :ok, screenshot = %{ file: %File{} } }, raw) do
     Logger.debug("The screenshot is there with file #{screenshot.file.id} correctly, probably because the screenshot existed.")
-    FileHelpers.encode_hash_save_file(raw, screenshot.file.filename)
+
+    IO.inspect(@dev_path <> screenshot.file.filename)
+    IO.inspect(screenshot)
+
     { :ok, %{ screenshot: screenshot }}
   end
-  def handle_screenshots_file({ :ok, screenshot }, raw) do
-    Logger.debug("The screenshot is there without the file, probably because we just created it")
-    { :ok, file } = Media.create_file(FileHelpers.encode_hash_save_file(raw, nil))
+  def handle_screenshots_file({ :ok, %Screenshot{} = screenshot }, raw) do
+    Logger.debug("Handling Screenshot File")
+    FileHelpers.encode_hash_save_file(raw, screenshot.file.filename)
+    { :ok, screenshot } = UserDocs.Media.update_screenshot(screenshot, %{ aws_file: (@dev_path <> screenshot.file.filename)})
+    IO.inspect(screenshot)
 
     { :ok, screenshot } =
       screenshot

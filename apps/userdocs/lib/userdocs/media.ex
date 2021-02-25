@@ -77,7 +77,7 @@ defmodule UserDocs.Media do
   def create_file_and_screenshot(%{ "encoded_image" => raw_encoded_image, "id" => step_id,
     "step_type" => %{ "name" => step_type_name }, "element" => element
     }) do
-      IO.puts("create_file_and_screenshot")
+      IO.puts("create_file_and_screenshot for step #{step_id}")
     %{
       name: "Screenshot for step #{step_id}",
       file_id: nil,
