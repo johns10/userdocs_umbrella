@@ -58,6 +58,13 @@ defmodule UserDocsWeb.MixProject do
       {:pbkdf2_elixir, "~> 1.0"},
       {:phoenix_slime, "~> 0.13.1"},
       {:userdocs, in_umbrella: true},
+
+      {:waffle, "~> 1.1.3"},
+      {:waffle_ecto, "~> 0.0.9"},
+      {:ex_aws, "~> 2.1.2"},
+      {:ex_aws_s3, "~> 2.0"},
+      {:hackney, "~> 1.9"},
+      {:sweet_xml, "~> 0.6"}
     ]
   end
 
