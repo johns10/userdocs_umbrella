@@ -58,14 +58,14 @@ config :userdocs_web, :pow,
 
 config :waffle,
   storage: Waffle.Storage.S3, # or Waffle.Storage.Local
-  bucket: System.get_env("userdocs-screenshots") # if using S3
+  bucket: System.get_env("AWS_BUCKET_NAME") # if using S3
 
 # If using S3:
 config :ex_aws,
   json_codec: Jason,
-  access_key_id: System.get_env("AKIAT5VKLWBUIMRZM7ZU"),
-  secret_access_key: System.get_env("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"),
-  region: System.get_env("us-east-2")
+  access_key_id: System.get_env("AWS_ACCESS_KEY_ID"),
+  secret_access_key: System.get_env("AWS_SECRET_ACCESS_KEY"),
+  region: System.get_env("AWS_REGION")
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
