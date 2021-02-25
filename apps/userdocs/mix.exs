@@ -46,6 +46,13 @@ defmodule UserDocs.MixProject do
       {:mogrify, "~> 0.8.0"},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:state_handlers, in_umbrella: true},
+
+      {:waffle, "~> 1.1.3"},
+      {:waffle_ecto, "~> 0.0.9"},
+      {:ex_aws, "~> 2.1.2"},
+      {:ex_aws_s3, "~> 2.0"},
+      {:hackney, "~> 1.9"},
+      {:sweet_xml, "~> 0.6"}
     ]
   end
 
