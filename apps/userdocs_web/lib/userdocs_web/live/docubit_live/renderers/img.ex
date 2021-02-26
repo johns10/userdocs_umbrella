@@ -13,14 +13,13 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
   @impl true
   def render(%{ role: :html_export } = assigns) do
     ~L"""
-    <img>
     <%= display_image(assigns, @docubit) %>
     """
   end
 
   def render(assigns) do
     ~L"""
-      <img>
+    <%= inspect(@docubit) %>
       <%= display_image(assigns, @docubit) %>
       <%= Base.render_inner_content(assigns) %>
     """
@@ -38,7 +37,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
   end
 
   def handle_src(opts, path, docubit, role) do
-    { status, docubit } = maybe_file({ :ok, docubit })
+    { status, docubit } = maybe_screenshot({ :ok, docubit })
     case status do
       :ok -> Keyword.put(opts, :src, maybe_path(path, role) <> docubit.file.filename)
       :nofile -> Keyword.put(opts, :src, path)
@@ -49,17 +48,17 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
   def maybe_path(path, _), do: path
 
   def handle_alt(opts, docubit) do
-    { status, docubit } = maybe_file({ :ok, docubit })
+    { status, docubit } = maybe_screenshot({ :ok, docubit })
     case status do
       :ok -> Keyword.put(opts, :alt, docubit.through_step.name)
       :nofile -> Keyword.put(opts, :alt, "No File Found for this Docubit")
     end
   end
 
-  def maybe_file({ :ok, docubit = %Docubit{ file: nil }}) do
+  def maybe_screenshot({ :ok, docubit = %Docubit{ screenshot: nil }}) do
     { :nofile, docubit }
   end
-  def maybe_file({ :ok, docubit = %Docubit{ file: _ }}) do
+  def maybe_screenshot({ :ok, docubit = %Docubit{ screenshot: _ }}) do
     { :ok, docubit }
   end
 

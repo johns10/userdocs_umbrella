@@ -19,7 +19,6 @@ defmodule UserDocs.Media.Screenshot do
 
   @doc false
   def changeset(screenshot, attrs) do
-    IO.inspect(attrs)
     screenshot
     |> cast(attrs, [:name, :file_id, :step_id])
     |> cast_attachments(attrs, [:aws_file], allow_paths: true)
