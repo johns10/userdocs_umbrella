@@ -109,8 +109,8 @@ defmodule UserDocs.Documents.DocubitType do
       ],
       allowed_children: [],
       allowed_data: [
-        UserDocs.Automation.Step,
-        UserDocs.Media.File
+        UserDocs.Media.Screenshot,
+        UserDocs.Automation.Step
       ]
     }
   end

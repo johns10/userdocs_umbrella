@@ -75,7 +75,7 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
     |> Documents.update_docubit(attrs)
 
     with {:ok, docubit} <- Documents.update_docubit(docubit, attrs),
-      docubit <- Map.put(docubit, :file, step.screenshot.file),
+      docubit <- Map.put(docubit, :screenshot, step.screenshot),
       docubit <- Map.put(docubit, :through_step, step)
     do
       { :ok, docubit }
@@ -187,7 +187,6 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
   def precheck_step_img({ status, errors }, step) do
     { status, errors }
     |> step_has_screenshot?(step)
-    |> screenshot_has_file?(step)
   end
 
   def annotation_has_content_id?({ status, errors }, annotation) do
@@ -215,16 +214,6 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
   end
   def step_has_screenshot?({ _, errors }, %{ screenshot: _ }) do
     { :precheck, Keyword.put(errors, :screenshot, "Screenshot not found in step") }
-  end
-
-  def screenshot_has_file?({ status, errors }, %{ screenshot: %{ file: %File{}}}) do
-    { status, errors }
-  end
-  def screenshot_has_file?({ _, errors }, %{ screenshot: %{ file: _}}) do
-    { :precheck, Keyword.put(errors, :file, "File not found in Screenshot") }
-  end
-  def screenshot_has_file?({ :precheck, errors }, _) do
-    { :precheck, errors }
   end
 
   def check({ status, errors }, bool, key, message) do

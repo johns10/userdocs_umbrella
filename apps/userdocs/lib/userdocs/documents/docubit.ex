@@ -16,7 +16,6 @@ defmodule UserDocs.Documents.Docubit do
   alias UserDocs.Documents.DocumentVersion
 
   alias UserDocs.Documents.Content
-  alias UserDocs.Media.File
   alias UserDocs.Web.Annotation
   alias UserDocs.Automation.Step
 
@@ -34,7 +33,7 @@ defmodule UserDocs.Documents.Docubit do
     belongs_to :docubit, Docubit
     belongs_to :document_version, DocumentVersion
     belongs_to :content, Content, on_replace: :nilify
-    belongs_to :file, File, on_replace: :nilify
+    belongs_to :screenshot, Screenshot, on_replace: :nilify
     belongs_to :through_annotation, Annotation, on_replace: :nilify
     belongs_to :through_step, Step, on_replace: :nilify
 

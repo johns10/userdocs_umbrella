@@ -21,7 +21,7 @@ import {Hooks} from "./hooks/hooks.js"
 
 let DOMAIN = "dev.user-docs.com"
 let PORT = "4002"
-let PATH = "processes"
+let PATH = "processpa"
 
 let APP_URL = "https://" + DOMAIN + ":" + PORT + "/" + PATH
 let WEBSOCKETS_URI = "wss://" + DOMAIN + ":" + PORT + "/live"
