@@ -2,6 +2,7 @@ defmodule UserDocs.Media.ScreenshotHelpers do
   require Logger
 
   alias Mogrify
+  alias UserDocs.Automation
   alias UserDocs.Media.File
   alias UserDocs.Media
   alias UserDocs.Media.Screenshot
@@ -27,26 +28,18 @@ defmodule UserDocs.Media.ScreenshotHelpers do
     state
   end
 
-  def handle_screenshots_file({ :ok, screenshot = %{ file: %File{} } }, raw) do
-    Logger.debug("The screenshot is there with file #{screenshot.file.id} correctly, probably because the screenshot existed.")
-
-    IO.inspect(@dev_path <> screenshot.file.filename)
-    IO.inspect(screenshot)
-
-    { :ok, %{ screenshot: screenshot }}
-  end
-  def handle_screenshots_file({ :ok, %Screenshot{} = screenshot }, raw) do
+  def save_file({ :ok, %Screenshot{} = screenshot }, raw) do
     Logger.debug("Handling Screenshot File")
-    FileHelpers.encode_hash_save_file(raw, screenshot.file.filename)
-    { :ok, screenshot } = UserDocs.Media.update_screenshot(screenshot, %{ aws_file: (@dev_path <> screenshot.file.filename)})
-    IO.inspect(screenshot)
+    step = Automation.get_step!(screenshot.step_id)
+    process = Automation.get_process!(step.process_id)
+    file_name = process.name <> " " <> Integer.to_string(step.order) <> ".jpeg"
+    case FileHelpers.encode_hash_save_file(raw, file_name) do
+      %{ filename: filename } -> { :ok, screenshot, filename}
+    end
+  end
 
-    { :ok, screenshot } =
-      screenshot
-      |> UserDocs.Media.change_screenshot(%{ file_id: file.id})
-      |> UserDocs.Media.update_screenshot()
-
-    { :ok, %{ screenshot: screenshot, file: file }}
+  def update_screenshot({ :ok, screenshot, filename }) do
+    UserDocs.Media.update_screenshot(screenshot, %{ aws_file: (@dev_path <> filename)})
   end
 
   # This is some bullshit I put in for the inconsistency after we get done.  Same deal as handle_file_disposition

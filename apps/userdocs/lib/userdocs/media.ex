@@ -85,9 +85,8 @@ defmodule UserDocs.Media do
     }
     |> upsert_screenshot()
     |> ScreenshotHelpers.handle_screenshot_upsert_results()
-    |> ScreenshotHelpers.handle_screenshots_file(raw_encoded_image)
-    |> ScreenshotHelpers.maybe_resize_image(step_type_name, element)
-    |> ScreenshotHelpers.handle_file_disposition()
+    |> ScreenshotHelpers.save_file(raw_encoded_image)
+    |> ScreenshotHelpers.update_screenshot()
   end
   def create_file_and_screenshot(%{}), do: { :error, "Missing encoded image.  Failed to create file"}
   def create_file_and_screenshot(_) do
