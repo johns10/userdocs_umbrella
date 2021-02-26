@@ -3,10 +3,10 @@ defmodule UserDocs.Media.ScreenshotHelpers do
 
   alias Mogrify
   alias UserDocs.Automation
-  alias UserDocs.Media.File
   alias UserDocs.Media
   alias UserDocs.Media.Screenshot
   alias UserDocs.Media.FileHelpers
+  alias UserDocs.Web.Element
 
   @dev_path "apps/userdocs_web/assets/static/images/"
   @prod_path "apps/userdocs_web/priv/static/images/"
@@ -38,21 +38,8 @@ defmodule UserDocs.Media.ScreenshotHelpers do
     end
   end
 
-  def update_screenshot({ :ok, screenshot, filename }) do
-    UserDocs.Media.update_screenshot(screenshot, %{ aws_file: (@dev_path <> filename)})
-  end
-
   # This is some bullshit I put in for the inconsistency after we get done.  Same deal as handle_file_disposition
-  def maybe_resize_image(state = { :ok, %{ screenshot: _, file: file } }, "Element Screenshot", element) do
-    maybe_resize_image(state, "Element Screenshot", element, file)
-  end
-  def maybe_resize_image(state = { :ok, %{ screenshot: %{ file: file} } }, "Element Screenshot", element) do
-    maybe_resize_image(state, "Element Screenshot", element, file)
-  end
-  def maybe_resize_image(state, _, _) do
-    state
-  end
-  def maybe_resize_image(state = { :ok, %{ screenshot: _ } }, "Element Screenshot", element, file) do
+  def maybe_resize_image(state = { :ok, %Screenshot{}, filename }, "Element Screenshot", %{ "size"=> _ } = element) do
     IO.puts("Resizing image")
     geometry = "#{element["size"]["width"]}x#{element["size"]["height"]}+#{element["size"]["x"]}+#{element["size"]["y"]}"
 
@@ -65,12 +52,23 @@ defmodule UserDocs.Media.ScreenshotHelpers do
         @prod_path
       end
 
-    path <> file.filename
+    path <> filename
     |> Mogrify.open()
     |> Mogrify.custom("crop", geometry)
     |> Mogrify.save(in_place: true)
 
     state
+  end
+  def maybe_resize_image(state, stn, e) do
+    IO.puts("Not maybe_resize_image")
+    IO.inspect(state)
+    IO.inspect(stn)
+    IO.inspect(e)
+    state
+  end
+
+  def update_screenshot({ :ok, screenshot, filename }) do
+    UserDocs.Media.update_screenshot(screenshot, %{ aws_file: (@dev_path <> filename)})
   end
 
   def handle_file_disposition({ :ok, result = %{ screenshot: _, file: _ }}) do
