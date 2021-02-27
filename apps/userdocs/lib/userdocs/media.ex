@@ -144,7 +144,7 @@ defmodule UserDocs.Media do
   alias UserDocs.Media.Screenshot
 
   def load_screenshots(state, opts) do
-    StateHandlers.load(state, list_files(), Screenshot, opts)
+    StateHandlers.load(state, list_screenshots(), Screenshot, opts)
   end
   @doc """
   Returns the list of screenshots.
