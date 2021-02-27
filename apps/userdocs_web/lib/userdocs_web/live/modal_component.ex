@@ -35,18 +35,17 @@ defmodule UserDocsWeb.ModalComponent do
     case app_name do
       "web" ->
         { :noreply, push_patch(socket, to: opts[:return_to])}
-      "extension" ->
+      "chrome" ->
         send(self(), :close_modal)
         {:noreply, socket}
     end
   end
   def handle_event("close", _, socket) do
     opts = socket.assigns.opts
-    IO.inspect(opts)
     case opts[:app_name] do
       "web" ->
         { :noreply, push_patch(socket, to: opts[:return_to])}
-      "extension" ->
+      "chrome" ->
         send(self(), :close_modal)
         {:noreply, socket}
       nil ->
