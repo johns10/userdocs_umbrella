@@ -323,6 +323,16 @@ defmodule UserDocs.Automation do
     from(step in Step, where: step.id == ^id)
   end
 
+  def get_step!(id, state, opts) when is_list(opts) do
+    StateHandlers.get(state, id, Step, opts)
+    |> maybe_preload_step(opts[:preloads], state, opts)
+  end
+
+  defp maybe_preload_step(step, nil, _, _), do: step
+  defp maybe_preload_step(step, _preloads, state, opts) do
+    opts = Keyword.delete(opts, :filter)
+    StateHandlers.preload(state, step, opts)
+  end
 
   @doc """
   Creates a step.
