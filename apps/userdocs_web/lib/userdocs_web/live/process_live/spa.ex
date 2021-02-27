@@ -26,7 +26,8 @@ defmodule UserDocsWeb.ProcessLive.SPA do
       UserDocs.Web.Element,
       UserDocs.Web.Page,
       UserDocs.Documents.Content,
-      UserDocs.Documents.ContentVersion
+      UserDocs.Documents.ContentVersion,
+      UserDocs.Media.Screenshot,
     ]
   end
 
@@ -90,6 +91,7 @@ defmodule UserDocsWeb.ProcessLive.SPA do
       |> Loaders.annotations(opts)
       |> Loaders.elements(opts)
       |> Loaders.pages(opts)
+      |> UserDocsWeb.Loaders.screenshots(opts)
       |> assign(:expanded, %{})
       |> select_lists()
     }
@@ -229,6 +231,7 @@ defmodule UserDocsWeb.ProcessLive.SPA do
       [
         :processes,
         [ processes: :steps ],
+        [ processes: [ steps: :screenshot ] ],
         [ processes: [ steps: :step_type ] ],
         [ processes: [ steps: :page ] ],
         [ processes: [ steps: :annotation ] ],
@@ -248,6 +251,8 @@ defmodule UserDocsWeb.ProcessLive.SPA do
       |> Keyword.put(:preloads, preloads)
       |> Keyword.put(:order, order)
       |> Keyword.put(:filter, {:version_id, socket.assigns.current_version.id})
+
+    IO.inspect(Automation.list_processes(socket, opts) |> Enum.at(0))
 
     socket
     |> assign(:processes, Automation.list_processes(socket, opts))

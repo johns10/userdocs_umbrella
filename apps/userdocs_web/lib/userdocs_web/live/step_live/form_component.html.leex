@@ -21,6 +21,9 @@
 
     </div>
 
+    <p> AWS File </p>
+    <%= @step.screenshot.aws_file %>
+
     <%= if "page_reference" in @enabled_step_fields and @action not in [:new] do %>
       <div class="field">
         <%= label(f, :page_reference, [ class: :label ]) %>

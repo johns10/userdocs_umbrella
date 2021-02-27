@@ -38,8 +38,9 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
 
   def handle_src(opts, path, docubit, role) do
     { status, docubit } = maybe_screenshot({ :ok, docubit })
+    IO.puts("handle_src")
     case status do
-      :ok -> Keyword.put(opts, :src, maybe_path(path, role) <> docubit.file.filename)
+      :ok -> Keyword.put(opts, :src, docubit.screenshot.aws_file)
       :nofile -> Keyword.put(opts, :src, path)
     end
   end

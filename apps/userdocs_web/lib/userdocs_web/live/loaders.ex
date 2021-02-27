@@ -2,6 +2,7 @@ defmodule UserDocsWeb.Loaders do
   require Logger
 
   alias UserDocs.Documents
+  alias UserDocs.Media
 
   def load_content(%{ assigns: %{ current_team_id: current_team_id }} = socket, opts) do
     opts =
@@ -24,4 +25,7 @@ defmodule UserDocsWeb.Loaders do
     Documents.load_content_versions(socket, opts)
   end
 
+  def screenshots(socket, opts) do
+    Media.load_screenshots(socket, opts)
+  end
 end

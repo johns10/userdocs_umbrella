@@ -29,7 +29,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
       :docubits,
       :docubit_type,
       [ docubits: :content ],
-      [ docubits: :file ],
+      [ docubits: :screenshot ],
       [ docubits: :through_annotation ],
       [ docubits: :through_step ],
       [ docubits: :docubit_type ],

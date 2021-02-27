@@ -12,6 +12,7 @@ defmodule UserDocs.Documents.Docubit do
   alias UserDocs.Documents.Docubit.Context
   alias UserDocs.Documents.Docubit.Renderer
   alias UserDocs.Documents.Docubit.Hydrate
+  alias UserDocs.Media.Screenshot
 
   alias UserDocs.Documents.DocumentVersion
 
@@ -66,7 +67,7 @@ defmodule UserDocs.Documents.Docubit do
     docubit
     |> cast(attrs, [ :delete, :docubit_type_id, :address,
         :document_version_id, :content_id, :through_annotation_id,
-        :through_step_id, :docubit_id, :file_id, :context ])
+        :through_step_id, :docubit_id, :context ])
     |> cast_embed(:settings)
     |> cast_assoc(:docubits)
     |> foreign_key_constraint(:docubit_type_id)
