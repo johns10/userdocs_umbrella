@@ -19,14 +19,6 @@ defmodule UserDocsWeb.StepLive.Index do
   alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.ProcessLive.Loaders
 
-  @subscribed_types [
-    UserDocs.Automation.Process,
-    UserDocs.Automation.Step,
-    UserDocs.Web.Annotation,
-    UserDocs.Web.Element,
-    UserDocs.Web.Page
-  ]
-
   def types() do
     [
       UserDocs.Web.AnnotationType,
@@ -34,7 +26,6 @@ defmodule UserDocsWeb.StepLive.Index do
       UserDocs.Documents.LanguageCode,
       UserDocs.Automation.StepType,
       UserDocs.Documents.Content,
-      UserDocs.Documents.ContentVersion,
       UserDocs.Automation.Process,
       UserDocs.Automation.Step,
       UserDocs.Web.Annotation,
@@ -70,38 +61,46 @@ defmodule UserDocsWeb.StepLive.Index do
     |> Web.load_strategies(opts)
     |> Documents.load_language_codes(opts)
     |> Automation.load_step_types(opts)
-
+    |> Loaders.steps(opts)
+    |> Loaders.processes(opts)
+    |> Loaders.pages(opts)
+    |> Loaders.content(opts)
+    |> Loaders.annotations(opts)
+    |> Loaders.elements(opts)
   end
 
   @impl true
   def handle_params(_, _, %{ assigns: %{ auth_state: :not_logged_in }} = socket), do: { :noreply, socket }
-  def handle_params(%{ "id" => id } = params, _, socket) do
+  def handle_params(%{ "process_id" => process_id } = params, _, socket) do
     IO.puts("handle_params")
+    process = Automation.get_process!(process_id)
+    opts = Defaults.opts(socket, @subscribed_types)
     {
       :noreply,
       socket
-      |> do_handle_params(id)
+      |> assign(:process, process)
+      |> prepare_steps(String.to_integer(process_id))
+      |> assign(:select_lists, %{})
       |> apply_action(socket.assigns.live_action, params)
     }
   end
 
-  def do_handle_params(socket, process_id) do
+  def handle_params(%{ "id" => id } = params, _, socket) do
+    IO.puts("handle_params")
     opts = Defaults.opts(socket, @subscribed_types)
-    process = Automation.get_process!(String.to_integer(process_id))
+    {
+      :noreply,
+      socket
+      |> prepare_step(String.to_integer(id))
+      |> apply_action(socket.assigns.live_action, params)
+    }
+  end
+
+  defp apply_action(socket, :edit, %{"id" => id}) do
     socket
-    |> assign(:process, process)
-    |> Loaders.content(opts)
-    |> Loaders.content_versions(opts)
-    |> assign_strategy_id()
-    |> Loaders.processes(opts)
-    |> Loaders.steps(opts)
-    |> Loaders.annotations(opts)
-    |> Loaders.elements(opts)
-    |> Loaders.pages(opts)
-    |> assign(:expanded, %{})
-    |> prepare_process()
+    |> assign(:page_title, "Edit Process")
+    |> prepare_step(String.to_integer(id))
     |> assign_select_lists()
-    |> assign(:state_opts, opts)
   end
 
   defp apply_action(socket, :new, _params) do
@@ -115,25 +114,12 @@ defmodule UserDocsWeb.StepLive.Index do
     socket
     |> assign(:page_title, "Listing Steps")
     |> assign(:step, nil)
-    |> assign(:processes, prepare_process(socket))
-  end
-
-  @impl true
-  def handle_event("expand", %{ "id" => id }, %{ assigns: assigns } = socket) do
-    id = String.to_integer(id)
-    status = Map.get(assigns.expanded, id, false)
-    expanded = Map.put(assigns.expanded, id, !status)
-    { :noreply, assign(socket, :expanded, expanded) }
   end
 
   @impl true
   def handle_info(%{topic: _, event: _, payload: %Step{}} = sub_data, socket) do
     { :noreply, socket } = Root.handle_info(sub_data, socket)
-    { :noreply, prepare_process(socket) }
-  end
-  def handle_info(%{topic: _, event: _, payload: %Element{}} = sub_data, socket) do
-    { :noreply, socket } = Root.handle_info(sub_data, socket)
-    { :noreply, prepare_process(socket) }
+    { :noreply, prepare_steps(socket) }
   end
   def handle_info(n, s), do: Root.handle_info(n, s)
 
@@ -215,19 +201,17 @@ defmodule UserDocsWeb.StepLive.Index do
     |> assign(:current_strategy, strategy)
   end
 
-  def prepare_process(%{ assigns: %{ process: %{ id: id }}} = socket), do: prepare_process(socket, id)
-  def prepare_process(socket, process_id) do
-    IO.inspect("Preparing process")
+  def prepare_step(socket, id) do
     preloads =
       [
-        :steps,
-        [ steps: :step_type ],
-        [ steps: :screenshot ],
-        [ steps: :page ],
-        [ steps: :annotation ],
-        [ steps: [ annotation: :annotation_type ] ],
-        [ steps: :element ],
-        [ steps: [ element: :strategy ] ],
+        :step_type,
+        :screenshot,
+        :page,
+        :annotation,
+        :element,
+        :process,
+        [ annotation: :annotation_type ],
+        [ element: :strategy ],
       ]
 
     order = [ steps: %{ field: :order, order: :asc } ]
@@ -237,15 +221,33 @@ defmodule UserDocsWeb.StepLive.Index do
       |> Keyword.put(:preloads, preloads)
       |> Keyword.put(:order, order)
 
-    process =
-      case Automation.get_process!(process_id, socket, opts) do
-        nil ->
-          process_ids =
-            Automation.list_processes(socket, opts)
-          raise("No process, available ids are #{process_ids}")
-        process -> process
-      end
+    step = Automation.get_step!(id, socket, opts)
 
-    assign(socket, :process, process)
+    socket
+    |> assign(:step, step)
+    |> assign(:process, step.process)
+    |> prepare_steps(step.process_id)
+  end
+
+  def prepare_steps(%{ assigns: %{ process: %{ id: id }}} = socket), do: prepare_steps(socket, id)
+  def prepare_steps(socket, process_id) do
+    preloads =
+      [
+        :step_type,
+        :screenshot,
+        :page,
+        :annotation,
+        :element,
+        [ annotation: :annotation_type ],
+        [ element: :strategy ],
+      ]
+
+    opts =
+      socket.assigns.state_opts
+      |> Keyword.put(:preloads, preloads)
+      |> Keyword.put(:order, [ %{ field: :order, order: :asc } ])
+      |> Keyword.put(:filter, { :process_id, process_id })
+
+    assign(socket, :steps, Automation.list_steps(socket, opts))
   end
 end
