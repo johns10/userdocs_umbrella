@@ -51,7 +51,7 @@ defmodule UserDocs.Documents.DocumentVersion do
   alias UserDocs.Documents.Docubit
 
   def load(%DocumentVersion{ docubits: _ } = document_version, state, opts) do
-    # preloads = [ :content, :file, :through_annotation ]
+    # preloads = [ :content, :through_annotation ]
     map = MapDocubits.apply(document_version)
 
     Map.put(document_version, :body, traverse_docubit_map(map, state, opts))
