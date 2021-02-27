@@ -297,10 +297,10 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
   def maybe_recent_page_id({ :nok, result }, process, step, pages) do
     case UserDocs.Automation.Process.RecentPage.get(process, step, pages) do
       nil ->
-        #IO.inspect("Nil recent page id")
+        #IO.puts("Nil recent page id")
         { :nok, result }
       page ->
-        #IO.inspect("Got recent page id")
+        #IO.puts("Got recent page id")
         { :ok, Map.get(page, :id) }
     end
   end

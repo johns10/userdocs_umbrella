@@ -61,9 +61,6 @@ defmodule UserDocs.Media.ScreenshotHelpers do
   end
   def maybe_resize_image(state, stn, e) do
     IO.puts("Not maybe_resize_image")
-    IO.inspect(state)
-    IO.inspect(stn)
-    IO.inspect(e)
     state
   end
 

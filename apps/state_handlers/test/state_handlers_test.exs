@@ -65,7 +65,6 @@ defmodule StateHandlersTest do
     alias UserDocs.Documents.DocumentVersion
 
     def broadcaster(channel, action, data) do
-      IO.inspect("Broadcasting")
       case data do
         [ object | _ ] -> IO.inspect(object.__meta__.schema)
         object -> IO.inspect(object.__meta__.schema)
