@@ -39,7 +39,8 @@ defmodule UserDocsWeb.StepLive.Index do
       UserDocs.Automation.Step,
       UserDocs.Web.Annotation,
       UserDocs.Web.Element,
-      UserDocs.Web.Page
+      UserDocs.Web.Page,
+      UserDocs.Media.Screenshot
     ]
   end
 
@@ -59,10 +60,12 @@ defmodule UserDocsWeb.StepLive.Index do
   def initialize(%{ assigns: %{ auth_state: :not_logged_in }} = socket), do: socket
   def initialize(socket) do
     opts = Defaults.opts(socket, types())
+    IO.puts("initializing")
 
     socket
     |> assign(:modal_action, :show)
     |> assign(:state_opts, opts)
+    |> UserDocsWeb.Loaders.screenshots(opts)
     |> Web.load_annotation_types(opts)
     |> Web.load_strategies(opts)
     |> Documents.load_language_codes(opts)
