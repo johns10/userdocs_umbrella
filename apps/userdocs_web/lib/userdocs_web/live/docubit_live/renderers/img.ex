@@ -3,6 +3,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
   use Phoenix.HTML
   alias UserDocsWeb.DocubitLive.Renderers.Base
 
+  alias UserDocs.Media.Screenshot
   alias UserDocs.Documents.Docubit
   alias UserDocs.Documents.Docubit.Context
   alias UserDocs.Documents.DocubitSetting, as: DocubitSettings
@@ -19,13 +20,13 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
 
   def render(assigns) do
     ~L"""
-    <%= inspect(@docubit) %>
       <%= display_image(assigns, @docubit) %>
       <%= Base.render_inner_content(assigns) %>
     """
   end
 
   def display_image(assigns, docubit) do
+    IO.puts("Display image #{docubit.id}")
     content_tag(:img, "", handle_opts(assigns, docubit))
   end
 
@@ -36,12 +37,15 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
     |> handle_border(docubit)
   end
 
-  def handle_src(opts, path, docubit, role) do
-    { status, docubit } = maybe_screenshot({ :ok, docubit })
-    IO.puts("handle_src")
+  def handle_src(opts, path, %Docubit{ screenshot: nil } = docubit, role) do
+    Keyword.put(opts, :src, path)
+  end
+  def handle_src(opts, path, %Docubit{ screenshot: %Screenshot{} = screenshot } = docubit, role) do
+    { status, url } = UserDocs.Media.get_screenshot_url(screenshot)
     case status do
-      :ok -> Keyword.put(opts, :src, docubit.screenshot.aws_file)
+      :ok -> Keyword.put(opts, :src, url)
       :nofile -> Keyword.put(opts, :src, path)
+      :no_screenshot -> Keyword.put(opts, :src, path)
     end
   end
 
