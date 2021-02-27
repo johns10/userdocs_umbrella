@@ -2,7 +2,7 @@
   %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name },
   %{ to: Routes.version_index_path(@socket, :index), name: @current_project.name },
   %{ to: Routes.process_index_path(@socket, :index), name: @current_version.name }],
-  last_item: %{ to: Routes.step_index_path(@socket, :index, @process.id), name: @process.name } ])
+  last_item: %{ to: "", name: @process.name } ])
 
 div.py-2
   h1.is-size-3
@@ -10,14 +10,14 @@ div.py-2
 
 = live_component(@socket, UserDocsWeb.StepLive.IndexComponent,
   [ live_action: @live_action,
+  process: @process,
   app_name: @app_name,
   state_opts: @state_opts,
-  process: @process,
+  steps: @steps,
   project: @current_project,
-  version: @current_version,
+  current_version: @current_version,
   team: @current_team,
   data: @data,
-  expanded: @expanded,
   page_title: @page_title,
   data: @data,
   step: @step,

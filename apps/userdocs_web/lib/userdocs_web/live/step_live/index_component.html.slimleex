@@ -1,18 +1,28 @@
 = if @live_action in [:edit, :new] do
   = live_modal @socket, UserDocsWeb.StepLive.FormComponent,
     id: @step.id || :new,
+    parent: @process,
+    parent_id: @process.id,
+    type: Step,
+    current_version: @current_version,
+    state_opts: @state_opts,
     parent_id: @process.id,
     title: @page_title,
     action: @live_action,
     step: @step,
-    state_opts: @state_opts,
     select_lists: @select_lists,
     data: @data,
     app_name: @app_name,
-    default_page_id: nil,
-    return_to: Routes.step_index_path(@socket, :index, @process.id)
+    default_page_id: RecentPage.get_id(@steps, @step, @data.pages),
+    data: %{ step_types: @data.step_types,
+      strategies: @data.strategies,
+      annotations: @data.annotations,
+      elements: @data.elements,
+      annotation_types: @data.annotation_types },
+    return_to: Routes.step_index_path(@socket, :index, @process.id),
+    select_lists: @select_lists
 
-= for step <- @process.steps do
+= for step <- @steps do
   .card
     header.card-header
       p.card-header-title style="margin-bottom:0px;"
@@ -21,30 +31,12 @@
         [ id: "step-" <> Integer.to_string(step.id) <> "-runner",
         step: step,
         step_type_name: step.step_type.name])
-      = content_tag :a, class: "card-header-icon",
-        phx_click: "expand",
-        phx_value_id: step.id,
-        aria_label: "expand" do
-        span.icon
-          i.fa.fa-angle-down aria-hidden="true"
-    div class="card-content <%= is_expanded?(@expanded, step.id) %>"
-      .content
-        = live_component(@socket, StepForm,
-          [ id: "step-" <> Integer.to_string(step.id),
-          action: :edit,
-          step: step,
-          parent: @process,
-          parent_id: @process.id,
-          type: Step,
-          current_version_id: @version.id,
-          state_opts: @state_opts,
-          default_page_id: RecentPage.get_id(@process, step, @data.pages),
-          data: %{ step_types: @data.step_types,
-            strategies: @data.strategies,
-            annotations: @data.annotations,
-            elements: @data.elements,
-            annotation_types: @data.annotation_types },
-          select_lists: @select_lists ])
+      = if @app_name == "web" do 
+        = live_patch class: "navbar-item", to: Routes.step_index_path(@socket, :edit, step.id) do
+          i.fa.fa-lg.fa-edit
+      - else 
+        = link to: "#", class: "navbar-item", phx_click: "edit-step", phx_value_id: step.id do 
+          i.fa.fa-lg.fa-edit
 
 
 = if @app_name == "web" do 
