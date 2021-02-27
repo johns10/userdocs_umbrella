@@ -115,6 +115,7 @@ defmodule StateHandlers.Preload do
       %Ecto.Association.Has{} ->
         case association.cardinality do
           :many -> preload_has_many(state, source, association, opts)
+          :one -> preload_has_one(state, source, association, opts)
           cardinality -> raise("Cardinality #{cardinality} not implemented")
         end
       association_type -> raise("Association type #{inspect(association_type)} not implemented")
@@ -138,6 +139,16 @@ defmodule StateHandlers.Preload do
 
   defp preload_has_one(state, source, association, opts) do
     # should be similar to has many
+    owner = schema_atom(association.owner)
+    owner_key = association.queryable.__schema__(:association, owner).owner_key
+
+    state
+    |> StateHandlers.list(association.queryable, opts)
+    |> Enum.filter(
+      fn(o) ->
+        Map.get(o, owner_key) == source.id
+      end)
+    |> Enum.at(0)
   end
 
   defp preload_many_to_many(state, association, source, opts) do
