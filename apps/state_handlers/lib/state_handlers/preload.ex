@@ -110,12 +110,12 @@ defmodule StateHandlers.Preload do
       %Ecto.Association.BelongsTo{} ->
         case association.cardinality do
           :one -> preload_belongs_to_one(state, source, association, opts)
-          _ -> raise("Cardinality not implemented")
+          cardinality -> raise("Cardinality #{cardinality} not implemented")
         end
       %Ecto.Association.Has{} ->
         case association.cardinality do
           :many -> preload_has_many(state, source, association, opts)
-          _ -> raise("Cardinality not implemented")
+          cardinality -> raise("Cardinality #{cardinality} not implemented")
         end
       association_type -> raise("Association type #{inspect(association_type)} not implemented")
     end
@@ -134,6 +134,10 @@ defmodule StateHandlers.Preload do
     state
     |> StateHandlers.list(association.queryable, opts)
     |> Enum.filter(fn(o) -> Map.get(o, owner_key) == source.id end)
+  end
+
+  defp preload_has_one(state, source, association, opts) do
+    # should be similar to has many
   end
 
   defp preload_many_to_many(state, association, source, opts) do

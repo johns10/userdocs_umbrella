@@ -27,8 +27,6 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   alias UserDocs.Documents.Docubit.Context
   alias UserDocs.Web.Page
   alias UserDocs.Web.Annotation
-  alias UserDocs.Web.AnnotationType
-  alias UserDocs.Media.File
 
   alias UserDocsWeb.Root
   alias UserDocsWeb.Defaults
@@ -37,9 +35,20 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
   @allowed_step_types ["Full Screen Screenshot", "Element Screenshot", "Apply Annotation"]
 
-  @types [  Document, DocumentVersion, Page,
-  Process, Content, ContentVersion, Step, LanguageCode, Annotation,
-  Docubit, File, DocubitType, AnnotationType ]
+  @types [
+    Docubit, DocubitType,
+    UserDocs.Documents.Document,
+    UserDocs.Documents.DocumentVersion,
+    UserDocs.Web.Page,
+    UserDocs.Automation.Process,
+    UserDocs.Documents.Content,
+    UserDocs.Documents.ContentVersion,
+    UserDocs.Automation.Step,
+    UserDocs.Documents.LanguageCode,
+    UserDocs.Web.Annotation,
+    UserDocs.Web.AnnotationType,
+    UserDocs.Media.Screenshot
+  ]
 
   @impl true
   def mount(_params, session, socket) do
@@ -72,10 +81,10 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       |> Loaders.load_language_codes(opts)
       |> Loaders.load_pages(opts)
       |> Loaders.load_processes(opts)
-      |> Loaders.load_files(opts)
       |> Loaders.load_content(opts)
       |> Loaders.load_content_versions(opts)
       |> Loaders.load_steps(opts)
+      |> Loaders.load_screenshots(opts)
       |> SelectLists.process(opts)
       |> current_selections()
       |> SelectLists.page(opts)
@@ -228,7 +237,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
           :docubits,
           :version,
           [ body: :content ],
-          [ body: :file ],
+          [ body: :screenshot ],
           [ body: :through_annotation ],
           [ body: :through_step ],
           [ body: :docubit_type ],

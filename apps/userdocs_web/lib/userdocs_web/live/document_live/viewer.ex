@@ -25,7 +25,6 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   alias UserDocs.Documents.DocubitType
   alias UserDocs.Web.Page
   alias UserDocs.Web.Annotation
-  alias UserDocs.Media.File
 
   alias UserDocsWeb.Root
   alias UserDocsWeb.Defaults
@@ -33,7 +32,9 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
 
   @types [  Document, DocumentVersion, Page,
   Process, Content, ContentVersion, Step, LanguageCode, Annotation,
-  Docubit, File, DocubitType ]
+  Docubit, DocubitType,
+  UserDocs.Media.Screenshot
+]
 
   @impl true
   def mount(_params, session, socket) do
@@ -63,7 +64,6 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
       |> Loaders.load_language_codes(opts)
       |> Loaders.load_pages(opts)
       |> Loaders.load_processes(opts)
-      |> Loaders.load_files(opts)
       |> Loaders.load_content(opts)
       |> Loaders.load_content_versions(opts)
       |> Loaders.load_steps(opts)
@@ -106,7 +106,6 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
           :docubits,
           :version,
           [ docubits: :content ],
-          [ docubits: :file ],
           [ docubits: :through_annotation ],
           [ docubits: :through_step ],
           [ docubits: :docubit_type ],

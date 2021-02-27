@@ -219,6 +219,7 @@ defmodule UserDocsWeb.StepLive.Index do
       [
         :steps,
         [ steps: :step_type ],
+        [ steps: :screenshot ],
         [ steps: :page ],
         [ steps: :annotation ],
         [ steps: [ annotation: :annotation_type ] ],
