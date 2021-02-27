@@ -1,0 +1,1 @@
+= img_tag @img_url, width: "250 px", height: "250 px", alt: @img_alt
