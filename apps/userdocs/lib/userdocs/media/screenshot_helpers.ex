@@ -32,9 +32,9 @@ defmodule UserDocs.Media.ScreenshotHelpers do
     Logger.debug("Handling Screenshot File")
     step = Automation.get_step!(screenshot.step_id)
     process = Automation.get_process!(step.process_id)
-    file_name = process.name <> " " <> Integer.to_string(step.order) <> ".jpeg"
+    file_name = Integer.to_string(screenshot.id) <> ".jpeg"
     case FileHelpers.encode_hash_save_file(raw, file_name) do
-      %{ filename: filename } -> { :ok, screenshot, filename}
+      %{ filename: filename } -> { :ok, screenshot, filename }
     end
   end
 
