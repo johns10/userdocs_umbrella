@@ -8,8 +8,7 @@ defmodule UserDocs.Media.ScreenshotHelpers do
   alias UserDocs.Media.FileHelpers
   alias UserDocs.Web.Element
 
-  @dev_path "apps/userdocs_web/assets/static/images/"
-  @prod_path "apps/userdocs_web/priv/static/images/"
+  @path "apps/userdocs_web/priv/static/images/"
 
   def handle_screenshot_upsert_results(state = { :nok, %{ id: nil } }) do
     # Logger.debug("The screenshot upsert failed")
@@ -45,14 +44,7 @@ defmodule UserDocs.Media.ScreenshotHelpers do
 
     IO.puts(geometry)
 
-    path =
-      if Mix.env() in [:dev, :test] do
-        @dev_path
-      else
-        @prod_path
-      end
-
-    path <> filename
+    @path <> filename
     |> Mogrify.open()
     |> Mogrify.custom("crop", geometry)
     |> Mogrify.save(in_place: true)
@@ -65,7 +57,7 @@ defmodule UserDocs.Media.ScreenshotHelpers do
   end
 
   def update_screenshot({ :ok, screenshot, filename }) do
-    UserDocs.Media.update_screenshot(screenshot, %{ aws_file: (@dev_path <> filename)})
+    UserDocs.Media.update_screenshot(screenshot, %{ aws_file: (@path <> filename)})
   end
 
   def handle_file_disposition({ :ok, result = %{ screenshot: _, file: _ }}) do
