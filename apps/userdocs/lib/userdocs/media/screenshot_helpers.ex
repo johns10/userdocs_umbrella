@@ -18,12 +18,12 @@ defmodule UserDocs.Media.ScreenshotHelpers do
   def handle_screenshot_upsert_results({ :ok, %Screenshot{ id: nil, step_id: step_id } }) do
     # Logger.debug("Screenshot #{step_id} exists, so we retreive it")
     screenshot =
-      Media.list_screenshots(%{file: true}, %{step_id: step_id})
+      Media.list_screenshots(%{step_id: step_id})
       |> Enum.at(0)
 
     { :ok, screenshot }
   end
-  def handle_screenshot_upsert_results(state = { :ok, %{ id: _id, file_id: _file_id, step_id: step_id }}) do
+  def handle_screenshot_upsert_results(state = { :ok, %{ id: _id, step_id: step_id }}) do
     Logger.debug("Screenshot #{step_id} was created correctly")
     state
   end

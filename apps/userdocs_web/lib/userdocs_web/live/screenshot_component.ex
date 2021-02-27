@@ -20,7 +20,7 @@ defmodule UserDocsWeb.ScreenShotHandler do
   @impl true
   def handle_event("create_screenshot", payload, socket) do
     IO.puts("Creating a screenshot")
-    {status, _result} = Media.create_file_and_screenshot(payload)
+    {status, _result} = Media.create_aws_file_and_screenshot(payload)
     case status do
       :ok ->
         IO.puts("Created File")

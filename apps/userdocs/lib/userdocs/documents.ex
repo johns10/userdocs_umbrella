@@ -306,7 +306,6 @@ defmodule UserDocs.Documents do
     |> join(:left, [ dv ], d in UserDocs.Documents.Docubit, on: d.document_version_id == dv.id, as: :docubits)
     |> join(:left, [ dv, docubits: d ], c in UserDocs.Documents.Content, on: d.content_id == c.id, as: :content)
     |> join(:left, [ dv, content: c], cv in UserDocs.Documents.ContentVersion, on: cv.content_id == c.id, as: :content_versions)
-    |> join(:left, [ dv, docubits: d ], f in UserDocs.Media.File, on: d.file_id == f.id, as: :files)
     |> join(:left, [ dv, docubits: d ], a in UserDocs.Web.Annotation, on: d.through_annotation_id == a.id, as: :annotations)
     |> join(:left, [ dv, docubits: d ], s in UserDocs.Automation.Step, on: d.through_step_id == s.id, as: :steps)
     |> join(:left, [ dv, docubits: d ], dt in UserDocs.Documents.DocubitType, on: d.docubit_type_id == dt.id, as: :docubit_types)
@@ -315,7 +314,6 @@ defmodule UserDocs.Documents do
         dv,
         docubits: d,
         content: c,
-        files: f,
         annotations: a,
         steps: s,
         docubit_types: dt,
@@ -327,7 +325,6 @@ defmodule UserDocs.Documents do
           content: {
             c, content_versions: cv
           },
-          file: f,
           through_annotation: a,
           through_step: s,
           docubit_type: dt

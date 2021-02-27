@@ -9,7 +9,6 @@ defmodule UserDocs.Media.Screenshot do
   schema "screenshots" do
     field :name, :string
 
-    belongs_to :file, File
     belongs_to :step, Step
 
     field :aws_file, UserDocs.ScreenshotUploader.Type
@@ -20,9 +19,8 @@ defmodule UserDocs.Media.Screenshot do
   @doc false
   def changeset(screenshot, attrs) do
     screenshot
-    |> cast(attrs, [:name, :file_id, :step_id])
+    |> cast(attrs, [:name, :step_id])
     |> cast_attachments(attrs, [:aws_file], allow_paths: true)
-    |> foreign_key_constraint(:file_id)
     |> foreign_key_constraint(:step_id)
     |> unique_constraint(:step_id)
     |> validate_required([:name])

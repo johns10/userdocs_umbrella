@@ -15,132 +15,6 @@ defmodule UserDocs.Media do
   alias UserDocs.Media.ScreenshotHelpers
 
 
-  def load_files(state, opts) do
-    StateHandlers.load(state, list_files(), File, opts)
-  end
-  @doc """
-  Returns the list of files.
-
-  ## Examples
-
-      iex> list_files()
-      [%File{}, ...]
-
-  """
-  def list_files do
-    base_files_query()
-    |> Repo.all()
-  end
-  def list_files(state, opts) when is_list(opts) do
-    StateHandlers.list(state, File, opts)
-  end
-
-  defp base_files_query(), do: from(files in File)
-
-  @doc """
-  Gets a single file.
-
-  Raises `Ecto.NoResultsError` if the File does not exist.
-
-  ## Examples
-
-      iex> get_file!(123)
-      %File{}
-
-      iex> get_file!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_file!(id), do: Repo.get!(File, id)
-  def get_file!(id, _params, _filters, state) do
-    UserDocs.State.get!(state, id, :files, File)
-  end
-
-  @doc """
-  Creates a file.
-
-  ## Examples
-
-      iex> create_file(%{field: value})
-      {:ok, %File{}}
-
-      iex> create_file(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_file(attrs \\ %{}) do
-    %File{}
-    |> File.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  def create_file_and_screenshot(%{ "encoded_image" => raw_encoded_image, "id" => step_id,
-    "step_type" => %{ "name" => step_type_name }, "element" => element
-    }) do
-      IO.puts("create_file_and_screenshot for step #{step_id}")
-    %{
-      name: "Screenshot for step #{step_id}",
-      file_id: nil,
-      step_id: step_id,
-    }
-    |> upsert_screenshot()
-    |> ScreenshotHelpers.handle_screenshot_upsert_results()
-    |> ScreenshotHelpers.save_file(raw_encoded_image)
-    |> ScreenshotHelpers.maybe_resize_image(step_type_name, element)
-    |> ScreenshotHelpers.update_screenshot()
-  end
-  def create_file_and_screenshot(%{}), do: { :error, "Missing encoded image.  Failed to create file"}
-  def create_file_and_screenshot(_) do
-    raise(ArgumentError, message: "Passed an invalid variable to " <> Atom.to_string(__MODULE__))
-  end
-
-  @doc """
-  Updates a file.
-
-  ## Examples
-
-      iex> update_file(file, %{field: new_value})
-      {:ok, %File{}}
-
-      iex> update_file(file, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_file(%File{} = file, attrs) do
-    file
-    |> File.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a file.
-
-  ## Examples
-
-      iex> delete_file(file)
-      {:ok, %File{}}
-
-      iex> delete_file(file)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_file(%File{} = file) do
-    Repo.delete(file)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking file changes.
-
-  ## Examples
-
-      iex> change_file(file)
-      %Ecto.Changeset{data: %File{}}
-
-  """
-  def change_file(%File{} = file, attrs \\ %{}) do
-    File.changeset(file, attrs)
-  end
-
   alias UserDocs.Media.Screenshot
 
   def load_screenshots(state, opts) do
@@ -159,7 +33,6 @@ defmodule UserDocs.Media do
     base_screenshots_query()
     |> maybe_filter_screenshots_by_version(filters[:version_id])
     |> maybe_filter_by_step_id(filters[:step_id])
-    |> maybe_preload_files(params[:file])
     |> Repo.all()
   end
 
@@ -171,11 +44,6 @@ defmodule UserDocs.Media do
       where: process.version_id == ^version_id,
       order_by: step.order
     )
-  end
-
-  defp maybe_preload_files(query, nil), do: query
-  defp maybe_preload_files(query, _) do
-    from(screenshots in query, preload: [:file])
   end
 
   defp maybe_filter_by_step_id(query, nil), do: query
@@ -242,6 +110,26 @@ defmodule UserDocs.Media do
     |> Screenshot.changeset(attrs)
     |> Repo.insert()
     |> Subscription.broadcast("screenshot", "create")
+  end
+
+  def create_aws_file_and_screenshot(%{ "encoded_image" => raw_encoded_image, "id" => step_id,
+    "step_type" => %{ "name" => step_type_name }, "element" => element
+    }) do
+      IO.puts("create_file_and_screenshot for step #{step_id}")
+    %{
+      name: "Screenshot for step #{step_id}",
+      step_id: step_id,
+    }
+    |> upsert_screenshot()
+    |> ScreenshotHelpers.handle_screenshot_upsert_results()
+    |> ScreenshotHelpers.save_file(raw_encoded_image)
+    |> ScreenshotHelpers.maybe_resize_image(step_type_name, element)
+    |> ScreenshotHelpers.update_screenshot()
+    |> IO.inspect()
+  end
+  def create_file_and_screenshot(%{}), do: { :error, "Missing encoded image.  Failed to create file"}
+  def create_file_and_screenshot(_) do
+    raise(ArgumentError, message: "Passed an invalid variable to " <> Atom.to_string(__MODULE__))
   end
 
   @doc """

@@ -46,8 +46,7 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
       step_type: true,
       annotation: true,
       annotation_type: true,
-      content_versions: true,
-      file: true
+      content_versions: true
     }
     opts =
       opts

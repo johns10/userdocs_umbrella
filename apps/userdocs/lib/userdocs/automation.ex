@@ -42,7 +42,6 @@ defmodule UserDocs.Automation do
         processes: {processes, steps: {steps, :screenshot}},
         processes: {processes, steps: {steps, :page}},
         processes: {processes, steps: {steps, element: {element, :strategy}}},
-        processes: {processes, steps: {steps, screenshot: {screenshot, :file}}},
         processes: {processes, steps: {steps, annotation: {annotation, :annotation_type}}},
         processes: {processes, steps: {steps, annotation: {annotation, :content}}},
         processes: {processes, steps: {steps, annotation: {annotation, content: {content, :content_versions}}}}
@@ -211,7 +210,6 @@ defmodule UserDocs.Automation do
     |> maybe_preload_step_type(params[:step_type])
     |> maybe_preload_element(params[:element])
     |> maybe_preload_content_versions(params[:content_versions])
-    |> maybe_preload_file(params[:content_versions])
     |> Repo.all()
   end
   def list_steps(state, opts) when is_list(opts) do
@@ -234,16 +232,6 @@ defmodule UserDocs.Automation do
       where: process.version_id == ^version_id,
       order_by: step.order
     )
-  end
-
-  defp maybe_preload_file(query, nil), do: query
-  defp maybe_preload_file(query, _) do
-    from(step in query,
-      left_join: screenshot in assoc(step, :screenshot), order_by: screenshot.name,
-      preload: [
-        :screenshot,
-        screenshot: :file
-      ])
   end
 
   defp maybe_preload_annotation_type(query, nil), do: query
