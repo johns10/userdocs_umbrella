@@ -112,11 +112,13 @@ defmodule UserDocsWeb.ProcessLive.SPA do
   end
   def handle_event("select-process", %{ "id" => id }, socket) do
     IO.puts("select-process #{id}")
+    process = Automation.get_process!(id)
     {
       :noreply,
       socket
+      |> assign(:process, process)
       |> assign(:mode, :steps)
-      |> StepLive.Index.prepare_process(String.to_integer(id))
+      |> StepLive.Index.prepare_steps(String.to_integer(id))
     }
   end
   def handle_event("processes", _params, socket) do
@@ -143,6 +145,16 @@ defmodule UserDocsWeb.ProcessLive.SPA do
       |> assign(:page_title, "New Step")
       |> assign(:live_action, :new)
       |> assign(:step, %Step{})
+    }
+  end
+  def handle_event("edit-step", %{ "id" => id }, socket) do
+    {
+      :noreply,
+      socket
+      |> assign(:page_title, "Edit Step")
+      |> assign(:mode, :steps)
+      |> assign(:live_action, :edit)
+      |> StepLive.Index.prepare_step(String.to_integer(id))
     }
   end
   def handle_event("edit-process", %{ "id" => id }, socket) do
@@ -196,7 +208,7 @@ defmodule UserDocsWeb.ProcessLive.SPA do
     case schema in subscribed_types() do
       true ->
         case socket.assigns.mode do
-          :steps -> { :noreply, StepLive.Index.prepare_process(socket) |> select_lists() }
+          :steps -> { :noreply, StepLive.Index.prepare_steps(socket) |> select_lists() }
           :process -> { :noreply, prepare_processes(socket) |> select_lists() }
         end
       false -> { :noreply, socket }
@@ -251,8 +263,6 @@ defmodule UserDocsWeb.ProcessLive.SPA do
       |> Keyword.put(:preloads, preloads)
       |> Keyword.put(:order, order)
       |> Keyword.put(:filter, {:version_id, socket.assigns.current_version.id})
-
-    IO.inspect(Automation.list_processes(socket, opts) |> Enum.at(0))
 
     socket
     |> assign(:processes, Automation.list_processes(socket, opts))

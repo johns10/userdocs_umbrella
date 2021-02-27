@@ -18,7 +18,7 @@ css:
     page_title: @page_title,
     team: @team,
     data: @data ])
-- else 
+= if @mode == :steps do
   nav.breadcrumb aria-label="breadcrumbs"
     ul
       li
@@ -42,10 +42,11 @@ css:
     version: @version,
     app_name: @app_name,
     page_title: @page_title,
+    steps: @steps,
     step: @step,
     team: @team,
     data: @data,
-    expanded: @expanded,
+    current_version: @current_version,
     select_lists: @select_lists ])
 
   .panel id="selector-transfer-menu"
