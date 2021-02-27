@@ -14,7 +14,8 @@ defmodule UserDocsWeb.ProcessLive.Index do
   alias UserDocsWeb.Root
 
   @types [
-    UserDocs.Automation.Process
+    UserDocs.Automation.Process,
+    UserDocs.Media.Screenshot,
   ]
 
   @impl true
