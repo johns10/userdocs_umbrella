@@ -31,7 +31,7 @@ defmodule UserDocsWeb.PageLive.FormComponent do
       <div class="field is-grouped">
         <%= Layout.select_input(form, :version_id, @select_lists.versions, [
           # TODO: Still a little funky
-          selected: @current_version_id || "",
+          selected: @current_version.id || "",
           id: @field_ids.version_id || ""
         ], "control") %>
 
