@@ -1,0 +1,106 @@
+
+= f = form_for @changeset, "#",
+  id: @id,
+  phx_target: @myself.cid,
+  phx_change: "validate",
+  phx_submit: "save"
+
+.field
+  = Layout.select_input(f, :process_id, @select_lists.processes_select, 
+      [ selected: @parent_id || "", id: @field_ids.process_id || ""], "control")
+  = Layout.number_input(f, :order, 
+    [ id: @field_ids.order || "" ], "control")
+    = Layout.select_input(f, :step_type_id, @select_lists.step_types_select, 
+    [ id: @field_ids.step_type_id || "" ], "control")
+
+= if "page_reference" in @enabled_step_fields and @action not in [:new] do
+  .field
+    = label(f, :page_reference, [ class: :label ])
+    .control
+      label.radio
+        = radio_button(f, :page_reference, "url", 
+          [ id: @field_ids.page_reference_url, label: "url" ])
+          span< Type
+      label.radio
+        = radio_button(f, :page_reference, "page", 
+          [ id: @field_ids.page_reference_page, label: "page" ])
+          span< Select
+      = error_tag(f, :page_reference)
+
+= if @action not in [:new] and (page_reference(@changeset) != "url") do
+  = label f, :page_id, class: "label"
+  .field.has-addons
+    = Layout.select_input(f, :page_id, @select_lists.pages_select,
+        [ value: f.data.page_id || @default_page_id ||  "",
+        id: @field_ids.page_id, label: false ], "control")
+    = Layout.new_item_button("new-page", 
+      [ button_class: :a, phx_target: @myself.cid ], "control")
+    = error_tag(f, :page_id)
+
+= if "page_id" in @enabled_step_fields and page_reference(@changeset) == "page" do
+  = inputs_for f, :page, [id: @form_ids.page ], fn fp ->
+    section.card
+      .card-content
+        .content
+          = PageLive.FormComponent.render_fields(Map.put(assigns, :field_ids, @field_ids.page),
+              fp, [ prefix: @form_ids.prefix ])
+  .level
+
+= if "element_id" in @enabled_step_fields and @action not in [:new] do
+  = label f, :element_id, class: "label"
+    .field.has-addons
+      = Layout.select_input(f, :element_id, @select_lists.elements, 
+        [ value: f.data.element_id || "", id: @field_ids.element_id, label: false,
+          hidden: "element_id" not in @enabled_step_fields ], "control")
+      = Layout.new_item_button("new-element", [ button_class: :a, phx_target: @myself.cid ], "control")
+    = inputs_for f, :element, [id: @form_ids.element], fn fe ->
+      section.card
+        .card-content
+          .content
+            h4 = fe.data.name
+            = ElementLive.FormComponent.render_fields(Map.put(assigns, :field_ids, @field_ids.element),
+                fe, @form_ids.prefix)
+  .level
+
+= if "annotation_id" in @enabled_step_fields and @action not in [:new] do
+  = label f, :annotation_id, class: "label"
+    .field.has-addons
+      = Layout.select_input(f, :annotation_id, @select_lists.annotations, 
+        [ value: f.data.annotation_id || "",
+            id: @field_ids.annotation_id,
+            label: false,
+            hidden: "annotation_id" not in @enabled_step_fields ], "control")
+      = Layout.new_item_button("new-annotation", [ button_class: :a, phx_target: @myself.cid ], "control")
+      = inputs_for f, :annotation, [id: @form_ids.annotation ], fn fa ->
+        section.card
+          .card-content
+            .content
+              = AnnotationLive.FormComponent.render_fields(assigns, fa, @form_ids.prefix)
+  .level
+
+= Layout.text_input(f, [ field_name: :url, id: @field_ids.url,
+      hidden: not(("url" in @enabled_step_fields) and (page_reference(@changeset) == "url"))])
+
+= Layout.text_input(f, [ field_name: :text, id: @field_ids.text,
+      hidden: not("text" in @enabled_step_fields)])
+
+= Layout.text_input(f, [ field_name: :width, id: @field_ids.width,
+      hidden: not("width" in @enabled_step_fields)])
+
+= Layout.text_input(f, [ field_name: :height, id: @field_ids.height,
+      hidden: not("height" in @enabled_step_fields)])
+
+.field
+  = live_component @socket, UserDocsWeb.ScreenshotLive.Preview, [ screenshot: f.data.screenshot]
+
+.field.is-grouped
+  = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
+    = if @action == :edit do
+      = link "Delete",
+        to: "#",
+        phx_click: "delete",
+        phx_value_id: @changeset.data.id,
+        data: [confirm: "Are you sure?"],
+        phx_target: @myself.cid,
+        class: "button is-danger is-link"
+</form>
