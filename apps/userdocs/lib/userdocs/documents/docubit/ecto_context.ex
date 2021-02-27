@@ -28,7 +28,7 @@ defmodule EctoContext do
 
   # dumping data to the database
   def dump(context = %{ settings: settings }) when is_map(context) and is_map(settings) do
-    #IO.inspect("Dumping contexts #{inspect(context)}")
+    #IO.puts("Dumping contexts #{inspect(context)}")
     settings =
       case EctoSettings.dump(settings) do
         { :ok, settings } -> settings
@@ -37,7 +37,7 @@ defmodule EctoContext do
     {:ok, %{ settings: settings }}
   end
   def dump(_) do
-    #IO.inspect("Dumping ERROR")
+    #IO.puts("Dumping ERROR")
     :error
   end
 end

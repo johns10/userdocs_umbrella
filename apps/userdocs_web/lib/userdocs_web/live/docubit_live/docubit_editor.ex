@@ -253,7 +253,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
           |> assign(:docubit, docubit)
         }
       { :error, message } ->
-        IO.inspect("Hydrate Error")
+        IO.puts("Hydrate Error")
         {
           :noreply,
           socket

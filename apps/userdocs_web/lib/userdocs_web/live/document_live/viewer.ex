@@ -129,8 +129,6 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   end
 
   def prepare_docubit(docubit, all_docubits) do
-    IO.puts("prepare_docubit")
-    IO.inspect(docubit.address)
     docubits =
       all_docubits
       |> Enum.filter(fn(d) -> d.docubit_id == docubit.id end)

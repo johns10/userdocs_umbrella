@@ -43,7 +43,7 @@ defmodule StateHandlers.Preload do
     #IO.puts("handle_preload Atom #{inspect(preload)}")
     schema = data.__meta__.schema
     opts = prepare_preload_opts(opts, schema, preload)
-    #IO.inspect(opts[:order])
+    #IO.puts(opts[:order])
     preload_data = handle_assoc(state, data, schema.__schema__(:association, preload), opts)
     Map.put(data, preload, preload_data)
   end

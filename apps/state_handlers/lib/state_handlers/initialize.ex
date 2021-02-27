@@ -34,7 +34,6 @@ defmodule StateHandlers.Initialize do
   def create_types(state, types, initial) do
     Enum.reduce(types, state,
       fn(type, state) ->
-        IO.inspect(type)
         Map.put(state, Helpers.type(type), initial)
       end
     )

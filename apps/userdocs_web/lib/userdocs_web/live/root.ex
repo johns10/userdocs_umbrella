@@ -147,7 +147,6 @@ defmodule UserDocsWeb.Root do
   end
 
   def put_app_name(socket, %{ "app_name" => app_name }) do
-    IO.inspect("Putting app name #{app_name}")
     uri =
       if Mix.env() in [:dev, :test] do
         URI.parse("https://dev.user-docs.com:4002")
