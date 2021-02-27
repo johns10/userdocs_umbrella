@@ -67,9 +67,10 @@ defmodule UserDocs.Documents.Docubit do
     docubit
     |> cast(attrs, [ :delete, :docubit_type_id, :address,
         :document_version_id, :content_id, :through_annotation_id,
-        :through_step_id, :docubit_id, :context ])
+        :through_step_id, :docubit_id, :context, :screenshot_id ])
     |> cast_embed(:settings)
     |> cast_assoc(:docubits)
+    |> foreign_key_constraint(:screenshot_id)
     |> foreign_key_constraint(:docubit_type_id)
     |> foreign_key_constraint(:document_version_id)
     |> foreign_key_constraint(:content_id)
