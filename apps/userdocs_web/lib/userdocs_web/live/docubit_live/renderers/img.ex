@@ -42,10 +42,11 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Img do
   end
   def handle_src(opts, path, %Docubit{ screenshot: %Screenshot{} = screenshot } = docubit, role) do
     { status, url } = UserDocs.Media.get_screenshot_url(screenshot)
+    fallback_path = ""
     case status do
       :ok -> Keyword.put(opts, :src, url)
-      :nofile -> Keyword.put(opts, :src, path)
-      :no_screenshot -> Keyword.put(opts, :src, path)
+      :nofile -> Keyword.put(opts, :src, fallback_path)
+      :no_screenshot -> Keyword.put(opts, :src, fallback_path)
     end
   end
 
