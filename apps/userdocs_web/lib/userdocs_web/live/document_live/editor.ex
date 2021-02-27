@@ -84,7 +84,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       |> Loaders.load_content(opts)
       |> Loaders.load_content_versions(opts)
       |> Loaders.load_steps(opts)
-      |> Loaders.load_screenshots(opts)
+      |> UserDocsWeb.Loaders.load_screenshots(opts)
       |> SelectLists.process(opts)
       |> current_selections()
       |> SelectLists.page(opts)
