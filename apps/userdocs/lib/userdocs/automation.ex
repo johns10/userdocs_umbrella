@@ -204,7 +204,7 @@ defmodule UserDocs.Automation do
     |> maybe_filter_by_process(filters[:process_id])
     |> maybe_filter_steps_by_version(filters[:version_id])
     |> maybe_filter_by_team(filters[:team_id])
-    |> maybe_preload_processes(params[:processes])
+    |> maybe_preload_process(params[:processes])
     |> maybe_preload_annotation(params[:annotation])
     |> maybe_preload_annotation_type(params[:annotation_type])
     |> maybe_preload_screenshot(params[:screenshot])
@@ -216,6 +216,7 @@ defmodule UserDocs.Automation do
   end
   def list_steps(state, opts) when is_list(opts) do
     StateHandlers.list(state, Step, opts)
+    |> maybe_preload_step(opts[:preloads], state, opts)
   end
 
   defp maybe_filter_by_process(query, nil), do: query
@@ -288,8 +289,8 @@ defmodule UserDocs.Automation do
   defp maybe_preload_screenshot(query, nil), do: query
   defp maybe_preload_screenshot(query, _), do: from(steps in query, preload: [:screenshot])
 
-  defp maybe_preload_processes(query, nil), do: query
-  defp maybe_preload_processes(query, _), do: from(steps in query, preload: [:processes])
+  defp maybe_preload_process(query, nil), do: query
+  defp maybe_preload_process(query, _), do: from(steps in query, preload: [:process])
 
   defp maybe_preload_element(query, nil), do: query
   defp maybe_preload_element(query, _), do: from(steps in query, preload: [:element])
@@ -695,7 +696,7 @@ defmodule UserDocs.Automation do
 
   """
   def get_process!(id, params \\ %{})
-  def get_process!(id, params) when is_integer(id) do
+  def get_process!(id, params) do
     base_process_query(id)
     |> maybe_preload_pages(params[:pages])
     |> maybe_preload_versions(params[:versions])
