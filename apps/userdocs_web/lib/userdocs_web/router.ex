@@ -51,10 +51,8 @@ defmodule UserDocsWeb.Router do
   scope "/", UserDocsWeb do
     pipe_through :browser
 
-    live "/processpa", ProcessLive.SPA, :index,
-      session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/index.html", ProcessLive.SPA, :index,
-      session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/processpa", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/index.html", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
 
     live "/teams", TeamLive.Index, :index,
@@ -82,8 +80,9 @@ defmodule UserDocsWeb.Router do
     live "/processes/:id", ProcessLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/processes/:id/edit", ProcessLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
-    live "/processes/:id/steps", StepLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/processes/:id/steps/new", StepLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/processes/:process_id/steps", StepLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/processes/:process_id/steps/new", StepLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/steps/:id/edit", StepLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
     live "/content", ContentLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/teams/:team_id/content", ContentLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
