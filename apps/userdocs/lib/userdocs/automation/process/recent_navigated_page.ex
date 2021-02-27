@@ -3,6 +3,8 @@ defmodule UserDocs.Automation.Process.RecentPage do
   require Logger
 
   alias UserDocs.Web.Page
+  alias UserDocs.Automation.Step
+  alias UserDocs.Automation.Process
 
   @doc """
   Takes a process, with steps preloaded, and a list of available pages.
@@ -18,9 +20,11 @@ defmodule UserDocs.Automation.Process.RecentPage do
     end
   end
 
-  def get(process, current_step, [ %Page{} | _ ] = pages) do
-    steps = process.steps
 
+  def get(%Process{ steps: [ %Step{} | _ ] = steps }, current_step, [ %Page{} | _ ] = pages) do
+    get(steps, current_step, pages)
+  end
+  def get([ %Step{} | _ ] = steps, current_step, [ %Page{} | _ ] = pages) do
     _step =
       case recent_navigation_step(current_step, steps) do
         None ->
