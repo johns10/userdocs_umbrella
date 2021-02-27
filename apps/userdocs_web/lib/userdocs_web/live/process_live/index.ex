@@ -89,6 +89,9 @@ defmodule UserDocsWeb.ProcessLive.Index do
   end
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
+  @impl true
+  def handle_info(p, s), do: Root.handle_info(p, s)
+
   def select_lists(socket) do
     %{
       versions:
