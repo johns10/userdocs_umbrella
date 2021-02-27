@@ -65,11 +65,11 @@ defmodule UserDocs.Documents.Docubit.Hydrate do
   end
   def hydrate(
     %Docubit{ docubit_type: %DocubitType{ name: "img" }} = docubit,
-    %Step{ screenshot: %Screenshot{ file: %File{}}} = step
+    %Step{ screenshot: %Screenshot{ } = screenshot } = step
   ) do
     attrs = %{
       through_step_id: step.id,
-      file_id: step.screenshot.file_id
+      screenshot_id: screenshot.id
     }
     docubit
     |> Documents.update_docubit(attrs)
