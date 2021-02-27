@@ -203,6 +203,26 @@ defmodule UserDocs.Media do
   """
   def get_screenshot!(id), do: Repo.get!(Screenshot, id)
 
+  def get_screenshot_url(screenshot) do
+    object = screenshot.aws_file.file_name
+
+    region =
+      Application.get_env(:userdocs, :ex_aws)
+      |> Keyword.get(:region)
+
+    bucket =
+      Application.get_env(:userdocs, :waffle)
+      |> Keyword.get(:bucket)
+
+    config =
+      ExAws.Config.new(:s3)
+      |> Map.put(:region, region)
+
+    path = "uploads/" <> screenshot.aws_file.file_name
+
+    ExAws.S3.presigned_url(config, :get, bucket, path, virtual_host: true)
+  end
+
   @doc """
   Creates a screenshot.
 
