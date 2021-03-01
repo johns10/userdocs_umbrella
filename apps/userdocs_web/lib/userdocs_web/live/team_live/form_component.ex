@@ -10,7 +10,6 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
 
   @impl true
   def update(%{team: team} = assigns, socket) do
-    IO.puts("update")
     changeset = Users.change_team(team)
     users_select =
       Users.list_users(assigns, assigns.state_opts)
