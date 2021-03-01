@@ -8,6 +8,7 @@ defmodule UserDocs.Users.TeamUser do
   @primary_key false
 
   schema "team_users" do
+    field :default, :boolean
     belongs_to :team, Team
     belongs_to :user, User
 

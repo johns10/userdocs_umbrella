@@ -9,6 +9,7 @@ defmodule UserDocs.Projects.Version do
 
   @derive {Jason.Encoder, only: [:name, :project, :strategy, :pages, :processes]}
   schema "versions" do
+    field :default, :boolean
     field :name, :string
     field :order, :integer
 
