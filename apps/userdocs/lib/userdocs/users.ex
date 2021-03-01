@@ -364,6 +364,7 @@ defmodule UserDocs.Users do
     preloads = Map.get(params, :preloads, [])
     base_team_query(id)
     |> maybe_preload_team_users(preloads[:users])
+    |> maybe_preload_users(preloads[:users])
     |> maybe_preload_default_project(preloads[:default_project])
     |> maybe_preload_projects(preloads[:projects])
     |> maybe_preload_content(preloads[:content])
@@ -384,8 +385,11 @@ defmodule UserDocs.Users do
     from(teams in query, preload: [:content])
   end
 
+  defp maybe_preload_users(query, nil), do: query
+  defp maybe_preload_users(query, _), do: from(items in query, preload: [:users])
+
   defp maybe_preload_team_users(query, nil), do: query
-  defp maybe_preload_team_users(query, _), do: from(items in query, preload: [:users])
+  defp maybe_preload_team_users(query, _), do: from(items in query, preload: [:team_users])
 
   defp maybe_preload_default_project(query, nil), do: query
   defp maybe_preload_default_project(query, _), do: from(items in query, preload: [:default_project])
