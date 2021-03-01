@@ -28,12 +28,14 @@ defmodule UserDocs.Users.Team do
   @doc false
   def changeset(team, attrs) do
     team
-    |> cast(attrs, [:name, :default_project_id, :default_language_code_id])
+    |> cast(attrs, [ :name, :default_project_id, :default_language_code_id ])
+    |> cast_assoc(:team_users)
     |> foreign_key_constraint(:default_language_code_id)
     |> handle_users(attrs)
     |> validate_required([:name])
   end
 
+"""
   # This one is called when a socket gets passed in that has the data
   def projects(team = %UserDocs.Users.Team{}, %{ projects: projects }) do
     projects(team.id, projects)
@@ -41,6 +43,7 @@ defmodule UserDocs.Users.Team do
   def projects(team_id, projects) when is_integer(team_id) do
     Enum.filter(projects, fn(p) -> p.team_id == team_id end)
   end
+"""
 
   @doc false
   defp handle_users(team, %{"users" => users}) do
@@ -48,4 +51,5 @@ defmodule UserDocs.Users.Team do
     |> put_assoc(:users, users)
   end
   defp handle_users(team, _), do: team
+
 end
