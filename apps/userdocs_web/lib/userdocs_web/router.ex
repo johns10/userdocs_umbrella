@@ -55,12 +55,10 @@ defmodule UserDocsWeb.Router do
     live "/index.html", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
 
-    live "/teams", TeamLive.Index, :index,
-      session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/teams/:id", TeamLive.Show, :show,
-      session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/teams/:id/edit", TeamLive.Index, :edit,
-      session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/new", TeamLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams", TeamLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:id", TeamLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:id/edit", TeamLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
     live "/teams/:team_id/projects", ProjectLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/projects", ProjectLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
