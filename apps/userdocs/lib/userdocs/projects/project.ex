@@ -7,6 +7,7 @@ defmodule UserDocs.Projects.Project do
   alias UserDocs.Users.Team
 
   schema "projects" do
+    field :default, :boolean
     field :base_url, :string
     field :name, :string
 
