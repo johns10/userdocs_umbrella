@@ -10,6 +10,7 @@ defmodule UserDocs.Documents.DocubitType do
     UserDocs.Documents.Content,
     UserDocs.Web.Annotation,
     UserDocs.Media.File,
+    UserDocs.Media.Screenshot,
     None
   ]
 
@@ -35,11 +36,11 @@ defmodule UserDocs.Documents.DocubitType do
       row_attrs(),
       column_attrs(),
       p_attrs(),
-      ol_attrs(),
       img_attrs(),
       li_attrs(),
       ul_attrs(),
-      info_attrs()
+      info_attrs(),
+      ol_attrs(),
     ]
   end
 
@@ -91,7 +92,7 @@ defmodule UserDocs.Documents.DocubitType do
         :show_title
         ],
       allowed_children: [ "li" ],
-      allowed_data: [ None ]
+      allowed_data: [  ]
     }
   end
 
