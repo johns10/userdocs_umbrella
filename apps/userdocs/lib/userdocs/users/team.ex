@@ -6,6 +6,7 @@ defmodule UserDocs.Users.Team do
   alias UserDocs.Projects.Project
   alias UserDocs.Documents.LanguageCode
   alias UserDocs.Documents.Content
+  alias UserDocs.Users.TeamUser
 
   schema "teams" do
     field :name, :string
@@ -14,10 +15,11 @@ defmodule UserDocs.Users.Team do
     belongs_to :default_project, Project
     has_many :projects, Project
     has_many :content, Content
+    has_many :team_users, TeamUser
 
     many_to_many :users,
       Users.User,
-      join_through: Users.TeamUser,
+      join_through: TeamUser,
       on_replace: :delete
 
     timestamps()
