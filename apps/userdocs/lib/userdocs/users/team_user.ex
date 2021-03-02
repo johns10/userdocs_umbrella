@@ -23,6 +23,8 @@ defmodule UserDocs.Users.TeamUser do
     |> cast(attrs, [ :team_id, :user_id, :delete, :default ])
     |> foreign_key_constraint(:team_id)
     |> foreign_key_constraint(:user_id)
+    |> unique_constraint(:user_id, name: :team_id_user_id_index)
+    |> unique_constraint(:default, name: :user_id_default_index)
     |> maybe_mark_for_deletion()
   end
 
