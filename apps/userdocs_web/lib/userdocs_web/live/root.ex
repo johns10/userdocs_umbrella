@@ -193,6 +193,11 @@ defmodule UserDocsWeb.Root do
     IO.puts("Root handling Content")
     { :noreply, ModalMenus.edit_content(socket, params) }
   end
+  def handle_event("edit-user", params, socket) do
+    IO.puts("Root opening user form")
+    IO.inspect(Users.list_teams(socket, socket.assigns.state_opts))
+    { :noreply, ModalMenus.edit_user(socket, params) }
+  end
   def handle_event("select-version", %{"select-version" => version_id_param} = _payload, socket) do
     IO.puts("Changing current version to #{version_id_param}")
     opts = Map.get(socket.assigns, :state_opts, state_opts())
