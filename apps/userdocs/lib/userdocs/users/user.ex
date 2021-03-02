@@ -17,6 +17,8 @@ defmodule UserDocs.Users.User do
     belongs_to :selected_project, Project
     belongs_to :selected_version, Version
 
+    has_many :team_users, TeamUser
+
     many_to_many :teams,
       Team,
       join_through: TeamUser,
@@ -30,6 +32,12 @@ defmodule UserDocs.Users.User do
     user
     |> pow_changeset(attrs)
     |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id])
+  end
+
+  def change_options(user, attrs) do
+    user
+    |> cast(attrs, [ :default_team_id, :selected_team_id, :selected_project_id, :selected_version_id ])
+    |> cast_assoc(:team_users)
   end
 
   def preload_teams(user = %UserDocs.Users.User{}, %{ teams: teams, team_users: team_users }) do
