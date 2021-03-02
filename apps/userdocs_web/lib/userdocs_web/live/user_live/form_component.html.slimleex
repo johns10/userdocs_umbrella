@@ -11,7 +11,6 @@ h2 = @title
   = inputs_for f, :team_users, fn tuf ->
     .field.is-grouped
       = hidden_input tuf, :user_id, value: f.data.id
-      = Layout.checkbox tuf, :default
       = Layout.select_input tuf, :team_id, @select_lists.teams, [], "control py-2"
       = if is_nil tuf.data.temp_id do 
         = Layout.checkbox tuf, :delete 
