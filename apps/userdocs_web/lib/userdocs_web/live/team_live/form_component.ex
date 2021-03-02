@@ -6,6 +6,7 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
 
   alias UserDocs.Users
   alias UserDocs.Helpers
+  alias UserDocs.Users.TeamUser
 
 
   @impl true
@@ -26,6 +27,7 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
 
   @impl true
   def handle_event("validate", %{"team" => team_params}, socket) do
+    IO.inspect(socket.assigns.changeset)
     changeset =
       socket.assigns.team
       |> Users.change_team(team_params)
@@ -37,6 +39,44 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
   def handle_event("save", %{"team" => team_params}, socket) do
     save_team(socket, socket.assigns.action, team_params)
   end
+
+  def handle_event("add-user", _, socket) do
+    existing_team_users =
+      Map.get(
+        socket.assigns.changeset.changes, :team_users,
+        socket.assigns.team.team_users
+      )
+
+    team_users =
+      existing_team_users
+      |> Enum.concat([
+        Users.change_team_user(%TeamUser{temp_id: get_temp_id()})
+      ])
+
+    IO.inspect(team_users)
+
+    changeset =
+      socket.assigns.changeset
+      |> Ecto.Changeset.put_assoc(:team_users, team_users)
+
+    {:noreply, assign(socket, changeset: changeset)}
+  end
+
+  def handle_event("remove-user", %{"remove" => remove_id}, socket) do
+    team_users =
+      socket.assigns.changeset.changes.team_users
+      |> Enum.reject(fn %{data: team_user} ->
+        team_user.temp_id == remove_id
+      end)
+
+    changeset =
+      socket.assigns.changeset
+      |> Ecto.Changeset.put_assoc(:team_users, team_users)
+
+    {:noreply, assign(socket, changeset: changeset)}
+  end
+
+  defp get_temp_id, do: :crypto.strong_rand_bytes(5) |> Base.url_encode64 |> binary_part(0, 5)
 
   defp save_team(socket, :edit, team_params) do
     case Users.update_team(socket.assigns.team, team_params) do
