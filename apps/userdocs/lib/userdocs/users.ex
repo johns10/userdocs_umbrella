@@ -61,6 +61,7 @@ defmodule UserDocs.Users do
     base_user_query(id)
     |> maybe_preload_default_team_project_version(params[:team_project_version])
     |> maybe_preload_user_teams(params[:teams])
+    |> maybe_preload_user_team_users(params[:team_users])
     |> maybe_preload_user_selected_team(params[:selected_team])
     |> maybe_preload_user_selected_project(params[:selected_project])
     |> maybe_preload_user_selected_version(params[:selected_version])
@@ -87,6 +88,11 @@ defmodule UserDocs.Users do
   defp maybe_preload_user_teams(query, nil), do: query
   defp maybe_preload_user_teams(query, _) do
     from(users in query, preload: [:teams])
+  end
+
+  defp maybe_preload_user_team_users(query, nil), do: query
+  defp maybe_preload_user_team_users(query, _) do
+    from(users in query, preload: [:team_users])
   end
 
   defp maybe_preload_user_selected_team(query, nil), do: query
@@ -149,6 +155,12 @@ defmodule UserDocs.Users do
     |> Repo.update()
   end
 
+  def update_user_options(%User{} = user, attrs) do
+    user
+    |> User.change_options(attrs)
+    |> Repo.update()
+  end
+
   @doc """
   Deletes a user.
 
@@ -176,6 +188,10 @@ defmodule UserDocs.Users do
   """
   def change_user(%User{} = user, attrs \\ %{}) do
     User.changeset(user, attrs)
+  end
+
+  def change_user_options(%User{} = user, attrs \\ %{}) do
+    User.change_options(user, attrs)
   end
 
   alias UserDocs.Users.TeamUser
