@@ -23,6 +23,7 @@ defmodule UserDocsWeb.ModalMenus do
   alias UserDocs.DocumentVersion.Messages, as: DocumentVersionMessage
   alias UserDocs.Docubit.Messages, as: DocubitMessage
   alias UserDocs.Documents.Content.Messages, as: ContentMessage
+  alias UserDocs.Users.User.Messages, as: UserMessage
 
   @impl true
   def render(assigns) do
@@ -271,6 +272,12 @@ defmodule UserDocsWeb.ModalMenus do
   def new_content(socket, params) do
     socket
     |> ContentMessage.new_modal_menu(params)
+    |> call_menu(socket)
+  end
+
+  def edit_user(socket, params) do
+    socket
+    |> UserMessage.edit_modal_menu(params)
     |> call_menu(socket)
   end
 
