@@ -1,7 +1,42 @@
 defmodule UserDocsWeb.UserLive.FormComponent do
   use UserDocsWeb, :live_component
+  alias UserDocsWeb.Layout
 
   alias UserDocs.Users
+
+  @impl true
+  def render(%{ action: :options } = assigns) do
+    ~L"""
+      h2 <%= @title %>
+
+      <%= f = form_for @changeset, "#",
+        id: "user-form",
+        phx_target: @myself.cid,
+        phx_change: "validate",
+        phx_submit: "save" %>
+
+        <%= Layout.text_input f, :email, [], "control" %>
+
+        <%= inputs_for f, :team_users, fn tuf -> %>
+          <div class="field is-grouped">
+            <%= hidden_input tuf, :user_id, value: f.data.id %>
+            <%= Layout.checkbox tuf, :default %>
+            <%= Layout.select_input tuf, :team_id, @select_lists.teams, [], "control px-2" %>
+            <%= if is_nil tuf.data.temp_id do %>
+              <%= Layout.checkbox tuf, :delete %>
+            <% else %>
+              <%= hidden_input tuf, :temp_id %>
+              <%= link(to: "#", phx_click: "remove-team", phx_value_remove: tuf.data.temp_id, phx_target: @myself.cid) do %>
+                <span>x</span>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+        <%= error_tag f, :team_users %>
+        <%= submit "Save", phx_disable_with: "Saving..." %>
+      </form>
+    """
+  end
 
   @impl true
   def update(%{user: user} = assigns, socket) do
@@ -14,11 +49,33 @@ defmodule UserDocsWeb.UserLive.FormComponent do
   end
 
   @impl true
-  def handle_event("validate", %{"user" => user_params}, socket) do
+  def handle_event("validate", %{"user" => user_params}, %{ assigns: %{ action: :options } } = socket) do
     changeset =
       socket.assigns.user
-      |> Users.change_user(user_params)
+      |> Users.change_user_options(user_params)
       |> Map.put(:action, :validate)
+
+    num_defaults =
+      case Ecto.Changeset.get_change(changeset, :team_users) do
+        nil -> 1
+        team_users ->
+          Enum.reduce(team_users, 0, fn(team_user, acc) ->
+            case { Ecto.Changeset.get_change(team_user, :default, nil), team_user.data.default } do
+              { true, _ } -> acc + 1
+              { nil, true } -> acc + 1
+              { _, _ } -> acc
+            end
+          end)
+      end
+
+    IO.inspect(num_defaults)
+
+    changeset =
+      if num_defaults != 1 do
+        Ecto.Changeset.add_error(changeset, :team_users, "May only have 1 default")
+      else
+        changeset
+      end
 
     {:noreply, assign(socket, :changeset, changeset)}
   end
@@ -44,7 +101,8 @@ defmodule UserDocsWeb.UserLive.FormComponent do
 
   defp save_user(socket, :new, user_params) do
     case Users.create_user(user_params) do
-      {:ok, _user} ->
+      {:ok, user} ->
+        IO.inspect(user)
         {
           :noreply,
           socket
@@ -53,6 +111,25 @@ defmodule UserDocsWeb.UserLive.FormComponent do
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, changeset: changeset)}
+    end
+  end
+
+  defp save_user(socket, :options, user_params) do
+    IO.puts("options")
+    case Users.update_user_options(socket.assigns.user, user_params) do
+      {:ok, user} ->
+        IO.inspect(user)
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "User created successfully")
+          |> push_redirect(to: socket.assigns.return_to)
+        }
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        IO.puts("Error")
+        IO.inspect(changeset)
         {:noreply, assign(socket, changeset: changeset)}
     end
   end
