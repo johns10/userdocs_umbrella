@@ -43,7 +43,7 @@ defmodule UserDocsWeb.TeamLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    team = Users.get_team!(id, %{ preloads: [ users: true, default_project: true, projects: true ] })
+    team = Users.get_team!(id, %{ preloads: [ users: true, default_project: true, projects: true, team_users: true ] })
     socket
     |> assign(:page_title, "Edit Team")
     |> assign(:team, team)
@@ -53,7 +53,7 @@ defmodule UserDocsWeb.TeamLive.Index do
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Team")
-    |> assign(:team, %Team{})
+    |> assign(:team, %Team{ users: [] })
     |> assign(:projects_select_options, [])
   end
 
