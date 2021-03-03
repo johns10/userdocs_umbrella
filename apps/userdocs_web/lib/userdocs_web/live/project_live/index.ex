@@ -81,6 +81,17 @@ defmodule UserDocsWeb.ProjectLive.Index do
   end
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
+  @impl true
+  def handle_info(%{topic: _, event: _, payload: %UserDocs.Users.User{} = user} = sub_data, socket) do
+    {
+      :noreply,
+      socket
+      |> assign(:projects, Projects.list_projects(%{}, %{ team_id: user.selected_team_id }))
+      |> push_patch(to: Routes.project_index_path(socket, :index))
+    }
+  end
+  def handle_info(n, p), do: Root.handle_info(n, p)
+
   defp prepare_index(socket, team_id) do
     Logger.debug("#{__MODULE__}.prepare_index issuing list_projects query")
     socket
