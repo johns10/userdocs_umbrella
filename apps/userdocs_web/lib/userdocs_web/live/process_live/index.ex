@@ -43,8 +43,17 @@ defmodule UserDocsWeb.ProcessLive.Index do
   def initialize(socket), do: socket
 
   @impl true
+  def handle_params(_params, _url, %{ assigns: %{ auth_state: :not_logged_in }} = socket) do
+    { :noreply, socket }
+  end
   def handle_params(%{ "version_id" => version_id } = params, _url, socket) do
+    version = Projects.get_version!(version_id)
+    project = Projects.get_project!(version.project_id)
+    team = Users.get_team!(project.team_id)
     socket
+    |> assign(:current_version, version)
+    |> assign(:current_project, project)
+    |> assign(:current_team, team)
     |> prepare_processes(String.to_integer(version_id))
     |> do_handle_params(params)
   end
