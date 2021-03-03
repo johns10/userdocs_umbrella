@@ -15,4 +15,4 @@
   data: @data ])
 
 = live_patch to: Routes.version_index_path(@socket, :new) do
-  button.button.is-primary New Project
+  button.button.is-primary New Version
