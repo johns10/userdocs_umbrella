@@ -66,6 +66,20 @@ defmodule UserDocs.Projects do
       ** (Ecto.NoResultsError)
 
   """
+  # This function is used because I reverted to integer
+  # keys on user selections.  I should go back to FK's
+  # and get my on_delete stuff right.
+  def try_get_project!(id) do
+    try do
+      get_project!(id)
+    rescue
+      e ->
+        Logger.error("Failed to retreive selected project, error: ")
+        Logger.error(e)
+        nil
+    end
+  end
+
   def get_project!(id, params \\ %{}) when is_map(params) do
     base_project_query(id)
     |> maybe_preload_versions(params[:versions])
@@ -234,6 +248,19 @@ defmodule UserDocs.Projects do
       ** (Ecto.NoResultsError)
 
   """
+  # This function is used because I reverted to integer
+  # keys on user selections.  I should go back to FK's
+  # and get my on_delete stuff right.
+  def try_get_version!(id) do
+    try do
+      get_version!(id)
+    rescue
+      e ->
+        Logger.error("Failed to retreive selected version, error: ")
+        Logger.error(e)
+        nil
+    end
+  end
   def get_version!(id, params \\ %{}, filters \\ %{})
   def get_version!(id, state, opts) when is_list(opts) do
     StateHandlers.get(state, id, Version, opts)
