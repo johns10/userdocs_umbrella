@@ -83,7 +83,7 @@
                 parent: process,
                 parent_id: Map.get(process, :id, nil),
                 type: Step,
-                current_version_id: @current_version_id,
+                current_version_id: @current_version.id,
                 state_opts: @state_opts,
                 data: %{
                   annotation_types: @data.annotation_types,
@@ -131,8 +131,8 @@
     <div class="card">
       <a
         phx-click="new-process"
-        phx-value-current-project-id=<%= @current_project_id %>
-        phx-value-current-version-id=<%= @current_version_id %>
+        phx-value-current-project-id=<%= @current_project.id %>
+        phx-value-current-version-id=<%= @current_version.id %>
         class="card-footer-item"
       >New Process</a>
     </div>

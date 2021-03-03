@@ -43,7 +43,7 @@ defmodule UserDocsWeb.ProjectLive.Index do
   defp apply_action(socket, :edit, %{ "id" => id }) do
     socket
     |> prepare_edit(id)
-    |> prepare_index(socket.assigns.current_team_id)
+    |> prepare_index(socket.assigns.current_team.id)
   end
 
   defp apply_action(socket, :new, _params) do
@@ -52,7 +52,7 @@ defmodule UserDocsWeb.ProjectLive.Index do
     |> assign(:page_title, "New Project")
     |> assign(:project, %Project{})
     |> assign(:teams_select_options, Helpers.select_list(user.teams, :name, false))
-    |> prepare_index(socket.assigns.current_team_id)
+    |> prepare_index(socket.assigns.current_team.id)
   end
 
   defp apply_action(socket, :index, %{ "team_id" => team_id}) do
@@ -66,7 +66,7 @@ defmodule UserDocsWeb.ProjectLive.Index do
     socket
     |> assign(:page_title, "Listing Projects")
     |> assign(:project, nil)
-    |> prepare_index(socket.assigns.current_team_id)
+    |> prepare_index(socket.assigns.current_team.id)
   end
 
   @impl true

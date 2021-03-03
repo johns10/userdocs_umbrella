@@ -242,6 +242,6 @@ defmodule UserDocsWeb.ProcessLive.Show do
       |> Keyword.put(:preloads, preloads)
       |> Keyword.put(:order, order)
 
-    assign(socket, :process, Automation.get_process!(socket.assigns.current_version_id, socket, opts))
+    assign(socket, :process, Automation.get_process!(socket.assigns.current_version.id, socket, opts))
   end
 end

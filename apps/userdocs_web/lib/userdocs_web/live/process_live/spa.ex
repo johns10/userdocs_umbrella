@@ -74,15 +74,11 @@ defmodule UserDocsWeb.ProcessLive.SPA do
   @impl true
   def handle_params(_, _, %{ assigns: %{ auth_state: :not_logged_in }} = socket) , do: {:noreply, socket}
   def handle_params(%{} = params, _url, socket) do
-    user = Users.get_user!(socket.assigns.current_user.id, %{ team_project_version: true })
     opts = socket.assigns.state_opts
     {
       :noreply,
       socket
-      |> assign(:team, user.default_team)
-      |> assign(:project, user.default_team.default_project)
-      |> assign(:version, user.default_team.default_project.default_version)
-      |> assign(:current_strategy_id, user.default_team.default_project.default_version.strategy_id)
+      |> assign(:current_strategy_id, socket.assigns.current_version.strategy_id)
       |> Loaders.content(opts)
       |> Loaders.content_versions(opts)
       |> StepLive.Index.assign_strategy_id()
@@ -177,10 +173,10 @@ defmodule UserDocsWeb.ProcessLive.SPA do
   def handle_event("expand" = n, p, s), do: StepLive.Index.handle_event(n, p, s)
   def handle_event("new-content" = n, _params, socket) do
     opts = socket.assigns.state_opts
-    team = Users.get_team!(socket.assigns.current_team_id, socket, opts)
+    team = Users.get_team!(socket.assigns.current_team.id, socket, opts)
     params =
       %{}
-      |> Map.put(:version_id, socket.assigns.current_version_id)
+      |> Map.put(:version_id, socket.assigns.current_version.id)
       |> Map.put(:teams, socket.assigns.data.teams)
       |> Map.put(:language_codes, Documents.list_language_codes(socket, opts))
       |> Map.put(:team, team)

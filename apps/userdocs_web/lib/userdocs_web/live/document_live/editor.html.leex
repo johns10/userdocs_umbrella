@@ -89,8 +89,8 @@
         live_component(@socket, UserDocsWeb.DocubitEditorLive, [
           id: "docubit-editor-" <> Integer.to_string(@document_version.body.id),
           current_language_code_id: @current_language_code_id,
-          current_version_id: @current_version_id,
-          current_team_id: @current_team_id,
+          current_version_id: @current_version.id,
+          current_team_id: @current_team.id,
           document_id: @document_version.document_id,
           docubit: @document_version.body,
           channel: @channel,
