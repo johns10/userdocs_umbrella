@@ -100,6 +100,17 @@ defmodule UserDocs.Projects do
   defp maybe_preload_default_version(query, nil), do: query
   defp maybe_preload_default_version(query, _), do: from(item in query, preload: [:default_version])
 
+  def project_default_version(nil), do: nil
+  def project_default_version(%Project{} = project) do
+    try do
+      project.versions
+      |> Enum.filter(fn(v) -> v.default == true end)
+      |> Enum.at(0)
+    rescue
+      e -> raise(e)
+    end
+  end
+
   @doc """
   Creates a project.
 
