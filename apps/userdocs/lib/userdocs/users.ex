@@ -470,6 +470,20 @@ defmodule UserDocs.Users do
       where: step.id == ^id
   end
 
+  def team_default_project(nil), do: nil
+  def team_default_project(%Team{} = team) do
+    try do
+      team.projects
+      |> Enum.filter(fn(p) -> p.default == true end)
+      |> Enum.at(0)
+    rescue
+      e in BadMapError ->
+        Logger.error(e)
+        nil
+      e -> raise(e)
+    end
+  end
+
   @doc """
   Creates a team.
 
