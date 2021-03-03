@@ -30,6 +30,27 @@ defmodule UserDocsWeb.DocumentLive.FormComponent do
     save_document(socket, socket.assigns.action, document_params)
   end
 
+  def handle_event("add-document-version", _, socket) do
+    changeset = ChangesetHelpers.add_object(
+      socket.assigns.changeset,
+      socket.assigns.document,
+      :document_versions,
+      %DocumentVersion{ temp_id: UUID.uuid4() }
+    )
+
+    {:noreply, assign(socket, changeset: changeset)}
+  end
+
+  def handle_event("remove-document-version", %{"remove" => remove_id}, socket) do
+    changeset = ChangesetHelpers.remove_object(
+      socket.assigns.changeset,
+      :document_versions,
+      remove_id
+    )
+
+    {:noreply, assign(socket, changeset: changeset)}
+  end
+
   defp save_document(socket, :edit, document_params) do
     case Documents.update_document(socket.assigns.document, document_params) do
       {:ok, document} ->
