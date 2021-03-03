@@ -39,6 +39,13 @@ defmodule UserDocsWeb.VersionLive.Index do
 
   @impl true
   def handle_params(%{ "project_id" => project_id } = params, url, socket) do
+    project = Projects.get_project!(project_id)
+    team = Users.get_team!(project.team_id)
+    socket =
+      socket
+      |> assign(:current_project, project)
+      |> assign(:current_team, team)
+
     do_handle_params(params, url, socket, String.to_integer(project_id))
   end
   def handle_params(params, url, socket) do
