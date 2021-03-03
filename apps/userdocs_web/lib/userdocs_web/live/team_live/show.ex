@@ -27,11 +27,8 @@ defmodule UserDocsWeb.TeamLive.Show do
   end
 
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
-    opts = Defaults.state_opts(socket)
-
     socket
     |> assign(:modal_action, :show)
-    |> assign(:state_opts, opts)
   end
   def initialize(socket), do: socket
 
