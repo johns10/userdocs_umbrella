@@ -132,6 +132,25 @@ defmodule UserDocs.Users do
     end
   end
 
+  alias UserDocs.Users.Team
+  alias UserDocs.Users.TeamUser
+  alias UserDocs.Projects.Project
+  alias UserDocs.Projects.Version
+
+  def get_user_and_configs!(id) do
+    User
+    |> where([u], u.id == ^id)
+    |> join(:left, [u, tu], tu in TeamUser, on: tu.user_id == u.id)
+    |> join(:left, [u, tu, t], t in Team, on: tu.team_id == t.id)
+    |> join(:left, [u, tu, t, p], p in Project, on: p.team_id == t.id)
+    |> join(:left, [u, tu, t, p, v], v in Version, on: v.project_id == p.id)
+    |> preload(    [u, tu, t, p, v], [ team_users: tu ])
+    |> preload(    [u, tu, t, p, v], [ team_users: { tu, team: t } ])
+    |> preload(    [u, tu, t, p, v], [ team_users: { tu, team: { t, projects: p } } ])
+    |> preload(    [u, tu, t, p, v], [ team_users: { tu, team: { t, projects: { p, versions: v } } } ])
+    |> Repo.one!()
+  end
+
   @doc """
   Creates a user.
 
