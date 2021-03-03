@@ -2,6 +2,7 @@ defmodule UserDocs.Users.Team do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias UserDocs.ChangesetHelpers
   alias UserDocs.Users
   alias UserDocs.Projects.Project
   alias UserDocs.Documents.LanguageCode
@@ -11,8 +12,9 @@ defmodule UserDocs.Users.Team do
   schema "teams" do
     field :name, :string
 
+    embeds_one :default_project, Project
+
     belongs_to :default_language_code, LanguageCode
-    belongs_to :default_project, Project
     has_many :projects, Project
     has_many :content, Content
     has_many :team_users, TeamUser
@@ -28,11 +30,13 @@ defmodule UserDocs.Users.Team do
   @doc false
   def changeset(team, attrs) do
     team
-    |> cast(attrs, [ :name, :default_project_id, :default_language_code_id ])
+    |> cast(attrs, [ :name, :default_language_code_id ])
     |> cast_assoc(:team_users)
+    |> cast_assoc(:projects, with: &Project.change_default_project/2)
     |> foreign_key_constraint(:default_language_code_id)
     |> handle_users(attrs)
     |> validate_required([:name])
+    |> ChangesetHelpers.check_only_one_default(:projects)
   end
 
 """
