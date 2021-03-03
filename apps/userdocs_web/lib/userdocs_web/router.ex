@@ -97,6 +97,7 @@ defmodule UserDocsWeb.Router do
     live "/projects/:project_id/documents", DocumentLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/documents/new", DocumentLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/documents", DocumentLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/documents/:id/edit", DocumentLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/documents/:id/editor", DocumentLive.Editor, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/documents/:id/viewer", DocumentLive.Viewer, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
