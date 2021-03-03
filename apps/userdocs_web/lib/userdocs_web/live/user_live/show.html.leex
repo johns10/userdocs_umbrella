@@ -1,37 +1,22 @@
 <h1>Show User</h1>
 
-<%= if @live_action in [:edit] do %>
+<%= if @live_action in [:edit, :options] do %>
   <%= live_modal @socket, UserDocsWeb.UserLive.FormComponent,
     id: @user.id,
     title: @page_title,
     action: @live_action,
     user: @user,
+    select_lists: @select_lists,
     return_to: Routes.user_show_path(@socket, :show, @user) %>
 <% end %>
 
-<ul>
+<%= live_component(@socket, UserDocsWeb.UserLive.DefaultsAndSelections, [ current_user: @current_user ]) %>
 
+<ul>
   <li>
     <strong>Email:</strong>
     <%= @user.email %>
   </li>
-
-  <li>
-    <strong>Password:</strong>
-    <%= @user.password %>
-  </li>
-
-  <li>
-    <strong>Password confirmation:</strong>
-    <%= @user.password_confirmation %>
-  </li>
-
-  <li>
-    <strong>Default team:</strong>
-    <%= @user.default_team_id %>
-  </li>
-
 </ul>
 
-<span><%= live_patch "Edit", to: Routes.user_show_path(@socket, :edit, @user), class: "button" %></span>
-<span><%= live_redirect "Back", to: Routes.user_index_path(@socket, :index) %></span>
+<span><%= live_patch "Options", to: Routes.user_show_path(@socket, :options, @user), class: "button" %></span>
