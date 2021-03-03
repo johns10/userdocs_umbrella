@@ -80,6 +80,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       |> Loaders.load_content(opts)
       |> Loaders.load_content_versions(opts)
       |> Loaders.load_steps(opts)
+      |> UserDocsWeb.Loaders.versions()
       |> UserDocsWeb.Loaders.screenshots(opts)
       |> SelectLists.process(opts)
       |> current_selections()
