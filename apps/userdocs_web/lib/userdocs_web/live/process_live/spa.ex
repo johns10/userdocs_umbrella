@@ -22,21 +22,22 @@ defmodule UserDocsWeb.ProcessLive.SPA do
     [
       UserDocs.Automation.Process,
       UserDocs.Automation.Step,
+      UserDocs.Documents.Content,
+      UserDocs.Documents.ContentVersion,
+      UserDocs.Projects.Version,
       UserDocs.Web.Annotation,
       UserDocs.Web.Element,
       UserDocs.Web.Page,
-      UserDocs.Documents.Content,
-      UserDocs.Documents.ContentVersion,
       UserDocs.Media.Screenshot,
     ]
   end
 
   def extra_types() do
     [
-      UserDocs.Web.AnnotationType,
-      UserDocs.Web.Strategy,
       UserDocs.Documents.LanguageCode,
       UserDocs.Automation.StepType,
+      UserDocs.Web.AnnotationType,
+      UserDocs.Web.Strategy,
     ]
   end
 
