@@ -64,6 +64,18 @@ defmodule UserDocsWeb.VersionLive.Index do
   @impl true
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
+
+  @impl true
+  def handle_info(%{topic: _, event: _, payload: %UserDocs.Users.User{} = user} = sub_data, socket) do
+    {
+      :noreply,
+      socket
+      |> prepare_versions(user.selected_project_id)
+      |> push_patch(to: Routes.version_index_path(socket, :index))
+    }
+  end
+  def handle_info(d, s), do: Root.handle_info(d, s)
+
   defp apply_action(socket, :edit, %{ "id" => id }) do
     IO.inspect("AA")
     IO.inspect(Projects.get_version!(String.to_integer(id), socket, socket.assigns.state_opts))
