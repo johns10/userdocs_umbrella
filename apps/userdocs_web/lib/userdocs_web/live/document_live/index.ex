@@ -10,7 +10,13 @@ defmodule UserDocsWeb.DocumentLive.Index do
   alias UserDocsWeb.Defaults
 
 
-  @types [ UserDocs.Documents.Document, UserDocs.Documents.DocumentVersion ]
+  @types [
+    UserDocs.Documents.Document,
+    UserDocs.Documents.DocumentVersion,
+    UserDocs.Projects.Version,
+    UserDocs.Projects.Project,
+    UserDocs.Users.Team
+  ]
 
   @impl true
   def mount(_params, session, socket) do
