@@ -66,7 +66,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
     IO.puts("Opening editor")
     id = String.to_integer(id)
     document = Documents.get_document!(id, %{ document_versions: true })
-    opts = Defaults.opts(socket, @types)
+    opts = socket.assigns.state_opts
     {
       :noreply,
       socket
