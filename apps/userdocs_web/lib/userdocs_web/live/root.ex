@@ -34,56 +34,17 @@ defmodule UserDocsWeb.Root do
 
   def initialize(socket, opts)
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket, opts) do
-    types_to_initialize = [ User, TeamUser, Team, Project, Version ] ++ Keyword.get(opts, :types, [])
-
-    initialization_opts =
-      opts
-      |> Keyword.put(:types, types_to_initialize)
-
     socket
-    |> StateHandlers.initialize(initialization_opts)
+    |> StateHandlers.initialize(opts)
     |> assign(:form_data, %{ action: :show })
-    |> users(opts)
-    |> team_users(opts)
-    |> teams(opts)
-    |> projects(opts)
-    |> versions(opts)
-    |> Select.assign_default_team_id(&assign/3)
-    |> Select.assign_default_project_id(&assign/3, opts)
-    |> Select.assign_default_version_id(&assign/3, opts)
     |> subscribe()
+    |> assign(:state_opts, opts)
   end
   def initialize(socket, _), do: socket
 
   def subscribe(socket) do
     UserDocsWeb.Endpoint.subscribe(Defaults.channel(socket))
     socket
-  end
-
-
-  def users(%{ assigns: %{ current_user: current_user }} = socket, opts \\ state_opts()) do
-    socket
-    |> StateHandlers.load([ current_user ], opts)
-  end
-
-  def team_users(%{ assigns: %{ current_user: %{ id: user_id }}} = socket, opts \\ state_opts()) do
-    opts = opts |> Keyword.put(:filters, %{ user_id: user_id })
-    Users.load_team_users(socket, opts)
-  end
-
-  def teams(%{ assigns: %{ current_user: %{ id: user_id }}} = socket, opts \\ state_opts()) do
-    opts = opts |> Keyword.put(:filters, %{ user_id: user_id })
-    Users.load_teams(socket, opts)
-  end
-
-  def projects(%{ assigns: %{ current_user: %{ id: user_id }}} = socket, opts \\ state_opts()) do
-    opts = opts |> Keyword.put(:filters, %{ user_id: user_id })
-    Projects.load_projects(socket, opts)
-  end
-
-  def versions(%{ assigns: %{ current_user: %{ id: user_id }}} = socket, opts \\ state_opts()) do
-    opts = opts |> Keyword.put(:filters, %{ user_id: user_id })
-    Projects.load_versions(socket, opts)
   end
 
   def validate_logged_in(socket, session) do
@@ -98,8 +59,9 @@ defmodule UserDocsWeb.Root do
           IO.puts("a user")
           socket
           |> maybe_assign_current_user(session)
+          |> prepare_user()
+          |> assign_current()
           |> assign(:auth_state, :logged_in)
-          |> assign_selections()
           |> (assign(:changeset, Users.change_user(current_user)))
         error ->
           IO.puts("Error")
@@ -114,36 +76,71 @@ defmodule UserDocsWeb.Root do
     end
   end
 
-  def assign_selections(socket) do
-    user = Users.get_user!(socket.assigns.current_user.id, %{
-      team_project_version: true,
-      selected_team: true,
-      selected_project: true,
-      selected_version: true
-    })
-    default_team = user.default_team
-    default_project = user.default_team.default_project
-    default_version = default_project.default_version
-    team =
-      case user.selected_team_id do
-        nil -> default_team
-        _ -> user.selected_team
-      end
-    project =
-      case user.selected_project_id do
-        nil -> default_project
-        _ -> user.selected_project
-      end
-    version =
-      case user.selected_version_id do
-        nil -> default_version
-        _ -> user.selected_version
-      end
+  def prepare_user(%{ assigns: %{ current_user: current_user } } = socket) do
+    current_user = Users.get_user_and_configs!(current_user.id)
+
+    current_user =
+      current_user
+      |> Map.put(:selected_team, Users.try_get_team!(current_user.selected_team_id))
+      |> Map.put(:selected_project, Projects.try_get_project!(current_user.selected_project_id))
+      |> Map.put(:selected_version, Projects.try_get_version!(current_user.selected_version_id))
+
+    assign(socket, :current_user, current_user)
+  end
+
+  def assign_current(%{ assigns: %{ current_user: current_user } } = socket) do
+
+    default_team = Users.user_default_team(current_user)
+    default_project = Users.team_default_project(default_team)
+    default_version = Projects.project_default_version(default_project)
+
+    current_user = assign_defaults(current_user, default_team, default_project, default_version)
+
+    current_team =
+      current_user.selected_team
+      || default_team
+      || %Team{}
+
+    current_project =
+      current_user.selected_project
+      || default_project
+      || %Project{}
+
+    current_version =
+      current_user.selected_version
+      || default_version
+      || %Version{}
+
+    IO.puts("Assign current")
 
     socket
-    |> assign(:current_team,  team)
-    |> assign(:current_project,  project)
-    |> assign(:current_version,  version)
+    |> assign(:current_user, current_user)
+    |> assign(:current_team, current_team)
+    |> assign(:current_project, current_project)
+    |> assign(:current_version, current_version)
+  end
+
+  def assign_defaults(user, %Team{} = team, %Project{} = project, %Version{} = version) do
+    Map.put(user, :default_team,
+      Map.put(team, :default_project,
+        Map.put(project, :default_version, version)
+      )
+    )
+  end
+  def assign_defaults(user, %Team{} = team, %Project{} = project, nil) do
+    Map.put(user, :default_team,
+      Map.put(team, :default_project,
+        Map.put(project, :default_version, nil)
+      )
+    )
+  end
+  def assign_defaults(user, %Team{} = team, nil, nil) do
+    Map.put(user, :default_team,
+      Map.put(team, :default_project, nil)
+    )
+  end
+  def assign_defaults(user, nil, nil, nil) do
+    Map.put(user, :default_team, nil)
   end
 
   def put_app_name(socket, %{ "app_name" => app_name }) do
@@ -195,39 +192,30 @@ defmodule UserDocsWeb.Root do
   end
   def handle_event("edit-user", params, socket) do
     IO.puts("Root opening user form")
-    IO.inspect(Users.list_teams(socket, socket.assigns.state_opts))
     { :noreply, ModalMenus.edit_user(socket, params) }
   end
-  def handle_event("select-version", %{"select-version" => version_id_param} = _payload, socket) do
-    IO.puts("Changing current version to #{version_id_param}")
+  def handle_event("select-version", %{"version-id" => version_id, "project-id" => project_id, "team-id" => team_id } = _payload, socket) do
+    IO.puts("Changing current version to #{version_id}")
     opts = Map.get(socket.assigns, :state_opts, state_opts())
-    with  version_id <- String.to_integer(version_id_param),
-      version <- UserDocs.Projects.get_version!(version_id, socket, opts),
-      project <- UserDocs.Projects.get_project!(version.project_id, socket, opts),
-      team <- UserDocs.Users.get_team!(project.team_id, socket, opts)
-    do
-      changes = %{
-        selected_team_id: team.id,
-        selected_project_id: project.id,
-        selected_version_id: version.id
-      }
 
-      { :ok, user } =
-        Ecto.Changeset.change(socket.assigns.current_user, changes)
-        |> UserDocs.Repo.update()
+    changes = %{
+      selected_team_id: String.to_integer(team_id),
+      selected_project_id: String.to_integer(project_id),
+      selected_version_id: String.to_integer(version_id)
+    }
 
-      {
-        :noreply,
-        socket
-        |> assign(:current_user, user)
-        |> assign(:current_team, team)
-        |> assign(:current_project, project)
-        |> assign(:current_version, version)
-        |> assign(:current_team_id, team.id)
-        |> assign(:current_project_id, project.id)
-        |> assign(:current_version_id, version.id)
-      }
-    end
+    { :ok, user } =
+      Users.update_user_options(socket.assigns.current_user, changes)
+
+    send(self(), { :broadcast, "update", user })
+
+    {
+      :noreply,
+      socket
+      |> prepare_user()
+      |> assign_current()
+    }
+
   end
   def handle_event(name, _payload, _socket) do
     raise(FunctionClauseError, message: "Event #{inspect(name)} not implemented by Root")
