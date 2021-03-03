@@ -18,10 +18,8 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
   alias UserDocs.Web.Strategy
   alias UserDocs.Automation
   alias UserDocs.Projects
-  alias UserDocs.Projects.Select
   alias UserDocs.Documents
   alias UserDocs.Documents.Content
-  alias UserDocs.Projects.Select
 
   alias UserDocsWeb.CollapsableFormComponent
   alias UserDocsWeb.GroupComponent
