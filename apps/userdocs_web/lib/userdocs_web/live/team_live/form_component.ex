@@ -78,10 +78,12 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
   defp save_team(socket, :edit, team_params) do
     case Users.update_team(socket.assigns.team, team_params) do
       {:ok, _team} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Team updated successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "Team updated successfully")
+          |> push_redirect(to: socket.assigns.return_to)
+        }
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
