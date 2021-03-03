@@ -8,7 +8,7 @@
     state_opts: @state_opts,
     select_lists: @select_lists,
     app_name: @app_name,
-    return_to: Routes.version_index_path(@socket, :index)
+    return_to: Routes.version_index_path(@socket, :index, @project.id)
 
 aside.menu
   p.menu-label Versions
