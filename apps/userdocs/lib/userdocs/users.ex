@@ -119,6 +119,18 @@ defmodule UserDocs.Users do
     from(user in User, where: user.id == ^id)
   end
 
+  def user_default_team(%User{} = user) do
+    try do
+      user.team_users
+      |> Enum.filter(fn(tu) -> tu.default == true end)
+      |> Enum.at(0)
+      |> Map.get(:team)
+    rescue
+      BadMapError -> nil
+      e -> raise(e)
+    end
+  end
+
   @doc """
   Creates a user.
 
