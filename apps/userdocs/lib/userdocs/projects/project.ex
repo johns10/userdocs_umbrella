@@ -1,6 +1,8 @@
 defmodule UserDocs.Projects.Project do
   use Ecto.Schema
   import Ecto.Changeset
+
+  alias UserDocs.ChangesetHelpers
   alias UserDocs.Projects.Version
   alias UserDocs.Documents.Document
 
@@ -32,9 +34,15 @@ defmodule UserDocs.Projects.Project do
   @doc false
   def changeset(project, attrs) do
     project
-    |> cast(attrs, [:name, :base_url,
-      :team_id, :default_version_id])
+    |> cast(attrs, [:name, :base_url, :team_id, :default_version_id, :default])
+    |> cast_assoc(:versions, with: &Version.change_default_version/2)
     |> foreign_key_constraint(:team_id)
     |> validate_required([:name, :base_url])
+    |> ChangesetHelpers.check_only_one_default(:versions)
+  end
+
+  def change_default_project(project, attrs) do
+    project
+    |> cast(attrs, [ :default ])
   end
 end
