@@ -7,7 +7,7 @@ defmodule UserDocsWeb.VersionPicker do
 
   alias UserDocs.Users
 
-  def dropdown_trigger(assigns, name, do: block) do
+  def dropdown_trigger(assigns, name, highlight, do: block) do
     ~L"""
       <div class="nested navbar-item dropdown">
         <div class="dropdown-trigger">
@@ -23,25 +23,29 @@ defmodule UserDocsWeb.VersionPicker do
     """
   end
 
+  def button_class(true), do: "button is-link"
+
   @impl true
   def render(assigns) do
     ~L"""
     <div class="navbar-item has-dropdown is-hoverable">
-      <a class="navbar-link"><%= @current_version.name %></a>
+      <a class="navbar-link"><%= @current_version_name %></a>
       <div class="navbar-dropdown">
-        <%= for team <- @current_user.teams do %>
-          <%= dropdown_trigger(assigns, team.name) do %>
+        <%= for team_user <- @current_user.team_users do %>
+          <%= dropdown_trigger(assigns, team_user.team.name, team_user.team.id == @current_user.selected_team_id) do %>
             <div class="dropdown-menu" role="menu">
-              <div class="dropdown-content">
-                <%= for project <- team.projects do %>
-                  <%= dropdown_trigger(assigns, project.name) do %>
+              <div class="dropdown-content" >
+                <%= for project <- team_user.team.projects do %>
+                  <%= dropdown_trigger(assigns, project.name, project.id == @current_user.selected_project_id) do %>
                     <div class="dropdown-menu" role="menu">
                       <div class="dropdown-content">
                         <%= for version <- project.versions do %>
                           <a href="#"
-                            class="dropdown-item"
+                            class="<%= is_active(@current_user.selected_version_id, version.id) %>"
                             phx-click="select-version"
-                            phx-value-select-version="<%= version.id %>"
+                            phx-value-version-id="<%= version.id %>"
+                            phx-value-project-id="<%= project.id %>"
+                            phx-value-team-id="<%= team_user.team.id %>"
                           ><%= version.name %></a>
                         <% end %>
                       </div>
@@ -68,13 +72,25 @@ defmodule UserDocsWeb.VersionPicker do
 
   @impl true
   def update(assigns, socket) do
-    preloads = %{ teams: [ :teams, [ teams: :projects ], [ teams: [ projects: :versions]]] }
-    user = Users.get_user!(assigns.current_user.id, preloads, %{}, assigns, Defaults.state_opts())
+    current_version_name =
+      case assigns.current_version do
+        %UserDocs.Projects.Version{ name: nil } = version -> "None Selected"
+        %UserDocs.Projects.Version{ name: name } = version -> name
+        _ -> "None Selected"
+      end
+
     {
       :ok,
       socket
       |> assign(assigns)
-      |> assign(:current_user, user)
+      |> assign(:current_version_name, current_version_name)
     }
+  end
+
+  def is_active(id1, id2) do
+    case id1 == id2 do
+      true -> "dropdown-item is-active"
+      false -> "dropdown-item"
+    end
   end
 end
