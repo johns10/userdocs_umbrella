@@ -49,7 +49,7 @@ defmodule UserDocsWeb.VersionLive.Index do
     do_handle_params(params, url, socket, String.to_integer(project_id))
   end
   def handle_params(params, url, socket) do
-    do_handle_params(params, url, socket, socket.assigns.current_project_id)
+    do_handle_params(params, url, socket, socket.assigns.current_project.id)
   end
   def do_handle_params(params, _url, socket, project_id) do
     {

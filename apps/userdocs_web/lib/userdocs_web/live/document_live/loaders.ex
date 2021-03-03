@@ -20,18 +20,18 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
     Documents.load_docubit_types(socket, opts)
   end
 
-  def load_pages(%{ assigns: %{ current_version_id: current_version_id }} = socket, opts) do
+  def load_pages(%{ assigns: %{ current_version: current_version }} = socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version: current_version_id})
+      |> Keyword.put(:filters, %{version: current_version.id})
 
     Web.load_pages(socket, opts)
   end
 
-  def load_processes(%{ assigns: %{ current_version_id: current_version_id }} = socket, opts) do
+  def load_processes(%{ assigns: %{ current_version: current_version }} = socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version: current_version_id})
+      |> Keyword.put(:filters, %{version: current_version.id})
 
     Automation.load_processes(socket, opts)
   end
@@ -50,7 +50,7 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
     }
     opts =
       opts
-      |> Keyword.put(:filters, %{team_id: socket.assigns.current_team_id})
+      |> Keyword.put(:filters, %{team_id: socket.assigns.current_team.id})
       |> Keyword.put(:params, params)
 
     Automation.load_steps(socket, opts)
@@ -84,7 +84,7 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
     params = %{ content: true, content_versions: true, annotation_type: true }
     opts =
       opts
-      |> Keyword.put(:filters, %{team_id: socket.assigns.current_team_id})
+      |> Keyword.put(:filters, %{team_id: socket.assigns.current_team.id})
       |> Keyword.put(:params, params)
 
     Web.load_annotations(socket, opts)

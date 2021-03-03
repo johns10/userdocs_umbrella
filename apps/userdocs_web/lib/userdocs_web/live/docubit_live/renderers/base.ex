@@ -20,7 +20,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
         <%= for docubit <- @docubit.docubits do %>
           <%= Docubit.renderer(docubit).render(%{
             current_language_code_id: @current_language_code_id,
-            current_version_id: @current_version_id,
+            current_version_id: @current_version.id,
             component: false,
             editor: false,
             role: @role,
@@ -51,9 +51,9 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
   end
   def display_content_header(assigns, %Docubit{content: %Content{} = content}) do
     content.content_versions
-    |> maybe_content_versions(assigns.current_version_id)
+    |> maybe_content_versions(assigns.current_version.id)
     |> maybe_language_code(assigns.current_language_code_id)
-    |> maybe_header(to_string(content.name), assigns.current_version_id)
+    |> maybe_header(to_string(content.name), assigns.current_version.id)
   end
 
   def display_content(_assigns, %Docubit{content: %Content{ name: name, content_versions: []}}) do
@@ -64,7 +64,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
   end
   def display_content(assigns, %Docubit{content: %Content{} = content} = docubit) do
     content.content_versions
-    |> maybe_content_versions(assigns.current_version_id)
+    |> maybe_content_versions(assigns.current_version.id)
     |> maybe_language_code(assigns.current_language_code_id)
     |> maybe_body()
     |> maybe_name_prefix(docubit.context, content)

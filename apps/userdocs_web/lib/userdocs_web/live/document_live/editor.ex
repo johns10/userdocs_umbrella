@@ -299,7 +299,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
   defp assign_current_version(socket) do
     version =
-      socket.assigns.current_version_id
+      socket.assigns.current_version.id
       |> Projects.get_version!(socket, socket.assigns.state_opts)
 
     socket
@@ -308,12 +308,8 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
   defp default_language_code_id(socket) do
     IO.puts("default_language_code_id")
-    language_code_id =
-      Users.get_team!(socket.assigns.current_team_id, socket, socket.assigns.state_opts)
-      |> Map.get(:default_language_code_id)
-
     socket
-    |> assign(:current_language_code_id, language_code_id)
+    |> assign(:current_language_code_id, socket.assigns.current_team.default_language_code_id)
   end
 
   defp default_document_version_id(socket, document_or_id) do

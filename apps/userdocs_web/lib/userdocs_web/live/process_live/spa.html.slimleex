@@ -13,10 +13,10 @@ css:
     processes: @processes,
     app_name: @app_name,
     process: @process,
-    project: @project,
-    version: @version,
+    project: @current_project,
+    version: @current_version,
     page_title: @page_title,
-    team: @team,
+    team: @current_team,
     data: @data ])
 = if @mode == :steps do
   nav.breadcrumb aria-label="breadcrumbs"
@@ -32,19 +32,19 @@ css:
     .level-right
       = live_component(@socket, ProcessLive.Runner, 
         [ id: "process-" <> Integer.to_string(@process.id) <> "-runner",
-        process: @process ])
+        process: Map.put(@process, :steps, @steps) ])
 
   = live_component(@socket, UserDocsWeb.StepLive.IndexComponent,
     [ live_action: @live_action,
     state_opts: @state_opts,
     process: @process,
-    project: @project,
-    version: @version,
+    project: @current_project,
+    version: @current_version,
     app_name: @app_name,
     page_title: @page_title,
     steps: @steps,
     step: @step,
-    team: @team,
+    team: @current_team,
     data: @data,
     current_version: @current_version,
     select_lists: @select_lists ])
