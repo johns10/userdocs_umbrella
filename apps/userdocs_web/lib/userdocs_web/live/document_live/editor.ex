@@ -56,7 +56,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       socket
       |> StateHandlers.initialize(opts)
       |> Root.authorize(session)
-      |> Root.initialize(opts)
+      |> (&(Root.initialize(&1, Defaults.opts(&1, @types)))).()
       |> assign(:dragging, %{ type: nil, id: nil})
     }
   end
