@@ -19,7 +19,6 @@ defmodule UserDocs.Documents.Document do
     document_version
     |> cast(attrs, [ :name, :title, :project_id ])
     |> foreign_key_constraint(:project_id)
-    |> cast_assoc(:document_versions)
-    |> validate_required([:name, :title])
+    |> cast_assoc(:document_versions, with: &DocumentVersion.changeset/2)
   end
 end
