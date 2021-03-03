@@ -13,27 +13,31 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   alias UserDocs.Web
   alias UserDocs.Users
 
-  alias UserDocs.Automation.Process
-  alias UserDocs.Automation.Step
   alias UserDocs.Documents
   alias UserDocs.Documents.Document
   alias UserDocs.Documents.Content
   alias UserDocs.Documents.ContentVersion
-  alias UserDocs.Documents.DocumentVersion
-  alias UserDocs.Documents.LanguageCode
   alias UserDocs.Documents.Docubit
-  alias UserDocs.Documents.DocubitType
-  alias UserDocs.Web.Page
-  alias UserDocs.Web.Annotation
 
   alias UserDocsWeb.Root
   alias UserDocsWeb.Defaults
   alias UserDocsWeb.DocubitLive.Renderers.Base
 
-  @types [  Document, DocumentVersion, Page,
-  Process, Content, ContentVersion, Step, LanguageCode, Annotation,
-  Docubit, DocubitType,
-  UserDocs.Media.Screenshot
+  @types [
+    UserDocs.Documents.Document,
+    UserDocs.Documents.DocumentVersion,
+    UserDocs.Web.Page,
+    UserDocs.Automation.Process,
+    UserDocs.Documents.Content,
+    UserDocs.Documents.ContentVersion,
+    UserDocs.Automation.Step,
+    UserDocs.Documents.LanguageCode,
+    UserDocs.Web.Annotation,
+    UserDocs.Documents.Docubit,
+    UserDocs.Documents.DocubitType,
+    UserDocs.Media.Screenshot,
+    UserDocs.Projects.Version,
+    UserDocs.Users.Team
 ]
 
   @impl true
