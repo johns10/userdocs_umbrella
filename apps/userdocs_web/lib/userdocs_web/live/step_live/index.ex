@@ -23,9 +23,10 @@ defmodule UserDocsWeb.StepLive.Index do
     [
       UserDocs.Web.AnnotationType,
       UserDocs.Web.Strategy,
+      UserDocs.Projects.Version,
+      UserDocs.Documents.Content,
       UserDocs.Documents.LanguageCode,
       UserDocs.Automation.StepType,
-      UserDocs.Documents.Content,
       UserDocs.Automation.Process,
       UserDocs.Automation.Step,
       UserDocs.Web.Annotation,
