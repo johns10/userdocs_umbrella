@@ -72,10 +72,9 @@ defmodule UserDocs.Media do
   def get_screenshot!(id), do: Repo.get!(Screenshot, id)
 
   def get_screenshot_url(nil), do: { :no_screenshot, "" }
+  def get_screenshot_url(%Ecto.Association.NotLoaded{}), do: { :not_loaded, "" }
   def get_screenshot_url(%Screenshot{ aws_file: nil }), do: { :nofile, "" }
   def get_screenshot_url(%Screenshot{ aws_file: aws_file }) do
-    object = aws_file.file_name
-
     region =
       Application.get_env(:userdocs, :ex_aws)
       |> Keyword.get(:region)
@@ -125,7 +124,6 @@ defmodule UserDocs.Media do
     |> ScreenshotHelpers.save_file(raw_encoded_image)
     |> ScreenshotHelpers.maybe_resize_image(step_type_name, element)
     |> ScreenshotHelpers.update_screenshot()
-    |> IO.inspect()
   end
   def create_file_and_screenshot(%{}), do: { :error, "Missing encoded image.  Failed to create file"}
   def create_file_and_screenshot(_) do
