@@ -59,6 +59,87 @@ defmodule UserDocs.TestDataset do
     Enum.each(Users.list_users, fn(u) -> Users.delete_user(u) end)
   end
 
+  def create_base_data() do
+    strategies = [
+      xpath_strategy = %{
+        name: "xpath"
+      },
+      css_strategy = %{
+        name: "css"
+      }
+    ]
+
+    Enum.each(strategies, fn(strategy) -> UserDocs.Web.create_strategy(strategy) end)
+
+    annotation_types = [
+      %{
+        args: ["color", "thickness"],
+        name: "Outline"
+      },
+      %{
+        args: ["color", "thickness"],
+        name: "Blur"
+      },
+      %{
+        args: ["x_orientation", "y_orientation", "size", "label", "color", "x_offset", "y_offset", "font_size"],
+        name: "Badge"
+      },
+      %{
+        args: ["x_orientation", "y_orientation", "size", "label", "color",
+         "x_offset", "y_offset", "font_size"],
+        name: "Badge Blur"
+      },
+      %{
+        args: ["x_orientation", "y_orientation", "size", "label", "color",
+         "thickness", "x_offset", "y_offset", "font_size"],
+        name: "Badge Outline"
+      }
+    ]
+
+    Enum.each(annotation_types, fn(annotation_type) -> UserDocs.Web.create_annotation_type(annotation_type) end)
+
+    step_types = [
+      %{
+        args: ["url", "page_id", "page_reference"],
+        name: "Navigate"
+      },
+      %{
+        args: ["element_id"],
+        name: "Wait"
+      },
+      %{
+        args: ["element_id"],
+        name: "Click"
+      },
+      %{
+        args: ["element_id", "text"],
+        name: "Fill Field"
+      },
+      %{
+        args: ["annotation_id", "element_id"],
+        name: "Apply Annotation"
+      },
+      %{
+        args: ["width", "height"],
+        name: "Set Size Explicit"
+      },
+      %{
+        args: [],
+        name: "Full Screen Screenshot"
+      },
+      %{
+        args: [],
+        name: "Clear Annotations"
+      },
+      %{
+        args: ["element_id"],
+        name: "Element Screenshot"
+      }
+    ]
+
+    Enum.each(step_types, fn(step_type) -> UserDocs.Automation.create_step_type(step_type) end)
+  end
+
   def create() do
 
   _strategies = [
@@ -236,6 +317,20 @@ defmodule UserDocs.TestDataset do
         password_confirmation: default_password
       }
 
+    test_user_1 =
+      %{
+        email: "user@organization.com",
+        password: "testtesttest",
+        password_confirmation: "testtesttest"
+      }
+
+    test_user_2 =
+      %{
+        email: "user2@organization.com",
+        password: "testtesttest",
+        password_confirmation: "testtesttest"
+      }
+
     {:ok, user_1 = %User{id: user1_id}} =
       %User{}
       |> User.changeset(user_1)
@@ -245,6 +340,16 @@ defmodule UserDocs.TestDataset do
     %User{}
     |> User.changeset(user_2)
     |> Repo.insert()
+
+    {:ok, _ } =
+      %User{}
+      |> User.changeset(test_user_1)
+      |> Repo.insert()
+
+    {:ok, _ } =
+      %User{}
+      |> User.changeset(test_user_2)
+      |> Repo.insert()
 
     # Team Data
 
