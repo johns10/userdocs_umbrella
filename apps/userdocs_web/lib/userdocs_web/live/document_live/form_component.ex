@@ -1,7 +1,11 @@
 defmodule UserDocsWeb.DocumentLive.FormComponent do
   use UserDocsWeb, :live_component
 
+  alias UserDocs.ChangesetHelpers
   alias UserDocs.Documents
+  alias UserDocs.Projects
+  alias UserDocs.Projects.Version
+  alias UserDocs.Documents.DocumentVersion
   alias UserDocsWeb.Layout
 
   @impl true
@@ -22,8 +26,29 @@ defmodule UserDocsWeb.DocumentLive.FormComponent do
       socket.assigns.document
       |> Documents.change_document(document_params)
       |> Map.put(:action, :validate)
+      |> update_document_version_names(socket)
 
     {:noreply, assign(socket, :changeset, changeset)}
+  end
+
+  def update_document_version_names(changeset, socket) do
+    case Ecto.Changeset.get_change(changeset, :document_versions, []) do
+      [] -> changeset
+      [ _ | _ ] = document_versions ->
+        document_versions =
+          Enum.map(document_versions, fn(dv) ->
+            document_name = Ecto.Changeset.get_field(changeset, :name)
+            version =
+              case Ecto.Changeset.get_field(dv, :version_id) do
+                nil -> %Version{ name: "No Version Set"}
+                id -> Projects.get_version!(id, socket, socket.assigns.state_opts)
+              end
+            name = document_name <> " (" <> version.name <> ")"
+            Ecto.Changeset.put_change(dv, :name, name)
+          end)
+
+        Ecto.Changeset.put_change(changeset, :document_versions, document_versions)
+    end
   end
 
   def handle_event("save", %{"document" => document_params}, socket) do
