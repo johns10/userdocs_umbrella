@@ -80,8 +80,12 @@ defmodule UserDocsWeb.DocumentLive.FormComponent do
     case Documents.update_document(socket.assigns.document, document_params) do
       {:ok, document} ->
         send(self(), { :broadcast, "update", document })
-        send(self(), :close_modal)
-        {:noreply, put_flash(socket, :info, "Document updated successfully") }
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "Document updated successfully")
+          |> push_redirect(to: socket.assigns.return_to)
+        }
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
@@ -92,8 +96,12 @@ defmodule UserDocsWeb.DocumentLive.FormComponent do
     case Documents.create_document(document_params) do
       {:ok, document} ->
         send(self(), { :broadcast, "create", document })
-        send(self(), :close_modal)
-        {:noreply, put_flash(socket, :info, "Document created successfully")}
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "Document created successfully")
+          |> push_redirect(to: socket.assigns.return_to)
+        }
 
       {:error, %Ecto.Changeset{} = changeset} ->
         IO.puts("Failed Save")
