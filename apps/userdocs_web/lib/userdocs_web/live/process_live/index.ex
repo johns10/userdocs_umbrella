@@ -15,6 +15,7 @@ defmodule UserDocsWeb.ProcessLive.Index do
 
   @types [
     UserDocs.Automation.Process,
+    UserDocs.Projects.Version,
     UserDocs.Media.Screenshot,
   ]
 
