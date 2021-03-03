@@ -1,5 +1,19 @@
 h1 Listing Documents
 
+= if @live_action in [:edit, :new] do
+  = live_modal @socket, UserDocsWeb.DocumentLive.FormComponent,
+    id: @document.id || :new,
+    parent_id: @current_team.id,
+    title: @page_title,
+    action: @live_action,
+    document: @document,
+    select_lists: @select_lists,
+    state_opts: @state_opts,
+    data: @data,
+    current_project: @current_project,
+    current_version: @current_version,
+    return_to: Routes.document_index_path(@socket, :index)
+
 aside.menu
   p.menu-label Documents 
   ul.menu-list
@@ -11,11 +25,9 @@ aside.menu
           div.is-flex.is-flex-direction-row.is-flex-grow-0
             = live_patch to: Routes.document_editor_path(@socket, :edit, document) do
               i.fa.fa-lg.fa-search
-            = content_tag :a, to: "#", phx_click: "new-document-version", phx_value_document_id: document.id do
-              i.fa.fa-lg.fa-plus-square
             = content_tag :a, to: "#", phx_click: "delete", phx_value_id: document.id do
               i.fa.fa-lg.fa-minus-square
-            = content_tag :a, to: "#", phx_click: "edit-document", phx_value_id: document.id do
+            = live_patch to: Routes.document_index_path(@socket, :edit, document) do
               i.fa.fa-lg.fa-edit
         ul
           = for document_version <- document.document_versions do
@@ -25,10 +37,6 @@ aside.menu
               div.is-flex.is-flex-direction-row.is-flex-grow-0
                 = link to: Routes.document_version_download_path(@socket, :show, document_version.id) do
                   i.fa.fa-lg.fa-cloud-download
-                = content_tag :a, phx_click: "delete-document-version", phx_value_id: document_version.id do
-                  i.fa.fa-lg.fa-minus-square
-                = content_tag :a, phx_click: "edit-document-version", phx_value_id: document_version.id do
-                  i.fa.fa-lg.fa-edit 
 
-= link to: "#", phx_click: "new-document" do
+= live_patch to: Routes.document_index_path(@socket, :new) do
   button.button.is-primary New Document
