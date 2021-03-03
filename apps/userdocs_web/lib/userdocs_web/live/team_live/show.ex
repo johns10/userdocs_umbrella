@@ -7,7 +7,6 @@ defmodule UserDocsWeb.TeamLive.Show do
 
   alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.Defaults
-  alias UserDocsWeb.Loaders
   alias UserDocsWeb.Root
 
   @types [
@@ -34,13 +33,14 @@ defmodule UserDocsWeb.TeamLive.Show do
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
-    team = Users.get_team!(id, %{ preloads: [ users: true, default_project: true, content: true ] })
-    IO.inspect(team)
+    team = Users.get_team!(id, %{ preloads: [ projects: true, users: true, content: true ] })
+    default_project = Users.team_default_project(team)
+
     {
       :noreply,
       socket
       |> assign(:page_title, page_title(socket.assigns.live_action))
-      |> assign(:team, team)
+      |> assign(:team, Map.put(team, :default_project, default_project))
     }
   end
 
