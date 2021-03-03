@@ -26,7 +26,6 @@ defmodule UserDocsWeb.Layout do
         content_tag(:div, [ class: "control" ]) do
           content_tag(:div, [ class: "checkbox" ]) do
             Form.checkbox(form, name, [
-              value: "Checkbox",
               type: "checkbox",
               placeholder: placeholder,
               id: id,
