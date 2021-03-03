@@ -59,6 +59,7 @@ defmodule UserDocsWeb.ProjectLive.Index do
     socket
     |> assign(:page_title, "Listing Projects")
     |> assign(:project, nil)
+    |> assign(:current_team, Users.get_team!(team_id))
     |> prepare_index(team_id)
   end
   defp apply_action(socket, :index, _params) do
