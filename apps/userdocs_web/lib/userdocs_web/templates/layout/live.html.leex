@@ -29,16 +29,16 @@
 
       <div class="navbar-end">
         <div class="navbar-item">
-          <div class="buttons">
-            <a class="button is-primary">
-              <%= "Sign In" %>
-            </a>
-            <%= if @app_name == "web" do %>
+          <%= if @app_name == "web" do %>
+            <div class="buttons">
+              <%= link "User", to: Routes.user_show_path(@socket, :show, @current_user.id), class: "button" %>
               <%= link "Sign out", to: Routes.logout_path(@socket, :delete), method: :delete, class: "button is-light" %>
-            <% else %>
+            </div>
+          <% else %>
+            <div class="buttons">
               <%= link "Sign out", to: URI.merge(@uri, Routes.session_path(@uri, :new)) |> to_string(), method: :delete, class: "button is-light" %>
-            <% end %>
-          </div>
+            </div>
+          <%= end %>
         </div>
       </div>
     </div>
