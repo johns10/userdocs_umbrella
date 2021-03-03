@@ -22,6 +22,14 @@ defmodule UserDocs.Projects.Project do
   end
 
   @doc false
+  def create_changeset(project, attrs) do
+    project
+    |> cast(attrs, [:name, :base_url, :team_id, :default_version_id, :default])
+    |> foreign_key_constraint(:team_id)
+    |> validate_required([:name, :base_url])
+  end
+
+  @doc false
   def changeset(project, attrs) do
     project
     |> cast(attrs, [:name, :base_url,
