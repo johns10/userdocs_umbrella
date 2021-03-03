@@ -3,12 +3,14 @@ defmodule UserDocs.Repo.Migrations.AddUserSelections do
 
   def change do
     alter table(:users) do
-      add :selected_team_id, references(:teams, on_delete: :nothing)
-      add :selected_project_id, references(:projects, on_delete: :nothing)
-      add :selected_version_id, references(:versions, on_delete: :nothing)
+      add :default_team, :map
+      modify :default_team_id, :integer, from: references(:teams, on_delete: :delete_all)
+      add :selected_team, :map
+      add :selected_team_id, :integer
+      add :selected_project, :map
+      add :selected_project_id, :integer
+      add :selected_version, :map
+      add :selected_version_id, :integer
     end
-    create index(:users, [:selected_team_id])
-    create index(:users, [:selected_project_id])
-    create index(:users, [:selected_version_id])
   end
 end
