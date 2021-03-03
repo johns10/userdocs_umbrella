@@ -149,17 +149,15 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   defp current_selections(socket) do
     process = Automation.list_processes(socket, socket.assigns.state_opts) |> Enum.at(0)
     page = Web.list_pages(socket, socket.assigns.state_opts) |> Enum.at(0)
-    version = Projects.get_version!(socket.assigns.current_version_id, socket, socket.assigns.state_opts)
 
     socket
     |> assign(:current_page, page)
     |> assign(:current_process, process)
-    |> assign(:current_version, version)
   end
 
   defp default_language_code_id(socket) do
     language_code_id =
-      Users.get_team!(socket.assigns.current_team_id, socket, socket.assigns.state_opts)
+      socket.assigns.current_team
       |> Map.get(:default_language_code_id)
 
     socket
