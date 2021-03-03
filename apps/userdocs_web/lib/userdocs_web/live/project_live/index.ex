@@ -17,18 +17,13 @@ defmodule UserDocsWeb.ProjectLive.Index do
     UserDocs.Projects.Project
   ]
 
-  def state_opts(socket) do
-    Defaults.opts(socket, @types)
-  end
-
   @impl true
   def mount(_params, session, socket) do
-    opts = state_opts(socket)
     {
       :ok,
       socket
       |> Root.authorize(session)
-      |> Root.initialize(opts)
+      |> (&(Root.initialize(&1, Defaults.opts(&1, @types)))).()
       |> initialize()
     }
   end
@@ -36,7 +31,7 @@ defmodule UserDocsWeb.ProjectLive.Index do
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
     socket
     |> assign(:modal_action, :show)
-    |> assign(:state_opts, state_opts(socket))
+    |> assign(:state_opts, socket.assigns.state_opts)
   end
   def initialize(socket), do: socket
 
