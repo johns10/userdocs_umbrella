@@ -31,6 +31,11 @@ defmodule UserDocs.Projects.Version do
     |> validate_required([:name])
   end
 
+  def change_default_version(version, attrs) do
+    version
+    |> cast(attrs, [ :default ])
+  end
+
   def processes(version = %UserDocs.Projects.Version{}, processes) do
     processes(version.id, processes)
   end
