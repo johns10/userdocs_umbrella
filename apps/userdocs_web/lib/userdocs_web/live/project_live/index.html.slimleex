@@ -10,7 +10,7 @@
     project: @project,
     select_lists: %{ teams: @teams_select_options },
     state_opts: @state_opts,
-    return_to: Routes.project_index_path(@socket, :index)
+    return_to: Routes.project_index_path(@socket, :index, @current_team.id)
 
 aside.menu
   p.menu-label Projects
