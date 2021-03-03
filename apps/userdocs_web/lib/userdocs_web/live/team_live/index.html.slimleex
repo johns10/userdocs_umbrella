@@ -26,7 +26,7 @@ aside.menu
             = live_patch to: Routes.team_index_path(@socket, :edit, team) do
               i.fa.fa-lg.fa-edit
             = link to: "#", phx_click: "delete", phx_value_id: team.id, data: [confirm: "Are you sure?"] do
-              i.fa.fa-lg.fa-trashproject_show_path
+              i.fa.fa-lg.fa-trash
 
 = if @current_user.email == "johns10davenport@gmail.com" do 
   = live_patch to: Routes.team_index_path(@socket, :new) do
