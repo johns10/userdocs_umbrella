@@ -13,20 +13,14 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   alias UserDocs.Web
   alias UserDocs.Users
 
-  alias UserDocs.Automation.Process
-  alias UserDocs.Automation.Step
   alias UserDocs.Documents
   alias UserDocs.Documents.Document
   alias UserDocs.Documents.Content
   alias UserDocs.Documents.ContentVersion
-  alias UserDocs.Documents.DocumentVersion
-  alias UserDocs.Documents.LanguageCode
   alias UserDocs.Documents.Docubit
   alias UserDocs.Documents.DocubitType
   alias UserDocs.Documents.DocubitSetting
   alias UserDocs.Documents.Docubit.Context
-  alias UserDocs.Web.Page
-  alias UserDocs.Web.Annotation
 
   alias UserDocsWeb.Root
   alias UserDocsWeb.Defaults
@@ -36,18 +30,21 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   @allowed_step_types ["Full Screen Screenshot", "Element Screenshot", "Apply Annotation"]
 
   @types [
-    Docubit, DocubitType,
-    UserDocs.Documents.Document,
-    UserDocs.Documents.DocumentVersion,
-    UserDocs.Web.Page,
     UserDocs.Automation.Process,
+    UserDocs.Automation.Step,
     UserDocs.Documents.Content,
     UserDocs.Documents.ContentVersion,
-    UserDocs.Automation.Step,
+    UserDocs.Documents.Docubit,
+    UserDocs.Documents.DocubitType,
+    UserDocs.Documents.Document,
+    UserDocs.Documents.DocumentVersion,
     UserDocs.Documents.LanguageCode,
+    UserDocs.Media.Screenshot,
+    UserDocs.Projects.Version,
+    UserDocs.Users.Team,
     UserDocs.Web.Annotation,
     UserDocs.Web.AnnotationType,
-    UserDocs.Media.Screenshot
+    UserDocs.Web.Page,
   ]
 
   @impl true
