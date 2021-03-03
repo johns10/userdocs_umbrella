@@ -33,20 +33,6 @@
   }
 </style>
 
-<%= live_component(@socket, UserDocsWeb.BreadCrumb, [
-  state_opts: @state_opts,
-  data: %{
-    teams: @data.teams,
-    team_users: @data.team_users,
-    projects: @data.projects,
-    versions: @data.versions,
-  },
-  current_team_id: @current_team_id,
-  current_project_id: @current_project_id,
-  current_version_id: @current_version_id,
-  additional_items: [ %{ to: "#", name: @document.name } ],
-  last_item: %{ to: "#", name: @document_version.version.name }
-]) %>
 
 <%= live_component(@socket, Dragging, [
   object_type: @dragging.type,
