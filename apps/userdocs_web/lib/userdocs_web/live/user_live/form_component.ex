@@ -55,28 +55,6 @@ defmodule UserDocsWeb.UserLive.FormComponent do
       |> Users.change_user_options(user_params)
       |> Map.put(:action, :validate)
 
-    num_defaults =
-      case Ecto.Changeset.get_change(changeset, :team_users) do
-        nil -> 1
-        team_users ->
-          Enum.reduce(team_users, 0, fn(team_user, acc) ->
-            case { Ecto.Changeset.get_change(team_user, :default, nil), team_user.data.default } do
-              { true, _ } -> acc + 1
-              { nil, true } -> acc + 1
-              { _, _ } -> acc
-            end
-          end)
-      end
-
-    IO.inspect(num_defaults)
-
-    changeset =
-      if num_defaults != 1 do
-        Ecto.Changeset.add_error(changeset, :team_users, "May only have 1 default")
-      else
-        changeset
-      end
-
     {:noreply, assign(socket, :changeset, changeset)}
   end
 
