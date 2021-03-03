@@ -58,7 +58,6 @@ defmodule UserDocsWeb.DocumentLive.Editor do
       |> Root.authorize(session)
       |> Root.initialize(opts)
       |> assign(:dragging, %{ type: nil, id: nil})
-      |> assign(:state_opts, opts)
     }
   end
 
