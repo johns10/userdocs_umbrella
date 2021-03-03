@@ -21,9 +21,10 @@ defmodule UserDocsWeb.Loaders do
     Projects.load_versions(socket, opts)
   end
 
+  def load_content(%{ assigns: %{ current_team: current_team }} = socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{team_id: current_team_id})
+      |> Keyword.put(:filters, %{team_id: current_team.id})
       |> Keyword.put(:params, %{ content_versions: true })
 
 
