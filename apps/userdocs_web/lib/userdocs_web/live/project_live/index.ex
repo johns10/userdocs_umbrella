@@ -100,7 +100,7 @@ defmodule UserDocsWeb.ProjectLive.Index do
   end
 
   defp prepare_edit(socket, id) do
-    Logger.debug("#{__MODULE__}.prepare_index issuing get_user! and get_project! query")
+    Logger.debug("#{__MODULE__}.prepare_edit issuing get_user! and get_project! query")
     user = Users.get_user!(socket.assigns.current_user.id, %{ teams: true }, %{})
     socket
     |> assign(:page_title, "Edit Project")
