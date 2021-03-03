@@ -3,6 +3,7 @@ defmodule UserDocs.Documents.DocumentVersion do
   import Ecto.Changeset
 
   alias UserDocs.Documents
+  alias UserDocs.ChangesetHelpers
   alias UserDocs.Projects.Version
   alias UserDocs.Documents.Docubit
   alias UserDocs.Documents.Document
@@ -11,6 +12,9 @@ defmodule UserDocs.Documents.DocumentVersion do
   alias UserDocs.Documents.Docubit.Context
 
   schema "document_versions" do
+    field :temp_id, :string, virtual: true
+    field :delete, :boolean, virtual: true
+
     field :name, :string
     field :map, { :map, :integer }
 
@@ -25,13 +29,16 @@ defmodule UserDocs.Documents.DocumentVersion do
 
   @doc false
   def changeset(document_version, attrs) do
+    IO.puts("DV Changeset")
     document_version
-    |> cast(attrs, [ :name, :document_id, :version_id, :docubit_id ])
+    |> Map.put(:temp_id, (document_version.temp_id || attrs["temp_id"]))
+    |> cast(attrs, [ :name, :document_id, :version_id, :docubit_id, :delete ])
     |> body_is_container_docubit_if_empty()
     |> cast_assoc(:body, with: &Docubit.changeset/2)
     |> foreign_key_constraint(:version_id)
     |> foreign_key_constraint(:docubit_id)
     |> foreign_key_constraint(:document_id)
+    |> ChangesetHelpers.maybe_mark_for_deletion()
   end
 
   defp body_is_container_docubit_if_empty(changeset) do
