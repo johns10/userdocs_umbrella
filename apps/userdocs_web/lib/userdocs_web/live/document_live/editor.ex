@@ -235,8 +235,16 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
     document_version = Documents.get_document_version!(document_version_id, socket, opts)
 
+    { :ok, body } =
+      case document_version.body do
+        nil -> { :error, "No Document Body" }
+        %Docubit{ document_version_id: nil } = docubit ->
+          Documents.update_docubit(docubit, %{ document_version_id: document_version_id })
+        %Docubit{ document_version_id: _ } = docubit -> { :ok, docubit }
+      end
+
     body =
-      document_version.body
+      body
       |> Docubit.apply_context(%{ settings: %{} })
 
     document_version = Map.put(document_version, :body, body)
