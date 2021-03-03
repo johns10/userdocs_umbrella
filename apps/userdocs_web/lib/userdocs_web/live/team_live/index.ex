@@ -11,7 +11,8 @@ defmodule UserDocsWeb.TeamLive.Index do
   alias UserDocsWeb.ComposableBreadCrumb
 
   @types [
-    UserDocs.Users.Team
+    UserDocs.Users.Team,
+    UserDocs.Users.User
   ]
 
   @impl true
