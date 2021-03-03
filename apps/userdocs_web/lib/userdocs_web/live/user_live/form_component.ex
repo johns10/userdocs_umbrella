@@ -102,7 +102,6 @@ defmodule UserDocsWeb.UserLive.FormComponent do
   defp save_user(socket, :new, user_params) do
     case Users.create_user(user_params) do
       {:ok, user} ->
-        IO.inspect(user)
         {
           :noreply,
           socket
@@ -119,7 +118,6 @@ defmodule UserDocsWeb.UserLive.FormComponent do
     IO.puts("options")
     case Users.update_user_options(socket.assigns.user, user_params) do
       {:ok, user} ->
-        IO.inspect(user)
         {
           :noreply,
           socket
@@ -128,8 +126,6 @@ defmodule UserDocsWeb.UserLive.FormComponent do
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        IO.puts("Error")
-        IO.inspect(changeset)
         {:noreply, assign(socket, changeset: changeset)}
     end
   end
