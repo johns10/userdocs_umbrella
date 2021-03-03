@@ -17,7 +17,7 @@ defmodule UserDocsWeb.TeamLive.Index do
 
   @impl true
   def mount(_params, session, socket) do
-    opts = Defaults.base_opts(@types)
+    opts = Defaults.opts(socket, @types)
     {
       :ok,
       socket
