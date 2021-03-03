@@ -3,6 +3,7 @@ defmodule UserDocs.Users.User do
   use Pow.Ecto.Schema
   import Ecto.Changeset
 
+  alias UserDocs.ChangesetHelpers
   alias UserDocs.Users.Team
   alias UserDocs.Users.TeamUser
   alias UserDocs.Projects.Project
@@ -11,11 +12,15 @@ defmodule UserDocs.Users.User do
   schema "users" do
     pow_user_fields()
 
-    belongs_to :default_team, Team
+    field :default_team_id, :integer
+    embeds_one :default_team, Team
 
-    belongs_to :selected_team, Team
-    belongs_to :selected_project, Project
-    belongs_to :selected_version, Version
+    field :selected_team_id, :integer
+    embeds_one :selected_team, Team
+    field :selected_project_id, :integer
+    embeds_one :selected_project, Project
+    field :selected_version_id, :integer
+    embeds_one :selected_version, Version
 
     has_many :team_users, TeamUser
 
@@ -38,6 +43,7 @@ defmodule UserDocs.Users.User do
     user
     |> cast(attrs, [ :default_team_id, :selected_team_id, :selected_project_id, :selected_version_id ])
     |> cast_assoc(:team_users)
+    |> ChangesetHelpers.check_only_one_default(:team_users)
   end
 
   def preload_teams(user = %UserDocs.Users.User{}, %{ teams: teams, team_users: team_users }) do
