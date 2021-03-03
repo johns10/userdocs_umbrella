@@ -3,8 +3,24 @@ defmodule UserDocsWeb.Loaders do
 
   alias UserDocs.Documents
   alias UserDocs.Media
+  alias UserDocs.Projects
 
-  def load_content(%{ assigns: %{ current_team_id: current_team_id }} = socket, opts) do
+  def projects(%{ assigns: %{ current_user: current_user } } = socket) do
+    opts =
+      socket.assigns.state_opts
+      |> Keyword.put(:filters, %{ user_id: current_user.id })
+
+    Projects.load_projects(socket, opts)
+  end
+
+  def versions(%{ assigns: %{ current_user: current_user } } = socket) do
+    opts =
+      socket.assigns.state_opts
+      |> Keyword.put(:filters, %{ user_id: current_user.id })
+
+    Projects.load_versions(socket, opts)
+  end
+
     opts =
       opts
       |> Keyword.put(:filters, %{team_id: current_team_id})
