@@ -3,6 +3,7 @@ defmodule UserDocs.Users do
   The Users context.
   """
 
+  require Logger
   import Ecto.Query, warn: false
   alias UserDocs.Repo
 
@@ -388,6 +389,19 @@ defmodule UserDocs.Users do
       ** (Ecto.NoResultsError)
 
   """
+  # This function is used because I reverted to integer
+  # keys on user selections.  I should go back to FK's
+  # and get my on_delete stuff right.
+  def try_get_team!(id) do
+    try do
+      get_team!(id)
+    rescue
+      e ->
+        Logger.error("Failed to retreive selected team, error: ")
+        Logger.error(e)
+        nil
+    end
+  end
   def get_team!(id, params \\ %{}) do
     preloads = Map.get(params, :preloads, [])
     base_team_query(id)
