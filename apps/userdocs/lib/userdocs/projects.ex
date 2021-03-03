@@ -3,6 +3,7 @@ defmodule UserDocs.Projects do
   The Projects context.
   """
 
+  require Logger
   import Ecto.Query, warn: false
   alias UserDocs.Repo
   alias UserDocs.Subscription
