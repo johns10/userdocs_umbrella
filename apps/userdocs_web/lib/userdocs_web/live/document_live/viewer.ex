@@ -49,8 +49,7 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
       socket
       |> StateHandlers.initialize(opts)
       |> Root.authorize(session)
-      |> Root.initialize(opts)
-      |> assign(:state_opts, opts)
+      |> (&(Root.initialize(&1, Defaults.opts(&1, @types)))).()
     }
   end
 
