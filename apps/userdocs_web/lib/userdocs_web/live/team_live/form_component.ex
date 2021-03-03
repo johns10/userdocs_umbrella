@@ -27,7 +27,6 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
 
   @impl true
   def handle_event("validate", %{"team" => team_params}, socket) do
-    IO.inspect(socket.assigns.changeset)
     changeset =
       socket.assigns.team
       |> Users.change_team(team_params)
@@ -52,8 +51,6 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
       |> Enum.concat([
         Users.change_team_user(%TeamUser{temp_id: get_temp_id()})
       ])
-
-    IO.inspect(team_users)
 
     changeset =
       socket.assigns.changeset
