@@ -79,8 +79,6 @@ defmodule UserDocsWeb.ProjectLive.Index do
       assign(socket, :projects, Projects.list_projects(%{}, %{ team_id: socket.assigns.team_id }))
     }
   end
-
-  @imple true
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   defp prepare_index(socket, team_id) do
