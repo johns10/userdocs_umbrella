@@ -3,8 +3,8 @@ defmodule UserDocs.Repo.Migrations.ModifyDefaultProject do
 
   def change do
     alter table(:teams) do
-      remove :default_project_id
-      add :default_project, :map, from: references(:projects, on_delete: :delete_all)
+      remove :default_project_id, references(:projects, on_delete: :delete_all)
+      add :default_project, :map
     end
   end
 end
