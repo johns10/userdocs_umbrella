@@ -193,6 +193,12 @@ defmodule UserDocs.Users do
     |> Repo.update()
   end
 
+  def update_user_selections(%User{} = user, attrs) do
+    user
+    |> User.change_selections(attrs)
+    |> Repo.update()
+  end
+
   @doc """
   Deletes a user.
 
