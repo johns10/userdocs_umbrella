@@ -205,7 +205,7 @@ defmodule UserDocsWeb.Root do
     }
 
     { :ok, user } =
-      Users.update_user_options(socket.assigns.current_user, changes)
+      Users.update_user_selections(socket.assigns.current_user, changes)
 
     send(self(), { :broadcast, "update", user })
 

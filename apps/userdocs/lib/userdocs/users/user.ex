@@ -46,6 +46,11 @@ defmodule UserDocs.Users.User do
     |> ChangesetHelpers.check_only_one_default(:team_users)
   end
 
+  def change_selections(user, attrs) do
+    user
+    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id])
+  end
+
   def preload_teams(user = %UserDocs.Users.User{}, %{ teams: teams, team_users: team_users }) do
     Map.put(user, :teams, teams(user.id, teams, team_users))
   end
