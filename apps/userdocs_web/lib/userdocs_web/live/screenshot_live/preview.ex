@@ -21,7 +21,7 @@ defmodule UserDocsWeb.ScreenshotLive.Preview do
       case Media.get_screenshot_url(screenshot) do
         { :ok, url } -> { url, screenshot.aws_file.file_name}
         { :not_loaded, path } -> { path, "Screenshot association not loaded, this is probably a new file." }
-        { :nofile, path } -> { path, "No file created for this screenshot, go collect your screenshot" }
+        { :nofile, path } -> { path, "No file created for screenshot #{screenshot.id}, go collect your screenshot" }
       end
 
     {
