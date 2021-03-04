@@ -70,6 +70,7 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
       |> Loaders.load_content(opts)
       |> Loaders.load_content_versions(opts)
       |> Loaders.load_steps(opts)
+      |> UserDocs.Media.load_screenshots(opts)
       |> current_selections()
       |> Loaders.load_annotations(opts)
       |> SelectLists.language_code(opts)
@@ -106,9 +107,10 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
       socket.assigns.state_opts
       |> Keyword.put(:preloads, [
           :body,
-          :docubits,
           :version,
+          :docubits,
           [ docubits: :content ],
+          [ docubits: :screenshot ],
           [ docubits: :through_annotation ],
           [ docubits: :through_step ],
           [ docubits: :docubit_type ],
