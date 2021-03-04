@@ -7,7 +7,6 @@ defmodule UserDocsWeb.ContentLive.Index do
   alias UserDocs.Projects
   alias UserDocs.Documents.Content
   alias UserDocs.Documents.ContentVersion
-  alias UserDocs.Documents.LanguageCode
   alias UserDocs.Helpers
 
   alias UserDocsWeb.ComposableBreadCrumb
@@ -15,17 +14,20 @@ defmodule UserDocsWeb.ContentLive.Index do
   alias UserDocsWeb.Defaults
   alias UserDocsWeb.Loaders
 
-  @types [ Content, ContentVersion, LanguageCode ]
+  @types [
+    UserDocs.Users.Team,
+    UserDocs.Projects.Version,
+    UserDocs.Documents.Content,
+    UserDocs.Documents.ContentVersion,
+    UserDocs.Documents.LanguageCode
+  ]
 
   @impl true
   def mount(_params, session, socket) do
-    opts = Defaults.opts(socket, @types)
-
     {
       :ok,
       socket
-      |> Root.authorize(session)
-      |> Root.initialize(opts)
+      |> Root.apply(session, @types)
       |> initialize()
     }
   end
@@ -38,26 +40,23 @@ defmodule UserDocsWeb.ContentLive.Index do
     |> load_content_versions(opts)
     |> load_teams(opts)
     |> load_versions(opts)
-    |> assign(:state_opts, opts)
   end
   def initialize(socket), do: socket
 
   @impl true
   def handle_params(%{ "team_id" => team_id } = params, url, socket) do
     team = Users.get_team!(String.to_integer(team_id))
-    do_handle_params(params, url, socket, team)
+    socket = assign(socket, :current_team, team)
+    do_handle_params(params, url, socket)
   end
   def handle_params(%{} = params, url, socket) do
-    user = Users.get_user!(socket.assigns.current_user.id, %{ team_project_version: true })
-    team = user.default_team
-    do_handle_params(params, url, socket, team)
+    do_handle_params(params, url, socket)
   end
 
-  def do_handle_params(params, _url, socket, team) do
+  def do_handle_params(params, _url, socket) do
     {
       :noreply,
       socket
-      |> assign(:team, team)
       |> apply_action(socket.assigns.live_action, params)
     }
   end
@@ -121,12 +120,22 @@ defmodule UserDocsWeb.ContentLive.Index do
     { :noreply, socket } = Root.handle_info(sub_data, socket)
     { :noreply, prepare_content(socket) }
   end
+  @impl true
+  def handle_info(%{topic: _, event: _, payload: %UserDocs.Users.User{} = user} = sub_data, socket) do
+    { :noreply, socket } = Root.handle_info(sub_data, socket)
+    {
+      :noreply,
+      socket
+      |> prepare_content()
+      |> push_patch(to: Routes.content_index_path(socket, :index))
+    }
+  end
   def handle_info(n, s), do: Root.handle_info(n, s)
 
   defp prepare_content(socket) do
     opts =
       socket.assigns.state_opts
-      |> Keyword.put(:filter, { :team_id, socket.assigns.team.id })
+      |> Keyword.put(:filter, { :team_id, socket.assigns.current_team.id })
       |> Keyword.put(:preloads, [ :content_versions, [ content_versions: :version ] ])
       |> Keyword.put(:order, [ %{ field: :id, order: :asc } ])
 
