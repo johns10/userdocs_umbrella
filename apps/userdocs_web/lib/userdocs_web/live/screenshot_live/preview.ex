@@ -15,6 +15,7 @@ defmodule UserDocsWeb.ScreenshotLive.Preview do
     }
   end
   def update(%{ screenshot: screenshot } = assigns, socket) do
+    IO.inspect(Media.get_screenshot_url(screenshot))
     { img_url, img_alt} =
       case Media.get_screenshot_url(screenshot) do
         { :ok, url } -> { url, screenshot.aws_file.file_name}

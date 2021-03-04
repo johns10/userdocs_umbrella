@@ -79,15 +79,23 @@ defmodule UserDocs.Media do
       Application.get_env(:userdocs, :ex_aws)
       |> Keyword.get(:region)
 
+    IO.inspect(region)
+
     bucket =
       Application.get_env(:userdocs, :waffle)
       |> Keyword.get(:bucket)
+
+    IO.inspect(bucket)
 
     config =
       ExAws.Config.new(:s3)
       |> Map.put(:region, region)
 
+    IO.inspect(config)
+
     path = "uploads/" <> aws_file.file_name
+
+    IO.inspect(path)
 
     ExAws.S3.presigned_url(config, :get, bucket, path, virtual_host: true)
   end
