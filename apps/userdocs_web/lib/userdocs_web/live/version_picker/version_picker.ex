@@ -29,7 +29,7 @@ defmodule UserDocsWeb.VersionPicker do
   def render(assigns) do
     ~L"""
     <div class="navbar-item has-dropdown is-hoverable">
-      <a class="navbar-link"><%= @current_version_name %></a>
+      <a class="navbar-link"><%= @selected_version_name %></a>
       <div class="navbar-dropdown">
         <%= for team_user <- @current_user.team_users do %>
           <%= dropdown_trigger(assigns, team_user.team.name, team_user.team.id == @current_user.selected_team_id) do %>
@@ -79,11 +79,18 @@ defmodule UserDocsWeb.VersionPicker do
         _ -> "None Selected"
       end
 
+    selected_version_name =
+      case assigns.current_user do
+        %UserDocs.Users.User{ selected_version: %UserDocs.Projects.Version{ name: name }} -> name
+        _ -> "None Selected"
+      end
+
     {
       :ok,
       socket
       |> assign(assigns)
       |> assign(:current_version_name, current_version_name)
+      |> assign(:selected_version_name, selected_version_name)
     }
   end
 
