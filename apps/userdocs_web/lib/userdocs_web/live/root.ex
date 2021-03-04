@@ -26,6 +26,13 @@ defmodule UserDocsWeb.Root do
     Defaults.state_opts()
   end
 
+  def apply(socket, session, types) do
+    socket
+    |> authorize(session)
+    |> initialize(Defaults.opts(socket, types))
+    |> assign_state_opts(types)
+  end
+
   def authorize(socket, session) do
     socket
     |> validate_logged_in(session)
@@ -41,6 +48,11 @@ defmodule UserDocsWeb.Root do
     |> assign(:state_opts, opts)
   end
   def initialize(socket, _), do: socket
+
+  def assign_state_opts(socket, types) do
+    socket
+    |> assign(:state_opts, Defaults.opts(socket, types))
+  end
 
   def subscribe(socket) do
     UserDocsWeb.Endpoint.subscribe(Defaults.channel(socket))
