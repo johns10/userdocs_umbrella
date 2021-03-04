@@ -5,6 +5,11 @@
   phx_change: "validate",
   phx_submit: "save"
 
+  p 
+    = f.data.id
+  p 
+    = inspect(f.data.screenshot)
+
   .field
     = Layout.select_input(f, :process_id, @select_lists.processes_select, 
         [ selected: @parent_id || "", id: @field_ids.process_id || ""], "control")
