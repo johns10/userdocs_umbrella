@@ -111,7 +111,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
           component: true,
           role: :editor,
           current_language_code_id: @current_language_code_id,
-          current_version_id: @current_version_id,
+          current_version: @current_version,
           docubit: @docubit,
           parent_cid: @myself.cid,
           state_opts: get_state_opts(assigns),
@@ -122,8 +122,8 @@ defmodule UserDocsWeb.DocubitEditorLive do
             <%= live_component(@socket, DocubitEditorLive, [
               id: "docubit-editor-" <> Integer.to_string(docubit.id),
               current_language_code_id: @current_language_code_id,
-              current_version_id: @current_version_id,
-              current_team_id: @current_team_id,
+              current_version: @current_version,
+              current_team: @current_team,
               document_id: @document_id,
               docubit: docubit,
               state_opts: get_state_opts(assigns),
@@ -241,7 +241,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
         Phoenix.LiveView.send_update(
           socket.assigns.renderer,
           current_language_code_id: socket.assigns.current_language_code_id,
-          current_version_id: socket.assigns.current_version_id,
+          current_version: socket.assigns.current_version,
           docubit: docubit,
           parent_cid: socket.assigns.myself.cid,
           id: "docubit-" <> docubit.docubit_type.name <> Integer.to_string(docubit.id)
