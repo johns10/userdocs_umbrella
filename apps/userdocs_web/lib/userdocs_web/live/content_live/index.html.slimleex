@@ -1,5 +1,5 @@
 = ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
-  %{ to: Routes.project_index_path(@socket, :index, @team.id), name: @team.name }], 
+  %{ to: Routes.project_index_path(@socket, :index, @current_team.id), name: @current_team.name }], 
   last_item: %{ to: "", name: "Content" } ])
   
 = if @live_action in [:edit, :new] do
@@ -12,8 +12,8 @@
     select_lists: @select_lists,
     current_version: @current_version,
     app_name: @app_name,
-    team: @team,
-    return_to: Routes.content_index_path(@socket, :index, @team.id)
+    team: @current_team,
+    return_to: Routes.content_index_path(@socket, :index, @current_team.id)
 
 aside.menu
   p.menu-label Content
@@ -24,7 +24,7 @@ aside.menu
           = link to: "", class: "is-flex-grow-1" do 
             = content.name
           .is-flex.is-flex-direction-row.is-flex-grow-0
-            = live_patch to: Routes.content_index_path(@socket, :edit, @team.id, content.id) do 
+            = live_patch to: Routes.content_index_path(@socket, :edit, @current_team.id, content.id) do 
               i.fa.fa-lg.fa-edit
         = if content.content_versions != [] do
           ul
@@ -33,5 +33,5 @@ aside.menu
                 = link to: "", class: "is-flex-grow-1" do 
                   = content_version.version.name 
 
-= live_patch to: Routes.content_index_path(@socket, :new, @team.id) do
+= live_patch to: Routes.content_index_path(@socket, :new, @current_team.id) do
   button.button.is-primary New Content
