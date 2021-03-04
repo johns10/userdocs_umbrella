@@ -29,6 +29,9 @@ defmodule UserDocsWeb.Defaults do
     end
   end
 
-  def channel(%{ assigns: %{ current_team: current_team }}), do: "team-" <> Integer.to_string(current_team.id)
+  def channel(%{ assigns: %{ current_team: %{ id: nil} }}), do: ""
+  def channel(%{ assigns: %{ current_team: %{ id: id } }}) when is_integer(id) do
+    "team-" <> Integer.to_string(id)
+  end
   def channel(_), do: nil
 end
