@@ -4,14 +4,11 @@ defmodule UserDocs.ChangesetHelpers do
     changeset
   end
   def check_only_one_default(changeset, assoc_key) do
-    IO.inspect(changeset)
     num_defaults =
       case Ecto.Changeset.get_change(changeset, assoc_key) do
         nil -> count_defaults(Map.get(changeset.data, assoc_key))
         assoc -> count_defaults(assoc)
       end
-
-    IO.inspect(num_defaults)
 
     if num_defaults != 1 do
       Ecto.Changeset.add_error(changeset, assoc_key, "May only have 1 default")
@@ -62,9 +59,6 @@ defmodule UserDocs.ChangesetHelpers do
     objects =
       existing_objects
       |> Enum.concat([ fresh_changeset ])
-
-    IO.puts("Changegset")
-    IO.inspect(changeset)
 
     changeset
     |> Ecto.Changeset.put_assoc(key, objects)

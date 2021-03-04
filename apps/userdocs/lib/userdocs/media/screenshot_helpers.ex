@@ -22,15 +22,14 @@ defmodule UserDocs.Media.ScreenshotHelpers do
 
     { :ok, screenshot }
   end
-  def handle_screenshot_upsert_results(state = { :ok, %{ id: _id, step_id: step_id }}) do
-    Logger.debug("Screenshot #{step_id} was created correctly")
+  def handle_screenshot_upsert_results(state = { :ok, %{ id: id, step_id: step_id }}) do
+    Logger.debug("Screenshot #{id} for step #{step_id} was created correctly")
     state
   end
 
   def save_file({ :ok, %Screenshot{} = screenshot }, raw) do
     Logger.debug("Handling Screenshot File")
     step = Automation.get_step!(screenshot.step_id)
-    process = Automation.get_process!(step.process_id)
     file_name = Integer.to_string(screenshot.id) <> ".jpeg"
     case FileHelpers.encode_hash_save_file(raw, file_name) do
       %{ filename: filename } -> { :ok, screenshot, filename }

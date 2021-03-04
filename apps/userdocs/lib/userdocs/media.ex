@@ -79,23 +79,15 @@ defmodule UserDocs.Media do
       Application.get_env(:userdocs, :ex_aws)
       |> Keyword.get(:region)
 
-    IO.inspect(region)
-
     bucket =
       Application.get_env(:userdocs, :waffle)
       |> Keyword.get(:bucket)
-
-    IO.inspect(bucket)
 
     config =
       ExAws.Config.new(:s3)
       |> Map.put(:region, region)
 
-    IO.inspect(config)
-
     path = "uploads/" <> aws_file.file_name
-
-    IO.inspect(path)
 
     ExAws.S3.presigned_url(config, :get, bucket, path, virtual_host: true)
   end
@@ -127,14 +119,10 @@ defmodule UserDocs.Media do
       name: "Screenshot for step #{step_id}",
       step_id: step_id,
     }
-    |> upsert_screenshot()
-    |> IO.inspect()
+    |> get_or_insert_screenshot(step_id)
     |> ScreenshotHelpers.handle_screenshot_upsert_results()
-    |> IO.inspect()
     |> ScreenshotHelpers.save_file(raw_encoded_image)
-    |> IO.inspect()
     |> ScreenshotHelpers.maybe_resize_image(step_type_name, element)
-    |> IO.inspect()
     |> ScreenshotHelpers.update_screenshot()
   end
   def create_file_and_screenshot(%{}), do: { :error, "Missing encoded image.  Failed to create file"}
@@ -163,6 +151,21 @@ defmodule UserDocs.Media do
   def update_screenshot(%Ecto.Changeset{} = screenshot) do
     Repo.update(screenshot)
     |> Subscription.broadcast("screenshot", "update")
+  end
+
+  def get_or_insert_screenshot(attrs, step_id) do
+    try do
+      { :ok, get_screenshot_by_step_id!(step_id) }
+    rescue
+      Ecto.NoResultsError ->
+        create_screenshot(attrs)
+    end
+  end
+
+  def get_screenshot_by_step_id!(step_id) do
+    Screenshot
+    |> where([s], s.step_id == ^step_id)
+    |> Repo.one!
   end
 
   def upsert_screenshot(attrs \\ %{}) do
