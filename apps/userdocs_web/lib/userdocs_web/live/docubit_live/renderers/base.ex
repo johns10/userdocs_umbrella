@@ -20,7 +20,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
         <%= for docubit <- @docubit.docubits do %>
           <%= Docubit.renderer(docubit).render(%{
             current_language_code_id: @current_language_code_id,
-            current_version_id: @current_version.id,
+            current_version: @current_version,
             component: false,
             editor: false,
             role: @role,
