@@ -20,7 +20,9 @@ defmodule UserDocs.Automation.Process.RecentPage do
     end
   end
 
-
+  def get(%Process{ steps: [] = steps }, current_step, pages) do
+    get(steps, current_step, pages)
+  end
   def get(%Process{ steps: [ %Step{} | _ ] = steps }, current_step, [ %Page{} | _ ] = pages) do
     get(steps, current_step, pages)
   end
@@ -39,6 +41,7 @@ defmodule UserDocs.Automation.Process.RecentPage do
             |> Enum.at(0)
       end
   end
+  def get([], _, _), do: %UserDocs.Web.Page{}
 
   # Takes a list of steps, returns the most recent step of type "Navigate"
   defp recent_navigation_step(step, steps) do
