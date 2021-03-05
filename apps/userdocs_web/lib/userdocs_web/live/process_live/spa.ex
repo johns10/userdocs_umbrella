@@ -69,6 +69,12 @@ defmodule UserDocsWeb.ProcessLive.SPA do
     |> Automation.load_step_types(opts)
     |> assign(:mode, :process)
     |> assign(:state_opts, opts)
+    |> turn_off_broadcast_associations()
+  end
+
+  def turn_off_broadcast_associations(socket) do
+    opts = Keyword.put(socket.assigns.state_opts, :broadcast_associations, false)
+    assign(socket, :state_opts, opts)
   end
 
   @impl true
