@@ -33,7 +33,9 @@ defmodule StateHandlers.Broadcast do
         action -> action
       end
     broadcaster.(channel, action, data)
-    handle_associations(channel, action, data, opts)
+    if opts[:broadcast_associations] != false do
+      handle_associations(channel, action, data, opts)
+    end
   end
 
   def handle_associations(channel, action, [ _ | _ ] = data, opts) do
@@ -62,7 +64,9 @@ defmodule StateHandlers.Broadcast do
     broadcaster = opts[:broadcast_function]
     case data do
       [ _ | _ ] -> broadcaster.(channel, action, %{ objects: data })
-      data -> broadcaster.(channel, action, data)
+      data ->
+        handle_associations(channel, action, data, opts)
+        broadcaster.(channel, action, data)
     end
 
   end
