@@ -251,6 +251,7 @@ defmodule UserDocsWeb.Root do
         true -> UserDocs.Subscription.handle_event(socket, event, payload, socket.assigns.state_opts)
         false -> socket
       end
+
     { :noreply, socket }
   end
   def handle_info({:update_form_data, form_data}, socket) do
@@ -265,7 +266,12 @@ defmodule UserDocsWeb.Root do
     StateHandlers.broadcast(socket, data, opts)
     { :noreply, socket }
   end
-  def handle_info(:close_modal, socket), do: { :noreply, ModalMenus.close(socket) }
+  def handle_info({ :close_modal, to: path }, socket) do
+    { :noreply, push_patch(socket, to: path)}
+  end
+  def handle_info(:close_modal, socket) do
+    { :noreply, ModalMenus.close(socket) }
+  end
   def handle_info(name, _socket) do
     raise(FunctionClauseError, message: "Subscription #{inspect(name)} not implemented by Root")
   end
