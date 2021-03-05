@@ -113,6 +113,14 @@ defmodule UserDocsWeb.StepLive.Index do
   end
 
   @impl true
+  def handle_info(%{topic: _, event: _, payload: %UserDocs.Documents.Content{}} = sub_data, socket) do
+    { :noreply, socket } = Root.handle_info(sub_data, socket)
+    {
+      :noreply,
+      socket
+      |> assign(:select_lists, select_lists(socket))
+    }
+  end
   def handle_info(%{topic: _, event: _, payload: %Step{}} = sub_data, socket) do
     { :noreply, socket } = Root.handle_info(sub_data, socket)
     { :noreply, prepare_steps(socket) }
@@ -207,6 +215,7 @@ defmodule UserDocsWeb.StepLive.Index do
         :element,
         :process,
         [ annotation: :annotation_type ],
+        [ annotation: :content ],
         [ element: :strategy ],
       ]
 
@@ -234,6 +243,7 @@ defmodule UserDocsWeb.StepLive.Index do
         :page,
         :annotation,
         :element,
+        [ annotation: :content ],
         [ annotation: :annotation_type ],
         [ element: :strategy ],
       ]
