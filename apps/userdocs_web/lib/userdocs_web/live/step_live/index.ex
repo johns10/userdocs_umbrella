@@ -35,25 +35,19 @@ defmodule UserDocsWeb.StepLive.Index do
 
   @impl true
   def mount(_params, session, socket) do
-    IO.puts("Mounting")
-    opts = Defaults.opts(socket, types())
     {
       :ok,
       socket
-      |> Root.authorize(session)
-      |> Root.initialize(opts)
+      |> Root.apply(session, types())
       |> initialize()
     }
   end
 
   def initialize(%{ assigns: %{ auth_state: :not_logged_in }} = socket), do: socket
   def initialize(socket) do
-    opts = Defaults.opts(socket, types())
-    IO.puts("initializing")
-
+    opts = socket.assigns.state_opts
     socket
     |> assign(:modal_action, :show)
-    |> assign(:state_opts, opts)
     |> UserDocsWeb.Loaders.screenshots(opts)
     |> Web.load_annotation_types(opts)
     |> Web.load_strategies(opts)
@@ -65,6 +59,12 @@ defmodule UserDocsWeb.StepLive.Index do
     |> Loaders.content(opts)
     |> Loaders.annotations(opts)
     |> Loaders.elements(opts)
+    |> turn_off_broadcast_associations()
+  end
+
+  def turn_off_broadcast_associations(socket) do
+    opts = Keyword.put(socket.assigns.state_opts, :broadcast_associations, false)
+    assign(socket, :state_opts, opts)
   end
 
   @impl true
@@ -72,7 +72,6 @@ defmodule UserDocsWeb.StepLive.Index do
   def handle_params(%{ "process_id" => process_id } = params, _, socket) do
     IO.puts("handle_params")
     process = Automation.get_process!(process_id)
-    opts = Defaults.opts(socket, @subscribed_types)
     {
       :noreply,
       socket
@@ -85,7 +84,6 @@ defmodule UserDocsWeb.StepLive.Index do
 
   def handle_params(%{ "id" => id } = params, _, socket) do
     IO.puts("handle_params")
-    opts = Defaults.opts(socket, @subscribed_types)
     {
       :noreply,
       socket
