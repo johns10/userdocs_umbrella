@@ -32,68 +32,81 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
           id: prefix <> @field_ids.page_id,
         ], "control") %>
 
-        <%= Layout.text_input(form, :name, [
-          id: prefix <> @field_ids.name
-        ], "control") %>
+        <%= render_name_field(assigns, form, prefix) %>
 
         <%= Layout.number_input(form, :order, [
           id: prefix <> @field_ids.order
         ]) %>
 
       </div>
-      <div class="field">
-        <%= label form, :selector, class: "label" %>
-        <p class="control is-expanded">
-          <div class="field has-addons">
 
-            <%= Layout.select_input(form, :strategy_id, @select_lists.strategies, [
-                id: prefix <> @field_ids.strategy_id, label: false
-              ], "control") %>
+      <%= render_selector_field(assigns, form, prefix) %>
+    """
+  end
 
-            <%= Layout.text_input(form, :selector, [
-                label: false,
-                id: prefix <> @field_ids.selector
-              ], "control is-expanded") %>
+  def render_name_field(assigns, form, prefix) do
+    ~L"""
+    <%= Layout.text_input(form, :name, [
+      id: prefix <> @field_ids.name
+    ], "control") %>
+    """
+  end
 
-            <div class="control">
-              <button
-                class="button"
-                type="button"
-                id="<%= ID.strategy_field(form.data.page_id, form.data.id) %>"
-                selector="<%= prefix <> @field_ids.selector %>"
-                strategy="<%= prefix <> @field_ids.strategy_id %>"
-                phx-hook="CopySelector"
-              >
-                <span class="icon" >
-                  <i
-                    class="fa fa-arrow-left"
-                    aria-hidden="true"
-                  ></i>
-                </span>
+  def render_selector_field(assigns, form, prefix) do
+    ~L"""
+    <div class="field">
+      <%= label form, :selector, class: "label" %>
+      <p class="control is-expanded">
+        <div class="field has-addons">
+
+          <%= Layout.select_input(form, :strategy_id, @select_lists.strategies, [
+              id: prefix <> @field_ids.strategy_id, label: false
+            ], "control") %>
+
+          <%= Layout.text_input(form, :selector, [
+              label: false,
+              id: prefix <> @field_ids.selector
+            ], "control is-expanded") %>
+
+          <div class="control">
+            <button
+              class="button"
+              type="button"
+              id="<%= ID.strategy_field(form.data.page_id, form.data.id) %>"
+              selector="<%= prefix <> @field_ids.selector %>"
+              strategy="<%= prefix <> @field_ids.strategy_id %>"
+              phx-hook="CopySelector"
+            >
+              <span class="icon" >
+                <i
+                  class="fa fa-arrow-left"
+                  aria-hidden="true"
+                ></i>
               </span>
-            </div>
-            <!-- TODO validate that @changeset.data.selector works here -->
-            <p class="control">
-              <button
-                type="button"
-                class="button"
-                phx-target="<%= @myself.cid %>"
-                phx-value-element-id="<%= form.data.id %>"
-                phx-value-selector="test"
-                phx-value-strategy="css"
-                phx-click="test_selector"
-              >
-                <span class="icon" >
-                  <i class="fa fa-cloud-upload"
-                    aria-hidden="true"
-                  ></i>
-                </span>
-              </span>
-            </p>
+            </span>
           </div>
-          <%= error_tag form, :selector %>
-        </p>
-      </div>
+          <!-- TODO validate that @changeset.data.selector works here -->
+          <p class="control">
+            <button
+              type="button"
+              class="button"
+              phx-target="<%= @myself.cid %>"
+              phx-value-element-id="<%= form.data.id %>"
+              phx-value-selector="test"
+              phx-value-strategy="css"
+              phx-click="test_selector"
+            >
+              <span class="icon" >
+                <i class="fa fa-cloud-upload"
+                  aria-hidden="true"
+                ></i>
+              </span>
+            </span>
+          </p>
+        </div>
+        <%= error_tag form, :selector %>
+      </p>
+    </div>
     """
   end
 
