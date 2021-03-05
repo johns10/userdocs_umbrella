@@ -145,11 +145,15 @@ defmodule UserDocsWeb.StepLive.FormComponent do
           { :ok, step } = Automation.update_step(socket.assigns.step, %{ page_id: page_id })
           page = Web.get_page!(page_id)
           step = Map.put(step, :page, page)
+          select_lists =
+            socket.assigns.select_lists
+            |> Map.put(:elements, elements_select(socket.assigns, page_id))
           {
             step
             |> Automation.change_step(Map.delete(step_params, "page")),
             socket
             |> assign(:step, step)
+            |> assign(:select_lists, select_lists)
           }
       end
 
@@ -451,6 +455,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   end
 
   def elements_select(%{ state_opts: state_opts } = socket, page_id) do
+    Web.list_elements(socket, state_opts)
+    |> Enum.each(fn(e) -> IO.inspect("#{e.name}: #{e.page_id}") end)
     opts = Keyword.put(state_opts, :filter, { :page_id, page_id })
     Web.list_elements(socket, opts)
     |> Helpers.select_list(:name, true)
