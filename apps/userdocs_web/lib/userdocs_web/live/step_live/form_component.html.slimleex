@@ -10,7 +10,8 @@
       = label f, :process_id, class: "label"
     .field-body
       .control
-        = select f,:process_id, @select_lists.processes_select, [ class: "select", selected: @parent_id || "", id: @field_ids.process_id || "" ]
+        .select
+          = select f,:process_id, @select_lists.processes_select, [ class: "input", selected: @parent_id || "", id: @field_ids.process_id || "" ]
 
   .field.is-horizontal
     .field-label.is-normal
@@ -24,8 +25,9 @@
       = label f, :step_type_id, class: "label"
     .field-body
       .control
-        = select f,:step_type_id, @select_lists.step_types_select, 
-          [ class: "select", type: "text", id: @field_ids.step_type_id || "" ]
+        .select
+          = select f,:step_type_id, @select_lists.step_types_select, 
+            [ class: "input", type: "text", id: @field_ids.step_type_id || "" ]
 
 
   = if "page_reference" in @enabled_step_fields and @action not in [:new] do
