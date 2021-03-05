@@ -455,8 +455,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   end
 
   def elements_select(%{ state_opts: state_opts } = socket, page_id) do
-    Web.list_elements(socket, state_opts)
-    |> Enum.each(fn(e) -> IO.inspect("#{e.name}: #{e.page_id}") end)
     opts = Keyword.put(state_opts, :filter, { :page_id, page_id })
     Web.list_elements(socket, opts)
     |> Helpers.select_list(:name, true)
