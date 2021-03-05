@@ -48,10 +48,55 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
       </div>
       <div class="field is-grouped is-grouped-multiline">
 
-        <%= Layout.text_input(form, :label, [
-          id: @field_ids.annotation.label,
-          hidden: not("label" in @enabled_annotation_fields)
-        ], "control") %>
+        <%= content_tag(:div, style: "width: 15%;", class: Layout.is_hidden?("control", not("label" in @enabled_annotation_fields))) do %>
+          <%= label form, :label, class: "label" %>
+          <div class="control">
+            <%= text_input form, :label,
+              class: "input",
+              type: "text",
+              id: @field_ids.annotation.label %>
+          </div>
+        <% end %>
+
+        <%= content_tag(:div, style: "width: 15%;", class: Layout.is_hidden?("control", not("size" in @enabled_annotation_fields))) do %>
+          <%= label form, :size, class: "label" %>
+          <div class="control">
+            <%= number_input form, :size,
+              class: "input",
+              type: "text",
+              id: @field_ids.annotation.size %>
+          </div>
+        <% end %>
+
+        <%= content_tag(:div, style: "width: 15%;", class: Layout.is_hidden?("control", not("x_offset" in @enabled_annotation_fields))) do %>
+          <%= label form, :x_offset, class: "label" %>
+          <div class="control">
+            <%= number_input form, :x_offset,
+              class: "input",
+              type: "text",
+              id: @field_ids.annotation.x_offset %>
+          </div>
+        <% end %>
+
+        <%= content_tag(:div, style: "width: 15%;", class: Layout.is_hidden?("control", not("y_offset" in @enabled_annotation_fields))) do %>
+          <%= label form, :y_offset, class: "label" %>
+          <div class="control">
+            <%= number_input form, :y_offset,
+              class: "input",
+              type: "text",
+              id: @field_ids.annotation.y_offset %>
+          </div>
+        <% end %>
+
+        <%= content_tag(:div, style: "width: 15%;", class: Layout.is_hidden?("control", not("font_size" in @enabled_annotation_fields))) do %>
+          <%= label form, :font_size, class: "label" %>
+          <div class="control">
+            <%= text_input form, :font_size,
+              class: "input",
+              type: "text",
+              id: @field_ids.annotation.font_size %>
+          </div>
+        <% end %>
 
         <%=
           Layout.select_input(form, :x_orientation,
@@ -71,45 +116,39 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
             ], "control")
         %>
 
-        <%= Layout.number_input(form, :size, [
-          id: @field_ids.annotation.size,
-          hidden: not("size" in @enabled_annotation_fields)
-        ], "control") %>
-
         <%= Layout.text_input(form, :color, [
           id: @field_ids.annotation.color,
           hidden: not("color" in @enabled_annotation_fields)
         ], "control") %>
 
-        <%= Layout.number_input(form, :thickness, [
-          id: @field_ids.annotation.thickness,
-          hidden: not("thickness" in @enabled_annotation_fields)
-        ], "control") %>
-
-        <%= Layout.number_input(form, :x_offset, [
-          id: @field_ids.annotation.x_offset,
-          hidden: not("x_offset" in @enabled_annotation_fields)
-        ], "control") %>
-
-        <%= Layout.number_input(form, :y_offset, [
-          id: @field_ids.annotation.y_offset,
-          hidden: not("y_offset" in @enabled_annotation_fields)
-        ], "control") %>
-
-        <%= Layout.text_input(form, [
-          field_name: :font_size,
-          id: @field_ids.annotation.font_size,
-          hidden: not("font_size" in @enabled_annotation_fields)
-        ]) %>
-
+        <%= content_tag(:div, style: "width: 15%;", class: Layout.is_hidden?("control", not("thickness" in @enabled_annotation_fields))) do %>
+          <%= label form, :thickness, class: "label" %>
+          <div class="control">
+            <%= text_input form, :thickness,
+              class: "input",
+              type: "text",
+              id: @field_ids.annotation.thickness %>
+          </div>
+        <% end %>
       </div>
 
-      <%= label form, :content_id, class: "label" %>
       <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <%= label form, :content_id, class: "label" %>
+        </div>
         <div class="field-body">
           <div class="field has-addons">
-
-            <%= Layout.new_item_button("new-content", [ button_class: :div ], "control") %>
+            <div class="control">
+              <%= content_tag :div,
+                [ value: form.data.content_id,
+                button_class: "div",
+                class: "button",
+                phx_click: "new-content",
+                phx_target: @myself.cid,
+                phx_value_annotation_id: form.data.id ] do %>
+                <i class="fa fa-plus"></i>
+              <% end %>
+            </div>
 
             <%= Layout.select_input(form, :content_id, @select_lists.content,
               [
@@ -120,6 +159,20 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
 
           </div>
         </div>
+      </div>
+      <%= error_tag(form, :content) %>
+      <div class="pl-2">
+        <%= inputs_for form, :content, fn fc -> %>
+          <div class="field is-grouped">
+            <%= hidden_input(fc, :team_id, value: @current_team.id) %>
+            <div class="control is-expanded">
+              <%= Layout.text_input(fc, :name, [ ]) %>
+            </div>
+            <div class="control">
+              <%= Layout.text_input(fc, :title, [ ]) %>
+            </div>
+          </div>
+        <% end %>
       </div>
     """
   end
@@ -162,7 +215,6 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Annotation updated successfully")
-         # |> LiveHelpers.maybe_push_redirect()
          |> push_patch(to: socket.assigns.return_to)
         }
 
@@ -177,7 +229,6 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:info, "Annotation created successfully")
-         # |> LiveHelpers.maybe_push_redirect()
          |> push_patch(to: socket.assigns.return_to)
         }
 
