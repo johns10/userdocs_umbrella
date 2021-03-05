@@ -195,8 +195,12 @@ defmodule UserDocsWeb.ProcessLive.SPA do
   end
 
   @impl true
+  def handle_info({ :close_modal, _ }, socket) do
+    IO.inspect("SPA closing modal")
+    { :noreply, assign(socket, :live_action, :show) }
+  end
   def handle_info(:close_modal, socket) do
-    { :noreply, socket } = Root.handle_info(:close_modal, socket)
+    IO.inspect("SPA closing modal")
     { :noreply, assign(socket, :live_action, :show) }
   end
   def handle_info(%{ topic: _, event: _, payload: payload } = sub_data, socket) do
