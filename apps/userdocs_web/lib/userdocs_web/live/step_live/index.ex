@@ -6,12 +6,9 @@ defmodule UserDocsWeb.StepLive.Index do
   alias UserDocs.Automation
   alias UserDocs.Automation.Step
   alias UserDocs.Web
-  alias UserDocs.Web.Element
-  alias UserDocs.Users
   alias UserDocs.Projects
   alias UserDocs.Documents
   alias UserDocs.Helpers
-  alias UserDocs.Automation.Process
   alias UserDocs.Web.Strategy
 
   alias UserDocsWeb.Defaults
