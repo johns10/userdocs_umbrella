@@ -16,7 +16,7 @@ css:
     project: @current_project,
     version: @current_version,
     page_title: @page_title,
-    team: @current_team,
+    current_team: @current_team,
     data: @data ])
 = if @mode == :steps do
   nav.breadcrumb aria-label="breadcrumbs"
@@ -44,7 +44,7 @@ css:
     page_title: @page_title,
     steps: @steps,
     step: @step,
-    team: @current_team,
+    current_team: @current_team,
     data: @data,
     current_version: @current_version,
     select_lists: @select_lists ])
