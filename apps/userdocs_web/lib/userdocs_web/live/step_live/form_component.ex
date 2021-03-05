@@ -455,4 +455,21 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     Web.list_elements(socket, opts)
     |> Helpers.select_list(:name, true)
   end
+
+  def update_step_content(step, content_id) do
+    { :ok, annotation } =
+      Web.update_annotation(step.annotation, %{ content_id: content_id })
+    content = content_or_nil(content_id)
+    annotation = Map.put(annotation, :content, content)
+    Map.put(step, :annotation, annotation)
+  end
+
+  def content_or_nil(nil), do: nil
+  def content_or_nil(id), do: Documents.get_content!(id)
+
+  def update_changeset_for_content_change(step, params) do
+    { _, params } = Kernel.pop_in(params, [ "annotation", "content" ])
+    { _, params } = Kernel.pop_in(params, [ "annotation", "content_id" ])
+    Automation.change_step(step, params)
+  end
 end
