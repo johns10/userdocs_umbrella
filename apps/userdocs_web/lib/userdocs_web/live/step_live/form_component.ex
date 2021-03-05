@@ -460,12 +460,13 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     |> Helpers.select_list(:name, true)
   end
 
-  def update_step_content(step, content_id) do
+  def update_step_content(%Automation.Step{ annotation: nil } = step, _), do: step
+  def update_step_content(%Automation.Step{ annotation: annotation } = step, content_id) do
     { :ok, annotation } =
-      Web.update_annotation(step.annotation, %{ content_id: content_id })
+      Web.update_annotation(annotation, %{ content_id: content_id })
     content = content_or_nil(content_id)
-    annotation = Map.put(annotation, :content, content)
-    Map.put(step, :annotation, annotation)
+    new_annotation = Map.put(annotation, :content, content)
+    Map.put(step, :annotation, new_annotation)
   end
 
   def content_or_nil(nil), do: nil
