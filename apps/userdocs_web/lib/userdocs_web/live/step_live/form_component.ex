@@ -343,7 +343,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     # recent_navigated_to_page(process, step, assigns)
     case Automation.create_step(step_params) do
       {:ok, step} ->
-        send(self(), :close_modal)
+        send(self(), {:close_modal, to: socket.assigns.return_to })
         Automation.handle_step_broadcast(step, "create")
         {
           :noreply,
