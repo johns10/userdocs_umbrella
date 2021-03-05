@@ -59,6 +59,7 @@ defmodule UserDocsWeb.StepLive.Index do
     |> Loaders.content(opts)
     |> Loaders.annotations(opts)
     |> Loaders.elements(opts)
+    |> UserDocsWeb.Loaders.versions()
     |> turn_off_broadcast_associations()
   end
 
@@ -178,7 +179,9 @@ defmodule UserDocsWeb.StepLive.Index do
   def strategies_select(_), do: []
 
   def versions_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
+    IO.inspect("versions_select")
     Projects.list_versions(socket, state_opts)
+    |> IO.inspect()
     |> Helpers.select_list(:name, :false)
   end
 
