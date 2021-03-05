@@ -326,8 +326,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   defp save_step(socket, :edit, step_params) do
     case Automation.update_step(socket.assigns.step, remove_empty_associations(step_params)) do
       {:ok, step} ->
-        send(self(), :close_modal)
-        send(self(), { :broadcast, "update", step })
+        send(self(), {:close_modal, to: socket.assigns.return_to })
+        Automation.handle_step_broadcast(step, "update")
         {
           :noreply,
           socket
@@ -344,7 +344,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     case Automation.create_step(step_params) do
       {:ok, step} ->
         send(self(), :close_modal)
-        send(self(), { :broadcast, "create", step })
+        Automation.handle_step_broadcast(step, "create")
         {
           :noreply,
           socket
