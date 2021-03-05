@@ -207,6 +207,8 @@ defmodule UserDocsWeb.Layout do
 
   # SOMe old shit I brought in
 
+  def is_hidden?(class, true), do: class <> " is-hidden"
+  def is_hidden?(class, false), do: class
   def is_hidden?(%{expanded: false}), do: " is-hidden"
   def is_hidden?(%{expanded: true}), do: ""
   def is_hidden?(%{action: :new}), do: ""
