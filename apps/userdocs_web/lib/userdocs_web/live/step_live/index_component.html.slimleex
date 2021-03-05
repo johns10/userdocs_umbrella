@@ -5,6 +5,7 @@
     parent_id: @process.id,
     type: Step,
     current_version: @current_version,
+    current_team: @current_team,
     state_opts: @state_opts,
     parent_id: @process.id,
     title: @page_title,
