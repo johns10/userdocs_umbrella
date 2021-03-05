@@ -5,8 +5,6 @@
   phx_change: "validate",
   phx_submit: "save"
 
-  = @return_to
-
   .field.is-horizontal
     .field-label.is-normal
       = label f, :process_id, class: "label"
@@ -65,7 +63,7 @@
         .pl-2
           = PageLive.FormComponent.render_fields(Map.put(assigns, :field_ids, @field_ids.page),
               fp, [ prefix: @form_ids.prefix ])
-    .level
+      .level
 
   = if "element_id" in @enabled_step_fields and @action not in [:new] do
     .field.is-horizontal
@@ -84,7 +82,7 @@
               fe, @form_ids.prefix)
           = ElementLive.FormComponent.render_selector_field(Map.put(assigns, :field_ids, @field_ids.element),
               fe, @form_ids.prefix)
-  .level
+    .level
 
   = if "annotation_id" in @enabled_step_fields and @action not in [:new] do
     .field.is-horizontal
