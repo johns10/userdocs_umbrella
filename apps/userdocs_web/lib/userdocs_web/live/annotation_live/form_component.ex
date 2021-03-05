@@ -162,16 +162,18 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
       </div>
       <%= error_tag(form, :content) %>
       <div class="pl-2">
-        <%= inputs_for form, :content, fn fc -> %>
-          <div class="field is-grouped">
-            <%= hidden_input(fc, :team_id, value: @current_team.id) %>
-            <div class="control is-expanded">
-              <%= Layout.text_input(fc, :name, [ ]) %>
+        <%= if form.data.id do %>
+          <%= inputs_for form, :content, fn fc -> %>
+            <div class="field is-grouped">
+              <%= hidden_input(fc, :team_id, value: @current_team.id) %>
+              <div class="control is-expanded">
+                <%= Layout.text_input(fc, :name, [ ]) %>
+              </div>
+              <div class="control">
+                <%= Layout.text_input(fc, :title, [ ]) %>
+              </div>
             </div>
-            <div class="control">
-              <%= Layout.text_input(fc, :title, [ ]) %>
-            </div>
-          </div>
+          <% end %>
         <% end %>
       </div>
     """
