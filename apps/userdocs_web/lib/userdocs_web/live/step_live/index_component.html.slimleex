@@ -15,11 +15,7 @@
     data: @data,
     app_name: @app_name,
     default_page_id: RecentPage.get_id(@steps, @step, @data.pages),
-    data: %{ step_types: @data.step_types,
-      strategies: @data.strategies,
-      annotations: @data.annotations,
-      elements: @data.elements,
-      annotation_types: @data.annotation_types },
+    data: @data,
     return_to: Routes.step_index_path(@socket, :index, @process.id),
     select_lists: @select_lists
 
