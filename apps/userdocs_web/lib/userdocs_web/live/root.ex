@@ -267,9 +267,14 @@ defmodule UserDocsWeb.Root do
     { :noreply, socket }
   end
   def handle_info({ :close_modal, to: path }, socket) do
-    { :noreply, push_patch(socket, to: path)}
+    case socket.assigns.app_name do
+      "web" -> { :noreply, push_patch(socket, to: path)}
+      "chrome" -> { :noreply, ModalMenus.close(socket) }
+    end
+
   end
   def handle_info(:close_modal, socket) do
+    IO.inspect("Closing modal in root with no extra arg")
     { :noreply, ModalMenus.close(socket) }
   end
   def handle_info(name, _socket) do
