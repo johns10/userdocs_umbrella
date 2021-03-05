@@ -181,7 +181,6 @@ defmodule UserDocsWeb.StepLive.Index do
   def versions_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
     IO.inspect("versions_select")
     Projects.list_versions(socket, state_opts)
-    |> IO.inspect()
     |> Helpers.select_list(:name, :false)
   end
 
