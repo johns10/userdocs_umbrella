@@ -80,6 +80,8 @@
     = inputs_for f, :element, [id: @form_ids.element], fn fe ->
       div style="border-left: 5px solid LightGray;"
         .pl-2
+          = hidden_input(fe, :page_id, value: f.data.page_id || @default_page_id)
+          = error_tag(fe, :page_id)
           = ElementLive.FormComponent.render_name_field(Map.put(assigns, :field_ids, @field_ids.element),
               fe, @form_ids.prefix)
           = ElementLive.FormComponent.render_selector_field(Map.put(assigns, :field_ids, @field_ids.element),
