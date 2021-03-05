@@ -21,7 +21,7 @@ defmodule UserDocs.Web.Element do
     |> cast(attrs, [:name, :strategy_id, :selector, :page_id])
     |> foreign_key_constraint(:strategy_id)
     |> foreign_key_constraint(:page_id)
-    |> validate_required([:strategy_id, :selector])
+    |> validate_required([:strategy_id, :selector, :page_id])
     |> ignore_missing()
   end
 
