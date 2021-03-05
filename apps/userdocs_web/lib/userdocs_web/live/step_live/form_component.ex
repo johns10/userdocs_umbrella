@@ -8,9 +8,9 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   alias UserDocsWeb.PageLive
   alias UserDocsWeb.ID
   alias UserDocsWeb.Layout
-  alias UserDocsWeb.Defaults
 
   alias UserDocs.Automation
+  alias UserDocs.Documents
   alias UserDocs.Web
   alias UserDocs.Web.Annotation
   alias UserDocs.Helpers
