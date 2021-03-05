@@ -438,6 +438,38 @@ defmodule UserDocs.Automation do
     Subscription.broadcast({ :ok, object }, type, action(action))
   end
 
+  def handle_step_broadcast(%Step{} = step, action) do
+    step
+    |> maybe_broadcast_content(action)
+    |> maybe_broadcast_annotation(action)
+    |> maybe_broadcast_element(action)
+    |> broadcast_step(action)
+  end
+  def maybe_broadcast_content(%{ annotation: %{ content: %UserDocs.Documents.Content{} = content }} = step, action) do
+    send(self(), { :broadcast, action, content })
+    step
+  end
+  def maybe_broadcast_content(step, action), do: step
+  def maybe_broadcast_annotation(%{ annotation: %UserDocs.Web.Annotation{} = annotation } = step, action) do
+    send(self(), { :broadcast, action, annotation })
+    step
+  end
+  def maybe_broadcast_annotation(step, action), do: step
+  def maybe_broadcast_element(%{ element: %UserDocs.Web.Element{} = element } = step, action) do
+    send(self(), { :broadcast, action, element })
+    step
+  end
+  def maybe_broadcast_element(step, action), do: step
+  def maybe_broadcast_page(%{ element: %UserDocs.Web.Page{} = page } = step, action) do
+    send(self(), { :broadcast, action, page })
+    step
+  end
+  def maybe_broadcast_page(step, action), do: step
+  def broadcast_step(step, action) do
+    send(self(), { :broadcast, action, step })
+    step
+  end
+
   def action(:insert), do: "create"
   def action(:update), do: "update"
 
