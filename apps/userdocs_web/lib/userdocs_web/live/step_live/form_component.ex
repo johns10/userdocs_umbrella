@@ -277,6 +277,45 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       |> assign(:step, changeset.data)
     }
   end
+
+  def handle_event("new-content", %{ "annotation-id" => _ }, socket) do
+    annotation = socket.assigns.step.annotation
+
+    { :ok, new_annotation } =
+      annotation
+      |> UserDocs.Web.update_annotation(%{ content_id: nil })
+
+    cleared_annotation = Map.put(new_annotation, :content, nil)
+
+    old_annotation_changeset =
+      socket.assigns.changeset
+      |> Ecto.Changeset.get_change(:annotation, UserDocs.Web.change_annotation(%Web.Annotation{}))
+
+    annotation_params =
+      old_annotation_changeset.params
+      |> Map.put("content", "")
+      |> Map.put("content_id", "")
+
+    new_annotation_changeset =
+      cleared_annotation
+      |> UserDocs.Web.change_annotation(annotation_params)
+
+    new_step =
+      socket.assigns.step
+      |> Map.put(:annotation, cleared_annotation)
+
+    new_changeset =
+      new_step
+      |> Automation.Step.changeset(socket.assigns.changeset.params)
+      |> Ecto.Changeset.put_change(:annotation, new_annotation_changeset)
+
+    {
+      :noreply,
+      socket
+      |> assign(:step, new_step)
+      |> assign(:changeset, new_changeset)
+    }
+  end
   def handle_event("delete", %{"id" => id}, socket) do
     step = Automation.get_step!(String.to_integer(id))
     {:ok, deleted_step } = Automation.delete_step(step)
