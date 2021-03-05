@@ -526,6 +526,7 @@ defmodule UserDocs.Web do
   end
   def get_annotation!(id, state, opts) when is_list(opts) do
     StateHandlers.get(state, id, Annotation, opts)
+    |> maybe_preload_annotation(opts[:preloads], state, opts)
   end
 
   @doc """
