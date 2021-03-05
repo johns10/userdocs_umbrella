@@ -128,36 +128,45 @@ defmodule UserDocsWeb.StepLive.FormComponent do
         nil -> { changeset, socket }
         annotation_id ->
           { :ok, step } = Automation.update_step(socket.assigns.step, %{ annotation_id: annotation_id })
-          annotation = Web.get_annotation!(annotation_id)
+          opts = Keyword.put(socket.assigns.state_opts, :preloads, [ :content, :annotation_type ])
+          annotation = Web.get_annotation!(annotation_id, socket, opts)
           step = Map.put(step, :annotation, annotation)
-
           {
-            Automation.change_step(step, Map.delete(step_params, "element")),
+            Automation.change_step(step, Map.delete(step_params, "annotation")),
             socket
             |> assign(:step, step)
           }
       end
 
-      { changeset, socket } =
-        case Ecto.Changeset.get_change(changeset, :page_id, nil) do
-          nil -> { changeset, socket }
-          page_id ->
-            { :ok, step } = Automation.update_step(socket.assigns.step, %{ page_id: page_id })
-            page = Web.get_page!(page_id)
-            step = Map.put(step, :page, page)
-            select_lists =
-              socket.assigns.select_lists
-              |> Map.put(:elements, elements_select(socket.assigns, page_id))
+    { changeset, socket } =
+      case Ecto.Changeset.get_change(changeset, :page_id, nil) do
+        nil -> { changeset, socket }
+        page_id ->
+          { :ok, step } = Automation.update_step(socket.assigns.step, %{ page_id: page_id })
+          page = Web.get_page!(page_id)
+          step = Map.put(step, :page, page)
+          {
+            step
+            |> Automation.change_step(Map.delete(step_params, "page")),
+            socket
+            |> assign(:step, step)
+          }
+      end
 
-            {
-              step
-              |> Automation.change_step(Map.delete(step_params, "page")),
-              socket
-              |> assign(:step, step)
-              |> assign(:select_lists, select_lists)
-            }
-        end
-
+    { changeset, socket } =
+      case Ecto.Changeset.get_change(changeset, :annotation, :no_change) do
+        :no_change -> { changeset, socket }
+        annotation_changeset ->
+          case Ecto.Changeset.get_change(annotation_changeset, :content_id, :no_change) do
+            :no_change -> { changeset, socket }
+            content_id ->
+              step = update_step_content(socket.assigns.step, content_id)
+              {
+                update_changeset_for_content_change(step, step_params),
+                assign(socket, :step, step)
+              }
+          end
+      end
 
     enabled_step_fields =
       case socket.assigns.action do
