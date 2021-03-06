@@ -98,8 +98,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       |> assign(:field_ids, step_field_ids)
       |> assign(:form_ids, form_ids)
       |> assign(:select_lists, select_lists)
-      |> assign(:disable_element_fields, false)
-      |> assign(:disable_annotation_fields, false)
       |> assign(:state_opts, assigns.state_opts)
     }
   end
