@@ -47,7 +47,9 @@ css:
     current_team: @current_team,
     data: @data,
     current_version: @current_version,
-    select_lists: @select_lists ])
+    select_lists: @select_lists,
+    new_element: false,
+    new_annotation: false, ])
 
   .panel id="selector-transfer-menu"
     .panel-block
