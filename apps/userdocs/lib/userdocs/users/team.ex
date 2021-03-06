@@ -32,10 +32,15 @@ defmodule UserDocs.Users.Team do
     team
     |> cast(attrs, [ :name, :default_language_code_id ])
     |> cast_assoc(:team_users)
-    |> cast_assoc(:projects, with: &Project.change_default_project/2)
+    |> cast_assoc(:projects)
     |> foreign_key_constraint(:default_language_code_id)
     |> handle_users(attrs)
     |> validate_required([:name])
+  end
+
+  def change_default_project(changeset) do
+    changeset
+    |> cast_assoc(:projects, with: &Project.change_default_project/2)
     |> ChangesetHelpers.check_only_one_default(:projects)
   end
 
