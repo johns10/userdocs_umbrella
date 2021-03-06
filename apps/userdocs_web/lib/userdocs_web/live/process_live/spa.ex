@@ -214,9 +214,36 @@ defmodule UserDocsWeb.ProcessLive.SPA do
 
     case schema in subscribed_types() do
       true ->
-        case socket.assigns.mode do
-          :steps -> { :noreply, StepLive.Index.prepare_steps(socket) |> select_lists() }
-          :process -> { :noreply, prepare_processes(socket) |> select_lists() }
+        case { socket.assigns.mode, socket.assigns.live_action } do
+          { :steps, :new} ->
+            {
+              :noreply,
+              socket
+              |> StepLive.Index.prepare_steps()
+              |> select_lists()
+            }
+          { :steps, :edit} ->
+            {
+              :noreply,
+              socket
+              |> StepLive.Index.prepare_steps()
+              |> StepLive.Index.prepare_step(socket.assigns.step.id)
+              |> select_lists()
+            }
+          { :steps, :show } ->
+            {
+              :noreply,
+              socket
+              |> StepLive.Index.prepare_steps()
+            }
+          { :process, _ } ->
+            {
+              :noreply,
+              socket
+              |> prepare_processes()
+              |> select_lists()
+            }
+          { _, _ } -> { :noreply, socket }
         end
       false -> { :noreply, socket }
     end
