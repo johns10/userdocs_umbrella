@@ -177,30 +177,15 @@ defmodule UserDocsWeb.ProcessLive.SPA do
     {:noreply, socket}
   end
   def handle_event("expand" = n, p, s), do: StepLive.Index.handle_event(n, p, s)
-  def handle_event("new-content" = n, _params, socket) do
-    opts = socket.assigns.state_opts
-    team = Users.get_team!(socket.assigns.current_team.id, socket, opts)
-    params =
-      %{}
-      |> Map.put(:version_id, socket.assigns.current_version.id)
-      |> Map.put(:teams, socket.assigns.data.teams)
-      |> Map.put(:language_codes, Documents.list_language_codes(socket, opts))
-      |> Map.put(:team, team)
-      |> Map.put(:versions, socket.assigns.data.versions)
-      |> Map.put(:content, socket.assigns.data.content)
-      |> Map.put(:channel, UserDocsWeb.Defaults.channel(socket))
-      |> Map.put(:state_opts, opts)
-
-    Root.handle_event(n, params, socket)
+  def handle_event("new-content", _params, socket) do
+    {:noreply, socket}
   end
 
   @impl true
   def handle_info({ :close_modal, _ }, socket) do
-    IO.inspect("SPA closing modal")
     { :noreply, assign(socket, :live_action, :show) }
   end
   def handle_info(:close_modal, socket) do
-    IO.inspect("SPA closing modal")
     { :noreply, assign(socket, :live_action, :show) }
   end
   def handle_info(%{ topic: _, event: _, payload: payload } = sub_data, socket) do
