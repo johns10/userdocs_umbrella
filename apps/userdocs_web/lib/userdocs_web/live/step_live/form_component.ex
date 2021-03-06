@@ -257,6 +257,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       socket
       |> assign(:changeset, changeset)
       |> assign(:step, changeset.data)
+      |> assign(:new_element, true)
     }
   end
   def handle_event("new-page", _, socket) do
@@ -280,6 +281,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       socket
       |> assign(:changeset, changeset)
       |> assign(:step, changeset.data)
+      |> assign(:new_annotation, true)
     }
   end
 
