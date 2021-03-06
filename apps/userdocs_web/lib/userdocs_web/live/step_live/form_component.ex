@@ -331,10 +331,13 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   end
 
   defp save_step(socket, :edit, step_params) do
+    changeset = Automation.change_step(socket.assigns.step, step_params)
     case Automation.update_step(socket.assigns.step, remove_empty_associations(step_params)) do
       {:ok, step} ->
-        send(self(), {:close_modal, to: socket.assigns.return_to })
-        Automation.handle_step_broadcast(step, "update")
+        # send(self(), {:close_modal, to: socket.assigns.return_to })
+        opts = socket.assigns.state_opts |> Keyword.put(:action, :update)
+        UserDocs.Subscription.broadcast_children(step, changeset, opts)
+        send(self(), { :broadcast, "update", step })
         {
           :noreply,
           socket
@@ -350,8 +353,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     # recent_navigated_to_page(process, step, assigns)
     case Automation.create_step(step_params) do
       {:ok, step} ->
-        send(self(), {:close_modal, to: socket.assigns.return_to })
-        Automation.handle_step_broadcast(step, "create")
+        send(self(), { :close_modal, to: socket.assigns.return_to })
+        send(self(), { :broadcast, "create", step })
         {
           :noreply,
           socket
