@@ -4,6 +4,7 @@
 = if @live_action in [:edit, :new] do
   = live_modal @socket, UserDocsWeb.TeamLive.FormComponent,
     id: @team.id || :new,
+    current_user: @current_user,
     title: @page_title,
     action: @live_action,
     team: @team,
