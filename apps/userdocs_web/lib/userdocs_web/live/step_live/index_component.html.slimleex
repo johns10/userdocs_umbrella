@@ -19,7 +19,9 @@
     return_to: Routes.step_index_path(@socket, :index, @process.id),
     select_lists: @select_lists,
     new_element: false,
-    new_annotation: false
+    new_annotation: false,
+    transferred_selector: @transferred_selector,
+    transferred_strategy: @transferred_strategy
 
 = for step <- @steps do
   .card
