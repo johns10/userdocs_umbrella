@@ -339,7 +339,6 @@ defmodule UserDocs.Automation do
     %Step{  }
     |> Step.changeset(attrs)
     |> Repo.insert()
-    |> Subscription.broadcast("step", "create")
   end
 
   @doc """
@@ -356,10 +355,8 @@ defmodule UserDocs.Automation do
   """
 
   def update_step(%Step{} = step, attrs) do
-    step
-    |> Step.changeset(attrs)
+    Step.changeset(step, attrs)
     |> Repo.update()
-    |> Subscription.broadcast("step", "update")
   end
 
   def update_step_with_nested_data(%Step{} = step, attrs, state) do
@@ -367,8 +364,7 @@ defmodule UserDocs.Automation do
       { :ok, step } <- Repo.update(changeset), # Apply to database and get new step
       step <- update_step_preloads(step, changeset.changes, state), # Preload data according to changes
       changeset <- Step.change_remaining(step, changeset.params), # Apply the changeset to the remaining fields
-      { :ok, step } <- Repo.update(changeset), # Apply the changes to the database
-      step <- update_children(step, changeset)
+      { :ok, step } <- Repo.update(changeset) # Apply the changes to the database
     do
       { :ok, step }
     else
@@ -418,57 +414,6 @@ defmodule UserDocs.Automation do
     |> Ecto.Changeset.put_change(key, struct)
   end
 
-  def update_children(object, changeset) do
-    Logger.debug("Updating Children")
-    Enum.each([ :annotation, :element, :page, :content ], fn(child) ->
-      case Ecto.Changeset.get_change(changeset, child, nil) do
-        :nil ->
-          Logger.debug("Tried to update a #{child}, but there was no change.")
-        change ->
-          Logger.debug("Updating a #{child}: #{inspect(object)}")
-          broadcast_child(Map.get(object, child), child, change.action)
-      end
-    end)
-    object
-  end
-
-  def broadcast_child(object, key, action) do
-    type = Atom.to_string(key)
-    Logger.debug("Broadcasting #{type}, #{action(action)}")
-    Subscription.broadcast({ :ok, object }, type, action(action))
-  end
-
-  def handle_step_broadcast(%Step{} = step, action) do
-    step
-    |> maybe_broadcast_content(action)
-    |> maybe_broadcast_annotation(action)
-    |> maybe_broadcast_element(action)
-    |> broadcast_step(action)
-  end
-  def maybe_broadcast_content(%{ annotation: %{ content: %UserDocs.Documents.Content{} = content }} = step, action) do
-    send(self(), { :broadcast, action, content })
-    step
-  end
-  def maybe_broadcast_content(step, action), do: step
-  def maybe_broadcast_annotation(%{ annotation: %UserDocs.Web.Annotation{} = annotation } = step, action) do
-    send(self(), { :broadcast, action, annotation })
-    step
-  end
-  def maybe_broadcast_annotation(step, action), do: step
-  def maybe_broadcast_element(%{ element: %UserDocs.Web.Element{} = element } = step, action) do
-    send(self(), { :broadcast, action, element })
-    step
-  end
-  def maybe_broadcast_element(step, action), do: step
-  def maybe_broadcast_page(%{ element: %UserDocs.Web.Page{} = page } = step, action) do
-    send(self(), { :broadcast, action, page })
-    step
-  end
-  def maybe_broadcast_page(step, action), do: step
-  def broadcast_step(step, action) do
-    send(self(), { :broadcast, action, step })
-    step
-  end
 
   def action(:insert), do: "create"
   def action(:update), do: "update"
@@ -761,7 +706,6 @@ defmodule UserDocs.Automation do
     %Process{}
     |> Process.changeset(attrs)
     |> Repo.insert()
-    |> Subscription.broadcast("process", "create")
   end
 
   @doc """
@@ -780,7 +724,6 @@ defmodule UserDocs.Automation do
     process
     |> Process.changeset(attrs)
     |> Repo.update()
-    |> Subscription.broadcast("process", "update")
   end
 
   @doc """
