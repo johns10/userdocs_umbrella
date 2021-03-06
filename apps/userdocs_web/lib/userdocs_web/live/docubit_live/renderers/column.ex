@@ -26,7 +26,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Column do
 
   def render(assigns) do
     ~L"""
-      <div class="">
+      <div class="column">
         <%= Base.render_inner_content(assigns) %>
         <%= AddDocubitOptions.render(assigns) %>
       </div>
