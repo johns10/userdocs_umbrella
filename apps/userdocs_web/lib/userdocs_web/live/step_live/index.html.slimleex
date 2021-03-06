@@ -21,4 +21,6 @@ div.py-2
   page_title: @page_title,
   data: @data,
   step: @step,
-  select_lists: @select_lists ])
+  select_lists: @select_lists,
+  new_element: false,
+  new_annotation: false ])
