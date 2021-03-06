@@ -144,7 +144,7 @@ defmodule UserDocsWeb.StepLive.Index do
 
   def annotation_types_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
     Web.list_annotation_types(socket, state_opts)
-    |> Helpers.select_list(:name, :false)
+    |> Helpers.select_list(:name, :true)
   end
   def annotation_types_select(_), do: []
 
