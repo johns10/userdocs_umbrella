@@ -49,7 +49,9 @@ css:
     current_version: @current_version,
     select_lists: @select_lists,
     new_element: false,
-    new_annotation: false, ])
+    new_annotation: false,
+    transferred_selector: @transferred_selector,
+    transferred_strategy: @transferred_strategy ])
 
   .panel id="selector-transfer-menu"
     .panel-block
