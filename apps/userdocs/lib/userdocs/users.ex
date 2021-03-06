@@ -557,6 +557,12 @@ defmodule UserDocs.Users do
     |> Team.changeset(attrs)
     |> Repo.update()
   end
+  def update_team_and_default_project(%Team{} = team, attrs) do
+    team
+    |> Team.changeset(attrs)
+    |> Team.change_default_project()
+    |> Repo.update()
+  end
 
   @doc """
   Deletes a team.
