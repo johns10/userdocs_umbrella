@@ -91,7 +91,8 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
   end
 
   defp save_team(socket, :new, team_params) do
-    case Users.create_team(team_params) do
+    params = Map.put(team_params, "team_users", [ %{ "default" => "false", "user_id" => Integer.to_string(socket.assigns.current_user.id) }])
+    case Users.create_team(params) do
       {:ok, _team} ->
         {:noreply,
          socket
