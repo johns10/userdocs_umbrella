@@ -5,7 +5,6 @@ defmodule UserDocsWeb.SelectorHandler do
   def render(assigns) do
     ~L"""
     <div
-      class="card"
       id="<%= @id %>"
       phx-hook="selectorTransfer"
     >
