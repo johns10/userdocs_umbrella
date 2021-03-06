@@ -29,7 +29,7 @@ defmodule UserDocs.MediaFixtures do
 
     s = Automation.list_steps(state, opts) |> Enum.at(0)
     f = Media.list_files(state, opts) |> Enum.at(0)
-    screenshot = screenshot(f.id, s.id)
+    screenshot = screenshot(s.id)
 
     state
     |> StateHandlers.initialize(opts)
@@ -43,17 +43,16 @@ defmodule UserDocs.MediaFixtures do
     object
   end
 
-  def screenshot(file_id, step_id) do
+  def screenshot(step_id) do
     { :ok, object } =
-      screenshot_attrs(:valid, file_id, step_id)
+      screenshot_attrs(:valid, step_id)
       |> Media.create_screenshot()
     object
   end
 
-  def screenshot_attrs(:valid, file_id, step_id) do
+  def screenshot_attrs(:valid, step_id) do
     %{
       name: UUID.uuid4(),
-      file_id: file_id,
       step_id: step_id
     }
   end
