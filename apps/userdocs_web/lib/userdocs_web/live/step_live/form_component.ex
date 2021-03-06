@@ -115,7 +115,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
           element = Web.get_element!(element_id)
           step = Map.put(step, :element, element)
           {
-            Automation.change_step(step, Map.delete(step_params, "element")),
+            Automation.change_step(step, Map.delete(step_params, "element"))
+            |> Ecto.Changeset.put_assoc(:element, element),
             socket
             |> assign(:step, step)
           }
@@ -130,7 +131,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
           annotation = Web.get_annotation!(annotation_id, socket, opts)
           step = Map.put(step, :annotation, annotation)
           {
-            Automation.change_step(step, Map.delete(step_params, "annotation")),
+            Automation.change_step(step, Map.delete(step_params, "annotation"))
+            |> Ecto.Changeset.put_assoc(:annotation, annotation),
             socket
             |> assign(:step, step)
           }
@@ -148,7 +150,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
             |> Map.put(:elements, elements_select(socket.assigns, page_id))
           {
             step
-            |> Automation.change_step(Map.delete(step_params, "page")),
+            |> Automation.change_step(Map.delete(step_params, "page"))
+            |> Ecto.Changeset.put_assoc(:page, page),
             socket
             |> assign(:step, step)
             |> assign(:select_lists, select_lists)
