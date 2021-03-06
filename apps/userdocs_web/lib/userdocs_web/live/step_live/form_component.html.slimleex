@@ -67,7 +67,7 @@
               fp, [ prefix: @form_ids.prefix ])
       .level
 
-  = if "element_id" in @enabled_step_fields and @action not in [:new] do
+  = if "element_id" in @enabled_step_fields and @action not in [:new]  do
     .field.is-horizontal
       .field-label.is-normal
         = label f, :element_id, class: "label"
@@ -75,18 +75,19 @@
         .field.has-addons
           = Layout.select_input(f, :element_id, @select_lists.elements, 
             [ value: f.data.element_id || "", id: @field_ids.element_id, label: false,
-              hidden: "element_id" not in @enabled_step_fields ], "control")
+            hidden: "element_id" not in @enabled_step_fields ], "control")
           = Layout.new_item_button("new-element", [ button_class: :a, phx_target: @myself.cid ], "control")
-    = inputs_for f, :element, [id: @form_ids.element], fn fe ->
-      div style="border-left: 5px solid LightGray;"
-        .pl-2
-          = hidden_input(fe, :page_id, value: f.data.page_id || @default_page_id)
-          = error_tag(fe, :page_id)
-          = ElementLive.FormComponent.render_name_field(Map.put(assigns, :field_ids, @field_ids.element),
-              fe, @form_ids.prefix)
-          = ElementLive.FormComponent.render_selector_field(Map.put(assigns, :field_ids, @field_ids.element),
-              fe, @form_ids.prefix)
-    .level
+    = if !is_nil(@step.element) or @new_element do 
+      = inputs_for f, :element, [id: @form_ids.element], fn fe ->
+        div style="border-left: 5px solid LightGray;"
+          .pl-2
+            = hidden_input(fe, :page_id, value: f.data.page_id || @default_page_id)
+            = error_tag(fe, :page_id) 
+            = ElementLive.FormComponent.render_name_field(Map.put(assigns, :field_ids, @field_ids.element),
+                fe, @form_ids.prefix)
+            = ElementLive.FormComponent.render_selector_field(Map.put(assigns, :field_ids, @field_ids.element),
+                fe, @form_ids.prefix)
+  .level
 
   = if "annotation_id" in @enabled_step_fields and @action not in [:new] do
     .field.is-horizontal
@@ -96,14 +97,14 @@
         .field.has-addons
           = Layout.select_input(f, :annotation_id, @select_lists.annotations, 
             [ value: f.data.annotation_id || "",
-                id: @field_ids.annotation_id,
-                label: false,
-                hidden: "annotation_id" not in @enabled_step_fields ], "control")
+            id: @field_ids.annotation_id, label: false,
+            hidden: "annotation_id" not in @enabled_step_fields ], "control")
           = Layout.new_item_button("new-annotation", [ button_class: :a, phx_target: @myself.cid ], "control")
-    = inputs_for f, :annotation, [id: @form_ids.annotation ], fn fa ->
-      div style="border-left: 5px solid LightGray;"
-        .pl-2
-          = AnnotationLive.FormComponent.render_fields(assigns, fa, @form_ids.prefix)
+    = if !is_nil(@step.annotation) or @new_annotation do 
+      = inputs_for f, :annotation, [id: @form_ids.annotation ], fn fa ->
+        div style="border-left: 5px solid LightGray;"
+          .pl-2
+            = AnnotationLive.FormComponent.render_fields(assigns, fa, @form_ids.prefix)
   .level
 
   = Layout.text_input(f, [ field_name: :url, id: @field_ids.url,
