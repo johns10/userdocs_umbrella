@@ -13,7 +13,7 @@ defmodule UserDocsWeb.UserLive.DefaultsAndSelections do
   end
 
   def update(%{ current_user: current_user }, socket) do
-    default_team = Map.get(current_user, :default_team, %UserDocs.Users.Team{ name: "Not Found" })
+    default_team = Map.get(current_user, :default_team, %UserDocs.Users.Team{ name: "Not Found" }) || %UserDocs.Users.Team{ name: "Not Found" }
     default_project =
       case Map.get(default_team, :default_project, %UserDocs.Projects.Project{ name: "Not Found" }) do
         nil -> %UserDocs.Projects.Project{ name: "Not Found" }
