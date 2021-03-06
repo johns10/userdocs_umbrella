@@ -75,32 +75,48 @@ defmodule UserDocsWeb.DocubitEditorLive do
         id=<%= @id %>
       >
         <div class="is-flex is-flex-direction-row is-justify-content-space-between py-1">
-          <div><%= @renderer.header(assigns) %></div>
-          <div class="py-0">
-            <div class="<%= dropdown_is_active?(@display_settings_menu) %>" >
-              <i class="fa fa-gear"
-                phx-click="display-settings-menu"
-                phx-value-docubit-id=<%= @docubit.id %>
-                phx-target="<%= @myself.cid %>"
-              ></i>
-              <div class="dropdown-menu" id="dropdown-menu" role="menu">
-                <div class="dropdown-content">
-                  <%= if is_integer(@parent_cid) do %>
+          <div>
+            <%= @renderer.header(assigns) %>
+          </div>
+          <div class="is-flex is-flex-direction-row">
+            <%= if is_integer(@parent_cid) do %>
+              <%= if @docubit.order > 0 do %>
+                <%= link to: "#", phx_click: "move-docubit-up-one", class: "px-1",
+                  phx_value_docubit_order: @docubit.order, phx_target: @parent_cid do %>
+                  <i class="fa fa-arrow-up"></i>
+                <% end %>
+              <% end %>
+              <%= if @docubit.order < @quantity_docubits - 1 do %>
+                <%= link to: "#", phx_click: "move-docubit-down-one", class: "px-1",
+                  phx_value_docubit_order: @docubit.order, phx_target: @parent_cid do %>
+                  <i class="fa fa-arrow-down"></i>
+                <% end %>
+              <% end %>
+            <% end %>
+            <div class="pl-1">
+              <div class="<%= dropdown_is_active?(@display_settings_menu) %>" >
+                <%= link to: "#", phx_click: "display-settings-menu", phx_value_docubit_id: @docubit.id, phx_target: @myself.cid do %>
+                  <i class="fa fa-gear"></i>
+                <% end %>
+                <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                  <div class="dropdown-content">
+                    <%= if is_integer(@parent_cid) do %>
+                      <a href="#"
+                        class="dropdown-item"
+                        phx-click="delete-docubit"
+                        phx-target=<%= @parent_cid %>
+                        phx-value-id=<%= @docubit.id %>>
+                        Delete
+                      </a>
+                    <% end %>
                     <a href="#"
                       class="dropdown-item"
-                      phx-click="delete-docubit"
-                      phx-target=<%= @parent_cid %>
+                      phx-click="edit-docubit"
+                      phx-target=<%= @myself.cid %>
                       phx-value-id=<%= @docubit.id %>>
-                      Delete
+                      Settings
                     </a>
-                  <% end %>
-                  <a href="#"
-                    class="dropdown-item"
-                    phx-click="edit-docubit"
-                    phx-target=<%= @myself.cid %>
-                    phx-value-id=<%= @docubit.id %>>
-                    Settings
-                  </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -131,7 +147,8 @@ defmodule UserDocsWeb.DocubitEditorLive do
               parent_cid: @myself.cid,
               data: @data,
               channel: @channel,
-              img_path: @img_path
+              img_path: @img_path,
+              quantity_docubits: Enum.count(@docubit.docubits),
             ]) %>
           <% end %>
         <% end %>
@@ -264,6 +281,26 @@ defmodule UserDocsWeb.DocubitEditorLive do
 
 
   end
+  def handle_event("move-docubit-up-one", %{"docubit-order" => docubit_order }, socket) do
+    IO.puts("move-docubit #{docubit_order} up-one")
+    docubit_order = String.to_integer(docubit_order)
+    first_order = docubit_order - 1
+    second_order = docubit_order
+
+    updated_docubit = swap_adjacent_docubits(socket.assigns.docubit, first_order, second_order)
+
+    { :noreply, assign(socket, :docubit, updated_docubit) }
+  end
+  def handle_event("move-docubit-down-one", %{"docubit-order" => docubit_order }, socket) do
+    IO.puts("move-docubit #{docubit_order} down-one")
+    docubit_order = String.to_integer(docubit_order)
+    first_order = docubit_order
+    second_order = docubit_order + 1
+
+    updated_docubit = swap_adjacent_docubits(socket.assigns.docubit, first_order, second_order)
+
+    { :noreply, assign(socket, :docubit, updated_docubit) }
+  end
   def handle_event("display-settings-menu", %{"docubit-id" => docubit_id}, socket) do
     send(self(), { :close_all_dropdowns, [ String.to_integer(docubit_id) ] })
     {:noreply, assign(socket, :display_settings_menu, not socket.assigns.display_settings_menu)}
@@ -282,4 +319,29 @@ defmodule UserDocsWeb.DocubitEditorLive do
     { :noreply, socket }
   end
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
+
+  def swap_adjacent_docubits(parent_docubit, first_order, second_order) do
+    parent_address = parent_docubit.address
+
+    attrs = Enum.map(parent_docubit.docubits,
+      fn(d) ->
+        attrs = Map.take(d, Docubit.__schema__(:fields))
+        case attrs.order do
+          order when order == second_order ->
+            attrs
+            |> Map.put(:order, first_order)
+            |> Map.put(:address, List.insert_at(parent_address, -1, first_order))
+          order when order == first_order ->
+            attrs
+            |> Map.put(:order, second_order)
+            |> Map.put(:address, List.insert_at(parent_address, -1, second_order))
+          _ -> attrs
+        end
+      end
+    )
+    |> Enum.sort(fn(x, y) -> x.order < y.order end)
+
+    { :ok, updated_docubit } = Documents.update_docubit(parent_docubit, %{ docubits: attrs })
+    updated_docubit
+  end
 end

@@ -176,7 +176,8 @@ defmodule UserDocsWeb.DocumentLive.Editor do
   end
   def handle_info(%{topic: topic, event: event, payload: %Docubit{} = docubit}, socket) do
     IO.puts("Handling Docubit Subscription")
-    { :noreply, _ } = Root.handle_info(%{ topic: topic, event: event, payload: docubit }, socket)
+    { :noreply, socket } = Root.handle_info(%{ topic: topic, event: event, payload: docubit }, socket)
+    { :noreply, prepare_document_version(socket, socket.assigns.document_version.id) }
   end
   def handle_info({ :close_all_dropdowns, exclude }, socket) do
     Enum.each(Documents.list_docubits(socket, socket.assigns.state_opts),
