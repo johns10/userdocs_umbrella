@@ -95,7 +95,6 @@ defmodule UserDocs.Web do
     %Page{}
     |> Page.changeset(attrs)
     |> Repo.insert()
-    |> Subscription.broadcast("page", "create")
   end
 
   @doc """
@@ -114,7 +113,6 @@ defmodule UserDocs.Web do
     page
     |> Page.changeset(attrs)
     |> Repo.update()
-    |> Subscription.broadcast("page", "update")
   end
 
   @doc """
@@ -362,7 +360,6 @@ defmodule UserDocs.Web do
     %Element{}
     |> Element.changeset(attrs)
     |> Repo.insert()
-    |> Subscription.broadcast("element", "create")
   end
 
   @doc """
@@ -381,7 +378,6 @@ defmodule UserDocs.Web do
     element
     |> Element.changeset(attrs)
     |> Repo.update()
-    |> Subscription.broadcast("element", "update")
   end
 
   @doc """
@@ -545,7 +541,6 @@ defmodule UserDocs.Web do
     %Annotation{}
     |> Annotation.changeset(attrs)
     |> Repo.insert()
-    |> Subscription.broadcast("annotation", "create")
   end
 
   @doc """
@@ -561,17 +556,8 @@ defmodule UserDocs.Web do
 
   """
   def update_annotation(%Annotation{} = annotation, attrs) do
-    IO.puts("Updatiung annotation")
     changeset = Annotation.changeset(annotation, attrs)
-
-    #name = UserDocs.Web.Annotation.Name.execute(changeset.data)
-
-    #changeset = Ecto.Changeset.put_change(changeset, :name, "name")
-
     {status, annotation} = Repo.update(changeset)
-
-    Subscription.broadcast({status, annotation}, "annotation", "update")
-
     { status, annotation }
   end
 
