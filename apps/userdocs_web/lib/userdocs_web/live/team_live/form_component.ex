@@ -76,7 +76,7 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
   defp get_temp_id, do: :crypto.strong_rand_bytes(5) |> Base.url_encode64 |> binary_part(0, 5)
 
   defp save_team(socket, :edit, team_params) do
-    case Users.update_team(socket.assigns.team, team_params) do
+    case Users.update_team_and_default_project(socket.assigns.team, team_params) do
       {:ok, _team} ->
         {
           :noreply,
