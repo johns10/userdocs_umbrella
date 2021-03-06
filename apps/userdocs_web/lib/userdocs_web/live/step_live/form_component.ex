@@ -73,6 +73,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       assigns.select_lists
       |> Map.put(:annotations, Helpers.select_list(assigns.data.annotations, :name, true))
       |> Map.put(:elements, elements_select(assigns, step.page_id || assigns.default_page_id))
+      |> Map.put(:annotations, annotations_select(assigns, step.page_id || assigns.default_page_id))
 
     nested_element_expanded =
       case { Ecto.Changeset.get_field(changeset, :element_id), Ecto.Changeset.get_change(changeset, :element) } do
@@ -234,7 +235,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
                 name: "Test Selector"
               }
             }
-           ],
+          ],
         },
         element_id: socket.assigns.id,
         status: "not_started",
@@ -464,6 +465,12 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     opts = Keyword.put(state_opts, :filter, { :page_id, page_id })
     Web.list_elements(socket, opts)
     |> Helpers.select_list(:name, true)
+  end
+
+  def annotations_select(%{ state_opts: state_opts } = socket, page_id) do
+    opts = Keyword.put(state_opts, :filter, { :page_id, page_id })
+    Web.list_annotations(socket, opts)
+    |> Helpers.select_list(:name, false)
   end
 
   def update_step_content(%Automation.Step{ annotation: nil } = step, _), do: step
