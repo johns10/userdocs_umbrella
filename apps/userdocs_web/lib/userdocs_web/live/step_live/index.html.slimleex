@@ -23,4 +23,6 @@ div.py-2
   step: @step,
   select_lists: @select_lists,
   new_element: false,
-  new_annotation: false ])
+  new_annotation: false,
+  transferred_selector: "",
+  transferred_strategy: %{ name: "", id: ""} ])
