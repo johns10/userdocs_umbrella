@@ -62,7 +62,10 @@ defmodule UserDocsWeb.ContentLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    content = Documents.get_content!(String.to_integer(id), socket, socket.assigns.state_opts)
+    opts =
+      socket.assigns.state_opts
+      |> Keyword.put(:preloads, [ :content_versions, [ content_versions: :version ] ])
+    content = Documents.get_content!(String.to_integer(id), socket, opts)
     socket
     |> assign(:page_title, "Edit Content")
     |> assign(:content, content)
