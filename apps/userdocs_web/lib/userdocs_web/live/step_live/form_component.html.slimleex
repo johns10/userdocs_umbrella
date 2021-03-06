@@ -11,14 +11,15 @@
     .field-body
       .control
         .select
-          = select f,:process_id, @select_lists.processes_select, [ class: "input", selected: @parent_id || "", id: @field_ids.process_id || "" ]
+          = select f, :process_id, @select_lists.processes_select, 
+            [ class: "input", selected: @parent_id || "", id: @field_ids.process_id || "" ]
 
   .field.is-horizontal
     .field-label.is-normal
       = label f, :order, class: "label"
     .field-body
       .control
-        = number_input f,:order, [ class: "input", type: "text", id: @field_ids.order || "" ]
+        = number_input f, :order, [ class: "input", type: "text", id: @field_ids.order || "" ]
 
   .field.is-horizontal
     .field-label.is-normal
@@ -28,7 +29,6 @@
         .select
           = select f,:step_type_id, @select_lists.step_types_select, 
             [ class: "input", type: "text", id: @field_ids.step_type_id || "" ]
-
 
   = if "page_reference" in @enabled_step_fields and @action not in [:new] do
     .field.is-horizontal
@@ -88,8 +88,8 @@
             = ElementLive.FormComponent.render_selector_field(Map.put(assigns, :field_ids, @field_ids.element),
                 fe, @form_ids.prefix)
             p 
-              = "Transferred Selector, " <> @transferred_strategy.name <> ": "
-              = @transferred_selector
+              = "Transferred Selector " <> (@transferred_strategy.name || "") <> ": "
+              = @transferred_selector || ""
   .level  
 
   = if "annotation_id" in @enabled_step_fields and @action not in [:new] do
