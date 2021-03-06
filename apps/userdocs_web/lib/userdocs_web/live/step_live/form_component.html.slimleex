@@ -87,7 +87,10 @@
                 fe, @form_ids.prefix)
             = ElementLive.FormComponent.render_selector_field(Map.put(assigns, :field_ids, @field_ids.element),
                 fe, @form_ids.prefix)
-  .level
+            p 
+              = "Transferred Selector, " <> @transferred_strategy.name <> ": "
+              = @transferred_selector
+  .level  
 
   = if "annotation_id" in @enabled_step_fields and @action not in [:new] do
     .field.is-horizontal
