@@ -30,6 +30,7 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
     changeset =
       socket.assigns.team
       |> Users.change_team(team_params)
+      |> Users.Team.change_default_project()
       |> Map.put(:action, :validate)
 
     {:noreply, assign(socket, :changeset, changeset)}
