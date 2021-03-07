@@ -256,7 +256,8 @@ function collectElementDimensions(job, configuration, proceed) {
 function annotations() {
   return {
     "Outline": outline,
-    "Badge": badge
+    "Badge": badge,
+    "Badge Outline": badge_outline
   }
 }
 
@@ -302,22 +303,36 @@ function badge_outline(job, configuration, proceed) {
   const strategy = step.element.strategy
   const element = getElement(strategy, selector)
 
-  var badge_x = step.annotation.x_orientation
-  var badge_y = step.annotation.y_orientation
-  var size = step.annotation.size
-  var labelText = step.annotation.label
-  var color = step.annotation.color
-  var xOffset = step.annotation.x_offset
-  var yOffset = step.annotation.y_offset
-  var fontSize = step.annotation.font_size;
+  const thickness = step.annotation.thickness + 'px';
+  const badge_x = step.annotation.x_orientation
+  const badge_y = step.annotation.y_orientation
+  const size = step.annotation.size
+  const labelText = step.annotation.label
+  const color = step.annotation.color
+  const xOffset = step.annotation.x_offset
+  const yOffset = step.annotation.y_offset
+  const fontSize = step.annotation.font_size;
   
-  const outline = create_outline_element(element, outlineColor, thickness)
+  const outline = create_outline_element(element, color, thickness)
+
+  var badge = document.createElement('span');
+  badge = style_badge(badge, size, fontSize, color)
+
+  var label = document.createElement('span');
+  label = style_label(label, size, fontSize, labelText);
+
+  const rect = element.getBoundingClientRect();
+
+  var wrapper = document.createElement('div');
+  wrapper = style_wrapper(wrapper, rect, size, xOffset, yOffset, badge_x, badge_y)
 
   try {
     document.body.appendChild(wrapper);
+    document.body.appendChild(outline);
     wrapper.appendChild(badge); 
     badge.appendChild(label);
     window.active_annotations.push(wrapper);
+    window.active_annotations.push(outline);
   } catch(error) {
     step.status = "failed"
     step.error = error
@@ -342,8 +357,6 @@ function badge(job, configuration, proceed) {
   const xOffset = step.annotation.x_offset
   const yOffset = step.annotation.y_offset
   const fontSize = step.annotation.font_size;
-  const outlineColor = step.annotation.color
-  const thickness = step.annotation.thickness + 'px';
 
   var badge = document.createElement('span');
   badge = style_badge(badge, size, fontSize, color)
