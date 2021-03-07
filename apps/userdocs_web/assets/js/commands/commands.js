@@ -279,13 +279,14 @@ function clearAnnotations(job, configuration, proceed) {
 function applyAnnotation(job, configuration, proceed) {
   const step = current_step(job)
   const name = step.annotation.annotation_type.name
-  console.log("applying annotation")
+  console.log("applying annotation " + name)
   /*
   console.log(step)
   console.log(step.annotation.annotation_type.name)
   console.log(annotations())
   */
   var apply = annotations()[name]
+  console.log(apply)
   try {
     apply(job, configuration, proceed)
     success(job, configuration, proceed)
@@ -294,12 +295,8 @@ function applyAnnotation(job, configuration, proceed) {
   }
 }
 
-function blur(job, configuration) {
-
-}
-
-function badge(job, configuration, proceed) {
-  console.log("Applying badge annotation")
+function badge_outline(job, configuration, proceed) {
+  console.log("Applying badge outline annotation")
   const step = current_step(job)
   const selector = step.element.selector
   const strategy = step.element.strategy
@@ -313,12 +310,87 @@ function badge(job, configuration, proceed) {
   var xOffset = step.annotation.x_offset
   var yOffset = step.annotation.y_offset
   var fontSize = step.annotation.font_size;
+  
+  const outline = create_outline_element(element, outlineColor, thickness)
 
-  var wrapper = document.createElement('div');
+  try {
+    document.body.appendChild(wrapper);
+    wrapper.appendChild(badge); 
+    badge.appendChild(label);
+    window.active_annotations.push(wrapper);
+  } catch(error) {
+    step.status = "failed"
+    step.error = error
+    failStep(job, error, configuration, proceed)
+  }
+}
+
+function badge(job, configuration, proceed) {
+  console.log("Applying badge annotation")
+  // Get normal vars
+  const step = current_step(job)
+  const selector = step.element.selector
+  const strategy = step.element.strategy
+  const element = getElement(strategy, selector)
+
+  // Get vars for these elements
+  const badge_x = step.annotation.x_orientation
+  const badge_y = step.annotation.y_orientation
+  const size = step.annotation.size
+  const labelText = step.annotation.label
+  const color = step.annotation.color
+  const xOffset = step.annotation.x_offset
+  const yOffset = step.annotation.y_offset
+  const fontSize = step.annotation.font_size;
+  const outlineColor = step.annotation.color
+  const thickness = step.annotation.thickness + 'px';
+
   var badge = document.createElement('span');
+  badge = style_badge(badge, size, fontSize, color)
+
   var label = document.createElement('span');
+  label = style_label(label, size, fontSize, labelText);
 
   const rect = element.getBoundingClientRect();
+
+  var wrapper = document.createElement('div');
+  wrapper = style_wrapper(wrapper, rect, size, xOffset, yOffset, badge_x, badge_y)
+
+  try {
+    document.body.appendChild(wrapper);
+    wrapper.appendChild(badge); 
+    badge.appendChild(label);
+    window.active_annotations.push(wrapper);
+  } catch(error) {
+    step.status = "failed"
+    step.error = error
+    failStep(job, error, configuration, proceed)
+  }
+}
+
+function style_label(label, size, fontSize, labelText) {
+  label.style.position = 'relative';
+  label.style.top = ((size * 2 - fontSize) / 2).toString() + 'px';
+  label.textContent = labelText;
+  label.style.color = 'white';
+
+  return label
+}
+
+function style_badge(badge, size, fontSize, color) {
+  badge.style.position = 'relative';
+  badge.style.display = 'inline-table';
+  badge.style.width = (2 * size).toString() + 'px';
+  badge.style.height = (2 * size).toString() + 'px';
+  badge.style.borderRadius = '50%';
+  badge.style.fontSize = fontSize.toString() + 'px';
+  badge.style.textAlign = 'center';
+  badge.style.background = color;
+
+  return badge
+}
+
+function style_wrapper(wrapper, rect, size, xOffset, yOffset, badge_x, badge_y) {
 
   const x_calcs = {
     L: Math.round(rect.left - size + xOffset).toString() + 'px',
@@ -334,8 +406,6 @@ function badge(job, configuration, proceed) {
   const x = x_calcs[badge_x]
   const y = y_calcs[badge_y]
 
-  console.log("Placing a badge at " + x.toString() + ", " + y.toString())
-
   wrapper.style.display = 'static';
   wrapper.style.justifyContent = 'center';
   wrapper.style.alignItems = 'center';
@@ -345,30 +415,7 @@ function badge(job, configuration, proceed) {
   wrapper.style.left = x;
   wrapper.style.zIndex = 999999;
 
-  badge.style.position = 'relative';
-  badge.style.display = 'inline-table';
-  badge.style.width = (2 * size).toString() + 'px';
-  badge.style.height = (2 * size).toString() + 'px';
-  badge.style.borderRadius = '50%';
-  badge.style.fontSize = fontSize.toString() + 'px';
-  badge.style.textAlign = 'center';
-  badge.style.background = color;
-
-  label.style.position = 'relative';
-  label.style.top = ((size * 2 - fontSize) / 2).toString() + 'px';
-  label.textContent = labelText;
-  label.style.color = 'white';
-
-  try {
-    document.body.appendChild(wrapper);
-    wrapper.appendChild(badge); 
-    badge.appendChild(label);
-    window.active_annotations.push(wrapper);
-  } catch(error) {
-    step.status = "failed"
-    step.error = error
-    failStep(job, error, configuration, proceed)
-  }
+  return wrapper
 }
 
 function outline(job, configuration, proceed) {
@@ -380,6 +427,19 @@ function outline(job, configuration, proceed) {
 
   const element = getElement(strategy, selector)
 
+  const outline = create_outline_element(element, outlineColor, thickness)
+
+  try {
+    document.body.appendChild(outline)
+    window.active_annotations.push(outline)
+  } catch(error) {
+    step.status = "failed"
+    step.error = error
+    failStep(job, error, configuration, proceed)
+  }
+}
+
+function create_outline_element(element, outlineColor, thickness) {
   const rect = element.getBoundingClientRect();
   const outline = document.createElement('div');
   
@@ -391,14 +451,7 @@ function outline(job, configuration, proceed) {
   outline.style.left = Math.round(rect.left).toString() + 'px';
   outline.style.zIndex = 99999;
 
-  try {
-    document.body.appendChild(outline)
-    window.active_annotations.push(outline)
-  } catch(error) {
-    step.status = "failed"
-    step.error = error
-    failStep(job, error, configuration, proceed)
-  }
+  return outline
 }
 
 function fullScreenShot(job, configuration, proceed) {
