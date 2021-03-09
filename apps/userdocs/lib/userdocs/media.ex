@@ -87,7 +87,11 @@ defmodule UserDocs.Media do
       ExAws.Config.new(:s3)
       |> Map.put(:region, region)
 
-    path = "uploads/" <> aws_file.file_name
+    uploads_dir =
+      Application.get_env(:userdocs, :userdocs_s3)
+      |> Keyword.get(:uploads_dir)
+
+    path = uploads_dir <> "/" <> aws_file.file_name
 
     ExAws.S3.presigned_url(config, :get, bucket, path, virtual_host: true)
   end
