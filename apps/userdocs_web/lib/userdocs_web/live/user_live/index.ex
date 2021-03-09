@@ -1,13 +1,35 @@
 defmodule UserDocsWeb.UserLive.Index do
   use UserDocsWeb, :live_view
 
+  use UserdocsWeb.LiveViewPowHelper
+
   alias UserDocs.Users
   alias UserDocs.Users.User
+  alias UserDocsWeb.Root
+
+  def types() do
+    [
+      UserDocs.Users.User,
+      UserDocs.Users.TeamUser,
+      UserDocs.Users.Team
+    ]
+  end
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, :users, list_users())}
+  def mount(_params, session, socket) do
+    {
+      :ok,
+      socket
+      |> Root.apply(session, types())
+      |> initialize()
+    }
   end
+
+  def initialize(%{ assigns: %{ current_user: %{ email: "johns10davenport@gmail.com" }}} = socket) do
+    socket
+    |> assign(:users, list_users())
+  end
+  def initialize(socket), do: socket
 
   @impl true
   def handle_params(params, _url, socket) do
