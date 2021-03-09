@@ -10,14 +10,19 @@ defmodule UserDocs.ChangesetHelpers do
       end
     num_projects =
       Ecto.Changeset.get_field(changeset, :projects)
-      |> Enum.count()
-
+      |> count_projects()
 
     if num_defaults != 1 && num_projects > 0 do
       Ecto.Changeset.add_error(changeset, assoc_key, "May only have 1 default")
     else
       changeset
     end
+  end
+
+  def count_projects(nil), do: 0
+  def count_projects([]), do: 0
+  def count_projects([ _ ] = projects) do
+    Enum.count(projects)
   end
 
   def count_defaults(%Ecto.Association.NotLoaded{}), do: 0
