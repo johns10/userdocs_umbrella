@@ -92,6 +92,10 @@ defmodule UserDocsWeb.ProcessLive.Index do
   end
 
   @impl true
+  def handle_event("select-version" = n, p, s) do
+    { :noreply, socket } = Root.handle_event(n, p, s)
+    { :noreply, prepare_processes(socket, socket.assigns.current_version.id) }
+  end
   def handle_event("delete", %{"id" => id}, socket) do
     process = Automation.get_process!(id)
     { :ok, _ } = Automation.delete_process(process)
