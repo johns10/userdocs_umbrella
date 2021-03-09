@@ -16,6 +16,9 @@
       <div class="navbar-start">
         <%= if @app_name == "web" do %>
           <a class="navbar-item">Home</a>
+          <%= live_patch "Teams", class: "navbar-item", to: Routes.team_index_path(@socket, :index) %>
+          <%= live_patch "Projects", class: "navbar-item", to: Routes.project_index_path(@socket, :index) %>
+          <%= live_patch "Versions", class: "navbar-item", to: Routes.version_index_path(@socket, :index) %>
           <%= live_patch "Content", class: "navbar-item", to: Routes.content_index_path(@socket, :index) %>
           <%= live_patch "Documents", class: "navbar-item", to: Routes.document_index_path(@socket, :index) %>
           <%= live_patch "Processes", class: "navbar-item", to: Routes.process_index_path(@socket, :index) %>
