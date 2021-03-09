@@ -1,6 +1,5 @@
 defmodule UserDocs.ChangesetHelpers do
   def check_only_one_default(%Ecto.Changeset{ action: :insert } = changeset, _) do
-    IO.puts("insert")
     changeset
   end
   def check_only_one_default(changeset, assoc_key) do
@@ -9,8 +8,12 @@ defmodule UserDocs.ChangesetHelpers do
         nil -> count_defaults(Map.get(changeset.data, assoc_key))
         assoc -> count_defaults(assoc)
       end
+    num_projects =
+      Ecto.Changeset.get_field(changeset, :projects)
+      |> Enum.count()
 
-    if num_defaults != 1 do
+
+    if num_defaults != 1 && num_projects > 0 do
       Ecto.Changeset.add_error(changeset, assoc_key, "May only have 1 default")
     else
       changeset
