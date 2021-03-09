@@ -125,7 +125,9 @@ defmodule UserDocs.Documents.DocubitType do
       },
       allowed_settings: [
         :li_value,
-        :name_prefix
+        :name_prefix,
+        :show_title,
+        :show_h2
         ],
       allowed_children: [],
       allowed_data: [

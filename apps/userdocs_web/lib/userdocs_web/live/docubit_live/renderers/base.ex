@@ -69,6 +69,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
     |> maybe_body()
     |> maybe_name_prefix(docubit.context, content)
     |> maybe_title(docubit.context, content)
+    |> maybe_h2(docubit.context, content)
   end
 
   defp maybe_content_versions(content_versions, version_id) do
@@ -110,6 +111,23 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
   defp maybe_name_prefix(current_content, %Context{ settings: _ }, _) do
     Map.put(current_content, :prefix, nil)
   end
+
+  defp maybe_h2(current_content, %Context{ settings: %{ show_h2: true } }, content) do
+    IO.puts("maybe_h2 true")
+    Map.put(current_content, :h2, content.name)
+    |> IO.inspect()
+  end
+    IO.puts("maybe_h2 false")
+    defp maybe_h2(current_content, %Context{ settings: %{ show_h2: false } }, _) do
+    Map.put(current_content, :h2, nil)
+  end
+  defp maybe_h2(current_content, _, _), do: Map.put(current_content, :show_h2, nil)
+
+  def maybe_render_h2(%{h2: nil}), do: ""
+  def maybe_render_h2(%{h2: title}) do
+    title
+  end
+  def maybe_render_h2(_), do: ""
 
   defp maybe_title(current_content, %Context{ settings: %{ show_title: true } }, content) do
     Map.put(current_content, :title, content.name)
