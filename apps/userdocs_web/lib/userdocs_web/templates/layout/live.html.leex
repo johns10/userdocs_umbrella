@@ -1,7 +1,7 @@
 <%= if @auth_state == :logged_in do %>
   <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <a class="navbar-item" href="https://user-docs.com">
+      <a class="navbar-item" href="<%= Routes.page_path(@socket, :index) %>">
         <img src="<%= Routes.static_path(@socket, "/images/logo.png") %>" height="28">
       </a>
 
