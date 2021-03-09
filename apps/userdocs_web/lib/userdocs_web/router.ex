@@ -51,6 +51,8 @@ defmodule UserDocsWeb.Router do
   scope "/", UserDocsWeb do
     pipe_through :browser
 
+    live "/", PageLive, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
     live "/processpa", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/index.html", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
@@ -109,8 +111,6 @@ defmodule UserDocsWeb.Router do
   scope "/", UserDocsWeb do
     #pipe_through [:protected]
     pipe_through [ :browser, :protected ]
-
-    live "/", PageLive, :index
 
     live "/process_administrator", ProcessAdministratorLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
