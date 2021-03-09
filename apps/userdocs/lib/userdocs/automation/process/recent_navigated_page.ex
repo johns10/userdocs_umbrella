@@ -19,6 +19,7 @@ defmodule UserDocs.Automation.Process.RecentPage do
         Map.get(page, :id)
     end
   end
+  def get_id(_, _, []), do: nil
 
   def get(%Process{ steps: [] = steps }, current_step, pages) do
     get(steps, current_step, pages)
