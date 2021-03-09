@@ -113,11 +113,9 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
   end
 
   defp maybe_h2(current_content, %Context{ settings: %{ show_h2: true } }, content) do
-    IO.puts("maybe_h2 true")
-    Map.put(current_content, :h2, content.name)
+    Map.put(current_content, :h2, content.title)
     |> IO.inspect()
   end
-    IO.puts("maybe_h2 false")
     defp maybe_h2(current_content, %Context{ settings: %{ show_h2: false } }, _) do
     Map.put(current_content, :h2, nil)
   end
@@ -130,7 +128,7 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
   def maybe_render_h2(_), do: ""
 
   defp maybe_title(current_content, %Context{ settings: %{ show_title: true } }, content) do
-    Map.put(current_content, :title, content.name)
+    Map.put(current_content, :title, content.title)
   end
   defp maybe_title(current_content, %Context{ settings: %{ show_title: false } }, _) do
     Map.put(current_content, :title, nil)
