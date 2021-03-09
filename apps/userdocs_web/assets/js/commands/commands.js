@@ -235,6 +235,14 @@ function commands() {
       1: sendToBrowser,
       2: testSelector,
       3: completeStep
+    },
+    "Scroll to Element": {
+      1: startStep,
+      2: sendToBrowser,
+      3: waitForElement,
+      4: scrollToElement,
+      5: sendToExtension,
+      6: completeStep
     }
   }
 }
@@ -257,7 +265,8 @@ function annotations() {
   return {
     "Outline": outline,
     "Badge": badge,
-    "Badge Outline": badge_outline
+    "Badge Outline": badge_outline,
+    "Blur": blur
   }
 }
 
@@ -294,6 +303,17 @@ function applyAnnotation(job, configuration, proceed) {
   } catch(error) {
     failStep(job, error, configuration, proceed)
   }
+}
+
+function blur(job, configuration, proceed) {
+  console.log("Applying blur outline annotation")
+  const step = current_step(job)
+  const selector = step.element.selector
+  const strategy = step.element.strategy
+  const element = getElement(strategy, selector)
+
+  element.style.textShadow = "0 0 5px rgba(0,0,0,0.5)";
+  element.style.color = "transparent";
 }
 
 function badge_outline(job, configuration, proceed) {
@@ -815,6 +835,21 @@ function testSelector(job, configuration, proceed) {
       .querySelector(selector)
       .style
       .backgroundColor = "#FDFF47"
+  }
+}
+
+
+function scrollToElement(job, configuration, proceed) {
+  const step = current_step(job)
+  const selector = step.element.selector
+  const strategy = step.element.strategy
+  const element = getElement(strategy, selector)
+  console.log(element)
+  element.scrollIntoView(true)
+  try {
+    success(job, configuration, proceed)
+  } catch(error) {
+    failStep(job, error, configuration, proceed)
   }
 }
 
