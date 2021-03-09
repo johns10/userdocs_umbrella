@@ -29,6 +29,9 @@ defmodule UserDocsWeb.DocubitSettingsLive.FormComponent do
     <%= Layout.select_input(form, :show_title, setting_select_options(:show_title),
       [ hidden: :show_title not in @settings_to_display ]) %>
 
+    <%= Layout.select_input(form, :show_h2, setting_select_options(:show_h2),
+      [ hidden: :show_h2 not in @settings_to_display ]) %>
+
     <%= Layout.select_input(form, :img_border, setting_select_options(:img_border),
       [ hidden: :img_border not in @settings_to_display ]) %>
 

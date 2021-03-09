@@ -6,6 +6,7 @@ defmodule UserDocs.Documents.DocubitSetting do
     :li_value,
     :name_prefix,
     :show_title,
+    :show_h2,
     :img_border,
     :border_width,
     :border_color
@@ -17,6 +18,7 @@ defmodule UserDocs.Documents.DocubitSetting do
     field :li_value, :string
     field :name_prefix, :boolean
     field :show_title, :boolean
+    field :show_h2, :boolean
     field :img_border, :boolean
     field :border_width, :integer
     field :border_color, :string
@@ -68,6 +70,14 @@ defmodule UserDocs.Documents.DocubitSetting do
 
   #def name_prefix(), do: Kernel.struct(DocubitSetting, name_prefix_attrs())
   def show_title() do
+    %{
+      field_type: :select,
+      select_options: [{"None", nil}, { "False", false }, { "True", true }]
+    }
+  end
+
+  #def name_prefix(), do: Kernel.struct(DocubitSetting, name_prefix_attrs())
+  def show_h2() do
     %{
       field_type: :select,
       select_options: [{"None", nil}, { "False", false }, { "True", true }]
