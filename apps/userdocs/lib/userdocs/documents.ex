@@ -304,30 +304,42 @@ defmodule UserDocs.Documents do
     DocumentVersion
     |> where([ dv ], dv.id == ^id)
     |> join(:left, [ dv ], d in UserDocs.Documents.Docubit, on: d.document_version_id == dv.id, as: :docubits)
+    |> join(:left, [ dv ], v in UserDocs.Projects.Version, on: dv.version_id == v.id, as: :version)
     |> join(:left, [ dv, docubits: d ], c in UserDocs.Documents.Content, on: d.content_id == c.id, as: :content)
     |> join(:left, [ dv, content: c], cv in UserDocs.Documents.ContentVersion, on: cv.content_id == c.id, as: :content_versions)
+    |> join(:left, [ dv, content_versions: cv ], cvv in UserDocs.Projects.Version, on: cv.version_id == cvv.id, as: :content_version_version)
+    |> join(:left, [ dv, docubits: d ], s in UserDocs.Media.Screenshot, on: d.screenshot_id == s.id, as: :screenshot)
     |> join(:left, [ dv, docubits: d ], a in UserDocs.Web.Annotation, on: d.through_annotation_id == a.id, as: :annotations)
     |> join(:left, [ dv, docubits: d ], s in UserDocs.Automation.Step, on: d.through_step_id == s.id, as: :steps)
     |> join(:left, [ dv, docubits: d ], dt in UserDocs.Documents.DocubitType, on: d.docubit_type_id == dt.id, as: :docubit_types)
+    |> order_by([ dv, docubits: d ], asc: d.id)
     |> preload(
       [
         dv,
         docubits: d,
+        version: v,
         content: c,
         annotations: a,
-        steps: s,
+        steps: ts,
         docubit_types: dt,
-        content_versions: cv
+        content_versions: cv,
+        content_version_version: cvv,
+        screenshot: s
       ],
-      [ docubits:
+      [
+        version: v,
+        docubits:
         {
           d,
           content: {
-            c, content_versions: cv
+            c, content_versions: {
+              cv, version: cvv
+            }
           },
           through_annotation: a,
-          through_step: s,
-          docubit_type: dt
+          through_step: ts,
+          docubit_type: dt,
+          screenshot: s
         }
       ])
     |> Repo.one!()
