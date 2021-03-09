@@ -37,6 +37,42 @@ defmodule UserDocsWeb.UserLive.FormComponent do
       </form>
     """
   end
+  def render(%{ action: action } = assigns) when action in [ :new, :edit ] do
+    ~L"""
+      <%= form_for @changeset, Routes.pow_registration_path(@socket, :update), [as: :user], fn f -> %>
+        <%= Layout.text_input(f, Pow.Ecto.Schema.user_id_field(@changeset), [], "control") %>
+
+        <div class="field">
+          <%= label f, :current_password, class: "label" %>
+          <div>
+            <%= password_input f, :current_password, class: :input, type: :password %>
+          </div>
+          <%= error_tag f, :current_password %>
+        </div>
+
+        <div class="field">
+          <%= label f, :password, class: "label" %>
+          <div>
+            <%= password_input f, :password, class: :input, type: :password %>
+          </div>
+          <%= error_tag f, :password %>
+        </div>
+
+        <div class="field">
+          <%= label f, :password_confirmation, class: "label" %>
+          <div>
+            <%= password_input f, :password_confirmation, class: :input, type: :password %>
+          </div>
+          <%= error_tag f, :password_confirmation %>
+        </div>
+
+        <div>
+          <%= submit "Update", class: "button is-primary" %>
+        </div>
+
+      <% end %>
+    """
+  end
 
   @impl true
   def update(%{user: user} = assigns, socket) do
