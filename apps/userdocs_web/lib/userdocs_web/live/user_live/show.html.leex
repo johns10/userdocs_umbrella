@@ -10,8 +10,6 @@
     return_to: Routes.user_show_path(@socket, :show, @user) %>
 <% end %>
 
-<%= live_component(@socket, UserDocsWeb.UserLive.DefaultsAndSelections, [ current_user: @current_user ]) %>
-
 <ul>
   <li>
     <strong>Email:</strong>
