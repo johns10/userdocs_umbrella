@@ -56,6 +56,10 @@ config :userdocs_web, :pow,
   backend: Pow.Store.Backend.MnesiaCache,
   routes_backend: UserDocsWeb.Pow.Routes
 
+config :userdocs, :userdocs_s3,
+  uploads_dir: "uploads"
+
+#Because I can't get config without an App name
 config :userdocs, :waffle,
   storage: Waffle.Storage.S3, # or Waffle.Storage.Local
   bucket: System.get_env("AWS_BUCKET_NAME") # if using S3
