@@ -54,6 +54,8 @@ defmodule UserDocsWeb.Router do
     live "/processpa", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/index.html", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
+    live "/users/new", UserLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/users", UserLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/users/:id", UserLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/users/:id/show/edit", UserLive.Show, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/users/:id/show/options", UserLive.Show, :options, session: {UserDocsWeb.LiveHelpers, :which_app, []}
@@ -112,11 +114,8 @@ defmodule UserDocsWeb.Router do
 
     live "/process_administrator", ProcessAdministratorLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
-
     get "/document_versions/:id/download", DocumentVersionDownloadController, :show
 
-    live "/users", UserLive.Index, :index
-    live "/users/new", UserLive.Index, :new
     live "/users/:id/edit", UserLive.Index, :edit
 
 
