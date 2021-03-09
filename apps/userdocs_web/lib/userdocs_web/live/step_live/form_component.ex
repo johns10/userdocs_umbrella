@@ -71,7 +71,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
     select_lists =
       assigns.select_lists
-      |> Map.put(:annotations, Helpers.select_list(assigns.data.annotations, :name, true))
       |> Map.put(:elements, elements_select(assigns, step.page_id || assigns.default_page_id))
       |> Map.put(:annotations, annotations_select(assigns, step.page_id || assigns.default_page_id))
 
@@ -470,7 +469,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   def annotations_select(%{ state_opts: state_opts } = socket, page_id) do
     opts = Keyword.put(state_opts, :filter, { :page_id, page_id })
     Web.list_annotations(socket, opts)
-    |> Helpers.select_list(:name, false)
+    |> Helpers.select_list(:name, true)
   end
 
   def update_step_content(%Automation.Step{ annotation: nil } = step, _), do: step
