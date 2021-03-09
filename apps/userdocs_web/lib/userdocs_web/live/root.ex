@@ -101,35 +101,48 @@ defmodule UserDocsWeb.Root do
   end
 
   def assign_current(%{ assigns: %{ current_user: current_user } } = socket) do
-
-    default_team = Users.user_default_team(current_user)
-    default_project = Users.team_default_project(default_team)
-    default_version = Projects.project_default_version(default_project)
+    { default_team, current_team } = current_team(current_user)
+    { default_project, current_project } = current_project(current_user, default_team)
+    { default_version, current_version } = current_version(current_user, default_project)
 
     current_user = assign_defaults(current_user, default_team, default_project, default_version)
-
-    current_team =
-      current_user.selected_team
-      || default_team
-      || %Team{}
-
-    current_project =
-      current_user.selected_project
-      || default_project
-      || %Project{}
-
-    current_version =
-      current_user.selected_version
-      || default_version
-      || %Version{}
-
-    IO.puts("Assign current")
 
     socket
     |> assign(:current_user, current_user)
     |> assign(:current_team, current_team)
     |> assign(:current_project, current_project)
     |> assign(:current_version, current_version)
+  end
+
+  def current_team(current_user) do
+    default_team = Users.user_default_team(current_user)
+    {
+      default_team,
+      current_user.selected_team
+      || default_team
+      || %Team{}
+    }
+  end
+
+  def current_project(current_user, default_team) do
+    default_project = Users.team_default_project(default_team)
+
+    {
+      default_project,
+      current_user.selected_project
+      || default_project
+      || %Project{}
+    }
+  end
+
+  def current_version(current_user, default_project) do
+    default_version = Projects.project_default_version(default_project)
+    {
+      default_version,
+      current_user.selected_version
+      || default_version
+      || %Version{}
+    }
   end
 
   def assign_defaults(user, %Team{} = team, %Project{} = project, %Version{} = version) do
