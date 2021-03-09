@@ -25,19 +25,27 @@ defmodule UserDocsWeb.UserLive.Show do
   end
 
   @impl true
-  def handle_params(%{"id" => id}, _, socket) do
-    user = Users.get_user!(id, %{ team_users: true, teams: true })
-    select_lists = %{
-      teams: Helpers.select_list(user.teams, :name, true)
-    }
+  def handle_params(%{"id" => id}, _, %{ assigns: %{ current_user: current_user }} = socket) do
+    case String.to_integer(id) == current_user.id do
+      true ->
+        user = Users.get_user!(id, %{ team_users: true, teams: true })
+        select_lists = %{
+          teams: Helpers.select_list(user.teams, :name, true)
+        }
 
-    {
-      :noreply,
-      socket
-      |> assign(:page_title, page_title(socket.assigns.live_action))
-      |> assign(:user, user)
-      |> assign(:select_lists, select_lists)
-    }
+        {
+          :noreply,
+          socket
+          |> assign(:page_title, page_title(socket.assigns.live_action))
+          |> assign(:user, user)
+          |> assign(:select_lists, select_lists)
+        }
+      false ->
+        {
+          :noreply,
+          socket
+        }
+    end
   end
 
   @impl true
