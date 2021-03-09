@@ -1,27 +1,31 @@
 defmodule UserDocsWeb.DocumentVersionDownloadController do
   use UserDocsWeb, :controller
-  use UserDocsWeb, :live_view
 
+  alias UserDocs.Users
   alias UserDocs.Documents.Docubit
+  alias UserDocsWeb.Root
   alias UserDocsWeb.DocumentLive.Viewer
   alias UserDocsWeb.DocubitLive.Renderers.Base
 
-  def render(assigns) do
-    ~L"""
-    """
-  end
-
-  def show(conn, %{"id" => id}) do
+  def show(%{ assigns: %{ current_user: current_user }} = conn, %{"id" => id}) do
+    IO.puts("Starting controller")
     document_version = UserDocs.Documents.prepare_document_version(id)
 
+    current_user = Users.get_user_and_configs!(current_user.id)
+
+    { default_team, _ } = Root.current_team(current_user)
+    { default_project, _ } = Root.current_project(current_user, default_team)
+    { _, current_version } = Root.current_version(current_user, default_project)
+
     body =
-      document_version.docubits |> Enum.at(0)
+      document_version.docubits
+      |> Enum.at(0)
       |> Docubit.apply_context(%{ settings: %{} })
       |> Viewer.prepare_docubit(document_version.docubits)
 
     assigns = %{
       current_language_code_id: 1,
-      current_version_id: document_version.version_id,
+      current_version: current_version,
       component: false,
       editor: false,
       role: :html_export,
@@ -43,13 +47,26 @@ defmodule UserDocsWeb.DocumentVersionDownloadController do
     :ok = File.mkdir_p!(target_path)
     :ok = File.mkdir_p!(target_path <> "/images")
 
+    bucket =
+      Application.get_env(:userdocs, :waffle)
+      |> Keyword.get(:bucket)
+
+
+    uploads_dir =
+      Application.get_env(:userdocs, :userdocs_s3)
+      |> Keyword.get(:uploads_dir)
+
+
     document_version.docubits
-    |> Enum.filter(fn(docubit) -> docubit.file_id != nil end)
-    |> Enum.map(fn(docubit) -> docubit.file end)
-    |> Enum.each(fn(file) ->
-        source_file = File.cwd! <> "/apps/userdocs_web/assets/images/" <> file.filename
-        File.copy(source_file, target_path <> "/images/" <> file.filename)
-      end)
+    |> Enum.filter(fn(docubit) -> docubit.screenshot_id != nil end)
+    |> Enum.filter(fn(docubit) -> docubit.screenshot.aws_file != nil end)
+    |> Enum.each(fn(d) ->
+      path = uploads_dir <> "/" <> d.screenshot.aws_file.file_name
+      local_path = File.cwd! <> "/tmp/" <> tmp_folder_name <> "/images/" <> d.screenshot.aws_file.file_name
+      {:ok, :done} =
+        ExAws.S3.download_file(bucket, path, local_path)
+        |> ExAws.request
+    end)
 
     File.write(target_path <> "/index.html", result)
 
