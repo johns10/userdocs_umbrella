@@ -9,6 +9,8 @@ h2.title = @title
   .field
     = Layout.text_input form, :name, [], "control"
 
+    = Layout.select_input(form, :default_language_code_id, @language_codes_select_options, [], "control")
+
   = if form.data.id do
     h3.is-size-4 Default Project
     = inputs_for form, :projects, fn pf ->
