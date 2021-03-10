@@ -35,6 +35,7 @@ defmodule UserDocs.Users.Team do
     |> cast_assoc(:projects)
     |> foreign_key_constraint(:default_language_code_id)
     |> handle_users(attrs)
+    |> unique_constraint(:name)
     |> validate_required([:name])
   end
 
