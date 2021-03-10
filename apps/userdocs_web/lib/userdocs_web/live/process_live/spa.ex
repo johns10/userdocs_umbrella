@@ -85,6 +85,7 @@ defmodule UserDocsWeb.ProcessLive.SPA do
       :noreply,
       socket
       |> assign(:current_strategy_id, socket.assigns.current_version.strategy_id)
+      |> send_default_strategy()
       |> Loaders.content(opts)
       |> Loaders.content_versions(opts)
       |> StepLive.Index.assign_strategy_id()
@@ -179,6 +180,26 @@ defmodule UserDocsWeb.ProcessLive.SPA do
   def handle_event("expand" = n, p, s), do: StepLive.Index.handle_event(n, p, s)
   def handle_event("new-content", _params, socket) do
     {:noreply, socket}
+  end
+  def handle_event("update_current_strategy", %{"current_strategy" => %{ "strategy_id" => id }}, socket) do
+    strategy =
+      socket.assigns.data.strategies
+      |> Enum.filter(fn(s) -> s.id == String.to_integer(id) end)
+      |> Enum.at(0)
+
+    message = %{
+      type: "configuration",
+      payload: %{
+        strategy: Strategy.safe(strategy)
+      }
+    }
+
+    {
+      :noreply,
+      socket
+      |> push_event("configure", message)
+      |> assign(:current_strategy, strategy)
+    }
   end
 
   @impl true
@@ -285,5 +306,25 @@ defmodule UserDocsWeb.ProcessLive.SPA do
 
     socket
     |> assign(:processes, Automation.list_processes(socket, opts))
+  end
+
+  def send_default_strategy(%{ assigns: %{ current_strategy_id: id }} = socket) do
+    #TODO: Use state
+    IO.puts("send_default_strategy")
+    strategy =
+      Web.list_strategies()
+      |> Enum.filter(fn(s) -> s.id == id end)
+      |> Enum.at(0)
+
+    message = %{
+      type: "configuration",
+      payload: %{
+        strategy: Strategy.safe(strategy)
+      }
+    }
+
+    socket
+    |> push_event("configure", message)
+    |> assign(:current_strategy, strategy)
   end
 end
