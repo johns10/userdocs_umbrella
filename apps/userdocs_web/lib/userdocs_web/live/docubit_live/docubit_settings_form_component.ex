@@ -7,8 +7,6 @@ defmodule UserDocsWeb.DocubitSettingsLive.FormComponent do
   def render_fields(assigns, form) do
     ~L"""
     <p class="subtitle mb-1">Effective Settings</p>
-    <%= inspect(@docubit.settings) %>
-    <%= inspect(@settings_to_display) %>
     <div class="field ml-2">
       <div class="control">
         <%= for { name, value } <- @docubit.context.settings |> Map.take(DocubitSettings.__schema__(:fields)) do %>
