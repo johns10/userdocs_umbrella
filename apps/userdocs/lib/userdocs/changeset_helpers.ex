@@ -24,6 +24,9 @@ defmodule UserDocs.ChangesetHelpers do
   def count_projects([ _ ] = projects) do
     Enum.count(projects)
   end
+  def count_projects([ _ | _ ] = projects) do
+    Enum.count(projects)
+  end
 
   def count_defaults(%Ecto.Association.NotLoaded{}), do: 0
   def count_defaults([ %Ecto.Changeset{} | _ ] = assoc) do
