@@ -289,8 +289,8 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
   defp current_selections(socket) do
     opts = socket.assigns.state_opts
-    process = Automation.list_processes(socket, opts) |> Enum.at(0)
-    page = Web.list_pages(socket, opts) |> Enum.at(0)
+    process = (Automation.list_processes(socket, opts) |> Enum.at(0)) || %UserDocs.Automation.Process{}
+    page = (Web.list_pages(socket, opts) |> Enum.at(0)) || %UserDocs.Web.Page{}
 
     socket
     |> assign(:current_page, page)
@@ -326,6 +326,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
     |> Enum.at(0)
   end
 
+  defp process_steps(nil, _), do: []
   defp process_steps(process_id, steps) when is_integer(process_id) do
     steps
     |> Enum.filter(fn(s) -> s.process_id == process_id end)
