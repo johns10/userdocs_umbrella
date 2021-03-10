@@ -23,15 +23,16 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
   def load_pages(%{ assigns: %{ current_version: current_version }} = socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version: current_version.id})
+      |> Keyword.put(:filters, %{version_id: current_version.id})
 
     Web.load_pages(socket, opts)
   end
 
   def load_processes(%{ assigns: %{ current_version: current_version }} = socket, opts) do
+    IO.puts("loading processes")
     opts =
       opts
-      |> Keyword.put(:filters, %{version: current_version.id})
+      |> Keyword.put(:filters, %{version_id: current_version.id})
 
     Automation.load_processes(socket, opts)
   end
