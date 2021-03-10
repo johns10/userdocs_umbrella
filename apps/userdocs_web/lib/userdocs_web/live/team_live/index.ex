@@ -4,6 +4,7 @@ defmodule UserDocsWeb.TeamLive.Index do
   use UserdocsWeb.LiveViewPowHelper
 
   alias UserDocs.Users
+  alias UserDocs.Documents
   alias UserDocs.Users.Team
   alias UserDocs.Helpers
   alias UserDocsWeb.Defaults
@@ -12,7 +13,8 @@ defmodule UserDocsWeb.TeamLive.Index do
 
   @types [
     UserDocs.Users.Team,
-    UserDocs.Users.User
+    UserDocs.Users.User,
+    UserDocs.Documents.LanguageCode
   ]
 
   @impl true
@@ -28,16 +30,17 @@ defmodule UserDocsWeb.TeamLive.Index do
   end
 
   def initialize(%{ assigns: %{ auth_state: :logged_in, state_opts: opts }} = socket) do
+    IO.puts("initialize team")
     socket
     |> assign(:modal_action, :show)
     |> load_teams()
+    |> Documents.load_language_codes(opts)
     |> Users.load_users(opts)
   end
   def initialize(socket), do: socket
 
   @impl true
   def handle_params(params, _url, %{ assigns: %{ auth_state: :not_logged_in }} = socket) do
-    IO.puts("handle_params")
     {:noreply, socket}
   end
   def handle_params(params, _url, socket) do
@@ -45,11 +48,13 @@ defmodule UserDocsWeb.TeamLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
+    IO.puts("apply_action team")
     team = Users.get_team!(id, %{ preloads: [ users: true, projects: true, team_users: true ] })
     socket
     |> assign(:page_title, "Edit Team")
     |> assign(:team, team)
     |> assign(:projects_select_options, Helpers.select_list(team.projects, :name, false))
+    |> assign(:language_codes_select_options, language_codes_select_list(socket))
     |> prepare_teams()
   end
 
@@ -58,12 +63,14 @@ defmodule UserDocsWeb.TeamLive.Index do
     |> assign(:page_title, "New Team")
     |> assign(:team, %Team{ users: [], projects: [] })
     |> assign(:projects_select_options, [])
+    |> assign(:language_codes_select_options, language_codes_select_list(socket))
     |> prepare_teams()
   end
 
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Listing Teams")
+    |> assign(:language_codes_select_options, language_codes_select_list(socket))
     |> assign(:team, nil)
     |> prepare_teams()
   end
@@ -88,6 +95,11 @@ defmodule UserDocsWeb.TeamLive.Index do
       |> Keyword.put(:filters, %{ user_id: socket.assigns.current_user.id})
     socket
     |> Users.load_teams(opts)
+  end
+
+  def language_codes_select_list(socket) do
+    Documents.list_language_codes(socket, socket.assigns.state_opts)
+    |> Helpers.select_list(:name, false)
   end
 
   @impl true
