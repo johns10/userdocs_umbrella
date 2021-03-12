@@ -19,6 +19,7 @@ config :userdocs_web, UserDocsWeb.Endpoint,
     "chrome-extension://dieemmbgjkifojmoegfgiekpbodeidcd",
     "chrome-extension://alolcmhepgllblhpnakjcmbjngadbkpi",
     "chrome-extension://lfaidgfkijcdncojclecfjocihfoecpd", # Lukas id
+    "chrome-extension://oogkkkaeofonaibdnpdckkkahhceojhk", # Chris id
     "https://app.user-docs.com",
     ],
   cache_static_manifest: "priv/static/cache_manifest.json",
