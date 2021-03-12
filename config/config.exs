@@ -39,7 +39,9 @@ config :cors_plug,
   origin: [
     "chrome-extension://mkbbhaeofgjbbhopopbjnjjjfbbnaone",
     "http://localhost",
+    "file:///D:/Users/johns10/Documents/GitHub/electro_test/",
     "https://app.user-docs.com",
+    "https://electron.user-docs.com",
   ],
   max_age: 86400,
   methods: ["GET", "PUT", "POST", "OPTIONS"]
@@ -62,25 +64,23 @@ config :userdocs, :userdocs_s3,
 #Because I can't get config without an App name
 config :userdocs, :waffle,
   storage: Waffle.Storage.S3, # or Waffle.Storage.Local
-  bucket: System.get_env("AWS_BUCKET_NAME") # if using S3
+  bucket: "userdocs-screenshots" # if using S3
 
-# If using S3:
 config :userdocs, :ex_aws,
   json_codec: Jason,
-  access_key_id: System.get_env("AWS_ACCESS_KEY_ID"),
-  secret_access_key: System.get_env("AWS_SECRET_ACCESS_KEY"),
-  region: System.get_env("AWS_REGION")
+  access_key_id: "AKIAT5VKLWBUIMRZM7ZU",
+  secret_access_key: "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",
+  region: "us-east-2"
 
 config :waffle,
   storage: Waffle.Storage.S3, # or Waffle.Storage.Local
-  bucket: System.get_env("AWS_BUCKET_NAME") # if using S3
+  bucket: "userdocs-screenshots" # if using S3
 
-# If using S3:
 config :ex_aws,
   json_codec: Jason,
-  access_key_id: System.get_env("AWS_ACCESS_KEY_ID"),
-  secret_access_key: System.get_env("AWS_SECRET_ACCESS_KEY"),
-  region: System.get_env("AWS_REGION")
+  access_key_id: "AKIAT5VKLWBUIMRZM7ZU",
+  secret_access_key: "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",
+  region: "us-east-2"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
