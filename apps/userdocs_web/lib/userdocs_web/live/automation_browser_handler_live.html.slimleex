@@ -1,0 +1,16 @@
+div id="automated-browser-handler" phx-hook="automatedBrowserHandler"
+  p
+    = if @current_user.browser_session do 
+      = link to: "#", phx_click: "close-browser", 
+        phx_target: @myself.cid do
+        | Close Browser
+    - else
+      = link to: "#", phx_click: "open-browser", 
+        phx_target: @myself.cid do
+        | Open Browser
+
+    =< link to: "#", phx_click: "clear-browser",
+        phx_target: @myself.cid do 
+        | x
+
+  = @current_user.browser_session
