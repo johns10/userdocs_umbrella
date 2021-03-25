@@ -12,6 +12,8 @@ defmodule UserDocs.Users.User do
   schema "users" do
     pow_user_fields()
 
+    field :browser_session, :string
+
     field :default_team_id, :integer
     embeds_one :default_team, Team
 
@@ -30,6 +32,11 @@ defmodule UserDocs.Users.User do
       on_replace: :delete
 
     timestamps()
+  end
+
+  def change_browser_session(user, attrs) do
+    user
+    |> cast(attrs, [ :browser_session ])
   end
 
   @doc false
