@@ -8,7 +8,7 @@ div.py-2
       p.card-header-title style="margin-bottom:0px;"
         = step.name
       = live_component(@socket, Runner, 
-        [ id: "step-" <> Integer.to_string(step.id) <> "-runner",
+        [ id: "step-" <> Integer.to_string(step.id),
         step: step,
         step_type_name: step.step_type.name])
       = content_tag :a, class: "card-header-icon",
