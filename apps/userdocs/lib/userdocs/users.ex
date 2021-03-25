@@ -193,6 +193,12 @@ defmodule UserDocs.Users do
     |> Repo.update()
   end
 
+  def update_user_browser_session(%User{} = user, attrs) do
+    user
+    |> User.change_browser_session(attrs)
+    |> Repo.update()
+  end
+
   def update_user_selections(%User{} = user, attrs) do
     user
     |> User.change_selections(attrs)
