@@ -24,15 +24,7 @@ defmodule UserDocs.Automation.Process do
     |> validate_required([:name])
   end
 
-  def safe(process = %UserDocs.Automation.Process{}, handlers) do
-    step_handler = Map.get(handlers, :step)
-
-    %{
-      id: process.id,
-      order: process.order,
-      name: process.name,
-
-      steps: Enum.map(process.steps, &step_handler.(&1, handlers))
-    }
+  def safe(process, handlers) do
+    UserDocs.Automation.Process.Safe.apply(process, handlers)
   end
 end
