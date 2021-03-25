@@ -375,17 +375,24 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   # THIS IS WHERE YOU WERE
   defp save_step(socket, :edit, step_params) do
-    changeset = Automation.assocs_and_fields(socket.assigns.step, step_params)
+    fk_changeset = Step.change_nested_foreign_keys(socket.assigns.step, step_params)
+    { :ok, step } = Ecto.Changeset.apply_action(fk_changeset, :update)
+    step = Automation.update_step_preloads(step, fk_changeset.changes, socket)
+    fields_changeset = Step.change_remaining(step, fk_changeset.params)
+
+    IO.inspect(fk_changeset)
+    IO.inspect(fields_changeset)
+
     case Automation.update_step_with_nested_data(socket.assigns.step, remove_empty_associations(step_params), socket) do
       {:ok, step} ->
-        # send(self(), {:close_modal, to: socket.assigns.return_to })
         opts = socket.assigns.state_opts |> Keyword.put(:action, :update)
-        UserDocs.Subscription.broadcast_children(step, changeset, opts)
+        UserDocs.Subscription.broadcast_children(step, fields_changeset, opts)
         send(self(), { :broadcast, "update", step })
         {
           :noreply,
           socket
           |> put_flash(:info, "Step updated successfully")
+          |> push_patch(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -395,14 +402,17 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   defp save_step(socket, :new, step_params) do
     # recent_navigated_to_page(process, step, assigns)
-    case Automation.create_step(step_params) do
+    order = step_params["order"]
+    step_type = Automation.get_step_type!(step_params["step_type_id"])
+    name = order <> ": " <> step_type.name
+    case Automation.create_step(Map.put(step_params, "name", name)) do
       {:ok, step} ->
-        send(self(), { :close_modal, to: socket.assigns.return_to })
         send(self(), { :broadcast, "create", step })
         {
           :noreply,
           socket
           |> put_flash(:info, "Step created successfully")
+          |> push_patch(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
