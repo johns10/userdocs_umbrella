@@ -16,8 +16,9 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import NProgress from "nprogress"
 import {LiveSocket} from "phoenix_live_view"
+import {Hooks} from "./hooks/hooks.js"
 
-
+/*
 let Hooks = {}
 Hooks.editorSource = {
   mounted() {
@@ -89,7 +90,7 @@ Hooks.executeStep = {
         status: e.detail.status,
         error: e.detail.error
       }
-      this.pushEventTo(e.detail.updateTarget, "update_job_status", payload)
+      this.pushEventTo(e.detail.updateTarget, "update_step", payload)
     })
   }
 };
@@ -131,6 +132,17 @@ Hooks.testSelector = {
     });
   }
 };
+Hooks.test = {
+  mounted() {
+    this.handleEvent("test", (message) => {
+      console.log("test")
+    })
+  }
+};
+*/
+
+console.log("Running web appss")
+console.log(window.location)
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
