@@ -134,7 +134,9 @@ defmodule UserDocs.TestDataset do
       %{
         args: ["element_id"],
         name: "Element Screenshot"
-      }
+      },
+      %{ args: ["element_id"], name: "Scroll to Element" },
+      %{ args: ["element_id"], name: "Send Enter Key" }
     ]
 
     Enum.each(step_types, fn(step_type) -> UserDocs.Automation.create_step_type(step_type) end)
@@ -294,10 +296,10 @@ defmodule UserDocs.TestDataset do
     |> StepType.changeset(clear_annotations)
     |> Repo.insert()
 
-    {:ok, %StepType{id: _element_screenshot_id}} =
-      %StepType{}
-      |> StepType.changeset(element_screenshot)
-      |> Repo.insert()
+  {:ok, %StepType{id: _element_screenshot_id}} =
+    %StepType{}
+    |> StepType.changeset(element_screenshot)
+    |> Repo.insert()
 
     # User Data
 
