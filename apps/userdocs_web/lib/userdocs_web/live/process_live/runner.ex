@@ -7,18 +7,18 @@ defmodule UserDocsWeb.ProcessLive.Runner do
   def render(assigns) do
     ~L"""
     <a id="<%= @id %>"
-      phx-click="execute_job"
+      phx-click="execute_process"
       phx-value-process-id="<%= @process.id %>"
       phx-target="<%= @myself.cid %>"
-      phx-hook="jobRunner"
+      phx-hook="executeProcess"
       status="<%= @status %>"
     >
       <span class="icon">
         <%= case @status do
-          :ok -> content_tag(:i, "", [class: "fa fa-2x fa-play-circle", aria_hidden: "true"])
-          :failed -> content_tag(:i, "", [class: "fa fa-2x fa-times", aria_hidden: "true"])
-          :running -> content_tag(:i, "", [class: "fa fa-2x fa-spinner", aria_hidden: "true"])
-          :complete -> content_tag(:i, "", [class: "fa fa-2x fa-check", aria_hidden: "true"])
+          :ok -> content_tag(:i, "", [class: "fa fa-play-circle", aria_hidden: "true"])
+          :failed -> content_tag(:i, "", [class: "fa fa-times", aria_hidden: "true"])
+          :started -> content_tag(:i, "", [class: "fa fa-spinner", aria_hidden: "true"])
+          :complete -> content_tag(:i, "", [class: "fa fa-check", aria_hidden: "true"])
         end %>
       </span>
     </a>
@@ -26,29 +26,18 @@ defmodule UserDocsWeb.ProcessLive.Runner do
   end
 
   @impl true
-  def handle_event("execute_job", %{"process-id" => process_id}, socket) do
-    _log_string = "Executing process " <> process_id
-
-    payload =  %{
-      type: "process",
-      payload: %{
-        process: Runner.parse(socket.assigns.process),
-        element_id: socket.assigns.id,
-        status: "not_started",
-        active_annotations: []
-      }
-    }
-
-    {:noreply, push_event(socket, "message", payload)}
+  def handle_event("execute_process", %{"process-id" => process_id}, socket) do
+    send self(), {:execute_process, %{ process_id: String.to_integer(process_id) }}
+    { :noreply, socket }
   end
-  def handle_event("update_status", %{ "status" => status } = payload, socket) do
 
-    socket =
+  def handle_event("update_process", %{ "status" => status } = payload, socket) do
+    {
+      :noreply,
       socket
       |> assign(:status, String.to_atom(status))
-      |> assign(:error, payload["error"])
-
-    {:noreply, socket}
+      |> assign(:errors, payload["errors"])
+    }
   end
 
   @impl true
