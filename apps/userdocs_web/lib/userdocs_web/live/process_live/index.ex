@@ -12,6 +12,7 @@ defmodule UserDocsWeb.ProcessLive.Index do
   alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.Defaults
   alias UserDocsWeb.Root
+  alias UserDocsWeb.ProcessLive.Runner
 
   @types [
     UserDocs.Automation.Process,
