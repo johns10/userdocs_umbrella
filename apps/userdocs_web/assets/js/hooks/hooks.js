@@ -1,6 +1,47 @@
 import {handle_message} from "../commands/commands.js"
 
 let Hooks = {}
+
+Hooks.executeStep = {
+  mounted() {
+    this.el.addEventListener("update-step", e => {
+      console.log("Got a step update")
+      this.pushEventTo('#step-' + e.detail.step_id + '-runner', "update_step", e.detail)
+    })
+  }
+};
+
+Hooks.executeProcess = {
+  mounted() {
+    this.handleEvent("execute-process", (message) => {
+      console.log("Hook triggered for execute process")
+      window.userdocs.executeProcess(message)
+    })
+    this.el.addEventListener("update-process", e => {
+      console.log("executeProcess hook got an update for process " + e.detail.attrs.step.process.id + " to " + e.detail.status)
+      this.pushEventTo('#process-' + e.detail.attrs.step.process.id + '-runner', "update_process", e.detail)
+    })
+  }
+};
+
+Hooks.automationManager = {
+  mounted() {
+    this.handleEvent("put-job", (message) => {
+      window.userdocs.putJob(message)
+    })
+    this.handleEvent("start-running", (message) => {
+      window.userdocs.start(message)
+    })
+    this.handleEvent("execute", (message) => { window.userdocs.execute(message.step_instance) })
+    this.el.addEventListener("update-step", (message) => {
+      this.pushEventTo("#automation-manager", "update-step", message.detail)
+    })
+  }
+}
+
+
+
+
 Hooks.fileTransfer = {
   mounted() {
     this.el.addEventListener("message", e => {
@@ -37,11 +78,38 @@ Hooks.testSelector = {
     })
   }
 };
-
+Hooks.automatedBrowserHandler = {
+  mounted() {
+    this.handleEvent("open-browser", (message) => {
+      console.log("open browser")
+      window.userdocs.openBrowser()
+    })
+    this.handleEvent("close-browser", (message) => {
+      console.log("close browser")
+      window.userdocs.closeBrowser()
+    })
+    this.el.addEventListener("browser-opened", (message) => {
+      console.log("automation browser opened in hook")
+      console.log(message)
+      this.pushEventTo("#automated-browser-handler", "browser-opened", message.detail)
+    })
+    this.el.addEventListener("browser-closed", (message) => {
+      console.log("automation browser closed in hook")
+      console.log(message)
+      this.pushEventTo("#automated-browser-handler", "browser-closed", message.detail)
+    })
+  }
+};
+Hooks.test = {
+  mounted() {
+    this.handleEvent("test", (message) => {
+      console.log("test")
+    })
+  }
+}
 Hooks.jobRunner = {
   mounted() {
-    this.handleEvent("message", (message) =>
-    {
+    this.handleEvent("message", (message) => {
       const type = message.type
       if (type === 'process') {
         const thisProcessId =  this.el.attributes["phx-value-process-id"].value
@@ -63,36 +131,6 @@ Hooks.jobRunner = {
         error: e.detail.error
       }
       this.pushEventTo('#' + e.detail.element_id, "update_status", payload)
-    })
-  }
-};
-
-Hooks.executeStep = {
-  mounted() {
-    this.handleEvent("message", (message) =>
-    {
-      const type = message.type
-      if (type === 'step') {
-        const thisStepId =  this.el.attributes["phx-value-step-id"].value
-        const messageStepId = message.payload.process.steps[0].id
-        
-        if(thisStepId == messageStepId) {
-          chrome.storage.local.get(['activeTabId', 'activeWindowId'], function (result) {
-            message.payload.activeTabId = result.activeTabId
-            message.payload.activeWindowId = result.activeWindowId
-            handle_message(message, { environment: 'extension' })
-          })
-        }
-      }
-    }),
-    this.el.addEventListener("message", e => {
-      console.log("Got a step update")
-      console.log(e.detail)
-      var payload = {
-        status: e.detail.status,
-        error: e.detail.error
-      }
-      this.pushEventTo('#' + e.detail.element_id, "update_job_status", payload)
     })
   }
 };
