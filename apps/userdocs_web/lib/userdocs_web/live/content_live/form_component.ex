@@ -147,7 +147,6 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
     case Documents.create_content(content_params) do
       {:ok, content} ->
         send(self(), { :broadcast, "create", content })
-        send(self(), :close_modal)
         {
           :noreply,
           socket
