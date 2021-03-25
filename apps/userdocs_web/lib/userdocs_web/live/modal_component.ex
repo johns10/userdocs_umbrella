@@ -31,25 +31,8 @@ defmodule UserDocsWeb.ModalComponent do
   end
 
   @impl true
-  def handle_event("close", _, %{ assigns: %{ opts: opts, app_name: app_name } } = socket) do
-    case app_name do
-      "web" ->
-        { :noreply, push_patch(socket, to: opts[:return_to])}
-      "chrome" ->
-        send(self(), :close_modal)
-        {:noreply, socket}
-    end
-  end
   def handle_event("close", _, socket) do
     opts = socket.assigns.opts
-    case opts[:app_name] do
-      "web" ->
-        { :noreply, push_patch(socket, to: opts[:return_to])}
-      "chrome" ->
-        send(self(), :close_modal)
-        {:noreply, socket}
-      nil ->
-        { :noreply, push_patch(socket, to: opts[:return_to])}
-    end
+    { :noreply, push_patch(socket, to: opts[:return_to])}
   end
 end
