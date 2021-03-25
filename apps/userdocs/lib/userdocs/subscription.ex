@@ -39,7 +39,6 @@ defmodule UserDocs.Subscription do
         association_field = schema.__schema__(:association, association).field
 
         Logger.debug("  Checking changes on #{association_field}")
-        Logger.debug(inspect(changeset))
         Ecto.Changeset.get_change(changeset, association_field)
         |> check_change(association_field, acc)
       end
