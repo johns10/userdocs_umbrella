@@ -20,7 +20,7 @@ aside.menu
     = for process <- @processes do
       li class=""
         .is-flex
-          = if @app_name == "web" do 
+          = if @app_name in ["web", "electron"] do 
             = link to: Routes.step_index_path(@socket, :index, process.id), class: "is-flex-grow-1" do
               = process.name
             .is-flex.is-flex-direction-row.is-flex-grow-0
