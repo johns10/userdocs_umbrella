@@ -243,6 +243,14 @@ function commands() {
       4: scrollToElement,
       5: sendToExtension,
       6: completeStep
+    },
+    "Send Enter Key": {
+      1: startStep,
+      2: sendToBrowser,
+      3: waitForElement,
+      4: sendEnter,
+      5: sendToExtension,
+      6: completeStep
     }
   }
 }
@@ -493,6 +501,7 @@ function fullScreenShot(job, configuration, proceed) {
 
   console.log("Taking a full screen screenshot")
   try {
+    setTimeout(() => {}, 200);
     chrome.tabs.captureVisibleTab(activeWindowId, function(result) {
       console.log("Finished capturing Result")
       console.log(result)
@@ -738,7 +747,7 @@ function waitForElement(job, configuration, proceed) {
     clearInterval(interval)
     failStep(job, "Element not found", configuration, proceed)
    }, 3000);
-  var interval = setInterval(function(){
+  var interval =   setInterval(function(){
     element = getElement(strategy, selector)
     if(element) {
       step.status = "running_prechecks"
@@ -838,14 +847,28 @@ function testSelector(job, configuration, proceed) {
   }
 }
 
-
 function scrollToElement(job, configuration, proceed) {
   const step = current_step(job)
   const selector = step.element.selector
   const strategy = step.element.strategy
   const element = getElement(strategy, selector)
-  console.log(element)
   element.scrollIntoView(true)
+  try {
+    success(job, configuration, proceed)
+  } catch(error) {
+    failStep(job, error, configuration, proceed)
+  }
+}
+
+function sendEnter(job, configuration, proceed) {
+  const step = current_step(job)
+  const selector = step.element.selector
+  const strategy = step.element.strategy
+  const element = getElement(strategy, selector)
+  const ke = new KeyboardEvent('keypress', {
+    bubbles: true, cancelable: true, keyCode: 13
+  });
+  element.dispatchEvent(ke);
   try {
     success(job, configuration, proceed)
   } catch(error) {
