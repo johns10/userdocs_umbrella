@@ -13,5 +13,6 @@
   project: @current_project,
   version: @current_version,
   team: @current_team,
+  current_user: @current_user,
   app_name: @app_name,
   data: @data ])
