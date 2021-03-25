@@ -65,7 +65,6 @@ defmodule UserDocsWeb.DocubitLive.FormComponent do
         UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "update", message)
           %{ objects: [] } -> nil
         end
-        send(self(), :close_modal)
         {:noreply,
           socket
           |> put_flash(:info, "Docubit updated successfully")
