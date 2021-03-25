@@ -5,8 +5,8 @@ defmodule UserDocsWeb.ProjectLiveTest do
 
   alias UserDocs.Projects
 
-  @create_attrs %{base_url: "some base_url", name: "some name"}
-  @update_attrs %{base_url: "some updated base_url", name: "some updated name"}
+  @create_attrs %{base_url: "some base_url", name: "some name", versions: [] }
+  @update_attrs %{base_url: "some updated base_url", name: "some updated name" }
   @invalid_attrs %{base_url: nil, name: nil}
 
   defp fixture(:project) do
@@ -80,7 +80,7 @@ defmodule UserDocsWeb.ProjectLiveTest do
       refute has_element?(index_live, "#project-#{project.id}")
     end
   end
-
+"""
   describe "Show" do
     setup [:create_project]
 
@@ -113,4 +113,5 @@ defmodule UserDocsWeb.ProjectLiveTest do
       assert html =~ "some updated base_url"
     end
   end
+  """
 end
