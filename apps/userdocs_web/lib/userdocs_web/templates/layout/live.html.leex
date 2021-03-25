@@ -14,7 +14,7 @@
 
     <div id="navbar" class="navbar-menu">
       <div class="navbar-start">
-        <%= if @app_name == "web" do %>
+        <%= if @app_name in [ "web", "electron" ] do %>
           <a class="navbar-item">Home</a>
           <%= live_patch "Teams", class: "navbar-item", to: Routes.team_index_path(@socket, :index) %>
           <%= live_patch "Projects", class: "navbar-item", to: Routes.project_index_path(@socket, :index) %>
