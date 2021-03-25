@@ -99,27 +99,70 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       |> assign(:form_ids, form_ids)
       |> assign(:select_lists, select_lists)
       |> assign(:state_opts, assigns.state_opts)
+      |> assign(:last_step, assigns.step)
     }
   end
 
+
+  def put_element_when_element_id_changes(%{ changes: %{ element_id: element_id }} = changeset) when is_integer(element_id) do
+    case Ecto.Changeset.get_change(changeset, :element_id) do
+      nil -> changeset
+      element_id ->
+        element = Web.get_element!(element_id)
+        IO.inspect("Element id changed to #{element_id}.  It's name is #{element.name}")
+        changeset
+        |> Ecto.Changeset.put_change(:element_id, element_id)
+        |> Ecto.Changeset.put_assoc(:element, element)
+    end
+  end
+  def put_element_when_element_id_changes(changeset) do
+    changeset
+  end
+
+  def maybe_replace_element_fields_in_params(%{ changes: %{ element_id: element_id }} = changeset, params) do
+    case Ecto.Changeset.get_change(changeset, :element_id) do
+      nil -> params
+      element_id ->
+        element = Web.get_element!(element_id)
+        params
+        |> Kernel.put_in(["element", "id"], element.id)
+        |> Kernel.put_in(["element", "name"], element.name)
+        |> Kernel.put_in(["element", "selector"], element.selector)
+        |> Kernel.put_in(["element", "page_id"], element.page_id)
+        |> Kernel.put_in(["element", "strategy_id"], element.strategy_id)
+    end
+  end
+
+  alias UserDocs.Automation
+  alias UserDocs.Automation.Step
+
   @impl true
   def handle_event("validate", %{"step" => step_params}, socket) do
-    changeset =
-      Automation.change_step(socket.assigns.step, step_params)
-
+    IO.inspect("validating")
+    changeset = Step.change_nested_foreign_keys(socket.assigns.step, step_params)
+    { :ok, step } = Ecto.Changeset.apply_action(changeset, :update)
+    step = Automation.update_step_preloads(step, changeset.changes, socket)
+    changeset = Step.change_remaining(step, changeset.params)
+    { :ok, step } = Ecto.Changeset.apply_action(changeset, :update)
+"""
     { changeset, socket } =
       case Ecto.Changeset.get_change(changeset, :element_id, nil) do
         nil -> { changeset, socket }
         element_id ->
-          { :ok, step } = Automation.update_step(socket.assigns.step, %{ element_id: element_id })
           element = Web.get_element!(element_id)
-          step = Map.put(step, :element, element)
-          {
-            Automation.change_step(step, Map.delete(step_params, "element"))
-            |> Ecto.Changeset.put_assoc(:element, element),
-            socket
-            |> assign(:step, step)
-          }
+          IO.inspect("Element id changed to {element_id}.  It's name is {element.name}")
+          IO.inspect(element)
+          params =
+            step_params
+            |> Map.delete("element")
+
+          changeset =
+            socket.assigns.step
+            |> Automation.change_step(params)
+            |> Ecto.Changeset.put_assoc(:element, element)
+            |> Ecto.Changeset.put_change(:element_id, element_id)
+            |> IO.inspect()
+          { changeset, socket }
       end
 
     { changeset, socket } =
@@ -172,7 +215,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
               }
           end
       end
-
+"""
     enabled_step_fields =
       case socket.assigns.action do
         :new -> []
@@ -330,9 +373,10 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     {:noreply, socket}
   end
 
+  # THIS IS WHERE YOU WERE
   defp save_step(socket, :edit, step_params) do
-    changeset = Automation.change_step(socket.assigns.step, step_params)
-    case Automation.update_step(socket.assigns.step, remove_empty_associations(step_params)) do
+    changeset = Automation.assocs_and_fields(socket.assigns.step, step_params)
+    case Automation.update_step_with_nested_data(socket.assigns.step, remove_empty_associations(step_params), socket) do
       {:ok, step} ->
         # send(self(), {:close_modal, to: socket.assigns.return_to })
         opts = socket.assigns.state_opts |> Keyword.put(:action, :update)

@@ -10,11 +10,16 @@ defmodule UserDocsWeb.StepLive.Index do
   alias UserDocs.Documents
   alias UserDocs.Helpers
   alias UserDocs.Web.Strategy
+  alias UserDocs.Automation.Process.RecentPage
 
   alias UserDocsWeb.Defaults
   alias UserDocsWeb.Root
   alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.ProcessLive.Loaders
+  alias UserDocsWeb.StepLive.Runner
+  alias UserDocsWeb.StepLive.Queuer
+  alias UserDocsWeb.AutomationManagerLive
+  alias UserDocsWeb.AutomationBrowserHandlerLive
 
   def types() do
     [
@@ -123,6 +128,12 @@ defmodule UserDocsWeb.StepLive.Index do
     }
   end
   def handle_info(%{topic: _, event: _, payload: %Step{}} = sub_data, socket) do
+    IO.inspect("#{__MODULE__} Received a step broadcast")
+    { :noreply, socket } = Root.handle_info(sub_data, socket)
+    { :noreply, prepare_steps(socket) }
+  end
+  def handle_info(%{topic: _, event: _, payload: %UserDocs.Web.Annotation{}} = sub_data, socket) do
+    IO.inspect("#{__MODULE__} Received an annotation broadcast")
     { :noreply, socket } = Root.handle_info(sub_data, socket)
     { :noreply, prepare_steps(socket) }
   end

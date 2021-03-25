@@ -8,21 +8,63 @@ div.py-2
   h1.is-size-3
     = @process.name
 
-= live_component(@socket, UserDocsWeb.StepLive.IndexComponent,
-  [ live_action: @live_action,
-  process: @process,
-  app_name: @app_name,
-  state_opts: @state_opts,
-  steps: @steps,
-  project: @current_project,
-  current_version: @current_version,
-  current_team: @current_team,
-  data: @data,
-  page_title: @page_title,
-  data: @data,
-  step: @step,
-  select_lists: @select_lists,
-  new_element: false,
-  new_annotation: false,
-  transferred_selector: "",
-  transferred_strategy: %{ name: "", id: ""} ])
+= if @live_action in [:edit, :new] do
+  = live_modal @socket, UserDocsWeb.StepLive.FormComponent,
+    id: @step.id || :new,
+    parent: @process,
+    parent_id: @process.id,
+    type: Step,
+    current_version: @current_version,
+    current_team: @current_team,
+    state_opts: @state_opts,
+    parent_id: @process.id,
+    title: @page_title,
+    action: @live_action,
+    step: @step,
+    select_lists: @select_lists,
+    data: @data,
+    app_name: @app_name,
+    default_page_id: RecentPage.get_id(@steps, @step, @data.pages),
+    data: @data,
+    return_to: Routes.step_index_path(@socket, :index, @process.id),
+    select_lists: @select_lists,
+    new_element: false,
+    new_annotation: false,
+    transferred_selector: "",
+    transferred_strategy: %{ name: "", id: ""}
+.columns
+  .column
+    = for step <- @steps do
+      .card
+        header.card-header
+          p.card-header-title style="margin-bottom:0px;"
+            = step.name
+          = live_component(@socket, Queuer, 
+            [ id: "step-" <> Integer.to_string(step.id) <> "-runner",
+            step: step,
+            app_name: @app_name,
+            step_type_name: step.step_type.name])
+          = live_component(@socket, Runner, 
+            [ id: "step-" <> Integer.to_string(step.id) <> "-runner",
+            step: step,
+            step_type_name: step.step_type.name])
+          = if @app_name == "web" do 
+            = live_patch class: "navbar-item", to: Routes.step_index_path(@socket, :edit, step.id) do
+              i.fa.fa-lg.fa-edit
+          - else 
+            = link to: "#", class: "navbar-item", phx_click: "edit-step", phx_value_id: step.id do 
+              i.fa.fa-lg.fa-edit
+
+    = if @app_name == "web" do 
+      = live_patch to: Routes.step_index_path(@socket, :new, @process.id) do
+        button.button.is-primary New Step
+    - else
+      = link to: "#", phx_click: "new-step" do
+        button.button.is-primary New Step
+
+  .column   
+    = live_component(@socket, AutomationManagerLive,
+    [ id: "automation-manager", app_name: @app_name])
+    = live_component(@socket, UserDocsWeb.AutomationBrowserHandlerLive,
+    [ id: "automation-manager", app_name: @app_name, current_user: @current_user ])
+
