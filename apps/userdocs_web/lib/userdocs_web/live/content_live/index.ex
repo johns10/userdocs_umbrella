@@ -110,7 +110,6 @@ defmodule UserDocsWeb.ContentLive.Index do
     content = Documents.get_content!(id)
     {:ok, deleted_content} = Documents.delete_content(content)
     send(self(), { :broadcast, "delete", deleted_content })
-    send(self(), :close_modal)
     {:noreply, socket}
   end
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
