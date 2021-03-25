@@ -25,7 +25,6 @@ defmodule UserDocsWeb.DocubitLive.EventHandlers do
   defp save_docubit(socket, :new, docubit_params) do
     case Documents.create_docubit(docubit_params) do
       {:ok, docubit} ->
-        send(self(), :close_modal)
         UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "create", docubit)
         {:noreply, LiveView.put_flash(socket, :info, "Document created successfully")}
 
