@@ -12,16 +12,28 @@ defmodule UserDocsWeb.Router do
     plug :put_secure_browser_headers
   end
 
-  def root_layout(conn, _opts) do
-    case get_req_header(conn, "app") do
-      [ "chrome-extension" ] ->
+  def root_layout(conn, opts) do
+    electron? =
+      Plug.Conn.get_req_header(conn, "user-agent")
+      |> Enum.at(0)
+      |> String.contains?("Electron")
+
+    app_name = get_req_header(conn, "app") |> Enum.at(0)
+
+    if electron? do
+      conn
+      |> put_root_layout({UserDocsWeb.LayoutView, :electron_root})
+      |> assign(:app_name, :electron)
+    else
+      if app_name == "chrome-extension" do
         conn
         |> put_root_layout({UserDocsWeb.LayoutView, :chrome_root})
         |> assign(:app_name, :chrome)
-      _ ->
+      else
         conn
         |> put_root_layout({UserDocsWeb.LayoutView, :root})
         |> assign(:app_name, :web)
+      end
     end
   end
 
@@ -55,6 +67,7 @@ defmodule UserDocsWeb.Router do
 
     live "/processpa", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/index.html", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "index.html", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
     live "/users/new", UserLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/users", UserLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
