@@ -11,6 +11,7 @@ defmodule UserDocs.Automation.Step.Safe do
     |> maybe_safe_element(handlers[:element], step.element, element_handlers)
     |> maybe_safe_screenshot(handlers[:screenshot], step.screenshot, handlers)
     |> maybe_safe_page(handlers[:page], step.page, handlers)
+    |> maybe_safe_process(handlers[:process], step.process, handlers)
   end
   def apply(nil, _), do: nil
 
@@ -50,6 +51,11 @@ defmodule UserDocs.Automation.Step.Safe do
   defp maybe_safe_page(step, nil, _, _), do: step
   defp maybe_safe_page(step, handler, page, handlers) do
     Map.put(step, :page, handler.(page, handlers))
+  end
+
+  defp maybe_safe_process(step, nil, _, _), do: step
+  defp maybe_safe_process(step, handler, process, handlers) do
+    Map.put(step, :process, handler.(process, handlers))
   end
 
 end
