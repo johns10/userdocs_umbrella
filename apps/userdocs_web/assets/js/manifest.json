@@ -30,6 +30,7 @@
 		"app.css",
 		"index.html",
 		"chrome_app.js",
-		"chrome_app.js.map"
+		"chrome_app.js.map",
+		"logo.png"
   ]
 }
