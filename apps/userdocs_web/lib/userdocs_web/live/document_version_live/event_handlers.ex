@@ -26,7 +26,6 @@ defmodule UserDocsWeb.DocumentVersionLive.EventHandlers do
   defp save_document_version(socket, :edit, document_version_params) do
     case Documents.update_document_version(socket.assigns.document_version, document_version_params) do
       {:ok, _document_version} ->
-        send(self(), :close_modal)
         {:noreply, LiveView.put_flash(socket, :info, "Document Version updated successfully") }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -37,7 +36,6 @@ defmodule UserDocsWeb.DocumentVersionLive.EventHandlers do
   defp save_document_version(socket, :new, document_version_params) do
     case Documents.create_document_version(document_version_params) do
       {:ok, document_version} ->
-        send(self(), :close_modal)
         UserDocsWeb.Endpoint.broadcast(socket.assigns.channel, "create", document_version)
         {:noreply, LiveView.put_flash(socket, :info, "Document Version created successfully")}
 
