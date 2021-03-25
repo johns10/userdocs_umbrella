@@ -16,10 +16,9 @@ defmodule UserDocsWeb.StepLive.Index do
   alias UserDocsWeb.Root
   alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.ProcessLive.Loaders
-  alias UserDocsWeb.StepLive.Runner
   alias UserDocsWeb.StepLive.Queuer
-  alias UserDocsWeb.AutomationManagerLive
-  alias UserDocsWeb.AutomationBrowserHandlerLive
+  alias UserDocsWeb.StepLive.Runner
+  alias UserDocs.Automation.Process.RecentPage
 
   def types() do
     [
@@ -53,6 +52,8 @@ defmodule UserDocsWeb.StepLive.Index do
     opts = socket.assigns.state_opts
     socket
     |> assign(:modal_action, :show)
+    |> assign(:transferred_selector, "")
+    |> assign(:transferred_strategy, %{ name: "", id: ""})
     |> UserDocsWeb.Loaders.screenshots(opts)
     |> Web.load_annotation_types(opts)
     |> Web.load_strategies(opts)
@@ -98,6 +99,7 @@ defmodule UserDocsWeb.StepLive.Index do
     }
   end
 
+  @impl true
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Process")
