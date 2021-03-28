@@ -283,16 +283,30 @@ defmodule UserDocsWeb.Root do
     StateHandlers.broadcast(socket, data, opts)
     { :noreply, socket }
   end
-  def handle_info({ :close_modal, to: path }, socket) do
-    case socket.assigns.app_name do
-      "web" -> { :noreply, push_patch(socket, to: path)}
-      "chrome" -> { :noreply, ModalMenus.close(socket) }
-    end
 
+  def handle_info({ :execute_step, %{ step_id: step_id } = payload }, socket) do
+    IO.inspect("root got execute_step")
+    {
+      :noreply,
+      socket
+      |> UserDocsWeb.AutomationManagerLive.execute_step(payload)
+    }
   end
-  def handle_info(:close_modal, socket) do
-    IO.inspect("Closing modal in root with no extra arg")
-    { :noreply, ModalMenus.close(socket) }
+  def handle_info({ :execute_process, %{ process_id: process_id } = payload }, socket) do
+    IO.inspect("root got execute_step")
+    {
+      :noreply,
+      socket
+      |> UserDocsWeb.AutomationManagerLive.execute_process_instance(payload, 0)
+    }
+  end
+  def handle_info({ :queue_process_instance, payload }, socket) do
+    IO.inspect("root got add_process")
+    {
+      :noreply,
+      socket
+      |> UserDocsWeb.AutomationManagerLive.queue_process(payload)
+    }
   end
   def handle_info(name, _socket) do
     raise(FunctionClauseError, message: "Subscription #{inspect(name)} not implemented by Root")
