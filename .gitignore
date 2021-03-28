@@ -50,3 +50,5 @@ mix.lock
 tmp/*
 apps/userdocs/tmp/*
 apps/userdocs_web/assets/package-lock.json
+apps/userdocs_web/assets/css/app.css
+apps/userdocs_web/assets/css/app.css.map
