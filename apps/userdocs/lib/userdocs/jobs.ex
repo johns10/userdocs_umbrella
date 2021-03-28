@@ -6,7 +6,7 @@ defmodule UserDocs.Jobs do
 
   alias UserDocs.Jobs.StepInstance
 
-  def create_step_instance_from_step(step, order) do
+  def create_step_instance_from_step(step, order \\ 0) do
     attrs = base_step_instance_attrs(step, order)
     create_step_instance(attrs)
   end
