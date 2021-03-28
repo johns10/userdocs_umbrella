@@ -31,7 +31,7 @@ defmodule UserDocs.Web.Annotation do
     belongs_to :page, Page
 
     belongs_to :annotation_type, AnnotationType
-    belongs_to :content, Content
+    belongs_to :content, Content, on_replace: :update
     belongs_to :content_version, ContentVersion
 
     timestamps()
