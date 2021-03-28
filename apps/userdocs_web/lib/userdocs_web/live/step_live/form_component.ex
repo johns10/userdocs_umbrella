@@ -8,12 +8,14 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   alias UserDocsWeb.PageLive
   alias UserDocsWeb.ID
   alias UserDocsWeb.Layout
+  alias UserDocsWeb.StepLive.FormComponent.Helpers
 
   alias UserDocs.Automation
+  alias UserDocs.Automation.Step
   alias UserDocs.Documents
   alias UserDocs.Web
+  alias UserDocs.Web.Element
   alias UserDocs.Web.Annotation
-  alias UserDocs.Helpers
 
   @impl true
   def update(%{step: step} = assigns, socket) do
@@ -103,155 +105,45 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     }
   end
 
-
-  def put_element_when_element_id_changes(%{ changes: %{ element_id: element_id }} = changeset) when is_integer(element_id) do
-    case Ecto.Changeset.get_change(changeset, :element_id) do
-      nil -> changeset
-      element_id ->
-        element = Web.get_element!(element_id)
-        IO.inspect("Element id changed to #{element_id}.  It's name is #{element.name}")
-        changeset
-        |> Ecto.Changeset.put_change(:element_id, element_id)
-        |> Ecto.Changeset.put_assoc(:element, element)
-    end
-  end
-  def put_element_when_element_id_changes(changeset) do
-    changeset
-  end
-
-  def maybe_replace_element_fields_in_params(%{ changes: %{ element_id: element_id }} = changeset, params) do
-    case Ecto.Changeset.get_change(changeset, :element_id) do
-      nil -> params
-      element_id ->
-        element = Web.get_element!(element_id)
-        params
-        |> Kernel.put_in(["element", "id"], element.id)
-        |> Kernel.put_in(["element", "name"], element.name)
-        |> Kernel.put_in(["element", "selector"], element.selector)
-        |> Kernel.put_in(["element", "page_id"], element.page_id)
-        |> Kernel.put_in(["element", "strategy_id"], element.strategy_id)
-    end
-  end
-
-  alias UserDocs.Automation
-  alias UserDocs.Automation.Step
-
   @impl true
   def handle_event("validate", %{"step" => step_params}, socket) do
-    IO.inspect("validating")
-    changeset = Step.change_nested_foreign_keys(socket.assigns.step, step_params)
-    { :ok, step } = Ecto.Changeset.apply_action(changeset, :update)
-    step = Automation.update_step_preloads(step, changeset.changes, socket)
-    changeset = Step.change_remaining(step, changeset.params)
-    { :ok, step } = Ecto.Changeset.apply_action(changeset, :update)
 """
-    { changeset, socket } =
-      case Ecto.Changeset.get_change(changeset, :element_id, nil) do
-        nil -> { changeset, socket }
-        element_id ->
-          element = Web.get_element!(element_id)
-          IO.inspect("Element id changed to {element_id}.  It's name is {element.name}")
-          IO.inspect(element)
-          params =
-            step_params
-            |> Map.delete("element")
-
-          changeset =
-            socket.assigns.step
-            |> Automation.change_step(params)
-            |> Ecto.Changeset.put_assoc(:element, element)
-            |> Ecto.Changeset.put_change(:element_id, element_id)
-            |> IO.inspect()
-          { changeset, socket }
-      end
-
-    { changeset, socket } =
-      case Ecto.Changeset.get_change(changeset, :annotation_id, nil) do
-        nil -> { changeset, socket }
-        annotation_id ->
-          { :ok, step } = Automation.update_step(socket.assigns.step, %{ annotation_id: annotation_id })
-          opts = Keyword.put(socket.assigns.state_opts, :preloads, [ :content, :annotation_type ])
-          annotation = Web.get_annotation!(annotation_id, socket, opts)
-          step = Map.put(step, :annotation, annotation)
-          {
-            Automation.change_step(step, Map.delete(step_params, "annotation"))
-            |> Ecto.Changeset.put_assoc(:annotation, annotation),
-            socket
-            |> assign(:step, step)
-          }
-      end
-
-    { changeset, socket } =
-      case Ecto.Changeset.get_change(changeset, :page_id, nil) do
-        nil -> { changeset, socket }
-        page_id ->
-          { :ok, step } = Automation.update_step(socket.assigns.step, %{ page_id: page_id })
-          page = Web.get_page!(page_id)
-          step = Map.put(step, :page, page)
-          select_lists =
-            socket.assigns.select_lists
-            |> Map.put(:elements, elements_select(socket.assigns, page_id))
-          {
-            step
-            |> Automation.change_step(Map.delete(step_params, "page"))
-            |> Ecto.Changeset.put_assoc(:page, page),
-            socket
-            |> assign(:step, step)
-            |> assign(:select_lists, select_lists)
-          }
-      end
-
-    { changeset, socket } =
-      case Ecto.Changeset.get_change(changeset, :annotation, :no_change) do
-        :no_change -> { changeset, socket }
-        annotation_changeset ->
-          case Ecto.Changeset.get_change(annotation_changeset, :content_id, :no_change) do
-            :no_change -> { changeset, socket }
-            content_id ->
-              step = update_step_content(socket.assigns.step, content_id)
-              {
-                update_changeset_for_content_change(step, step_params),
-                assign(socket, :step, step)
-              }
-          end
-      end
+    params =
+      Helpers.remove_params_for_changed_associations(
+        socket.assigns.last_step, step_params, socket)
 """
-    enabled_step_fields =
-      case socket.assigns.action do
-        :new -> []
-        :edit ->
-          UserDocsWeb.LiveHelpers.enabled_fields(
-            Automation.list_step_types(socket, socket.assigns.state_opts),
-            Ecto.Changeset.get_field(changeset, :step_type_id)
-          )
+
+    changeset =
+      socket.assigns.step
+      |> Automation.change_step_two(socket.assigns.last_step, step_params, socket, :validate)
+      |> Map.put(:action, :validate)
+
+    socket =
+      case Ecto.Changeset.apply_action(changeset, :update) do
+        { :ok, step } ->
+          socket = assign(socket, :last_step, step)
+        { :error, changeset } ->
+          Logger.error("Last Step Changeset #{changeset.data.id} failed to update")
+          socket
       end
 
-    enabled_annotation_fields =
-      case socket.assigns.action do
-        :new -> []
-        :edit ->
-          annotation_type_id =
-            changeset
-            |> Ecto.Changeset.get_field(:annotation)
-            |> case do
-              nil -> nil
-              %Annotation{} = annotation -> Map.get(annotation, :annotation_type_id)
-            end
-
-          UserDocsWeb.LiveHelpers.enabled_fields(
-            Web.list_annotation_types(socket, socket.assigns.state_opts),
-            annotation_type_id
-          )
-    end
-
+"""
+    { status, step, changeset } =
+      Automation.validate_step_with_nested_data(
+        socket.assigns.step, step_params, socket)
+"""
+    enabled_step_fields = Helpers.enabled_step_fields(socket, changeset)
+    enabled_annotation_fields = Helpers.enabled_annotation_fields(socket, changeset)
 
     {
       :noreply,
       socket
-      |> assign(:changeset, changeset)
       |> assign(:enabled_step_fields, enabled_step_fields)
       |> assign(:enabled_annotation_fields, enabled_annotation_fields)
+      |> assign(:changeset, changeset)
+      |> put_flash(:info, "Step updated successfully")
     }
+
   end
 
   @impl true
@@ -373,20 +265,25 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     {:noreply, socket}
   end
 
-  # THIS IS WHERE YOU WERE
   defp save_step(socket, :edit, step_params) do
+    step = socket.assigns.step
+    last_step = socket.assigns.last_step
+    changeset = Automation.change_step(step, step_params)
+
+    """
     fk_changeset = Step.change_nested_foreign_keys(socket.assigns.step, step_params)
     { :ok, step } = Ecto.Changeset.apply_action(fk_changeset, :update)
     step = Automation.update_step_preloads(step, fk_changeset.changes, socket)
     fields_changeset = Step.change_remaining(step, fk_changeset.params)
 
-    IO.inspect(fk_changeset)
-    IO.inspect(fields_changeset)
+    all_changes = Map.merge(fk_changeset.changes, fields_changeset.changes)
+    final_changes = Map.put(fk_changeset, :changes, all_changes)
+    """
 
-    case Automation.update_step_with_nested_data(socket.assigns.step, remove_empty_associations(step_params), socket) do
+    case Automation.update_step_two(step, last_step, step_params, socket, :update) do
       {:ok, step} ->
         opts = socket.assigns.state_opts |> Keyword.put(:action, :update)
-        UserDocs.Subscription.broadcast_children(step, fields_changeset, opts)
+        UserDocs.Subscription.broadcast_children(step, changeset, opts)
         send(self(), { :broadcast, "update", step })
         {
           :noreply,
@@ -517,13 +414,13 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   def elements_select(%{ state_opts: state_opts } = socket, page_id) do
     opts = Keyword.put(state_opts, :filter, { :page_id, page_id })
     Web.list_elements(socket, opts)
-    |> Helpers.select_list(:name, true)
+    |> UserDocs.Helpers.select_list(:name, true)
   end
 
   def annotations_select(%{ state_opts: state_opts } = socket, page_id) do
     opts = Keyword.put(state_opts, :filter, { :page_id, page_id })
     Web.list_annotations(socket, opts)
-    |> Helpers.select_list(:name, true)
+    |> UserDocs.Helpers.select_list(:name, true)
   end
 
   def update_step_content(%Automation.Step{ annotation: nil } = step, _), do: step
