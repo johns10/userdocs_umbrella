@@ -75,8 +75,7 @@ defmodule UserDocs.SubscriptionTest do
       attrs = step_attrs(step.id, step.annotation.id, step.annotation.content.id)
       changeset = Automation.change_step(step, attrs)
       { :ok, updated_step } = Repo.update(changeset)
-      broadcast_actions = Subscription.check_changes(changeset)
-      result = Subscription.broadcast_result(updated_step, changeset, [])
+      result = Subscription.broadcast_children(updated_step, changeset, [])
     end
   end
 end
