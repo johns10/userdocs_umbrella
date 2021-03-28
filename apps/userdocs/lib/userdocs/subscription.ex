@@ -81,19 +81,19 @@ defmodule UserDocs.Subscription do
   end
 
   def handle_event(socket, "create" = _event, payload, opts) do
-    #IO.puts("Handling Event")
+    #Logger.debug("Handling Event")
     StateHandlers.create(socket, payload, opts)
   end
   def handle_event(socket, "update" = _event, payload, opts) do
-    #IO.puts("Handling Update Event")
+    #Logger.debug("Handling Update Event")
     StateHandlers.update(socket, payload, opts)
   end
   def handle_event(socket, "delete" = _event, payload, opts) do
-    #IO.puts("Handling Event")
+    #Logger.debug("Handling Event")
     StateHandlers.delete(socket, payload, opts)
   end
   def handle_event(socket, "upsert" = _event, payload, opts) do
-    # IO.puts("Handling upsert Event")
+    # Logger.debug("Handling upsert Event")
     StateHandlers.upsert(socket, payload, opts)
   end
 end
