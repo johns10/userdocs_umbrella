@@ -75,8 +75,8 @@ defmodule UserDocs.Web do
 
   """
   def get_page!(id), do: Repo.get!(Page, id)
-  def get_page!(id, _params, _filters, state) do
-    UserDocs.State.get!(state, id, :pages, Page)
+  def get_page!(id, state, opts) when is_list(opts) do
+    StateHandlers.get(state, id, Page, opts)
   end
 
   @doc """
