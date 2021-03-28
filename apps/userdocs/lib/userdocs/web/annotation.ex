@@ -52,6 +52,11 @@ defmodule UserDocs.Web.Annotation do
     |> ignore_missing()
   end
 
+  def content_id_changeset(annotation, attrs) do
+    annotation
+    |> cast(attrs, [ :content_id ])
+  end
+
   def ignore_missing(changeset) do
     case changeset do
       %{valid?: false, changes: changes} = changeset when changes == %{} ->
