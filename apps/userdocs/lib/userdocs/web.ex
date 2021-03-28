@@ -512,10 +512,6 @@ defmodule UserDocs.Web do
   """
   def get_annotation!(id), do: Repo.get!(Annotation, id)
   def get_annotation!(%{ annotations: annotations }, id), do: get_annotation!(annotations, id)
-  def get_annotation!(id, params, _filters, state) do
-    UserDocs.State.get!(state, id, :annotations, Annotation)
-    |> maybe_preload_annotation_type(params[:annotation_type], state)
-  end
   def get_annotation!(id, state, opts) when is_list(opts) do
     StateHandlers.get(state, id, Annotation, opts)
     |> maybe_preload_annotation(opts[:preloads], state, opts)
