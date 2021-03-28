@@ -57,6 +57,18 @@ defmodule UserDocs.Web.Annotation do
     |> cast(attrs, [ :content_id ])
   end
 
+  def fields_changeset(annotation, attrs) do
+    annotation
+    |> cast(attrs, [
+        :name, :label, :x_orientation, :y_orientation,
+        :size, :color, :thickness, :x_offset, :y_offset,
+        :font_size, :page_id, :annotation_type_id,
+        :content_id, :content_version_id ])
+    |> foreign_key_constraint(:page_id)
+    |> foreign_key_constraint(:annotation_type_id)
+    |> validate_required([:page_id])
+  end
+
   def ignore_missing(changeset) do
     case changeset do
       %{valid?: false, changes: changes} = changeset when changes == %{} ->
