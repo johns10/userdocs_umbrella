@@ -327,12 +327,8 @@ defmodule UserDocs.Web do
 
   """
   def get_element!(id, _params \\ %{}, _filters \\ %{})
-  def get_element!(id, _params, _filters) when is_integer(id) do
+  def get_element!(id, params, filters) when is_map(params) and is_map(filters) do
     Repo.get!(Element, id)
-  end
-  def get_element!(id, params, _filters, state) when is_integer(id) do
-    UserDocs.State.get!(state, id, :elements, Element)
-    |> maybe_preload_strategy(params[:strategy], state)
   end
   def get_element!(id, state, opts) when is_list(opts) do
     StateHandlers.get(state, id, Element, opts)
