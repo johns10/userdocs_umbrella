@@ -8,12 +8,12 @@ defmodule UserDocs.Web.Annotation.Name do
   alias UserDocs.Web.Element
 
   def execute(
-    %Annotation{ annotation_type: %{ name:  name } } = annotation,
+    %Annotation{ annotation_type: %{ name: annotation_type_name } } = annotation,
     %Element{} = element
     ) do
     ""
     |> maybe_field(annotation, :label, ": ")
-    |> field(name, " ")
+    |> field(annotation_type_name, " ")
     |> maybe_field(element, :name, "")
   end
 
