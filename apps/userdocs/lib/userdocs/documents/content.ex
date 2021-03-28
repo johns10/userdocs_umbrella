@@ -25,6 +25,12 @@ defmodule UserDocs.Documents.Content do
     |> cast_assoc(:content_versions)
     |> foreign_key_constraint(:team_id)
     |> validate_required([:name, :team_id])
+    |> case do
+        %{valid?: false, changes: changes} = changeset when map_size(changes) == 1 and :erlang.is_map_key(:team_id, changes) ->
+          %{changeset | action: :ignore}
+        changeset ->
+          changeset
+      end
   end
 
   def safe(content, handlers \\ %{})
