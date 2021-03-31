@@ -359,81 +359,8 @@ defmodule UserDocs.Automation do
 
   def update_step_two(%Step{} = step, last_step, attrs, socket, action) do
     Step.changeset_two(step, last_step, attrs, socket, action)
-    |> IO.inspect()
     |> Repo.update()
   end
-
-  def update_step_with_nested_data(%Step{} = step, attrs, state) do
-    with changeset <- Step.change_nested_foreign_keys(step, attrs), # get the changeset with updated foreign keys
-      { :ok, step } <- update_nested_step(changeset, state), # Apply to database and get new step
-      step <- update_step_preloads(step, changeset.changes, state), # Preload data according to changes
-      changeset <- Step.change_remaining(step, changeset.params), # Apply the changeset to the remaining fields
-      { :ok, step } <- Repo.update(changeset) # Apply the changes to the database
-    do
-      { :ok, step }
-    else
-      err -> err
-    end
-  end
-
-  def validate_step_with_nested_data(%Step{} = original_step, attrs, state) do
-    with changeset <- Step.change_nested_foreign_keys(original_step, attrs),
-      { :ok, step } <- update_nested_step(changeset, state),
-      step <- update_step_preloads(step, changeset.changes, state),
-      changeset <- Step.change_remaining(step, changeset.params),
-      { :ok, step } <- Ecto.Changeset.apply_action(changeset, :validate)
-    do
-      { :ok, step, changeset }
-    else
-      { :error, changeset } -> { :error, original_step, changeset }
-    end
-  end
-
-  def update_nested_step(changeset, state) do
-    #IO.puts("Updating a step")
-    changeset
-    |> maybe_update_annotation(state)
-
-    Ecto.Changeset.apply_action(changeset, :update)
-  end
-
-  def maybe_annotation_id_change(%{ changes: %{ annotation_id: annotation_id }} = changeset, state) do
-    { :ok, step } =
-      changeset
-      |> Ecto.Changeset.delete_change(:annotation)
-      |> Ecto.Changeset.apply_action(:update)
-
-    updated_annotation = Web.get_annotation!(annotation_id, state, state.assigns.state_opts)
-
-    step
-    |> Map.put(:annotation, updated_annotation)
-    |> Web.change_annotation(%{})
-  end
-
-  def maybe_update_annotation(
-    %{ changes: %{ annotation: %{ changes: %{ content_id: content_id } } = annotation_changeset }}, state
-  ) do
-    #IO.puts("Updating an annotation in a step when the content id has changed")
-    { :ok, annotation } =
-      annotation_changeset
-      |> Ecto.Changeset.delete_change(:content)
-      |> Ecto.Changeset.apply_action(:update)
-
-    updated_content = Documents.get_content!(content_id, state, state.assigns.state_opts)
-
-    annotation
-    |> Map.put(:content, updated_content)
-    |> Web.change_annotation(%{})
-  end
-  def maybe_update_annotation(annotation_changeset, _), do: annotation_changeset
-
-  def maybe_update_content(%{ changes: %{ content: content_changeset }}) do
-   #IO.inspect("only the content changed")
-    case Ecto.Changeset.apply_action(content_changeset, :update) do
-      { :ok, content } -> content
-    end
-  end
-  def maybe_update_content(changeset), do: changeset
 
   def new_step_element(step, changeset) do
     new_step_nested_object(step, changeset, :element_id, :element, %Element{})
@@ -476,56 +403,6 @@ defmodule UserDocs.Automation do
     |> Step.changeset(changeset.params)
     |> Ecto.Changeset.put_change(key, struct)
   end
-
-
-  #TODO: Move this somewhere else.  Otherwise ok.
-  def update_step_preloads(step, changes, state) do
-    step
-    |> maybe_update_annotation(changes, state)
-    |> maybe_update_element(changes, state)
-    |> maybe_update_page(changes, state)
-    |> maybe_update_content(changes, state)
-  end
-
-  def maybe_update_annotation(step, %{ annotation_id: nil }, _), do: Map.put(step, :annotation, nil)
-  def maybe_update_annotation(step, %{ annotation_id: annotation_id }, state) when is_integer(annotation_id) do
-    opts = Keyword.put(state.assigns.state_opts, :preloads, [ :content, :annotation_type ])
-    annotation = UserDocs.Web.get_annotation!(annotation_id, state, opts)
-   #IO.puts("Annotations content id will be #{annotation.content_id}.  It's content's id is #{annotation.content.id}")
-    step
-    |> Map.put(:annotation, annotation)
-  end
-  def maybe_update_annotation(step, _, _), do: step
-
-  def maybe_update_element(step, %{ element_id: nil }, _), do: Map.put(step, :element, nil)
-  def maybe_update_element(step, %{ element_id: element_id }, state) when is_integer(element_id) do
-    Map.put(step, :element, StateHandlers.get(state, element_id, Element, state.assigns.state_opts))
-  end
-  def maybe_update_element(step, _, _), do: step
-
-  def maybe_update_page(step, %{ page_id: nil }, _), do: Map.put(step, :page, nil)
-  def maybe_update_page(step, %{ page_id: page_id }, state) when is_integer(page_id) do
-    Map.put(step, :page, StateHandlers.get(state, page_id, Page, state.assigns.state_opts))
-  end
-  def maybe_update_page(step, _, _), do: step
-
-  alias UserDocs.Documents.Content
-
-  def maybe_update_content(step, %{ annotation: %{ content_id: nil } }, _) do
-   #IO.puts("changed to content id nil")
-    Kernel.put_in(step, [ :annotation, :content ], nil)
-  end
-  def maybe_update_content(step, %{ annotation: %{ changes: %{ content_id: content_id } } }, state) do
-   #IO.puts("domain changed to content id #{content_id}")
-    content = StateHandlers.get(state, content_id, Content, state.assigns.state_opts)
-    annotation =
-      Map.get(step, :annotation)
-      |> Map.put(:content, content)
-      |> Map.put(:content_id, content_id)
-
-    Map.put(step, :annotation, annotation)
-  end
-  def maybe_update_content(step, _, _), do: step
 
   defp base_steps_query(), do: from(steps in Step)
 
