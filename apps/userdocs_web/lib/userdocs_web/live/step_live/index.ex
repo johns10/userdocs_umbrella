@@ -77,7 +77,6 @@ defmodule UserDocsWeb.StepLive.Index do
   @impl true
   def handle_params(_, _, %{ assigns: %{ auth_state: :not_logged_in }} = socket), do: { :noreply, socket }
   def handle_params(%{ "process_id" => process_id } = params, _, socket) do
-    IO.puts("handle_params")
     process = Automation.get_process!(process_id)
     {
       :noreply,
@@ -90,13 +89,20 @@ defmodule UserDocsWeb.StepLive.Index do
   end
 
   def handle_params(%{ "id" => id } = params, _, socket) do
-    IO.puts("handle_params")
     {
       :noreply,
       socket
       |> prepare_step(String.to_integer(id))
       |> apply_action(socket.assigns.live_action, params)
     }
+  end
+
+  @impl true
+  def handle_event("delete", %{"id" => id}, socket) do
+    step = Automation.get_step!(String.to_integer(id))
+    {:ok, deleted_step } = Automation.delete_step(step)
+    send(self(), { :broadcast, "delete", deleted_step })
+    {:noreply, socket}
   end
 
   @impl true
@@ -192,7 +198,6 @@ defmodule UserDocsWeb.StepLive.Index do
   def strategies_select(_), do: []
 
   def versions_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
-    IO.inspect("versions_select")
     Projects.list_versions(socket, state_opts)
     |> Helpers.select_list(:name, :false)
   end
