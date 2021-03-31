@@ -266,29 +266,13 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       |> assign(:changeset, new_changeset)
     }
   end
-  def handle_event("delete", %{"id" => id}, socket) do
-    step = Automation.get_step!(String.to_integer(id))
-    {:ok, deleted_step } = Automation.delete_step(step)
-    send(self(), { :broadcast, "delete", deleted_step })
-    {:noreply, socket}
-  end
 
   defp save_step(socket, :edit, step_params) do
     step = socket.assigns.step
     last_step = socket.assigns.last_step
     changeset = Automation.change_step(step, step_params)
 
-    """
-    fk_changeset = Step.change_nested_foreign_keys(socket.assigns.step, step_params)
-    { :ok, step } = Ecto.Changeset.apply_action(fk_changeset, :update)
-    step = Automation.update_step_preloads(step, fk_changeset.changes, socket)
-    fields_changeset = Step.change_remaining(step, fk_changeset.params)
-
-    all_changes = Map.merge(fk_changeset.changes, fields_changeset.changes)
-    final_changes = Map.put(fk_changeset, :changes, all_changes)
-    """
-
-    case Automation.update_step_two(step, last_step, step_params, socket, :update) do
+    case Automation.update_nested_step(step, last_step, step_params, socket, :update) do
       {:ok, step} ->
         opts = socket.assigns.state_opts |> Keyword.put(:action, :update)
         UserDocs.Subscription.broadcast_children(step, changeset, opts)
