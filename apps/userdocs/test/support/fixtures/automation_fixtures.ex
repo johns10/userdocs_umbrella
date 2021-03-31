@@ -40,6 +40,16 @@ defmodule UserDocs.AutomationFixtures do
     process
   end
 
+  def all_valid_step_types() do
+    UserDocs.AutomationFixtures.StepTypes.data()
+    |> Enum.map(
+      fn(st) ->
+        { :ok, step_type } = Automation.create_step_type(st)
+        step_type
+      end
+    )
+  end
+
   def step_type() do
     {:ok, step_type } =
       step_type_attrs(:valid)
