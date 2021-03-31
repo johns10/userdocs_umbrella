@@ -325,64 +325,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     end
   end
 
-  defp remove_empty_associations(params) do
-    params
-    |> maybe_remove_empty_element()
-    |> maybe_remove_empty_annotation()
-  end
-
-  defp maybe_remove_empty_element(
-    %{
-      "element" => %{
-        "id" => "",
-        "name" => "",
-        "order" => "",
-        "selector" => "",
-        "strategy_id" => ""
-      } = element_params
-    } = step_params
-  ) do
-    element_params =
-      element_params
-      |> Map.put("page_id", "")
-
-    Map.put(step_params, "annotation", element_params)
-  end
-  defp maybe_remove_empty_element(params), do: params
-
-  defp maybe_remove_empty_annotation(
-    %{
-      "annotation" =>
-      %{
-        "annotation_type_id" => "",
-        "color" => "",
-        "content_id" => "",
-        "font_size" => "",
-        "id" => "",
-        "label" => "",
-        "size" => "",
-        "thickness" => "",
-        "x_offset" => "",
-        "x_orientation" => "",
-        "y_offset" => "",
-        "y_orientation" => ""
-      } = annotation_params
-    } = step_params
-  ) do
-    annotation_params =
-      annotation_params
-      |> Map.put("name", "")
-      |> Map.put("step_id", "")
-
-    Map.put(step_params, "annotation", annotation_params)
-  end
-  defp maybe_remove_empty_annotation(params), do: params
-
-  def expand(socket, key) do
-    socket
-    |> assign(key, not Map.get(socket.assigns, key))
-  end
-
   def field_ids(step = %Automation.Step{}) do
     %{}
     |> Map.put(:name, ID.form_field(step, :name))
@@ -415,10 +357,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     Ecto.Changeset.get_field(changeset, :page_reference, nil)
   end
 
-  def name(changeset) do
-    Ecto.Changeset.get_field(changeset, :name, nil)
-  end
-
   def elements_select(%{ state_opts: state_opts } = socket, page_id) do
     opts = Keyword.put(state_opts, :filter, { :page_id, page_id })
     Web.list_elements(socket, opts)
@@ -429,23 +367,5 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     opts = Keyword.put(state_opts, :filter, { :page_id, page_id })
     Web.list_annotations(socket, opts)
     |> UserDocs.Helpers.select_list(:name, true)
-  end
-
-  def update_step_content(%Automation.Step{ annotation: nil } = step, _), do: step
-  def update_step_content(%Automation.Step{ annotation: annotation } = step, content_id) do
-    { :ok, annotation } =
-      Web.update_annotation(annotation, %{ content_id: content_id })
-    content = content_or_nil(content_id)
-    new_annotation = Map.put(annotation, :content, content)
-    Map.put(step, :annotation, new_annotation)
-  end
-
-  def content_or_nil(nil), do: nil
-  def content_or_nil(id), do: Documents.get_content!(id)
-
-  def update_changeset_for_content_change(step, params) do
-    { _, params } = Kernel.pop_in(params, [ "annotation", "content" ])
-    { _, params } = Kernel.pop_in(params, [ "annotation", "content_id" ])
-    Automation.change_step(step, params)
   end
 end
