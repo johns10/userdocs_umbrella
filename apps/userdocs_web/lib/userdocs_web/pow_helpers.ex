@@ -70,7 +70,7 @@ defmodule UserdocsWeb.LiveViewPowHelper do
       _ -> assign_current_user(socket, nil) #We didn't get a current_user for the token
     end
   end
-  def maybe_assign_current_user(_, _, _), do: nil
+  def maybe_assign_current_user(socket, _, _, _, _), do: assign_current_user(socket, nil)
 
   # assigns the current_user to the socket with the key current_user
   def assign_current_user(socket, user) do
