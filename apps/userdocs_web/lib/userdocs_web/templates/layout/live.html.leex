@@ -14,15 +14,13 @@
 
     <div id="navbar" class="navbar-menu">
       <div class="navbar-start">
-        <%= if @app_name in [ "web", "electron" ] do %>
-          <a class="navbar-item">Home</a>
-          <%= live_patch "Teams", class: "navbar-item", to: Routes.team_index_path(@socket, :index) %>
-          <%= live_patch "Projects", class: "navbar-item", to: Routes.project_index_path(@socket, :index) %>
-          <%= live_patch "Versions", class: "navbar-item", to: Routes.version_index_path(@socket, :index) %>
-          <%= live_patch "Content", class: "navbar-item", to: Routes.content_index_path(@socket, :index) %>
-          <%= live_patch "Documents", class: "navbar-item", to: Routes.document_index_path(@socket, :index) %>
-          <%= live_patch "Processes", class: "navbar-item", to: Routes.process_index_path(@socket, :index) %>
-        <%= end %>
+        <a class="navbar-item">Home</a>
+        <%= live_patch "Teams", class: "navbar-item", to: Routes.team_index_path(@socket, :index) %>
+        <%= live_patch "Projects", class: "navbar-item", to: Routes.project_index_path(@socket, :index) %>
+        <%= live_patch "Versions", class: "navbar-item", to: Routes.version_index_path(@socket, :index) %>
+        <%= live_patch "Content", class: "navbar-item", to: Routes.content_index_path(@socket, :index) %>
+        <%= live_patch "Documents", class: "navbar-item", to: Routes.document_index_path(@socket, :index) %>
+        <%= live_patch "Processes", class: "navbar-item", to: Routes.process_index_path(@socket, :index) %>
         <%= live_component(@socket, UserDocsWeb.VersionPicker, [
           current_user: @current_user,
           current_project: @current_project,
@@ -32,16 +30,10 @@
 
       <div class="navbar-end">
         <div class="navbar-item">
-          <%= if @app_name == "web" do %>
-            <div class="buttons">
-              <%= link "User", to: Routes.user_show_path(@socket, :show, @current_user.id), class: "button" %>
-              <%= link "Sign out", to: Routes.logout_path(@socket, :delete), method: :delete, class: "button is-light" %>
-            </div>
-          <% else %>
-            <div class="buttons">
-              <%= link "Sign out", to: URI.merge(@uri, Routes.session_path(@uri, :new)) |> to_string(), method: :delete, class: "button is-light" %>
-            </div>
-          <%= end %>
+          <div class="buttons">
+            <%= link "User", to: Routes.user_show_path(@socket, :show, @current_user.id), class: "button" %>
+            <%= link "Sign out", to: Routes.pow_session_path(@socket, :delete), method: :delete, class: "button is-light" %>
+          </div>
         </div>
       </div>
     </div>
@@ -61,11 +53,4 @@
       form_data: @form_data
     ]) %>-->
   </main>
-<% else %>
-  <%= if @app_name == "web" do %>
-    <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns, Routes.session_path(@socket, :new)) %>
-  <% else %>
-    <%= UserDocsWeb.UserLive.LoginFormComponent.render(assigns, URI.merge(@uri, Routes.session_path(@uri, :new)) |> to_string()) %>
-  <% end %>
-
 <% end %>
