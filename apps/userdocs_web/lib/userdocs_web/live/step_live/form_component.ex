@@ -107,19 +107,36 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   @impl true
   def handle_event("validate", %{"step" => step_params}, socket) do
-"""
-    params =
-      Helpers.remove_params_for_changed_associations(
-        socket.assigns.last_step, step_params, socket)
-"""
-
-    changeset =
+    IO.puts("Validate")
+    last_step = socket.assigns.last_step
+    nested_changeset =
       socket.assigns.step
-      |> Automation.change_step_two(socket.assigns.last_step, step_params, socket, :validate)
+      |> Automation.change_step_two(last_step, step_params, socket, :validate)
       |> Map.put(:action, :validate)
 
+    last_change = Automation.Step.changeset(last_step, step_params)
+
+    changeset =
+      with changeset <- Automation.Step.fields_changeset(socket.assigns.step, step_params),
+        changeset <- Automation.Step.maybe_replace_page_params(changeset, last_change, socket),
+        changeset <- Automation.Step.maybe_replace_annotation_params(changeset, last_change, socket),
+        changeset <- Automation.Step.maybe_replace_element_params(changeset, last_change, socket),
+        changeset <- Automation.Step.maybe_replace_content_params(changeset, last_change, socket),
+        changeset <- Automation.Step.assoc_changeset(changeset),
+        changeset <- Automation.Step.names_changeset(changeset),
+        changeset <- Map.put(changeset, :action, :validate),
+        changeset <- Ecto.Changeset.validate_required(changeset, [:order])
+      do
+        changeset
+      else
+        _ -> raise("Fail")
+      end
+
+    enabled_step_fields = Helpers.enabled_step_fields(socket, changeset)
+    enabled_annotation_fields = Helpers.enabled_annotation_fields(socket, changeset)
+
     socket =
-      case Ecto.Changeset.apply_action(changeset, :update) do
+      case Ecto.Changeset.apply_action(nested_changeset, :update) do
         { :ok, step } ->
           socket = assign(socket, :last_step, step)
         { :error, changeset } ->
@@ -127,21 +144,12 @@ defmodule UserDocsWeb.StepLive.FormComponent do
           socket
       end
 
-"""
-    { status, step, changeset } =
-      Automation.validate_step_with_nested_data(
-        socket.assigns.step, step_params, socket)
-"""
-    enabled_step_fields = Helpers.enabled_step_fields(socket, changeset)
-    enabled_annotation_fields = Helpers.enabled_annotation_fields(socket, changeset)
-
     {
       :noreply,
       socket
       |> assign(:enabled_step_fields, enabled_step_fields)
       |> assign(:enabled_annotation_fields, enabled_annotation_fields)
       |> assign(:changeset, changeset)
-      |> put_flash(:info, "Step updated successfully")
     }
 
   end
