@@ -44,13 +44,17 @@ defmodule UserDocs.WebFixtures do
     object
   end
 
-  def element(page, strategy) do
+  def element(page_id, strategy_id) when is_integer(page_id) and is_integer(strategy_id) do
     {:ok, object } =
       element_attrs(:valid)
-      |> Map.put(:page_id, page.id)
-      |> Map.put(:strategy_id, strategy.id)
+      |> Map.put(:page_id, page_id)
+      |> Map.put(:strategy_id, strategy_id)
       |> Web.create_element()
     object
+  end
+
+  def element(page, strategy) do
+    element(page.id, strategy.id)
   end
 
   def strategy() do
@@ -60,12 +64,16 @@ defmodule UserDocs.WebFixtures do
       strategy
   end
 
-  def annotation(page) do
+  def annotation(page_id) when is_integer(page_id) do
     {:ok, annotation } =
       annotation_attrs(:valid)
-      |> Map.put(:page_id, page.id)
+      |> Map.put(:page_id, page_id)
       |> Web.create_annotation()
     annotation
+  end
+
+  def annotation(%Page{} = page) do
+    annotation(page.id)
   end
 
   def annotation_type(name \\ :badge) do
@@ -78,6 +86,7 @@ defmodule UserDocs.WebFixtures do
   def page_attrs(:valid, version_id \\ nil) do
     %{
       url: "some url",
+      name: UUID.uuid4(),
       version_id: version_id
     }
   end
