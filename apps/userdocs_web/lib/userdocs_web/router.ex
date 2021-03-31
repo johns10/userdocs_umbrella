@@ -12,28 +12,24 @@ defmodule UserDocsWeb.Router do
     plug :put_secure_browser_headers
   end
 
-  def root_layout(conn, opts) do
-    electron? =
-      Plug.Conn.get_req_header(conn, "user-agent")
-      |> Enum.at(0)
-      |> String.contains?("Electron")
-
-    app_name = get_req_header(conn, "app") |> Enum.at(0)
-
-    if electron? do
-      conn
-      |> put_root_layout({UserDocsWeb.LayoutView, :electron_root})
-      |> assign(:app_name, :electron)
-    else
-      if app_name == "chrome-extension" do
+  def root_layout(conn, _opts) do
+    case conn.host do
+      "dev-electron-app.user-docs.com" ->
+        conn
+        |> put_root_layout({UserDocsWeb.LayoutView, :electron_root})
+        |> assign(:app_name, :electron)
+      "electron-app.user-docs.com" ->
+        conn
+        |> put_root_layout({UserDocsWeb.LayoutView, :electron_root})
+        |> assign(:app_name, :electron)
+      "extension.user-docs.com" ->
         conn
         |> put_root_layout({UserDocsWeb.LayoutView, :chrome_root})
         |> assign(:app_name, :chrome)
-      else
+      _ ->
         conn
         |> put_root_layout({UserDocsWeb.LayoutView, :root})
         |> assign(:app_name, :web)
-      end
     end
   end
 
