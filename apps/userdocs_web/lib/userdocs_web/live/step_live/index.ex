@@ -3,6 +3,8 @@ defmodule UserDocsWeb.StepLive.Index do
 
   use UserdocsWeb.LiveViewPowHelper
 
+  require Logger
+
   alias UserDocs.Automation
   alias UserDocs.Automation.Step
   alias UserDocs.Web
@@ -136,12 +138,12 @@ defmodule UserDocsWeb.StepLive.Index do
     }
   end
   def handle_info(%{topic: _, event: _, payload: %Step{}} = sub_data, socket) do
-    IO.inspect("#{__MODULE__} Received a step broadcast")
+    Logger.debug("#{__MODULE__} Received a step broadcast")
     { :noreply, socket } = Root.handle_info(sub_data, socket)
     { :noreply, prepare_steps(socket) }
   end
   def handle_info(%{topic: _, event: _, payload: %UserDocs.Web.Annotation{}} = sub_data, socket) do
-    IO.inspect("#{__MODULE__} Received an annotation broadcast")
+    Logger.debug("#{__MODULE__} Received an annotation broadcast")
     { :noreply, socket } = Root.handle_info(sub_data, socket)
     { :noreply, prepare_steps(socket) }
   end
