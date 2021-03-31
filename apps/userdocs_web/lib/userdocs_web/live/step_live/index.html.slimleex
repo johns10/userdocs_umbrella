@@ -62,6 +62,8 @@
                   step_type_name: step.step_type.name])
                 = live_patch class: "navbar-item", to: Routes.step_index_path(@socket, :edit, step.id), id: "edit-step-#{step.id}" do
                   i.fa.fa-lg.fa-edit
+                = link to: "#", class: "navbar-item", phx_click: "delete", phx_value_id: step.id, id: "delete-step-#{step.id}" do
+                  i.fa.fa-lg.fa-trash
 
 
     = live_patch to: Routes.step_index_path(@socket, :new, @process.id) do
