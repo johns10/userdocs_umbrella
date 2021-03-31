@@ -64,12 +64,12 @@ defmodule UserDocsWeb.Root do
     try do
       case maybe_assign_current_user(socket, session) do
         %{ assigns: %{ current_user: nil }} ->
-          IO.puts("nil user")
+          Logger.debug("No user found in socket")
           socket
           |> assign(:auth_state, :not_logged_in)
           |> assign(:changeset, Users.change_user(%User{}))
         %{ assigns: %{ current_user: current_user }} ->
-          IO.puts("a user")
+          Logger.debug("User #{current_user.id} found in socket")
           socket
           |> maybe_assign_current_user(session)
           |> prepare_user()
