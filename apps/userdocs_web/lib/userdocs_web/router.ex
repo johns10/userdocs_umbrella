@@ -35,41 +35,29 @@ defmodule UserDocsWeb.Router do
 
   pipeline :protected do
     plug Pow.Plug.RequireAuthenticated,
-      error_handler: UserDocsWeb.AuthErrorHandler
+      error_handler: Pow.Phoenix.PlugErrorHandler
   end
 
   pipeline :not_authenticated do
     plug Pow.Plug.RequireNotAuthenticated,
-      error_handler: UserDocsWeb.AuthErrorHandler
-  end
-
-  scope "/", UserDocsWeb do
-    pipe_through [:browser, :not_authenticated]
-
-    get "/session", SessionController, :new
-    post "/session", SessionController, :create
+      error_handler: Pow.Plug.RequireNotAuthenticated
   end
 
   scope "/", UserDocsWeb do
     pipe_through [:browser, :protected]
 
-    delete "/session", SessionController, :delete, as: :logout
-  end
-
-  scope "/", UserDocsWeb do
-    pipe_through :browser
-
     live "/", PageLive, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-
+"""
     live "/processpa", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/index.html", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "index.html", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-
+"""
     live "/users/new", UserLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/users", UserLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/users/:id", UserLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/users/:id/show/edit", UserLive.Show, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/users/:id/show/options", UserLive.Show, :options, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/users/:id/edit", UserLive.Index, :edit
 
     live "/teams/new", TeamLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/teams", TeamLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
@@ -113,22 +101,11 @@ defmodule UserDocsWeb.Router do
     live "/documents/:id/edit", DocumentLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/documents/:id/editor", DocumentLive.Editor, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/documents/:id/viewer", DocumentLive.Viewer, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    get "/document_versions/:id/download", DocumentVersionDownloadController, :show
 
     live "/content/:id/show/edit", ContentLive.Show, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
   end
 
-  scope "/", UserDocsWeb do
-    #pipe_through [:protected]
-    pipe_through [ :browser, :protected ]
-
-    live "/process_administrator", ProcessAdministratorLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-
-    get "/document_versions/:id/download", DocumentVersionDownloadController, :show
-
-    live "/users/:id/edit", UserLive.Index, :edit
-
-
-  end
 
   scope "/" do
     pipe_through :browser
@@ -137,6 +114,30 @@ defmodule UserDocsWeb.Router do
 
 
   _commented_code = """
+  scope "/", UserDocsWeb do
+    pipe_through [:browser, :not_authenticated]
+
+    get "/session", SessionController, :new
+    post "/session", SessionController, :create
+  end
+
+  scope "/", UserDocsWeb do
+    pipe_through [:browser, :protected]
+
+    delete "/session", SessionController, :delete, as: :logout
+  end
+
+  scope "/", UserDocsWeb do
+    #pipe_through [:protected]
+    pipe_through [ :browser, :protected ]
+
+    live "/process_administrator", ProcessAdministratorLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
+
+
+
+  end
+
   scope "/", UserDocsWeb do
     pipe_through [:browser, :protected]
 
