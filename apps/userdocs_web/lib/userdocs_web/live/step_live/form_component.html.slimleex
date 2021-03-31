@@ -5,6 +5,8 @@
   phx_change: "validate",
   phx_submit: "save"
 
+  h2.is-size-5 Edit Step
+
   .field.is-horizontal
     .field-label.is-normal
       = label f, :process_id, class: "label"
@@ -13,6 +15,7 @@
         .select
           = select f, :process_id, @select_lists.processes_select, 
             [ class: "input", selected: @parent_id || "", id: @field_ids.process_id || "" ]
+          = error_tag(f, :process_id)
 
   .field.is-horizontal
     .field-label.is-normal
@@ -20,6 +23,7 @@
     .field-body
       .control
         = number_input f, :order, [ class: "input", type: "text", id: @field_ids.order || "" ]
+        = error_tag(f, :order)
 
   .field.is-horizontal
     .field-label.is-normal
@@ -29,6 +33,7 @@
         .select
           = select f,:step_type_id, @select_lists.step_types_select, 
             [ class: "input", type: "text", id: @field_ids.step_type_id || "" ]
+          = error_tag(f, :step_type_id)
 
   = if "page_reference" in @enabled_step_fields and @action not in [:new] do
     .field.is-horizontal
