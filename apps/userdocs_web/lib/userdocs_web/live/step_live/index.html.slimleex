@@ -41,6 +41,7 @@
       app_name: @app_name ])
 
     aside.menu 
+      p.menu-label Steps
       ul.menu-list
         = for step <- @steps do
           li class=""
