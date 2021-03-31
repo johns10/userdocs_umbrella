@@ -161,7 +161,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   @impl true
   def handle_event("test_selector", %{ "element-id" => element_id }, socket) do
     element_id = String.to_integer(element_id)
-    element = UserDocs.Web.get_element!(element_id, %{ strategy: true }, %{}, socket.assigns.data)
+    element = UserDocs.Web.get_element!(element_id, %{ strategy: true }, %{})
 
     payload =  %{
       type: "step",
