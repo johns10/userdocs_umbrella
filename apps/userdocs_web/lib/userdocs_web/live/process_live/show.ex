@@ -71,7 +71,6 @@ defmodule UserDocsWeb.ProcessLive.Show do
 
   @impl true
   def handle_params(%{ "id" => id, "team_id" => team_id, "project_id" => project_id, "version_id" => version_id }, _, socket) do
-    IO.puts("handle_params")
     opts = Defaults.opts(socket, @subscribed_types)
     process = Automation.get_process!(String.to_integer(id))
     {
