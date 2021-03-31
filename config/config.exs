@@ -52,6 +52,7 @@ config :phoenix, :template_engines,
   slimleex: PhoenixSlime.LiveViewEngine
 
 config :userdocs_web, :pow,
+  web_module: UserDocsWeb,
   user: UserDocs.Users.User,
   repo: UserDocs.Repo,
   cache_store_backend: Pow.Store.Backend.MnesiaCache,
