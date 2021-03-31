@@ -5,7 +5,7 @@ defmodule UserDocs.Subscription do
   alias UserDocsWeb.Endpoint
 
   def broadcast_children(object, changeset, opts) do
-    IO.inspect("Broadcasting restuls")
+    Logger.debug("Broadcasting results from a " <> inspect(changeset.data.__struct__))
     actions = check_changes(changeset)
     queue = traverse_changes(object, actions)
     Enum.each(queue,
