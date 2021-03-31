@@ -12,10 +12,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   alias UserDocs.Automation
   alias UserDocs.Automation.Step
-  alias UserDocs.Documents
+  alias UserDocs.Automation.Step.Changeset
   alias UserDocs.Web
-  alias UserDocs.Web.Element
-  alias UserDocs.Web.Annotation
 
   @impl true
   def update(%{step: step} = assigns, socket) do
