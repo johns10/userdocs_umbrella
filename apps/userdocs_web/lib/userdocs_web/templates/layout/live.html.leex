@@ -56,10 +56,10 @@
       phx-value-key="error"><%= live_flash(@flash, :error) %></p>
     <%= @inner_content %>
 
-    <%= UserDocsWeb.LiveHelpers.live_modal_menus(@socket, [
+    <!--<%= UserDocsWeb.LiveHelpers.live_modal_menus(@socket, [
       id: "modal-menus",
       form_data: @form_data
-    ]) %>
+    ]) %>-->
   </main>
 <% else %>
   <%= if @app_name == "web" do %>
