@@ -32,16 +32,16 @@ defmodule UserDocsWeb.PageLive.FormComponent do
         <%= Layout.select_input(form, :version_id, @select_lists.versions, [
           # TODO: Still a little funky
           selected: @current_version.id || "",
-          id: @field_ids.version_id || ""
+          id: "page_id" # @field_ids.version_id || ""
         ], "control") %>
 
         <%= Layout.number_input(form, :order, [
-          id: @field_ids.order || ""
+          id: "page_order" # @field_ids.order || ""
         ], "control") %>
 
         <%= Layout.text_input(form, [
           field_name: :name,
-          id: @field_ids.name
+          id: "page_name" # @field_ids.name
         ], "control is-expanded") %>
 
       </div>
