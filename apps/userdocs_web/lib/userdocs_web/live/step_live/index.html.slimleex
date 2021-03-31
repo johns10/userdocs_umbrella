@@ -60,7 +60,7 @@
                   app_name: @app_name,
                   current_user: @current_user,
                   step_type_name: step.step_type.name])
-                = live_patch class: "navbar-item", to: Routes.step_index_path(@socket, :edit, step.id) do
+                = live_patch class: "navbar-item", to: Routes.step_index_path(@socket, :edit, step.id), id: "edit-step-#{step.id}" do
                   i.fa.fa-lg.fa-edit
 
 
