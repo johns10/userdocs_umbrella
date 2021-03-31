@@ -7,7 +7,7 @@
   .column
     = if @live_action in [:edit, :new] do
       = live_modal @socket, UserDocsWeb.StepLive.FormComponent,
-        id: @step.id || :new,
+        id: "step-form",
         parent: @process,
         parent_id: @process.id,
         type: Step,
