@@ -58,7 +58,7 @@
       .field-body
         .field.has-addons
           = Layout.select_input(f, :page_id, @select_lists.pages_select,
-            [ value: f.data.page_id || @default_page_id ||  "",
+            [ value: @changeset |> Ecto.Changeset.get_change(:page_id, nil) || f.data.page_id || @default_page_id ||  "",
             id: @field_ids.page_id, label: false ], "control")
           = Layout.new_item_button("new-page", 
             [ button_class: :a, phx_target: @myself.cid ], "control")
@@ -79,7 +79,8 @@
       .field-body
         .field.has-addons
           = Layout.select_input(f, :element_id, @select_lists.elements, 
-            [ value: f.data.element_id || "", id: @field_ids.element_id, label: false,
+            [ value: @changeset |> Ecto.Changeset.get_change(:element_id, nil) || f.data.element_id || "", 
+            id: @field_ids.element_id, label: false,
             hidden: "element_id" not in @enabled_step_fields ], "control")
           = Layout.new_item_button("new-element", [ button_class: :a, phx_target: @myself.cid ], "control")
     = if !is_nil(@step.element) or @new_element do 
@@ -102,9 +103,9 @@
       .field-label.is-normal
         = label f, :annotation_id, class: "label"
       .field-body
-        .field.has-addons
+        .field.has-addons 
           = Layout.select_input(f, :annotation_id, @select_lists.annotations, 
-            [ value: f.data.annotation_id || "",
+            [ value: @changeset |> Ecto.Changeset.get_change(:annotation_id, nil) || f.data.annotation_id || "",
             id: @field_ids.annotation_id, label: false,
             hidden: "annotation_id" not in @enabled_step_fields ], "control")
           = Layout.new_item_button("new-annotation", [ button_class: :a, phx_target: @myself.cid ], "control")
