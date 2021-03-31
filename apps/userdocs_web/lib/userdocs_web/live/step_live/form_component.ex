@@ -281,7 +281,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
           :noreply,
           socket
           |> put_flash(:info, "Step updated successfully")
-          |> push_patch(to: socket.assigns.return_to)
+          |> push_redirect(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -290,7 +290,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   end
 
   defp save_step(socket, :new, step_params) do
-    # recent_navigated_to_page(process, step, assigns)
     order = step_params["order"]
     step_type = Automation.get_step_type!(step_params["step_type_id"])
     name = order <> ": " <> step_type.name
@@ -301,7 +300,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
           :noreply,
           socket
           |> put_flash(:info, "Step created successfully")
-          |> push_patch(to: socket.assigns.return_to)
+          |> push_redirect(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
