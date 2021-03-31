@@ -1,4 +1,4 @@
-container.hero.is-fullheight.bd-is-fullwidth
+container.hero.is-fullheight
   .hero-body
     .container
       .columns.is-centered
