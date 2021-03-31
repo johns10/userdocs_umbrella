@@ -357,8 +357,8 @@ defmodule UserDocs.Automation do
     |> Repo.update()
   end
 
-  def update_step_two(%Step{} = step, last_step, attrs, socket, action) do
-    Step.changeset_two(step, last_step, attrs, socket, action)
+  def update_nested_step(%Step{} = step, last_step, attrs, socket, action) do
+    Step.nested_changeset(step, last_step, attrs, socket, action)
     |> Repo.update()
   end
 
@@ -439,8 +439,8 @@ defmodule UserDocs.Automation do
     Step.changeset(step, attrs)
   end
 
-  def change_step_two(%Step{} = step, %Step{} = last_step, attrs \\ %{}, state, validate) do
-    Step.changeset_two(step, last_step, attrs, state, validate)
+  def change_nested_step(%Step{} = step, %Step{} = last_step, attrs \\ %{}, state, validate) do
+    Step.nested_changeset(step, last_step, attrs, state, validate)
   end
 
   alias UserDocs.Automation.Process
