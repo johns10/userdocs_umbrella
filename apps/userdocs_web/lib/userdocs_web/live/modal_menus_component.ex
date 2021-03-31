@@ -29,7 +29,6 @@ defmodule UserDocsWeb.ModalMenus do
   def render(assigns) do
     ~L"""
       <div id="<%= @id %>">
-        <%= IO.puts("Rendering form"); "" %>
         <%= if @form_data.action in [:new, :edit] do %>
           <%=
             case @form_data.type do
