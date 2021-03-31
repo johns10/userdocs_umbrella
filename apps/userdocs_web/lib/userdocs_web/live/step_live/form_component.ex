@@ -107,21 +107,20 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   @impl true
   def handle_event("validate", %{"step" => step_params}, socket) do
-    IO.puts("Validate")
     last_step = socket.assigns.last_step
     nested_changeset =
       socket.assigns.step
-      |> Automation.change_step_two(last_step, step_params, socket, :validate)
+      |> Automation.change_nested_step(last_step, step_params, socket, :validate)
       |> Map.put(:action, :validate)
 
-    last_change = Automation.Step.changeset(last_step, step_params)
+    last_change = Step.changeset(last_step, step_params)
 
     changeset =
-      with changeset <- Automation.Step.fields_changeset(socket.assigns.step, step_params),
-        changeset <- Automation.Step.maybe_replace_page_params(changeset, last_change, socket),
-        changeset <- Automation.Step.maybe_replace_annotation_params(changeset, last_change, socket),
-        changeset <- Automation.Step.maybe_replace_element_params(changeset, last_change, socket),
-        changeset <- Automation.Step.maybe_replace_content_params(changeset, last_change, socket),
+      with changeset <- Step.fields_changeset(socket.assigns.step, step_params),
+        changeset <- Changeset.maybe_replace_page_params(changeset, last_change, socket),
+        changeset <- Changeset.maybe_replace_annotation_params(changeset, last_change, socket),
+        changeset <- Changeset.maybe_replace_element_params(changeset, last_change, socket),
+        changeset <- Changeset.maybe_replace_content_params(changeset, last_change, socket),
         changeset <- Automation.Step.assoc_changeset(changeset),
         changeset <- Automation.Step.names_changeset(changeset),
         changeset <- Map.put(changeset, :action, :validate),
@@ -138,7 +137,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     socket =
       case Ecto.Changeset.apply_action(nested_changeset, :update) do
         { :ok, step } ->
-          socket = assign(socket, :last_step, step)
+          assign(socket, :last_step, step)
         { :error, changeset } ->
           Logger.error("Last Step Changeset #{changeset.data.id} failed to update")
           socket
