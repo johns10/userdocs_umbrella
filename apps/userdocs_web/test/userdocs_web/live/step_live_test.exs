@@ -149,6 +149,7 @@ defmodule UserDocsWeb.StepLiveTest do
 
       assert html =~ "Steps"
     end
+
     test "saves new step", %{conn: conn} do
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :index, first_process_id()))
 
@@ -208,7 +209,7 @@ defmodule UserDocsWeb.StepLiveTest do
       |> render_change(%{ "step" => %{"page_reference" => "page"} } )
 
       assert index_live
-             |> element("#step-#{step.id}-page_id")
+             |> element("#step-" <> (step.id |> to_string) <> "-page_id")
              |> has_element?()
 
       assert index_live
@@ -251,7 +252,8 @@ defmodule UserDocsWeb.StepLiveTest do
 
       changes = %{
         "step_type_id" => aa_step_type.id |> to_string(),
-        "annotation_id" => second_annotation().id |> to_string()
+        "annotation_id" => second_annotation().id |> to_string(),
+        "element_id" => second_element().id |> to_string()
       }
 
       # change the annotation_id
@@ -259,18 +261,25 @@ defmodule UserDocsWeb.StepLiveTest do
       |> form("#step-form", step: attrs)
       |> render_change(%{ "step" => changes })
 
+      # Annotation form changes
       assert index_live
-             |> element("#annotation-#{first_annotation().id}-label")
+             |> element("#annotation-" <> (first_annotation().id |> to_string) <> "-label")
              |> render() =~ second_annotation().label
 
       # change it back
       index_live
       |> form("#step-form", step: attrs)
-      |> render_change(%{ "step" => %{ "step_type_id" => aa_step_type.id |> to_string(), "annotation_id" => first_annotation().id |> to_string() } })
+      |> render_change(%{ "step" => %{ "step_type_id" => aa_step_type.id |> to_string(), "annotation_id" => (first_annotation().id |> to_string()) } })
 
+      # Annotation form changes
       assert index_live
-            |> element("#annotation-#{first_annotation().id}-label")
+            |> element("#annotation-" <> (first_annotation().id |> to_string) <> "-label")
             |> render() =~ first_annotation().label
+
+      # Element picker doesn't
+      assert index_live
+             |> element("#step-" <> (step.id |> to_string) <> "-element_id")
+             |> render() =~ "selected=\"selected\">" <> second_element().name
 
       # put some new text on the page, save it
       index_live
@@ -284,12 +293,13 @@ defmodule UserDocsWeb.StepLiveTest do
     end
 
     test "changing the element_id updates the form", %{conn: conn, step: step, step_type: step_type, step_types: step_types} do
-      step_type = step_type_from_name(step_types, "Click")
+      step_type = step_type_from_name(step_types, "Apply Annotation")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :edit, step))
       attrs = valid_attrs(step.process_id, step_type.id)
 
       changes = %{
         "step_type_id" => step_type.id |> to_string(),
+        "annotation_id" => second_annotation().id |> to_string(),
         "element_id" => second_element().id |> to_string()
       }
 
@@ -299,17 +309,26 @@ defmodule UserDocsWeb.StepLiveTest do
       |> render_change(%{ "step" => changes })
 
       assert index_live
-             |> element("#step-#{step.id}-element-#{first_element().id}-name")
+             |> element("#step-" <> (step.id |> to_string) <> "-element-" <> (first_element().id |> to_string) <> "-name")
              |> render() =~ second_element().name
 
       # change it back
       index_live
       |> form("#step-form", step: attrs)
-      |> render_change(%{ "step" => %{ "step_type_id" => step_type.id |> to_string(), "annotation_id" => first_annotation().id |> to_string() } })
+      |> render_change(%{ "step" => %{
+          "step_type_id" => step_type.id |> to_string(),
+          "element_id" => first_element().id |> to_string()
+        }})
 
+      # Element Form Changes
       assert index_live
-             |> element("#step-#{step.id}-element-#{first_element().id}-name")
+             |> element("#step-" <> (step.id |> to_string) <> "-element-" <> (first_element().id |> to_string) <> "-name")
              |> render() =~ first_element().name
+
+      # Annotation picker doesn't
+      assert index_live
+            |> element("#step-" <> (step.id |> to_string) <> "-annotation_id")
+            |> render() =~ "selected=\"selected\">" <> second_annotation().name
 
       # put some new text on the page, save it
       index_live
