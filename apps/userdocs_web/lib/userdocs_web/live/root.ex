@@ -61,31 +61,25 @@ defmodule UserDocsWeb.Root do
   end
 
   def validate_logged_in(socket, session) do
-    try do
-      case maybe_assign_current_user(socket, session) do
-        %{ assigns: %{ current_user: nil }} ->
-          Logger.debug("No user found in socket")
-          socket
-          |> assign(:auth_state, :not_logged_in)
-          |> assign(:changeset, Users.change_user(%User{}))
-        %{ assigns: %{ current_user: current_user }} ->
-          Logger.debug("User #{current_user.id} found in socket")
-          socket
-          |> maybe_assign_current_user(session)
-          |> prepare_user()
-          |> assign_current()
-          |> assign(:auth_state, :logged_in)
-          |> (assign(:changeset, Users.change_user(current_user)))
-        error ->
-          IO.puts("Error")
-          Logger.error(error)
-          socket
-      end
-    rescue
-      FunctionClauseError ->
+    case maybe_assign_current_user(socket, session) do
+      %{ assigns: %{ current_user: nil }} ->
+        Logger.debug("No user found in socket")
         socket
         |> assign(:auth_state, :not_logged_in)
         |> assign(:changeset, Users.change_user(%User{}))
+        |> push_redirect(to: UserDocsWeb.Router.Helpers.pow_session_path(socket, :new))
+      %{ assigns: %{ current_user: current_user }} ->
+        Logger.debug("User #{current_user.id} found in socket")
+        socket
+        |> maybe_assign_current_user(session)
+        |> prepare_user()
+        |> assign_current()
+        |> assign(:auth_state, :logged_in)
+        |> (assign(:changeset, Users.change_user(current_user)))
+      error ->
+        IO.puts("Error")
+        Logger.error(error)
+        socket
     end
   end
 
