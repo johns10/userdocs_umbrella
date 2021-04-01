@@ -16,6 +16,7 @@ defmodule UserDocsWeb.UserLive.FormComponent do
         phx_submit: "save" %>
 
         <%= Layout.text_input f, :email, [], "control" %>
+        <%= Layout.text_input f, :image_path, [], "control" %>
 
         <%= inputs_for f, :team_users, fn tuf -> %>
           <div class="field is-grouped">
@@ -129,13 +130,12 @@ defmodule UserDocsWeb.UserLive.FormComponent do
   end
 
   defp save_user(socket, :options, user_params) do
-    IO.puts("options")
     case Users.update_user_options(socket.assigns.user, user_params) do
       {:ok, user} ->
         {
           :noreply,
           socket
-          |> put_flash(:info, "User created successfully")
+          |> put_flash(:info, "User updated successfully")
           |> push_redirect(to: socket.assigns.return_to)
         }
 
