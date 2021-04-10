@@ -9,12 +9,9 @@ defmodule UserDocs.Application do
 
   def start(_type, _args) do
     children = [
-      # Start the Ecto repository
       UserDocs.Repo,
-      # Start the PubSub system
+      UserDocs.Vault,
       {Phoenix.PubSub, name: UserDocs.PubSub, adapter: Phoenix.PubSub.PG2}
-      # Start a worker by calling: UserDocs.Worker.start_link(arg)
-      # {UserDocs.Worker, arg}
     ]
 
     :pg2.create(UserDocs.PubSub)
