@@ -299,6 +299,22 @@ defmodule UserDocs.Automation do
       ** (Ecto.NoResultsError)
 
   """
+  def get_step!(id) do
+    Repo.one from step in Step,
+      where: step.id == ^id,
+      left_join: annotation in assoc(step, :annotation),
+      left_join: element in assoc(step, :element),
+      preload: [
+        :page,
+        :annotation,
+        :element,
+        :step_type,
+        :process,
+        annotation: {annotation, :annotation_type},
+        element: {element, :strategy},
+      ]
+  end
+
   def get_step!(id, params \\ %{}) do
     base_step_query(id)
     |> maybe_preload_element(params[:element])
