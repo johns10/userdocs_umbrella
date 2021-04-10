@@ -1,12 +1,12 @@
-defmodule UserDocs.Jobs.ProcessInstance do
+defmodule UserDocs.ProcessInstances.ProcessInstance do
   use Ecto.Schema
   import Ecto.Changeset
 
   alias UserDocs.Automation.Process
-  alias UserDocs.Jobs.StepInstance
+  alias UserDocs.StepInstances.StepInstance
   alias UserDocs.Jobs.Job
 
-  embedded_schema do
+  schema "process_instances" do
     field :order, :integer
     field :status, :string
     field :name, :string
@@ -24,9 +24,9 @@ defmodule UserDocs.Jobs.ProcessInstance do
 
   def changeset(process_instance, attrs) do
     process_instance
-    |> cast(attrs, [ :order, :status, :name, :type, :attrs, :errors, :warnings, :process_id, :expanded  ])
-    |> put_assoc(:process, Map.get(attrs, :process, process_instance.process))
-    |> cast_assoc(:step_instances, with: &StepInstance.create_changeset/2)
-    |> validate_required([ :order, :status, :name, :attrs, :process_id ])
+    |> cast(attrs, [ :order, :status, :name, :type, :errors, :warnings, :process_id, :expanded  ])
+    #|> put_assoc(:process, Map.get(attrs, :process, process_instance.process))
+    |> cast_assoc(:step_instances)
+    |> validate_required([ :order, :status, :name, :process_id ])
   end
 end
