@@ -425,13 +425,25 @@ defmodule UserDocs.Users do
   # and get my on_delete stuff right.
   def try_get_team!(id) do
     try do
-      get_team!(id)
+      get_team!(id, %{ preloads: %{ job: %{ step_instances: true, process_instances: true }}})
     rescue
       e ->
         Logger.error("Failed to retreive selected team, error: ")
         Logger.error(e)
         nil
     end
+  end
+  def get_team!(id, %{ preloads: %{ job: %{ step_instances: true, process_instances: true }}}) do
+    Repo.one from team in Team,
+    where: team.id == ^id,
+    left_join: job in assoc(team, :job),
+    left_join: process_instances in assoc(job, :process_instances),
+    preload: [
+      :job,
+      job: :step_instances,
+      job: :process_instances,
+      job: { job, process_instances: { process_instances, :step_instances } }
+    ]
   end
   def get_team!(id, params \\ %{}) do
     preloads = Map.get(params, :preloads, [])
