@@ -3,10 +3,11 @@ defmodule UserDocs.Jobs.Job do
   import Ecto.Changeset
 
 
-  alias UserDocs.Jobs.StepInstance
-  alias UserDocs.Jobs.ProcessInstance
+  alias UserDocs.StepInstances.StepInstance
+  alias UserDocs.ProcessInstances.ProcessInstance
+  alias UserDocs.Users.Team
 
-  embedded_schema do
+  schema "jobs" do
     field :order, :integer
     field :status, :string
     field :name, :string
@@ -15,13 +16,18 @@ defmodule UserDocs.Jobs.Job do
 
     has_many :process_instances, ProcessInstance, on_replace: :nilify
     has_many :step_instances, StepInstance, on_replace: :nilify
+
+    belongs_to :team, Team
+
+    timestamps()
   end
 
 
   def changeset(job, attrs) do
     job
-    |> cast(attrs, [ :order, :status, :name, :errors, :warnings  ])
-    |> put_assoc(:process_instances, Map.get(attrs, :process_instances, job.process_instances))
-    |> put_assoc(:step_instances, Map.get(attrs, :step_instances, job.step_instances))
+    |> cast(attrs, [ :team_id, :order, :status, :name, :errors, :warnings  ])
+    #|> put_assoc(:step_instances, Map.get(attrs, :step_instances, job.step_instances))
+    #|> put_assoc(:process_instances, Map.get(attrs, :process_instances, job.process_instances))
+    |> validate_required([ :order, :name, :status ])
   end
 end
