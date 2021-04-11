@@ -6,20 +6,6 @@ defmodule UserDocsWeb.LiveHelpers do
   alias Phoenix.LiveView
   alias UserDocsWeb.ModalMenus
 
-  @doc """
-  Renders a component inside the `UserDocsWeb.ModalComponent` component.
-
-  The rendered modal receives a `:return_to` option to properly update
-  the URL when the modal is closed.
-
-  ## Examples
-
-      <%= live_modal @socket, UserDocsWeb.TeamUserLive.FormComponent,
-        id: @team_user.id || :new,
-        action: @live_action,
-        team_user: @team_user,
-        return_to: Routes.team_user_index_path(@socket, :index) %>
-  """
   def which_app(conn) do
     %{ "app_name" => Atom.to_string(conn.assigns.app_name) }
   end
