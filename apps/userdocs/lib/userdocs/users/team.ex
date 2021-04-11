@@ -8,6 +8,7 @@ defmodule UserDocs.Users.Team do
   alias UserDocs.Documents.LanguageCode
   alias UserDocs.Documents.Content
   alias UserDocs.Users.TeamUser
+  alias UserDocs.Jobs.Job
 
   schema "teams" do
     field :name, :string
@@ -18,6 +19,13 @@ defmodule UserDocs.Users.Team do
     has_many :projects, Project
     has_many :content, Content
     has_many :team_users, TeamUser
+    has_one :job, Job
+
+    field :aws_region, :string
+    field :aws_access_key_id, UserDocs.Encrypted.Binary
+    field :aws_access_key_id_hash, Cloak.Ecto.SHA256
+    field :aws_secret_access_key, UserDocs.Encrypted.Binary
+    field :aws_secret_access_key_hash, Cloak.Ecto.SHA256
 
     many_to_many :users,
       Users.User,
@@ -30,13 +38,14 @@ defmodule UserDocs.Users.Team do
   @doc false
   def changeset(team, attrs) do
     team
-    |> cast(attrs, [ :name, :default_language_code_id ])
+    |> cast(attrs, [ :name, :default_language_code_id, :aws_region, :aws_access_key_id, :aws_secret_access_key ])
     |> cast_assoc(:team_users)
     |> cast_assoc(:projects)
     |> foreign_key_constraint(:default_language_code_id)
     |> handle_users(attrs)
     |> unique_constraint(:name)
     |> validate_required([:name])
+    |> put_hashed_fields()
   end
 
   def change_default_project(changeset) do
@@ -45,15 +54,11 @@ defmodule UserDocs.Users.Team do
     |> ChangesetHelpers.check_only_one_default(:projects)
   end
 
-"""
-  # This one is called when a socket gets passed in that has the data
-  def projects(team = %UserDocs.Users.Team{}, %{ projects: projects }) do
-    projects(team.id, projects)
+  defp put_hashed_fields(changeset) do
+    changeset
+    |> put_change(:aws_access_key_id_hash, get_field(changeset, :aws_access_key_id))
+    |> put_change(:aws_secret_access_key_hash, get_field(changeset, :aws_secret_access_key))
   end
-  def projects(team_id, projects) when is_integer(team_id) do
-    Enum.filter(projects, fn(p) -> p.team_id == team_id end)
-  end
-"""
 
   @doc false
   defp handle_users(team, %{"users" => users}) do
