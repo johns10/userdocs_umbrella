@@ -22,7 +22,7 @@ defmodule UserDocs.StepInstances.StepInstance do
 
   def changeset(step_instance, attrs) do
     step_instance
-    |> cast(attrs, [ :order, :status, :name, :type, :attrs, :errors, :warnings, :step_id  ])
+    |> cast(attrs, [ :order, :status, :name, :type, :attrs, :errors, :warnings, :step_id, :job_id  ])
     |> validate_required([ :order, :status, :step_id ])
   end
 end
