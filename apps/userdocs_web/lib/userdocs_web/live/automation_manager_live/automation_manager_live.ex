@@ -49,35 +49,27 @@ defmodule UserDocsWeb.AutomationManagerLive do
   end
 
   def render_job_item(%ProcessInstance{} = process_instance, cid) do
-    [
-      content_tag(:li, []) do
-        [
-          content_tag(:div, [ class: "is-flex py-0" ]) do
-            [
-              content_tag(:div, [ class: "is-flex is-flex-direction-row is-flex-grow-0 py-0" ]) do
-                link([ to: "#", phx_click: "expand-process-instance", phx_value_id: process_instance.id, phx_target: cid, class: "navbar-item py-0" ]) do
-                  content_tag(:span, [ class: "icon" ]) do
-                    content_tag(:i, "", [class: "fa fa-plus", aria_hidden: "true"])
-                  end
-                end
-              end,
-              link(to: "", class: "is-flex-grow-1 py-0") do
-                [ to_string(process_instance.order), ": ", process_instance.name ]
-              end
-            ]
-          end,
-          if process_instance.expanded do
-            content_tag(:ul, [ class: "my-0"]) do
-              for step_instance <- process_instance.step_instances do
-                render_job_item(step_instance, cid)
-              end
-            end
-          else
-            ""
-          end
-        ]
-      end
-    ]
+    ~L"""
+    li
+      .is-flex.py-0
+        .is-flex.is-flex-direction-row.is-flex-grow-0.py-0
+          = link to: "#", phx_click: "remove-process-instance", phx_value_process_instance_id: process_instance.id, phx_target: cid, class: "navbar-item py-0" do
+            span.icon
+              i.fa.fa-trash aria-hidden="true"
+          = link to: "#", phx_click: "expand-process-instance", phx_value_id: process_instance.id, phx_target: cid, class: "navbar-item py-0" do
+            span.icon
+              i.fa.fa-plus aria-hidden="true"
+        = link to: "", class: "is-flex-grow-1 py-0" do
+          = process_instance.order
+          | :
+          =< process_instance.name
+        = if process_instance.expanded do
+          ul.my-0
+            = for step_instance <- process_instance.step_instances do
+              = render_job_item(step_instance, cid)
+        - else
+          = inspect(process_instance.expanded)
+    """
   end
 
   @impl true
