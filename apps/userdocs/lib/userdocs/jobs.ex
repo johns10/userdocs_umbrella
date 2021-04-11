@@ -63,33 +63,72 @@ defmodule UserDocs.Jobs do
     Job.changeset(job, attrs)
   end
 
-  def remove_job_step_instance(%Job{} = job, step_id) do
-    IO.puts("remove_job_step_instance")
-    { step_instance, step_instances } =
-      job.step_instances
-      |> Enum.reduce({ nil, [] },
-        fn(step_instance, { found, remaining }) ->
-          if step_instance.id == step_id do
-            { step_instance, remaining }
-          else
-            { found, [ step_instance | remaining ] }
-          end
-        end)
+  def add_step_instance_to_job(%Job{} = job, step_id) when is_integer(step_id) do
+    { :ok, step_instance } =
+      UserDocs.Automation.get_step!(step_id)
+      |> StepInstances.create_step_instance_from_job_and_step(job, max_order(job) + 1)
 
+    add_step_instance_to_job(job, step_instance)
+  end
+  def add_step_instance_to_job(%Job{} = job, %StepInstance{} = step_instance) do
+    step_instances = job.step_instances ++ [ step_instance ]
+    { :ok, Map.put(job, :step_instances, step_instances) }
+  end
+
+  def remove_step_instance_from_job(%Job{} = job, step_instance_id) when is_integer(step_instance_id) do
+    step_instance = UserDocs.StepInstances.get_step_instance!(step_instance_id)
+    remove_step_instance_from_job(job, step_instance)
+  end
+
+  def remove_step_instance_from_job(%Job{} = job, %StepInstance{} = step_instance) do
     case StepInstances.delete_step_instance(step_instance) do
       { :ok, step_instance } ->
-        update_job_step_instances(job, step_instances)
+        { step_instance, step_instances } =
+          pop_item_from_list(job.step_instances, step_instance.id)
+
+        { :ok, Map.put(job, :step_instances, step_instances) }
       { :error, _changeset } -> { :error, job }
     end
   end
 
-  def update_job_step_instances(%Job{} = job, step_instances) do
-    IO.puts("update_job_step_instances")
-    IO.inspect(step_instances)
-    job
-    |> Ecto.Changeset.change()
-    |> Ecto.Changeset.put_assoc(:step_instances, step_instances)
-    |> Repo.update()
+  def add_process_instance_to_job(%Job{} = job, process_id) when is_integer(process_id) do
+    { :ok, process_instance } =
+      UserDocs.AutomationManager.get_process!(process_id)
+      |> ProcessInstances.create_process_instance_from_job_and_process(job, max_order(job) + 1)
+
+    add_process_instance_to_job(job, process_instance)
+  end
+  def add_process_instance_to_job(%Job{} = job, %ProcessInstance{} = process_instance) do
+    process_instances = job.process_instances ++ [ process_instance ]
+    { :ok, Map.put(job, :process_instances, process_instances) }
+  end
+
+  def remove_process_instance_from_job(%Job{} = job, process_instance_id) when is_integer(process_instance_id) do
+    process_instance = UserDocs.ProcessInstances.get_process_instance!(process_instance_id)
+    remove_process_instance_from_job(job, process_instance)
+  end
+
+  def remove_process_instance_from_job(%Job{} = job, %ProcessInstance{} = process_instance) do
+    case ProcessInstances.delete_process_instance(process_instance) do
+      { :ok, process_instance } ->
+        { process_instance, process_instances } =
+          pop_item_from_list(job.process_instances, process_instance.id)
+
+        { :ok, Map.put(job, :process_instances, process_instances) }
+      { :error, _changeset } -> { :error, job }
+    end
+  end
+
+  def pop_item_from_list(items, id) do
+    Enum.reduce(items, { nil, [] },
+      fn(item, { found_item, remaining_items }) ->
+        if item.id == id do
+          { item, remaining_items }
+        else
+          { found_item, [ item | remaining_items ] }
+        end
+      end
+    )
   end
 
   def update_job_step_instance(
@@ -132,22 +171,7 @@ defmodule UserDocs.Jobs do
     { :ok, Map.put(job, :process_instances, process_instances)} #TODO
   end
 
-  def add_item_to_job_queue(%Job{} = job, %StepInstance{} = step_instance) do
-    attrs = %{
-      step_instances: job.step_instances ++ [ step_instance ]
-    }
-    update_job(job, attrs)
-  end
-
-  def add_item_to_job_queue(%Job{} = job, %ProcessInstance{} = process_instance) do
-    attrs = %{
-      process_instances: job.process_instances ++ [ process_instance ]
-    }
-    update_job(job, attrs)
-  end
-
   def export_job(%Job{} = job) do
-    IO.inspect("Exporting job")
     Enum.reduce(get_executable_items(job), [],
       fn(instance, acc) ->
         case format_instance(instance) do
