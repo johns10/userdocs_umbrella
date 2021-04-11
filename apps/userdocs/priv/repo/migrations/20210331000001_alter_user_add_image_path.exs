@@ -1,4 +1,4 @@
-defmodule UserDocs.Repo.Migrations.AlterUserAddBrowserSessionPid do
+defmodule UserDocs.Repo.Migrations.AlterUserAddImagePath do
   use Ecto.Migration
 
   def change do
