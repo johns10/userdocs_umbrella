@@ -11,6 +11,12 @@ h2.title = @title
 
     = Layout.select_input(form, :default_language_code_id, @language_codes_select_options, [], "control")
 
+    = Layout.text_input form, :aws_region, [], "control"
+
+    = Layout.text_input form, :aws_access_key_id, [], "control"
+
+    = Layout.text_input form, :aws_secret_access_key, [], "control"
+
   = if form.data.id do
     h3.is-size-4 Default Project
     = inputs_for form, :projects, fn pf ->
