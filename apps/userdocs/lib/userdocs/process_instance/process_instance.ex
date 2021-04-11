@@ -24,7 +24,7 @@ defmodule UserDocs.ProcessInstances.ProcessInstance do
 
   def changeset(process_instance, attrs) do
     process_instance
-    |> cast(attrs, [ :order, :status, :name, :type, :errors, :warnings, :process_id, :expanded  ])
+    |> cast(attrs, [ :order, :status, :name, :type, :errors, :warnings, :process_id, :expanded, :job_id  ])
     #|> put_assoc(:process, Map.get(attrs, :process, process_instance.process))
     |> cast_assoc(:step_instances)
     |> validate_required([ :order, :status, :name, :process_id ])
