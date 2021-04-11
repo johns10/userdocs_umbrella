@@ -1,12 +1,12 @@
 = content_tag :div, phx_hook: "automationManager", id: @id do 
-  = link to: "#", phx_click: "start-running", phx_value_app_name: @app_name, phx_target: @myself.cid do
+  = link to: "#", phx_click: "start-running",  phx_target: @myself.cid do
     = content_tag(:i, "", [class: "fa fa-play-circle", aria_hidden: "true"])
-  = link to: "#", phx_click: "put-job", phx_value_app_name: @app_name, phx_target: @myself.cid do
+  = link to: "#", phx_click: "put-job", phx_target: @myself.cid do
     = content_tag(:i, "", [class: "fa fa-paper-plane", aria_hidden: "true"])
+  = link to: "#", phx_click: "update-job", phx_target: @myself.cid do
+    = content_tag(:i, "", [class: "fa fa-save", aria_hidden: "true"])
   
-= Enum.count(@job.process_instances)
-= Enum.count(@job.step_instances)
-aside.menu
-  ul.menu-list
-    = for item <- Jobs.get_executable_items(@job) do 
-      = render_job_item(item, @myself.cid)
+  aside.menu
+    ul.menu-list
+      = for item <- Jobs.get_executable_items(@job) do 
+        = render_job_item(item, @myself.cid)

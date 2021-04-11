@@ -4,18 +4,16 @@ defmodule UserDocsWeb.AutomationManagerLive do
   alias UserDocs.Jobs
   alias UserDocs.AutomationManager
   alias UserDocs.Jobs.Job
-  alias UserDocs.Jobs.StepInstance
-  alias UserDocs.Jobs.ProcessInstance
+  alias UserDocs.StepInstances.StepInstance
+  alias UserDocs.ProcessInstances.ProcessInstance
 
   @topic "automation_manager"
 
   @impl true
   def mount(socket) do
-    { :ok, job } = Jobs.create_job()
     {
       :ok,
       socket
-      |> assign(:job, job)
     }
   end
 
@@ -31,8 +29,21 @@ defmodule UserDocsWeb.AutomationManagerLive do
 
   def render_job_item(%StepInstance{} = step_instance, cid) do
     content_tag(:li, []) do
-      link([ to: "#", class: "py-0" ]) do
-        [ to_string(step_instance.order), ": ", step_instance.name ]
+      content_tag(:div, [ class: "is-flex is-flex-direction-row is-flex-grow-0" ]) do
+        [
+          link([ to: "#", phx_click: "remove-step-instance",
+            phx_value_step_instance_id: step_instance.id,
+            phx_target: cid,
+            class: "navbar-item py-0"
+          ]) do
+            content_tag(:span, [ class: "icon" ]) do
+              content_tag(:i, "", [class: "fa fa-trash", aria_hidden: "true"])
+            end
+          end,
+          link([ to: "#", class: "py-0" ]) do
+            [ step_instance.status, ", ", to_string(step_instance.order), ": ", step_instance.name ]
+          end
+        ]
       end
     end
   end
@@ -90,10 +101,10 @@ defmodule UserDocsWeb.AutomationManagerLive do
 
     { :noreply, assign(socket, :job, job) }
   end
-  def handle_event("add_step", %{ "app" => "electron", "step-id" => step_id }, socket) do
+  def handle_event("add_step", %{ "step-id" => step_id }, socket) do
     { :ok, step_instance } =
       AutomationManager.get_step!(String.to_integer(step_id))
-      |> Jobs.create_step_instance_from_step(Jobs.max_order(socket.assigns.job) + 1)
+      |> StepInstances.create_step_instance_from_job_and_step(socket.assigns.job, Jobs.max_order(socket.assigns.job) + 1)
 
     case Jobs.add_item_to_job_queue(socket.assigns.job, step_instance) do
       { :ok, job } -> { :noreply, socket |> assign(:job, job) }
@@ -105,9 +116,8 @@ defmodule UserDocsWeb.AutomationManagerLive do
         }
     end
   end
-  def handle_event("queue_process_instance", %{"app" => "electron", "process-id" => id }, socket) do
+  def handle_event("queue_process_instance", %{ "process-id" => id }, socket) do
     IO.puts("queue_process_instance")
-    IO.inspect(Jobs.max_order(socket.assigns.job))
     AutomationManager.get_process!(id)
     |> Jobs.create_process_instance_from_process(Jobs.max_order(socket.assigns.job) + 1)
     |> case do
@@ -128,6 +138,32 @@ defmodule UserDocsWeb.AutomationManagerLive do
         }
     end
   end
+  def handle_event("update-step-instance", %{ "step-instance-id" => id, "status" => status, "errors" => errors } = payload, socket) do
+    IO.inspect("update-step-instance")
+    { :ok, job } = Jobs.update_job_step_instance(socket.assigns.job, payload)
+    {
+      :noreply,
+      socket
+      |> assign(:job, job)
+    }
+  end
+  def handle_event("remove-step-instance", %{ "step-instance-id" => id }, socket) do
+    case Jobs.remove_job_step_instance(socket.assigns.job, String.to_integer(id)) do
+      { :ok, job } ->
+        {
+          :noreply,
+          socket
+          |> assign(:job, job)
+        }
+      { :error, changeset } ->
+        {
+          :noreply,
+          socket
+          |> Phoenix.LiveView.put_flash(:error, "Failed to remove step instance")
+        }
+    end
+    { :noreply, socket }
+  end
 
   def execute_step(socket, %{ step_id: step_id }) do
     socket
@@ -139,29 +175,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
     |> UserDocsWeb.ElectronWebDriver.ProcessInstance.execute(process_id, order)
   end
 
-  def handle_event("update-step", %{ "id" => id, "status" => status, "errors" => errors }, socket) do
-    job =
-      Enum.map(socket.assigns.job,
-        fn(si) ->
-          case si.id == id do
-            true ->
-              attrs = %{
-                errors: errors,
-                status: status
-              }
-              { :ok, step_instance } =
-                Jobs.update_step_instance(si, attrs)
-              step_instance
-            false -> si
-          end
-        end
-      )
-    {
-      :noreply,
-      socket
-      |> assign(:job, job)
-    }
-  end
 
 
 
