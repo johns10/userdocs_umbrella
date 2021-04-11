@@ -23,8 +23,11 @@ defmodule UserDocs.Jobs do
     |> Repo.all()
   end
 
-  def get_job!(id) do
+  def get_job!(id, params \\ %{}) do
+    preloads = Map.get(params, :preloads, [])
     base_job_query(id)
+    |> maybe_preload_step_instances(preloads[:step_instances])
+    |> maybe_preload_process_instances(preloads[:process_instances])
     |> Repo.one!()
   end
 
