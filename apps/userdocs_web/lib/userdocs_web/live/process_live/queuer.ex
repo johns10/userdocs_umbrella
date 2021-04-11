@@ -8,7 +8,7 @@ defmodule UserDocsWeb.ProcessLive.Queuer do
     ~L"""
     <a class="navbar-item"
       id="<%= @id %>"
-      phx-click="queue_process_instance"
+      phx-click="add-process-instance"
       phx-value-process-id="<%= @process.id %>"
       phx-value-app="<%= @app_name %>"
       phx-target="#automation-manager"
