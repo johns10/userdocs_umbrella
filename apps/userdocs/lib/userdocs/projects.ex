@@ -265,7 +265,7 @@ defmodule UserDocs.Projects do
   # and get my on_delete stuff right.
   def try_get_version!(id) do
     try do
-      get_version!(id)
+      get_version!(id, %{ strategy: true })
     rescue
       e ->
         Logger.error("Failed to retreive selected version, error: ")
