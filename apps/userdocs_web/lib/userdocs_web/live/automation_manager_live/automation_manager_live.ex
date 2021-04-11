@@ -93,41 +93,38 @@ defmodule UserDocsWeb.AutomationManagerLive do
 
     { :noreply, assign(socket, :job, job) }
   end
-  def handle_event("add_step", %{ "step-id" => step_id }, socket) do
-    { :ok, step_instance } =
-      AutomationManager.get_step!(String.to_integer(step_id))
-      |> StepInstances.create_step_instance_from_job_and_step(socket.assigns.job, Jobs.max_order(socket.assigns.job) + 1)
-
-    case Jobs.add_item_to_job_queue(socket.assigns.job, step_instance) do
+  def handle_event("add-step-instance", %{ "step-id" => step_id }, socket) do
+    case Jobs.add_step_instance_to_job(socket.assigns.job, String.to_integer(step_id)) do
       { :ok, job } -> { :noreply, socket |> assign(:job, job) }
       { :error, changeset } ->
-        {
-          :noreply,
-          socket
-          |> Phoenix.LiveView.put_flash(:error, format_changeset_errors(changeset))
-        }
+        formatted_errors = format_changeset_errors(changeset)
+        { :noreply, Phoenix.LiveView.put_flash(socket, :error,  formatted_errors) }
     end
   end
-  def handle_event("queue_process_instance", %{ "process-id" => id }, socket) do
-    IO.puts("queue_process_instance")
-    AutomationManager.get_process!(id)
-    |> Jobs.create_process_instance_from_process(Jobs.max_order(socket.assigns.job) + 1)
-    |> case do
-      { :ok, process_instance } ->
-        case Jobs.add_item_to_job_queue(socket.assigns.job, process_instance) do
-          { :ok, job } -> { :noreply, socket |> assign(:job, job) }
-          { :error, changeset } ->
-            {
-              :noreply,
-              put_flash(socket, :error, format_changeset_errors(changeset))
-            }
-        end
-
+  def handle_event("remove-step-instance", %{ "step-instance-id" => id }, socket) do
+    case Jobs.remove_step_instance_from_job(socket.assigns.job, String.to_integer(id)) do
+      { :ok, job } ->
+        IO.inspect(job.step_instances)
+        { :noreply, socket |> assign(:job, job) }
       { :error, changeset } ->
-        {
-          :noreply,
-          put_flash(socket, :error, format_changeset_errors(changeset))
-        }
+        { :noreply, Phoenix.LiveView.put_flash(socket, :error, "Failed to remove step instance") }
+    end
+  end
+  def handle_event("add-process-instance", %{ "process-id" => process_id }, socket) do
+    case Jobs.add_process_instance_to_job(socket.assigns.job, String.to_integer(process_id)) do
+      { :ok, job } -> { :noreply, socket |> assign(:job, job) }
+      { :error, changeset } ->
+        formatted_errors = format_changeset_errors(changeset)
+        { :noreply, Phoenix.LiveView.put_flash(socket, :error,  formatted_errors) }
+    end
+  end
+  def handle_event("remove-process-instance", %{ "process-instance-id" => process_instance_id }, socket) do
+    case Jobs.remove_process_instance_from_job(socket.assigns.job, String.to_integer(process_instance_id)) do
+      { :ok, job } ->
+        IO.inspect(job.step_instances)
+        { :noreply, socket |> assign(:job, job) }
+      { :error, changeset } ->
+        { :noreply, Phoenix.LiveView.put_flash(socket, :error, "Failed to remove step instance") }
     end
   end
   def handle_event("update-step-instance", %{ "step-instance-id" => id, "status" => status, "errors" => errors } = payload, socket) do
@@ -138,23 +135,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
       socket
       |> assign(:job, job)
     }
-  end
-  def handle_event("remove-step-instance", %{ "step-instance-id" => id }, socket) do
-    case Jobs.remove_job_step_instance(socket.assigns.job, String.to_integer(id)) do
-      { :ok, job } ->
-        {
-          :noreply,
-          socket
-          |> assign(:job, job)
-        }
-      { :error, changeset } ->
-        {
-          :noreply,
-          socket
-          |> Phoenix.LiveView.put_flash(:error, "Failed to remove step instance")
-        }
-    end
-    { :noreply, socket }
   end
 
   def execute_step(socket, %{ step_id: step_id }) do
