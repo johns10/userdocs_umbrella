@@ -232,6 +232,15 @@ defmodule UserDocsWeb.Root do
 
     send(self(), { :broadcast, "update", user })
 
+    version = Projects.get_version!(version_id, %{ strategy: true })
+
+    configuration = [
+      id: "configuration",
+      image_path: socket.assigns.current_user.image_path,
+      strategy: version.strategy.name |> to_string
+    ]
+    send_update(UserDocsWeb.Configuration, configuration)
+
     {
       :noreply,
       socket
