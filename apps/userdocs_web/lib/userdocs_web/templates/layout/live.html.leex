@@ -38,6 +38,16 @@
       </div>
     </div>
   </nav>
+
+  <%= live_component(@socket, UserDocsWeb.Configuration, [
+    id: "configuration",
+    image_path: @current_user.image_path,
+    strategy: @current_version.strategy.name |> to_string(),
+    test: "value"
+  ]) %>
+
+  <%= live_component(@socket, UserDocsWeb.ScreenShotHandler, [ id: "screenshot-handler-component" ]) %>
+
   <main role="main" class="container">
     <p class="alert alert-info" role="alert"
       phx-click="lv:clear-flash"
