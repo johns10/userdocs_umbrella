@@ -1,7 +1,7 @@
 defmodule UserDocsWeb.ElectronWebDriver.ProcessInstance do
   alias UserDocs.AutomationManager
   alias UserDocs.Jobs
-  alias UserDocs.Jobs.ProcessInstance
+  alias UserDocs.ProcessInstances.ProcessInstance
 
   def execute(socket, process_id, order) when is_integer(process_id) do
     IO.inspect("Electron Webdriver Executing Process")
