@@ -24,8 +24,39 @@ defmodule UserDocs.ProcessInstances do
     from(process_instance in ProcessInstance, where: process_instance.id == ^id)
   end
 
-  def create_process_instance(attrs \\ %{}) do
-    %ProcessInstance{ expanded: false }
+  alias UserDocs.Automation.Process
+  alias UserDocs.Jobs.Job
+  def create_process_instance_from_job_and_process(%Process{} = process, %Job{} = job, order \\ 0) do
+    process_instance = Ecto.build_assoc(job, :process_instances)
+    attrs = base_process_instance_attrs(process, step_instance_attrs(process), order)
+    create_process_instance(attrs, process_instance)
+  end
+
+  def create_process_instance_from_process(process, order) do
+    base_process_instance_attrs(process, step_instance_attrs(process), order)
+    |> create_process_instance()
+  end
+
+  def base_process_instance_attrs(process, step_instance_attrs, order) do
+    %{
+      order: order,
+      process_id: process.id,
+      process: process,
+      step_instances: step_instance_attrs,
+      name: process.name,
+      attrs: %{},
+      status: "not_started",
+      errors: [],
+      warnings: []
+    }
+  end
+
+  def create_process_instance(attrs) do
+    create_process_instance(attrs, %ProcessInstance{ expanded: false })
+  end
+
+  def create_process_instance(attrs \\ %{}, %ProcessInstance{} = process_instance) do
+    process_instance
     |> ProcessInstance.changeset(attrs)
     |> Repo.insert()
   end
@@ -83,7 +114,7 @@ defmodule UserDocs.ProcessInstances do
     ++ [ complete_attrs ]
   end
 
-  def create_process_instance_from_process(process, order) do
+  def step_instance_attrs(process) do
     { step_instance_attrs, _max_order } =
       process.steps
       |> Enum.sort(fn(x, y) -> x.order < y.order end)
@@ -93,24 +124,8 @@ defmodule UserDocs.ProcessInstances do
         end)
 
     step_instance_attrs = Enum.reverse(step_instance_attrs)
-
-    base_process_instance_attrs(process, step_instance_attrs, order)
-    |> create_process_instance()
   end
 
-  def base_process_instance_attrs(process, step_instance_attrs, order) do
-    %{
-      order: order,
-      process_id: process.id,
-      process: process,
-      step_instances: step_instance_attrs,
-      name: process.name,
-      attrs: %{},
-      status: "not_started",
-      errors: [],
-      warnings: []
-    }
-  end
   def delete_process_instance(%ProcessInstance{} = process_instance) do
     Repo.delete(process_instance)
   end
