@@ -13,4 +13,7 @@ defmodule UserDocsWeb.PageLive do
       |> Root.apply(session, @types)
     }
   end
+
+  @impl true
+  def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 end
