@@ -3,6 +3,8 @@ defmodule UserDocsWeb.AutomationManagerLive do
 
   alias UserDocs.Jobs
   alias UserDocs.AutomationManager
+  alias UserDocs.StepInstances
+
   alias UserDocs.Jobs.Job
   alias UserDocs.StepInstances.StepInstance
   alias UserDocs.ProcessInstances.ProcessInstance
@@ -44,16 +46,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
           =< step_instance.name
     """
   end
-          end,
-          link([ to: "#", class: "py-0" ]) do
-            [ step_instance.status, ", ", to_string(step_instance.order), ": ", step_instance.name ]
-          end
-        ]
-      end
-    end
-  end
-
-  def render_job_item(%ProcessInstance{} = process_instance, cid) do
+  def render_job_item(%ProcessInstance{} = process_instance, cid, interactive) do
     ~L"""
     li
       .is-flex.py-0
@@ -63,18 +56,30 @@ defmodule UserDocsWeb.AutomationManagerLive do
               i.fa.fa-trash aria-hidden="true"
           = link to: "#", phx_click: "expand-process-instance", phx_value_id: process_instance.id, phx_target: cid, class: "navbar-item py-0" do
             span.icon
-              i.fa.fa-plus aria-hidden="true"
+              = if process_instance.expanded do
+                i.fa.fa-minus aria-hidden="true"
+              - else
+                i.fa.fa-plus aria-hidden="true"
+          = link to: "#", class: "py-0" do
+            = render_instance_status(process_instance.status)
         = link to: "", class: "is-flex-grow-1 py-0" do
-          = process_instance.order
+          = process_instance.order || ""
           | :
           =< process_instance.name
-        = if process_instance.expanded do
-          ul.my-0
-            = for step_instance <- process_instance.step_instances do
-              = render_job_item(step_instance, cid)
-        - else
-          = inspect(process_instance.expanded)
+      = if process_instance.expanded do
+        ul.my-0
+          = for step_instance <- process_instance.step_instances do
+            = render_job_item(step_instance, cid, false)
     """
+  end
+
+  def render_instance_status(status) do
+    case status do
+      "not_started" -> content_tag(:i, "", [class: "fa fa-play-circle", aria_hidden: "true"])
+      "failed" -> content_tag(:i, "", [class: "fa fa-times", aria_hidden: "true"])
+      "started" -> content_tag(:i, "", [class: "fa fa-spinner", aria_hidden: "true"])
+      "complete" -> content_tag(:i, "", [class: "fa fa-check", aria_hidden: "true"])
+    end
   end
 
   @impl true
