@@ -433,17 +433,64 @@ defmodule UserDocs.Users do
         nil
     end
   end
+  alias UserDocs.Automation.Process
+  alias UserDocs.Automation.Step
+  alias UserDocs.Automation.StepType
+  alias UserDocs.Web.Strategy
+  alias UserDocs.Web.Annotation
+  alias UserDocs.Web.AnnotationType
+  alias UserDocs.Web.Page
+  alias UserDocs.Web.Element
   def get_team!(id, %{ preloads: %{ job: %{ step_instances: true, process_instances: true }}}) do
-    Repo.one from team in Team,
-    where: team.id == ^id,
-    left_join: job in assoc(team, :job),
-    left_join: process_instances in assoc(job, :process_instances),
-    preload: [
-      :job,
-      job: :step_instances,
-      job: :process_instances,
-      job: { job, process_instances: { process_instances, :step_instances } }
-    ]
+    from(t in Team, as: :team)
+    |> where([team: t], t.id == ^id)
+    |> join(:left, [team: t], job in assoc(t, :job), as: :j)
+    |> join(:left, [j: j], process_instances in assoc(j, :process_instances), as: :pi)
+    |> join(:left, [j: j], step_instances in assoc(j, :step_instances), as: :si)
+    |> join(:left, [si: si], steps in assoc(si, :step), as: :s)
+    |> join(:left, [s: s], st in assoc(s, :step_type), as: :st)
+    |> join(:left, [s: s], a in assoc(s, :annotation), as: :a)
+    |> join(:left, [s: s], p in assoc(s, :page), as: :page)
+    |> join(:left, [s: s], e in assoc(s, :element), as: :e)
+    |> join(:left, [s: s], pr in assoc(s, :process), as: :process)
+    |> join(:left, [e: e], st in assoc(e, :strategy), as: :strategy)
+    |> join(:left, [a: a ], at in assoc(a, :annotation_type), as: :at)
+    |> join(:left, [pi: pi], process_instance_step_instances in assoc(pi, :step_instances), as: :pi_si)
+    |> join(:left, [pi_si: si], steps in assoc(si, :step), as: :pi_si_s)
+    |> order_by([pi_si: si], asc: si.order)
+    |> join(:left, [pi_si_s: s], st in assoc(s, :step_type), as: :pi_si_st)
+    |> join(:left, [pi_si_s: s], a in assoc(s, :annotation), as: :pi_si_a)
+    |> join(:left, [pi_si_s: s], p in assoc(s, :page), as: :pi_si_page)
+    |> join(:left, [pi_si_s: s], e in assoc(s, :element), as: :pi_si_e)
+    |> join(:left, [pi_si_s: s], pr in assoc(s, :process), as: :pi_si_process)
+    |> join(:left, [pi_si_e: e], st in assoc(e, :strategy), as: :pi_si_strategy)
+    |> join(:left, [pi_si_a: a ], at in assoc(a, :annotation_type), as: :pi_si_at)
+    |> preload([ j: j, si: si, s: s, st: st, e: e, strategy: strategy, a: a, at: at, page: page, process: process ],
+      [ job: { j,
+        step_instances: { si,
+          step: { s, [
+            step_type: st,
+            element: { e, strategy: strategy },
+            annotation: { a, annotation_type: at },
+            page: page,
+            process: process
+          ]}
+        }}])
+    |> preload([ j: j, pi: pi, pi_si: pi_si, pi_si_s: s, pi_si_st: st,
+      pi_si_e: e, pi_si_strategy: strategy, pi_si_a: a, pi_si_at: at,
+      pi_si_page: page, pi_si_process: process ],
+      [ job: { j,
+        process_instances: { pi,
+          step_instances: { pi_si,
+            step: { s, [
+              step_type: st,
+              element: { e, strategy: strategy },
+              annotation: { a, annotation_type: at },
+              page: page,
+              process: process
+            ]}
+        }}}])
+    |> Repo.one()
   end
   def get_team!(id, params \\ %{}) do
     preloads = Map.get(params, :preloads, [])
