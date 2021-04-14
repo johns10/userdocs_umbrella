@@ -73,24 +73,18 @@ defmodule UserDocsWeb.AutomationManagerLive do
   end
 
   @impl true
-  def handle_event("put-job", %{ "app-name" => "electron" }, socket) do
-    IO.inspect("Put job event")
-    {
-      :noreply,
-      socket
-      |> push_event("put-job", %{ data: Jobs.export_job(socket.assigns.job) })
-    }
+  def handle_event("reset-job", _payload, socket) do
+    { :ok, updated_job } = Jobs.reset_job_status(socket.assigns.job)
+    { :noreply, assign(socket, :job, updated_job) }
   end
-  def handle_event("start-running", %{ "app-name" => "electron" }, socket) do
-    {
-      :noreply,
-      socket
-      |> push_event("start-running", %{})
-    }
+  def handle_event("put-job", _payload, socket) do
+    { :noreply, push_event(socket, "put-job", %{ data: Jobs.export_job(socket.assigns.job) }) }
+  end
+  def handle_event("start-running", _payload, socket) do
+    { :noreply, push_event(socket, "start-running", %{}) }
   end
   def handle_event("expand-process-instance", %{ "id" => id }, socket) do
-    { :ok, job } = Jobs.expand_process_instance(socket.assigns.job, id)
-
+    { :ok, job } = Jobs.expand_process_instance(socket.assigns.job, id |> String.to_integer())
     { :noreply, assign(socket, :job, job) }
   end
   def handle_event("add-step-instance", %{ "step-id" => step_id }, socket) do
@@ -104,7 +98,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
   def handle_event("remove-step-instance", %{ "step-instance-id" => id }, socket) do
     case Jobs.remove_step_instance_from_job(socket.assigns.job, String.to_integer(id)) do
       { :ok, job } ->
-        IO.inspect(job.step_instances)
         { :noreply, socket |> assign(:job, job) }
       { :error, changeset } ->
         { :noreply, Phoenix.LiveView.put_flash(socket, :error, "Failed to remove step instance") }
@@ -121,20 +114,14 @@ defmodule UserDocsWeb.AutomationManagerLive do
   def handle_event("remove-process-instance", %{ "process-instance-id" => process_instance_id }, socket) do
     case Jobs.remove_process_instance_from_job(socket.assigns.job, String.to_integer(process_instance_id)) do
       { :ok, job } ->
-        IO.inspect(job.step_instances)
         { :noreply, socket |> assign(:job, job) }
       { :error, changeset } ->
         { :noreply, Phoenix.LiveView.put_flash(socket, :error, "Failed to remove step instance") }
     end
   end
-  def handle_event("update-step-instance", %{ "step-instance-id" => id, "status" => status, "errors" => errors } = payload, socket) do
-    IO.inspect("update-step-instance")
+  def handle_event("update-step-instance", %{ "id" => id, "status" => status, "errors" => errors } = payload, socket) do
     { :ok, job } = Jobs.update_job_step_instance(socket.assigns.job, payload)
-    {
-      :noreply,
-      socket
-      |> assign(:job, job)
-    }
+    { :noreply, assign(socket, :job, job) }
   end
 
   def execute_step(socket, %{ step_id: step_id }) do
