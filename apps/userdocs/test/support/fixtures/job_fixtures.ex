@@ -96,7 +96,7 @@ defmodule UserDocs.JobsFixtures do
       order: nil,
       status: nil,
       name: nil,
-      errors: [],
+      errors: %{},
       warnings: []
     }
   end
