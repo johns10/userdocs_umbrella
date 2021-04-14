@@ -164,14 +164,23 @@ defmodule UserDocs.Jobs do
     end)
   end
 
-        end
-      )
-    { :ok, job } = update_job(job, %{ step_instances: updated_step_instances })
-    { :ok, Map.put(job, :step_instances, updated_step_instances)}
+  def reset_job_status(%Job{ process_instances: process_instances, step_instances: step_instances } = job) do
+    process_instance_attrs = Enum.map(process_instances,
+      fn(%{ step_instances: process_step_instances } = process_instance) ->
+        %{ id: process_instance.id, status: "not_started", step_instances: reset_step_instances_status_attrs(process_step_instances) }
+      end
+    )
+    step_instance_attrs = reset_step_instances_status_attrs(step_instances)
+    update_job(job, %{ process_instances: process_instance_attrs, step_instances: step_instance_attrs })
   end
 
-  def expand_process_instance(%Job{} = job, id) do
-    Ecto.Changeset.change(job, %{})
+  def reset_step_instances_status_attrs(step_instances) do
+    Enum.map(step_instances, fn(process_instance) ->
+      %{ id: process_instance.id, status: "not_started" }
+    end)
+  end
+
+  def expand_process_instance(%Job{} = job, id) when is_integer(id) do
     process_instances =
       Enum.map(job.process_instances,
         fn(process_instance) ->
