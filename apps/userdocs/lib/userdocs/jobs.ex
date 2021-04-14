@@ -203,7 +203,7 @@ defmodule UserDocs.Jobs do
       fn(instance, acc) ->
         case format_instance(instance) do
           %{} = instance -> [ instance | acc ]
-          [ _ | _ ] = instances -> instances ++ acc
+          [ _ | _ ] = instances -> acc ++ instances
         end
       end
     )
