@@ -147,17 +147,23 @@ defmodule UserDocs.Jobs do
     %Job{ step_instances: step_instances } = job,
     %{ "id" => id } = step_instance_attrs
   ) do
-    IO.inspect(step_instance_attrs)
-    updated_step_instances =
-      Enum.map(step_instances,
-        fn(step_instance) ->
-          case step_instance.id == id do
-            true ->
-              { :ok, updated_step_instance } = StepInstances.update_step_instance(step_instance, step_instance_attrs)
-              updated_step_instance
-              |> Map.put(:step, step_instance.step) # TODO: Go get the step?
-            false -> step_instance
-          end
+    updated_step_instances = update_this_step_instance(step_instances, id, step_instance_attrs)
+    { :ok, Map.put(job, :step_instances, updated_step_instances)}
+  end
+
+  def update_this_step_instance(step_instances, id, attrs) do
+    Enum.map(step_instances, fn(step_instance) ->
+      case step_instance.id == id do
+        true ->
+          { :ok, updated_step_instance } =
+            StepInstances.update_step_instance(step_instance, attrs)
+
+          Map.put(updated_step_instance, :step, step_instance.step) # TODO: Go get the step?
+        false -> step_instance
+      end
+    end)
+  end
+
         end
       )
     { :ok, job } = update_job(job, %{ step_instances: updated_step_instances })
