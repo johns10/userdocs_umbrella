@@ -1,5 +1,5 @@
 defmodule UserDocsWeb.AutomationManagerLive do
-  use UserDocsWeb, :live_component
+  use UserDocsWeb, :live_slime_component
 
   alias UserDocs.Jobs
   alias UserDocs.AutomationManager
@@ -27,18 +27,23 @@ defmodule UserDocsWeb.AutomationManagerLive do
     }
   end
 
-  def render_job_item(%StepInstance{} = step_instance, cid) do
-    content_tag(:li, []) do
-      content_tag(:div, [ class: "is-flex is-flex-direction-row is-flex-grow-0" ]) do
-        [
-          link([ to: "#", phx_click: "remove-step-instance",
-            phx_value_step_instance_id: step_instance.id,
-            phx_target: cid,
-            class: "navbar-item py-0"
-          ]) do
-            content_tag(:span, [ class: "icon" ]) do
-              content_tag(:i, "", [class: "fa fa-trash", aria_hidden: "true"])
-            end
+  def render_job_item(object_instance, cid, interactive \\ true)
+  def render_job_item(%StepInstance{} = step_instance, cid, interactive) do
+    ~L"""
+    li
+      div.is-flex.is-flex-direction-row.is-flex-grow-0
+        = if interactive do
+          = link to: "#", phx_click: "remove-step-instance", phx_value_step_instance_id: step_instance.id,phx_target: cid, class: "navbar-item py-0" do
+            span.icon
+              i.fa.fa-trash aria-hidden="true"
+        = link to: "#", class: "py-0" do
+          = render_instance_status(step_instance.status)
+        = link to: "#", class: "py-0" do
+          =< to_string(step_instance.order)
+          | :
+          =< step_instance.name
+    """
+  end
           end,
           link([ to: "#", class: "py-0" ]) do
             [ step_instance.status, ", ", to_string(step_instance.order), ": ", step_instance.name ]
