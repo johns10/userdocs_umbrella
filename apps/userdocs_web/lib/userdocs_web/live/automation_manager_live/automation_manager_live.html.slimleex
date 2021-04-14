@@ -5,7 +5,9 @@
     = content_tag(:i, "", [class: "fa fa-paper-plane", aria_hidden: "true"])
   = link to: "#", phx_click: "update-job", phx_target: @myself.cid do
     = content_tag(:i, "", [class: "fa fa-save", aria_hidden: "true"])
-  
+  = link to: "#", phx_click: "reset-job",  phx_target: @myself.cid do
+    = content_tag(:i, "", [class: "fa fa-refresh", aria_hidden: "true"])
+    
   aside.menu
     ul.menu-list
       = for item <- Jobs.get_executable_items(@job) do 
