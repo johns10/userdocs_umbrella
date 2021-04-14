@@ -26,8 +26,9 @@ defmodule UserDocs.Jobs.Job do
   def changeset(job, attrs) do
     job
     |> cast(attrs, [ :team_id, :order, :status, :name, :errors, :warnings  ])
+    |> cast_assoc(:process_instances)
+    |> cast_assoc(:step_instances)
     #|> put_assoc(:step_instances, Map.get(attrs, :step_instances, job.step_instances))
-    #|> put_assoc(:process_instances, Map.get(attrs, :process_instances, job.process_instances))
-    |> validate_required([ :order, :name, :status ])
+    #|> put_assoc(:process_instances, Map.get(attrs, :process_instances, job.process_instances))s
   end
 end
