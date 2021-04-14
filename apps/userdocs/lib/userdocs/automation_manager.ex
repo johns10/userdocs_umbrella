@@ -14,23 +14,33 @@ defmodule UserDocs.AutomationManager do
   alias UserDocs.Web.Element
 
   def get_step!(id) do
-    Step
-    |> where([s], s.id == ^id)
-    |> join(:left, [s], st in StepType, on: s.step_type_id == st.id, as: :step_type)
-    |> join(:left, [s], a in Annotation, on: s.annotation_id == a.id, as: :annotation)
-    |> join(:left, [s], p in Page, on: s.page_id == p.id, as: :page)
-    |> join(:left, [s], e in Element, on: s.element_id == e.id, as: :element)
-    |> join(:left, [s], pr in Process, on: s.process_id == pr.id, as: :process)
-    |> join(:left, [s, element: e], st in Strategy, on: e.strategy_id == st.id, as: :strategy)
-    |> join(:left, [s, annotation: a ], at in AnnotationType, on: a.annotation_type_id == at.id, as: :annotation_type)
-    |> preload([ s, step_type: step_type ], [ step_type: step_type ])
-    |> preload([ s, annotation: annotation ], [ annotation: annotation ])
-    |> preload([ s, page: page ], [ page: page ])
-    |> preload([ s, element: element ], [ element: element ])
-    |> preload([ s, process: process ], [ process: process ])
-    |> preload([ s, annotation: a, annotation_type: at ], [ annotation: { a, annotation_type: at } ])
-    |> preload([ s, element: e, strategy: st ], [ element: { e, strategy: st } ])
+    from(s in Step, as: :steps)
+    |> where([steps: s], s.id == ^id)
+    |> get_step_joins()
+    |> get_step_preloads()
     |> Repo.one()
+  end
+
+  def get_step_joins(query) do
+    query
+    |> join(:left, [steps: s], st in StepType, on: s.step_type_id == st.id, as: :step_type)
+    |> join(:left, [steps: s], a in Annotation, on: s.annotation_id == a.id, as: :annotation)
+    |> join(:left, [steps: s], p in Page, on: s.page_id == p.id, as: :page)
+    |> join(:left, [steps: s], e in Element, on: s.element_id == e.id, as: :element)
+    |> join(:left, [steps: s], pr in Process, on: s.process_id == pr.id, as: :process)
+    |> join(:left, [element: e], st in Strategy, on: e.strategy_id == st.id, as: :strategy)
+    |> join(:left, [annotation: a ], at in AnnotationType, on: a.annotation_type_id == at.id, as: :annotation_type)
+  end
+
+  def get_step_preloads(query) do
+    query
+    |> preload([ step_type: step_type ], [ step_type: step_type ])
+    |> preload([ annotation: annotation ], [ annotation: annotation ])
+    |> preload([ page: page ], [ page: page ])
+    |> preload([ element: element ], [ element: element ])
+    |> preload([ process: process ], [ process: process ])
+    |> preload([ annotation: a, annotation_type: at ], [ annotation: { a, annotation_type: at } ])
+    |> preload([ element: e, strategy: st ], [ element: { e, strategy: st } ])
   end
 
   def get_process!(id) do
