@@ -12,9 +12,6 @@ defmodule UserDocs.Jobs do
 
   alias UserDocs.Jobs.Job
 
-  def format_instance(%StepInstance{} = step_instance), do: StepInstances.format_step_instance_for_export(step_instance)
-  def format_instance(%ProcessInstance{} = process_instance), do: ProcessInstances.format_process_instance_for_export(process_instance)
-
   def list_jobs(params \\ %{}) do
     preloads = Map.get(params, :preloads, [])
     base_jobs_query()
@@ -181,6 +178,9 @@ defmodule UserDocs.Jobs do
       end
     )
   end
+
+  def format_instance(%StepInstance{} = step_instance), do: StepInstances.format_step_instance_for_export(step_instance)
+  def format_instance(%ProcessInstance{} = process_instance), do: ProcessInstances.format_process_instance_for_export(process_instance)
 
   def get_executable_items(%Job{ } = job) do
     job.step_instances
