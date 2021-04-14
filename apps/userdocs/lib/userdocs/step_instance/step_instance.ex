@@ -22,7 +22,10 @@ defmodule UserDocs.StepInstances.StepInstance do
 
   def changeset(step_instance, attrs) do
     step_instance
-    |> cast(attrs, [ :order, :status, :name, :type, :attrs, :errors, :warnings, :step_id, :job_id  ])
+    |> cast(attrs, [ :order, :status, :name, :type, :attrs, :errors, :warnings, :step_id, :job_id, :process_instance_id  ])
+    |> foreign_key_constraint(:step_id)
+    |> foreign_key_constraint(:job_id)
+    |> foreign_key_constraint(:process_instance_id)
     |> validate_required([ :order, :status, :step_id ])
   end
 end
