@@ -61,9 +61,11 @@ defmodule UserDocs.ProcessInstances do
     |> Repo.insert()
   end
 
+  def toggle_process_instance_expanded(%ProcessInstance{ expanded: nil } = process_instance) do
+    update_process_instance(process_instance, %{ expanded: true })
+  end
   def toggle_process_instance_expanded(%ProcessInstance{} = process_instance) do
-    attrs = %{ expanded: not process_instance.expanded }
-    update_process_instance(process_instance, attrs)
+    update_process_instance(process_instance, %{ expanded: not process_instance.expanded })
   end
 
   def update_process_instance(%ProcessInstance{} = process_instance, attrs) do
