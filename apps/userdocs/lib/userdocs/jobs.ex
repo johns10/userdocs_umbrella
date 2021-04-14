@@ -76,7 +76,6 @@ defmodule UserDocs.Jobs do
     step_instance = UserDocs.StepInstances.get_step_instance!(step_instance_id)
     remove_step_instance_from_job(job, step_instance)
   end
-
   def remove_step_instance_from_job(%Job{} = job, %StepInstance{} = step_instance) do
     case StepInstances.delete_step_instance(step_instance) do
       { :ok, step_instance } ->
@@ -104,7 +103,6 @@ defmodule UserDocs.Jobs do
     process_instance = UserDocs.ProcessInstances.get_process_instance!(process_instance_id)
     remove_process_instance_from_job(job, process_instance)
   end
-
   def remove_process_instance_from_job(%Job{} = job, %ProcessInstance{} = process_instance) do
     case ProcessInstances.delete_process_instance(process_instance) do
       { :ok, process_instance } ->
