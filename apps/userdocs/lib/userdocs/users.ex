@@ -433,14 +433,6 @@ defmodule UserDocs.Users do
         nil
     end
   end
-  alias UserDocs.Automation.Process
-  alias UserDocs.Automation.Step
-  alias UserDocs.Automation.StepType
-  alias UserDocs.Web.Strategy
-  alias UserDocs.Web.Annotation
-  alias UserDocs.Web.AnnotationType
-  alias UserDocs.Web.Page
-  alias UserDocs.Web.Element
   def get_team!(id, %{ preloads: %{ job: %{ step_instances: true, process_instances: true }}}) do
     from(t in Team, as: :team)
     |> where([team: t], t.id == ^id)
@@ -452,6 +444,7 @@ defmodule UserDocs.Users do
     |> join(:left, [s: s], a in assoc(s, :annotation), as: :a)
     |> join(:left, [s: s], p in assoc(s, :page), as: :page)
     |> join(:left, [s: s], e in assoc(s, :element), as: :e)
+    |> join(:left, [s: s], s in assoc(s, :screenshot), as: :screenshot)
     |> join(:left, [s: s], pr in assoc(s, :process), as: :process)
     |> join(:left, [e: e], st in assoc(e, :strategy), as: :strategy)
     |> join(:left, [a: a ], at in assoc(a, :annotation_type), as: :at)
@@ -462,10 +455,11 @@ defmodule UserDocs.Users do
     |> join(:left, [pi_si_s: s], a in assoc(s, :annotation), as: :pi_si_a)
     |> join(:left, [pi_si_s: s], p in assoc(s, :page), as: :pi_si_page)
     |> join(:left, [pi_si_s: s], e in assoc(s, :element), as: :pi_si_e)
+    |> join(:left, [pi_si_s: s], s in assoc(s, :screenshot), as: :pi_si_screenshot)
     |> join(:left, [pi_si_s: s], pr in assoc(s, :process), as: :pi_si_process)
     |> join(:left, [pi_si_e: e], st in assoc(e, :strategy), as: :pi_si_strategy)
     |> join(:left, [pi_si_a: a ], at in assoc(a, :annotation_type), as: :pi_si_at)
-    |> preload([ j: j, si: si, s: s, st: st, e: e, strategy: strategy, a: a, at: at, page: page, process: process ],
+    |> preload([ j: j, si: si, s: s, st: st, e: e, strategy: strategy, a: a, at: at, page: page, process: process, screenshot: screenshot ],
       [ job: { j,
         step_instances: { si,
           step: { s, [
@@ -473,12 +467,13 @@ defmodule UserDocs.Users do
             element: { e, strategy: strategy },
             annotation: { a, annotation_type: at },
             page: page,
-            process: process
+            process: process,
+            screenshot: screenshot
           ]}
         }}])
     |> preload([ j: j, pi: pi, pi_si: pi_si, pi_si_s: s, pi_si_st: st,
       pi_si_e: e, pi_si_strategy: strategy, pi_si_a: a, pi_si_at: at,
-      pi_si_page: page, pi_si_process: process ],
+      pi_si_screenshot: screenshot, pi_si_page: page, pi_si_process: process ],
       [ job: { j,
         process_instances: { pi,
           step_instances: { pi_si,
@@ -487,7 +482,8 @@ defmodule UserDocs.Users do
               element: { e, strategy: strategy },
               annotation: { a, annotation_type: at },
               page: page,
-              process: process
+              process: process,
+              screenshot: screenshot
             ]}
         }}}])
     |> Repo.one()
@@ -627,6 +623,12 @@ defmodule UserDocs.Users do
     |> Team.changeset(attrs)
     |> Team.change_default_project()
     |> Repo.update()
+  end
+
+  def configure_teams_aws_keys(%Team{} = team) do
+    Application.put_env(:ex_aws, :access_key_id, team.aws_access_key_id)
+    Application.put_env(:ex_aws, :secret_access_key, team.aws_secret_access_key)
+    Application.put_env(:ex_aws, :region, team.aws_region)
   end
 
   @doc """
