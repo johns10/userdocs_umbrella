@@ -31,6 +31,10 @@ defmodule UserDocs.UsersFixtures do
   def team_attrs(:valid) do
     %{
       name: UUID.uuid4(),
+      aws_bucket: "userdocs-test",
+      aws_access_key_id: "AKIAT5VKLWBUOAYXO656",
+      aws_secret_access_key: "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",
+      aws_region: "us-east-2",
       users: []
     }
   end

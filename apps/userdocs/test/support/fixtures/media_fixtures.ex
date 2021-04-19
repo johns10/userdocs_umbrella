@@ -56,6 +56,12 @@ defmodule UserDocs.MediaFixtures do
       step_id: step_id
     }
   end
+  def screenshot_attrs(:invalid, step_id) do
+    %{
+      name: nil,
+      step_id: step_id
+    }
+  end
   def file_attrs(:valid) do
     %{
       content_type: ".png",
