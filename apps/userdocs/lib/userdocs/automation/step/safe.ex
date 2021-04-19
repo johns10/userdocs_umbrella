@@ -12,6 +12,7 @@ defmodule UserDocs.Automation.Step.Safe do
     |> maybe_safe_screenshot(handlers[:screenshot], step.screenshot, handlers)
     |> maybe_safe_page(handlers[:page], step.page, handlers)
     |> maybe_safe_process(handlers[:process], step.process, handlers)
+    |> maybe_safe_screenshot(handlers[:screenshot], step.screenshot, handlers)
   end
   def apply(nil, _), do: nil
 
