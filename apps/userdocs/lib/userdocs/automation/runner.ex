@@ -7,6 +7,7 @@ defmodule UserDocs.Automation.Runner do
   alias UserDocs.Web.Element
   alias UserDocs.Web.Strategy
   alias UserDocs.Web.Page
+  alias UserDocs.Media.Screenshot
 
   def parse(process = %UserDocs.Automation.Process{}) do
     handlers = %{
@@ -31,6 +32,7 @@ defmodule UserDocs.Automation.Runner do
       annotation_type: &AnnotationType.safe/2,
       page: &Page.safe/2,
       process: &Process.safe/2,
+      screenshot: &Screenshot.safe/2
     }
 
     Step.safe(step, handlers)
