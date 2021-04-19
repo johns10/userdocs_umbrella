@@ -4,7 +4,6 @@ defmodule UserDocs.Media.Screenshot do
   use Waffle.Ecto.Schema
 
   alias UserDocs.Automation.Step
-  alias UserDocs.Media.File
 
   schema "screenshots" do
     field :name, :string
