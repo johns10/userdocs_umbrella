@@ -142,6 +142,15 @@ defmodule UserDocsWeb.StepLive.Index do
     { :noreply, socket } = Root.handle_info(sub_data, socket)
     { :noreply, prepare_steps(socket) }
   end
+  def handle_info(%{topic: _, event: _, payload: %Screenshot{}} = sub_data, socket) do
+    Logger.debug("#{__MODULE__} Received a screenshot broadcast")
+    { :noreply, socket } = Root.handle_info(sub_data, socket)
+    if socket.assigns.step do
+      { :noreply, socket |> prepare_step(socket.assigns.step.id) }
+    else
+      { :noreply, socket |> prepare_steps() }
+    end
+  end
   def handle_info(%{topic: _, event: _, payload: %UserDocs.Web.Annotation{}} = sub_data, socket) do
     Logger.debug("#{__MODULE__} Received an annotation broadcast")
     { :noreply, socket } = Root.handle_info(sub_data, socket)
