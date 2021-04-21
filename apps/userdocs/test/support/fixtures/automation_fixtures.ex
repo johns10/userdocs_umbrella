@@ -98,10 +98,20 @@ defmodule UserDocs.AutomationFixtures do
       step
   end
 
-  def step_attrs(:valid, page_id \\ nil, process_id \\ nil,
-    element_id \\ nil, annotation_id \\ nil, step_type_id \\ nil) do
+  def step_attrs(attr_types, page_id \\ nil, process_id \\ nil, element_id \\ nil, annotation_id \\ nil, step_type_id \\ nil)
+  def step_attrs(:valid, page_id, process_id, element_id, annotation_id, step_type_id) do
     %{
-      order: 42,
+      order: Enum.random(1..100),
+      page_id: page_id,
+      process_id: process_id,
+      element_id: element_id,
+      annotation_id: annotation_id,
+      step_type_id: step_type_id
+    }
+  end
+  def step_attrs(:invalid, page_id, process_id, element_id, annotation_id, step_type_id) do
+    %{
+      order: nil,
       page_id: page_id,
       process_id: process_id,
       element_id: element_id,
@@ -111,14 +121,28 @@ defmodule UserDocs.AutomationFixtures do
   end
 
   def step_type_attrs(:valid) do
-    %{ args: [], name: "some name" }
+    %{
+      args: [],
+      name: UUID.uuid4()
+    }
+  end
+  def step_type_attrs(:invalid) do
+    %{ args: nil, name: nil }
   end
 
-  def process_attrs(:valid, version_id \\ nil) do
+  def process_attrs(status, version_id \\ nil)
+  def process_attrs(:valid, version_id) do
     %{
       name: UUID.uuid4(),
       order: 1,
       version_id: version_id
+    }
+  end
+  def process_attrs(:invalid, version_id) do
+    %{
+      name: nil,
+      order: nil,
+      version_id: nil
     }
   end
 
