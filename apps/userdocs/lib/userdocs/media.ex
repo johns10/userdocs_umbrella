@@ -115,9 +115,9 @@ defmodule UserDocs.Media do
     |> Subscription.broadcast("screenshot", "create")
   end
 
-  def create_aws_file_and_screenshot(%{ "encoded_image" => raw_encoded_image, "id" => step_id,
-    "step_type" => %{ "name" => step_type_name }, "element" => element
-    }) do
+  def create_aws_file_and_screenshot(%{ "id" => step_id, "step_type" => %{ "name" => step_type_name },
+    "element" => element, "screenshot" => %{ "aws_file" => raw_encoded_image }
+  } = payload) do
       IO.puts("create_file_and_screenshot for step #{step_id}")
     %{
       name: "Screenshot for step #{step_id}",
