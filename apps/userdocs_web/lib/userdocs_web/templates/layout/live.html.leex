@@ -46,7 +46,10 @@
     test: "value"
   ]) %>
 
-  <%= live_component(@socket, UserDocsWeb.ScreenShotHandler, [ id: "screenshot-handler-component" ]) %>
+  <%= live_component(@socket, UserDocsWeb.ScreenShotHandler, [
+    id: "screenshot-handler-component",
+    team: @current_team
+  ]) %>
 
   <main role="main" class="container">
     <p class="alert alert-info" role="alert"
