@@ -19,8 +19,8 @@ async function authenticateJohnDavenport(mainWindow) {
   return mainWindow
 }
 
-function createMainWindow () {  
-  var win = new BrowserWindow({
+async function createMainWindow () {  
+  var win = await new BrowserWindow({
     width: 1600,
     height: 800,
     webPreferences: {
