@@ -2,10 +2,9 @@ const { ipcRenderer, contextBridge } = require('electron')
 const { browserOpened, browserClosed, stepStatusUpdated, processStatusUpdated } = require('./events.js')
 
 
-console.log('preload')
-
 contextBridge.exposeInMainWorld('userdocs', {
   test: () => { console.log('test')},
+  configure: (configuration) => { ipcRenderer.send('configure', configuration) },
   //openBrowser: () => { ipcRenderer.send('openBrowser') },
   openBrowser: () => { ipcRenderer.send('openBrowser') },
   closeBrowser: () => { ipcRenderer.send('closeBrowser') },
