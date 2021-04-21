@@ -300,7 +300,7 @@ defmodule UserDocs.Automation do
 
   """
   def get_step!(id) do
-    Repo.one from step in Step,
+    Repo.one! from step in Step,
       where: step.id == ^id,
       left_join: annotation in assoc(step, :annotation),
       left_join: element in assoc(step, :element),
