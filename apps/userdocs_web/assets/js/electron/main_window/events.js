@@ -26,9 +26,25 @@ function handleStepStatusUpdate(stepInstance, config) {
 
 function stepStatusUpdated(stepInstance) {
   if (stepInstance.step_id) {
+    if (stepInstance.attrs.screenshot != null) {
+      if (stepInstance.attrs.screenshot.base_64 != null) {
+        try {
+          document
+      document  
+          document
+          .getElementById("screenshot-handler-component")
+          .dispatchEvent(new CustomEvent("screenshot", {
+            bubbles: false,
+            detail: stepInstance
+          }))
+        } catch(e) {
+          console.log("Failed to update screenshot for step " + stepInstance.step_id)
+        }
+      }
+    }
     try {
       document  
-        .getElementById("step-" + stepInstance.step_id + "-runner")
+        .getElementById("step-" + stepInstance.step_id + "-status")
         .dispatchEvent(new CustomEvent("update-step", {
           bubbles: false,
           detail: stepInstance 
