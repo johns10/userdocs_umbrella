@@ -21,6 +21,7 @@ defmodule UserDocsWeb.StepLive.Index do
   alias UserDocsWeb.ProcessLive.Loaders
   alias UserDocsWeb.StepLive.Queuer
   alias UserDocsWeb.StepLive.Runner
+  alias UserDocsWeb.StepLive.Status
   alias UserDocs.Automation.Process.RecentPage
 
   def types() do
