@@ -1,5 +1,6 @@
 const { BrowserWindow } = require('electron')
-SESSION_URL = "https://dev.user-docs.com:4002/session"
+SESSION_URL = "https://dev-electron-app.user-docs.com:4002/session/new"
+APPLICATION_URL = "https://dev-electron-app.user-docs.com:4002"
 
 async function navigateToLoginPage (mainWindow) {
   console.log("navigateToLoginPage")
