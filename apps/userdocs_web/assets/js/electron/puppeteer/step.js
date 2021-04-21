@@ -1,48 +1,74 @@
 const { succeed, fail, start } = require('../../step/step_instance.js');
   const { currentPage, getElementHandle } = require('./helpers.js')
 const Puppeteer = require('./puppeteer.js')
+const { writeFile  } = require('fs/promises')
 
-async function navigate(browser, url) { 
+async function navigate(browser, stepInstance) { 
+  url = stepInstance.attrs.page.url
+
   const page = await currentPage(browser)
   await page.goto(url) 
-  return browser
+  return stepInstance
 }
 
-async function click(browser, selector, strategy) {
+async function click(browser, stepInstance) {
+  selector = stepInstance.attrs.element.selector
+  strategy = stepInstance.attrs.element.strategy.name
+
   let handle = await getElementHandle(browser, selector, strategy)
   await handle.click()
-  return browser
+  return stepInstance
 }
 
-async function setValue(browser, selector, strategy, text) {
+async function setValue(browser, stepInstance) {
+  selector = stepInstance.attrs.element.selector
+  strategy = stepInstance.attrs.element.strategy.name
+  text = stepInstance.attrs.text
+
   let handle = await getElementHandle(browser, selector, strategy)
   await handle.type(text);
-  return browser
+  return stepInstance
 }
 
-async function setSize(browser, width, height) {
+async function setSize(browser, stepInstance) {
+  width = stepInstance.attrs.width
+  height = stepInstance.attrs.height
+
   page = await currentPage(browser)
   await page.setViewport({
     width: width,
     height: height,
     deviceScaleFactor: 1,
   })
-  return browser
+  return stepInstance
 }
 
-async function elementScreenshot(browser, selector, strategy) {
+async function elementScreenshot(browser, stepInstance) {
+  selector = stepInstance.attrs.element.selector
+  strategy = stepInstance.attrs.element.strategy.name
+  file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order
+
   let handle = await getElementHandle(browser, selector, strategy)
-  buffer = await handle.screenshot();
-  return browser
+  let base_64 = await handle.screenshot({ encoding: "base64"});
+  if (stepInstance.attrs.screenshot === null) { 
+    stepInstance.attrs.screenshot = { base_64: base_64}
+  } else {
+    stepInstance.attrs.screenshot.base_64 = base_64
+  }
+  handle.screenshot({path: userdocs.configuration.image_path + "\\" + file_name + ".png"});
+  return stepInstance
 }
 
-async function fullScreenScreenshot(browser) {
+async function fullScreenScreenshot(browser, stepInstance) {
+  file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order
   const page = await currentPage(browser)
+
   buffer = await page.screenshot();
-  return browser
+  await writeFile(userdocs.configuration.image_path + "\\" + file_name + ".png", buffer)
+  return stepInstance
 }
 
-async function clearAnnotations(browser, selector, strategy) {
+async function clearAnnotations(browser, stepInstance) {
   const page = await currentPage(browser)
   page.evaluate(() => {
     for (let i = 0; i < window.active_annotations.length; i++) {
@@ -50,7 +76,7 @@ async function clearAnnotations(browser, selector, strategy) {
     }
     window.active_annotations = []
   })
-  return browser
+  return stepInstance
 }
 
 async function applyAnnotation(browser, stepInstance, applyAnnotationFunction) {
@@ -61,7 +87,7 @@ async function applyAnnotation(browser, stepInstance, applyAnnotationFunction) {
   try {
     const result = await page.evaluate(applyAnnotationFunction, stepInstance)
     if (result == true) {
-      return browser
+      return stepInstance
     } else {
       throw result
     }
@@ -70,13 +96,16 @@ async function applyAnnotation(browser, stepInstance, applyAnnotationFunction) {
   }
 }
 
-async function scrollIntoView(browser, selector, strategy) { 
+async function scrollIntoView(browser, stepInstance) { 
+  selector = stepInstance.attrs.element.selector
+  strategy = stepInstance.attrs.element.strategy.name
+
   const page = await currentPage(browser)
   let handle = await getElementHandle(browser, selector, strategy)
   console.log(handle)
   if (handle != undefined) {
     await page.evaluate(handle => { handle.scrollIntoView() }, handle) 
-    return browser
+    return stepInstance
   } else {
     throw new Error("Element not found")
   }
@@ -85,12 +114,12 @@ async function scrollIntoView(browser, selector, strategy) {
 async function startProcess(window, stepInstance) { 
   console.log("Updating Process status")
   window.webContents.send('processStatusUpdated', start(stepInstance))
-  return browser
+  return stepInstance
 }
 
 async function completeProcess(window, stepInstance) { 
   window.webContents.send('processStatusUpdated', succeed(stepInstance))
-  return browser
+  return stepInstance
 }
 
 module.exports.navigate = navigate
