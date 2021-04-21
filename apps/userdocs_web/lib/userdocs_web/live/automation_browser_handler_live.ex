@@ -6,6 +6,7 @@ defmodule UserDocsWeb.AutomationBrowserHandlerLive do
     {
       :ok,
       socket
+      |> assign(:user_opened_browser, false)
       |> assign(:browser_opened, false)
     }
   end
@@ -14,16 +15,13 @@ defmodule UserDocsWeb.AutomationBrowserHandlerLive do
   def handle_event("clear-browser", _params, socket) do
     attrs = %{ browser_session: nil }
     user = update_user(socket.assigns.current_user, attrs)
-    {
-      :noreply,
-      socket
-      |> assign(:current_user, user)
-    }
+    { :noreply, socket |> assign(:current_user, user) }
   end
   def handle_event("open-browser", _params, socket) do
     {
       :noreply,
       socket
+      |> assign(:user_opened_browser, true)
       |> push_event("open-browser", %{})
     }
   end
@@ -44,6 +42,7 @@ defmodule UserDocsWeb.AutomationBrowserHandlerLive do
     {
       :noreply,
       socket
+      |> assign(:user_opened_browser, false)
       |> push_event("close-browser", %{})
       |> assign(:current_user, user)
     }
