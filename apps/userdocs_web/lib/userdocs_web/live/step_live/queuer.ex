@@ -9,7 +9,6 @@ defmodule UserDocsWeb.StepLive.Queuer do
       id="<%= @id %>"
       phx-click="add-step-instance"
       phx-value-step-id="<%= @step.id %>"
-      phx-value-app="<%= @app_name %>"
       phx-target="#automation-manager"
     >
       <span class="icon">
