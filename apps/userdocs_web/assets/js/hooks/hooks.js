@@ -14,11 +14,11 @@ Hooks.executeStep = {
 Hooks.executeProcess = {
   mounted() {
     this.handleEvent("execute-process", (message) => {
-      console.log("Hook triggered for execute process")
+      //console.log("Hook triggered for execute process")
       window.userdocs.executeProcess(message)
     })
     this.el.addEventListener("update-process", e => {
-      console.log("executeProcess hook got an update for process " + e.detail.attrs.step.process.id + " to " + e.detail.status)
+      //console.log("executeProcess hook got an update for process " + e.detail.attrs.step.process.id + " to " + e.detail.status)
       this.pushEventTo('#process-' + e.detail.attrs.step.process.id + '-runner', "update_process", e.detail)
     })
   }
