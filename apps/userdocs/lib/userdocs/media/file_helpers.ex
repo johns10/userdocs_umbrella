@@ -55,7 +55,6 @@ defmodule UserDocs.Media.FileHelpers do
   end
 
   defp save_file(image, file_name) do
-
     image
     |> base64ToImage(@path <> file_name)
   end
