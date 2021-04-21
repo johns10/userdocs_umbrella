@@ -128,7 +128,8 @@
   = if f.data.id do
     = if f.data.step_type.name in [ "Full Screen Screenshot", "Element Screenshot"] do
       .field
-        = live_component @socket, UserDocsWeb.ScreenshotLive.Preview, [ screenshot: f.data.screenshot]
+        = live_component @socket, UserDocsWeb.ScreenshotLive.Preview, 
+        [ screenshot: f.data.screenshot, team: @current_team ]
 
   .buttons
     = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
