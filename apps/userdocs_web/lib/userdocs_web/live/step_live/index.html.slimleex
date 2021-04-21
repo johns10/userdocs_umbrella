@@ -92,8 +92,6 @@
       .pl-4.pt-4.pr-0
         = live_component @socket,
           UserDocsWeb.AutomationBrowserHandlerLive, 
-      UserDocsWeb.AutomationBrowserHandlerLive, 
-          UserDocsWeb.AutomationBrowserHandlerLive, 
           [ id: "automation-browser-handler",
             current_user: @current_user ]
       
