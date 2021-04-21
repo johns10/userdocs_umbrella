@@ -82,6 +82,12 @@ defmodule UserDocs.StepInstancesTest do
       assert {:ok, %StepInstance{} = step_instance} = StepInstances.create_step_instance_from_job_and_step(step, job, 0)
     end
 
+    test "create_step_instance_from_step/2 with valid data creates a step instance with the step preloaded", %{ step: step, team: team } do
+      attrs = JobsFixtures.step_instance_attrs(:valid, step.id)
+      job = JobsFixtures.job(team.id)
+      {:ok, %StepInstance{} = step_instance} = StepInstances.create_step_instance_from_step(step, 0)
+    end
+
     test "create_step_instance/1 with invalid data returns error changeset", %{ step: step } do
       attrs = JobsFixtures.step_instance_attrs(:invalid, step.id)
       assert {:error, %Ecto.Changeset{}} = StepInstances.create_step_instance(attrs)
@@ -99,6 +105,11 @@ defmodule UserDocs.StepInstancesTest do
       attrs = JobsFixtures.step_instance_attrs(:invalid, step.id)
       assert {:error, %Ecto.Changeset{}} = StepInstances.update_step_instance(step_instance, attrs)
       assert step_instance == StepInstances.get_step_instance!(step_instance.id)
+    end
+
+    test "update_step_instance/2 with a screenshot attr updates the screenshot", %{ step: step } do
+      step_instance = JobsFixtures.step_instance(step.id)
+      attrs = JobsFixtures.step_instance_attrs(:valid, step.id)
     end
 
     test "delete_step_instance/1 deletes the step instance", %{ step: step } do
