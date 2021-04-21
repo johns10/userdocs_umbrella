@@ -46,6 +46,7 @@ defmodule UserDocsWeb.StepLive.Index do
       :ok,
       socket
       |> Root.apply(session, types())
+      |> assign(:sidebar_open, false)
       |> initialize()
     }
   end
@@ -107,6 +108,9 @@ defmodule UserDocsWeb.StepLive.Index do
     {:ok, deleted_step } = Automation.delete_step(step)
     send(self(), { :broadcast, "delete", deleted_step })
     {:noreply, socket}
+  end
+  def handle_event("toggle-sidebar", _payload, socket) do
+    { :noreply, assign(socket, :sidebar_open, not socket.assigns.sidebar_open) }
   end
 
   @impl true
@@ -271,7 +275,7 @@ defmodule UserDocsWeb.StepLive.Index do
     socket
     |> assign(:step, step)
     |> assign(:process, step.process)
-    |> prepare_steps(step.process_id)
+    |> prepare_steps(step.process_id) # This has to go
   end
 
   def prepare_steps(%{ assigns: %{ process: %{ id: id }}} = socket), do: prepare_steps(socket, id)
