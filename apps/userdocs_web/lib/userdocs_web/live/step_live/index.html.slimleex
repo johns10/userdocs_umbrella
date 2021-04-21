@@ -33,6 +33,9 @@
           transferred_selector: @transferred_selector,
           transferred_strategy: @transferred_strategy
 
+      = if @live_action in [:screenshot_workflow] do 
+        = live_component @socket, UserDocsWeb.ScreenshotLive.Approve, 
+          [ id: "screenshot-approval-modal", step: @step, team: @current_team ]
       
       = if not @sidebar_open do
         button.button.is-primary phx-click="toggle-sidebar" id="automation-menu"
