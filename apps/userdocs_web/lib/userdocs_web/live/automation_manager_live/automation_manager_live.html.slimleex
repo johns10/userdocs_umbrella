@@ -1,12 +1,21 @@
 = content_tag :div, phx_hook: "automationManager", id: @id do 
-  = link to: "#", phx_click: "start-running",  phx_target: @myself.cid do
-    = content_tag(:i, "", [class: "fa fa-play-circle", aria_hidden: "true"])
-  = link to: "#", phx_click: "put-job", phx_target: @myself.cid do
-    = content_tag(:i, "", [class: "fa fa-paper-plane", aria_hidden: "true"])
-  = link to: "#", phx_click: "update-job", phx_target: @myself.cid do
-    = content_tag(:i, "", [class: "fa fa-save", aria_hidden: "true"])
-  = link to: "#", phx_click: "reset-job",  phx_target: @myself.cid do
-    = content_tag(:i, "", [class: "fa fa-refresh", aria_hidden: "true"])
+  .field.has-addons   
+    p.control 
+      button.button 
+        = link to: "#", phx_click: "start-running",  phx_target: @myself.cid do
+          = content_tag(:i, "", [class: "fa fa-play-circle", aria_hidden: "true"])
+    p.control 
+      button.button 
+        = link to: "#", phx_click: "put-job", phx_target: @myself.cid do
+          = content_tag(:i, "", [class: "fa fa-paper-plane", aria_hidden: "true"])
+    p.control 
+      button.button 
+        = link to: "#", phx_click: "update-job", phx_target: @myself.cid do
+          = content_tag(:i, "", [class: "fa fa-save", aria_hidden: "true"])
+    p.control 
+      button.button 
+        = link to: "#", phx_click: "reset-job",  phx_target: @myself.cid do
+          = content_tag(:i, "", [class: "fa fa-refresh", aria_hidden: "true"])
     
   aside.menu
     ul.menu-list
