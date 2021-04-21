@@ -85,6 +85,7 @@ defmodule UserDocsWeb.Router do
     live "/processes/:process_id/steps", StepLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/processes/:process_id/steps/new", StepLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/steps/:id/edit", StepLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/steps/:id/screenshot", StepLive.Index, :screenshot_workflow, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
     live "/content", ContentLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/teams/:team_id/content", ContentLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
