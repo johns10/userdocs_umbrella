@@ -136,7 +136,10 @@
         class="card-footer-item"
       >New Process</a>
     </div>
-    <%= live_component(@socket, UserDocsWeb.ScreenShotHandler, [ id: "screenshot-handler-component" ]) %>
+    <%= live_component(@socket, UserDocsWeb.ScreenShotHandler, [
+      id: "screenshot-handler-component",
+      team: @current_team
+    ]) %>
     <%= live_component(@socket, UserDocsWeb.SelectorHandler, [ id: "selector-handler" ]) %>
     <div id="selector-tester" phx-hook="testSelector"></div>
   <% end %>
