@@ -10,9 +10,7 @@ const {
   authenticateJohnDavenport, 
   createMainWindow } = require('./main_window/navigation.js')
 const puppeteer = require('./puppeteer/puppeteer.js')
-try {
-	require('electron-reloader')(module);
-} catch {}
+const path = require('path')
 
 userdocs = {
   browser: null,
