@@ -2,7 +2,15 @@ import {handle_message} from "../commands/commands.js"
 
 let Hooks = {}
 
-Hooks.executeStep = {
+Hooks.fileTransfer = {
+  mounted() {
+    this.el.addEventListener("screenshot", e => {
+      console.log("Got a file")
+      this.pushEventTo('#screenshot-handler-component', "create_screenshot", e.detail)
+    })
+  }
+};
+
   mounted() {
     this.el.addEventListener("update-step", e => {
       console.log("Got a step update")
