@@ -52,3 +52,7 @@ apps/userdocs/tmp/*
 apps/userdocs_web/assets/package-lock.json
 apps/userdocs_web/assets/css/app.css
 apps/userdocs_web/assets/css/app.css.map
+
+# Ignore certs
+apps/userdocs_web/assets/js.crx
+apps/userdocs_web/assets/js.pem
