@@ -173,8 +173,6 @@ defmodule UserDocs.Screenshots do
         contents = Base.decode64!(base_64)
         file_name = file_name(changeset.data, :production)
         aws_path = put_encoded_string_in_aws_object(contents, team, path(file_name))
-        IO.puts("AWS Path")
-        IO.inspect(aws_path)
         Ecto.Changeset.put_change(changeset, :aws_screenshot, aws_path)
     end
   end
@@ -204,9 +202,6 @@ defmodule UserDocs.Screenshots do
   def prepare_files(screenshot, names, bucket, opts) do
     Enum.each(names, fn({ field, file_name }) ->
       aws_key = Map.get(screenshot, field)
-      IO.inspect(opts)
-      IO.puts(aws_key)
-      IO.puts(file_name)
       case ExAws.S3.download_file(bucket, aws_key, file_name) |> ExAws.request(opts) do
         { :ok, done } -> true
         e -> raise("#{__MODULE__}.prepare_all_files failed because #{e}")
@@ -263,7 +258,7 @@ defmodule UserDocs.Screenshots do
 
     case ExAws.S3.put_object(bucket, path, contents) |> ExAws.request(opts) do
       { :ok, _response } -> path
-      _ -> raise("#{__MODULE__}.put_encoded_string_in_aws_object failed")
+      e -> raise("#{__MODULE__}.put_encoded_string_in_aws_object failed because #{e}")
     end
   end
 
