@@ -151,6 +151,13 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   end
 
+  def inspect_annotation_change(changeset) do
+    annotation_data = "Annotation Data: " <> (changeset.data |> Map.get(:annotation_id, "") |> to_string())
+    annotation_change = ", Annotation Change: " <> (changeset |> Ecto.Changeset.get_change(:annotation_id, "") |> to_string())
+    annotation_param = ", Annotation Param: " <> (changeset.params |> Map.get("annotation_id", ""))
+    Logger.debug(annotation_data <> annotation_change <> annotation_param)
+  end
+
   @impl true
   def handle_event("save", %{"step" => step_params}, socket) do
     save_step(socket, socket.assigns.action, step_params)
