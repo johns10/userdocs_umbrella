@@ -133,4 +133,10 @@ ipcMain.on('executeProcess', async (event, job) => {
   userdocs.runState = 'running'
 })
 
+ipcMain.on('configure', async (event, message) => {
+  console.log("configuring")
+  console.log(message)
+  userdocs.configuration = message
+})
+
 app.whenReady().then(main)
