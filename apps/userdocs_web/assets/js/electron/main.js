@@ -18,7 +18,8 @@ userdocs = {
   browser: null,
   browserExecutionQueue: [],
   process: {},
-  runState: 'stopped'
+  runState: 'stopped',
+  configuration: {}
 }
 
 
