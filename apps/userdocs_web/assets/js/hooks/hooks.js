@@ -33,20 +33,25 @@ Hooks.automationManager = {
       window.userdocs.start(message)
     })
     this.handleEvent("execute", (message) => { window.userdocs.execute(message.step_instance) })
-    this.el.addEventListener("update-step", (message) => {
-      this.pushEventTo("#automation-manager", "update-step", message.detail)
+    this.el.addEventListener("update-step-instance", (message) => {
+      this.pushEventTo("#automation-manager", "update-step-instance", message.detail)
     })
   }
 }
 
-
-
-
-Hooks.fileTransfer = {
+Hooks.configuration = {
   mounted() {
-    this.el.addEventListener("message", e => {
-      console.log("Got a file")
-      this.pushEventTo('#screenshot-handler-component', "create_screenshot", e.detail)
+    this.handleEvent("configure", (message) => {
+      window.userdocs.configure(message)
+    })
+  }
+}
+
+// TODO: THIS IS FOR THE EXTENSION AND SHOULD BE REMOVED 
+Hooks.configure = {
+  mounted() {
+    this.handleEvent("configure", (message) => {
+      handle_message(message, { environment: 'extension' })
     })
   }
 };
@@ -56,13 +61,6 @@ Hooks.selectorTransfer = {
       console.log("Got a selector")
       console.log(e.detail)
       this.pushEventTo('#selector-handler', "transfer_selector", e.detail)
-    })
-  }
-};
-Hooks.configure = {
-  mounted() {
-    this.handleEvent("configure", (message) => {
-      handle_message(message, { environment: 'extension' })
     })
   }
 };
