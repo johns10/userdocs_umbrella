@@ -6,6 +6,11 @@ async function navigateToLoginPage (mainWindow) {
   return mainWindow.loadURL(SESSION_URL)
 }
 
+async function navigateToApplication (mainWindow) {
+  console.log("navigateToApplication")
+  return mainWindow.loadURL(APPLICATION_URL)
+}
+
 async function authenticateJohnDavenport(mainWindow) {
   mainWindow = BrowserWindow.getAllWindows()[0]
   mainWindow.webContents.executeJavaScript("document.querySelector('#user_email').value = 'johns10davenport@gmail.com'")
@@ -52,6 +57,7 @@ function mainWindow () {
   return BrowserWindow.getAllWindows()[0]
 }
 
+module.exports.navigateToApplication = navigateToApplication
 module.exports.navigateToLoginPage = navigateToLoginPage
 module.exports.authenticateJohnDavenport = authenticateJohnDavenport
 module.exports.createMainWindow = createMainWindow
