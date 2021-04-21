@@ -1,0 +1,34 @@
+css:
+  .review-image {
+    object-fit: scale-down;
+    height: auto;
+  }
+
+.modal.is-active
+  .modal-background 
+    .section
+      .card
+        .card-header  
+          p.card-header-title Approve or Reject Image Update 
+        .card-content 
+          .columns
+            .column
+              h2 Original Image
+              = if @screenshot.aws_screenshot do 
+                = img_tag @aws_screenshot, class: "image review-image"
+            .column
+              h2 New Image
+              = if @screenshot.aws_provisional_screenshot do 
+                = img_tag @aws_provisional_screenshot, class: "image review-image"
+          .columns
+            .column
+              h2 Image Diff
+              = if @screenshot.aws_diff_screenshot do 
+                = img_tag @aws_diff_screenshot
+        .card-footer
+          = link "Approve", to: "#", phx_target: @myself.cid, phx_click: "approve-provisional", class: "card-footer-item is-success"
+          = link "Reject", to: "#", phx_target: @myself.cid, phx_click: "reject-provisional", class: "card-footer-item is-danger"
+
+
+  
+        
