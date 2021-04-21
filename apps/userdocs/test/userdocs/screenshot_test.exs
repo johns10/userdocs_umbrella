@@ -73,6 +73,21 @@ defmodule UserDocs.Screenshot do
       assert Screenshots.get_screenshot!(screenshot.id) == screenshot
     end
 
+    test "get_screenshot_url/1 with no screenshot returns { :nofile, _ }", %{ step: step, team: team } do
+      screenshot = MediaFixtures.screenshot(step.id)
+      result = Screenshots.get_screenshot_url(screenshot, team)
+      assert result == { :nofile, "" }
+    end
+
+    test "get_screenshot_url/1 with a screenshot a presigned url", %{ step: step, team: team } do
+      screenshot = MediaFixtures.screenshot(step.id)
+      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base_64, single_white_pixel)
+      { :ok, screenshot } = Screenshots.update_screenshot(screenshot, attrs, team)
+      { status, url } = Screenshots.get_screenshot_url(screenshot, team)
+      assert status == :ok
+      assert String.starts_with?(url, "https://userdocs-test.s3.us-east-2.amazonaws.com")
+    end
+
     test "create_screenshot/1 with valid data creates a screenshot", %{ step: step } do
       attrs = MediaFixtures.screenshot_attrs(:valid, step.id)
       assert {:ok, %Screenshot{} = screenshot} = Screenshots.create_screenshot(attrs)
@@ -154,6 +169,5 @@ defmodule UserDocs.Screenshot do
       screenshot = MediaFixtures.screenshot(step.id)
       assert %Ecto.Changeset{} = Screenshots.change_screenshot(screenshot)
     end
-
   end
 end
