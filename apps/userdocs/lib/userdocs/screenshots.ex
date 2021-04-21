@@ -230,7 +230,7 @@ defmodule UserDocs.Screenshots do
     end
   end
 
-  def handle_changes(%{ score: score, updated: updated, team: team } = state, changeset) do
+  def handle_changes(%{ score: score, diff: diff, updated: updated, team: team } = state, changeset) do
     case score do
       "inf" -> changeset
       _ ->
@@ -238,7 +238,7 @@ defmodule UserDocs.Screenshots do
         provisional_file_name = file_name(changeset.data, :provisional)
         put_encoded_string_in_aws_object(File.read!(updated), team, path(provisional_file_name))
         diff_file_name = file_name(changeset.data, :diff)
-        put_encoded_string_in_aws_object(File.read!(updated), team, path(diff_file_name))
+        put_encoded_string_in_aws_object(File.read!(diff), team, path(diff_file_name))
         changeset
         |> Ecto.Changeset.put_change(:aws_provisional_screenshot, path(provisional_file_name))
         |> Ecto.Changeset.put_change(:aws_diff_screenshot, path(diff_file_name))
