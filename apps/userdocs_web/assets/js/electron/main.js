@@ -107,7 +107,7 @@ async function executeStepInstance (stepInstance) {
   
   try {
     const stepFunction = automationModule.stepInstanceHandler(stepInstance, config)
-    await stepFunction()
+    stepInstance = await stepFunction()
     stepInstance = succeed(stepInstance)
     handleStepStatusUpdate(stepInstance, config)
     return stepInstance
