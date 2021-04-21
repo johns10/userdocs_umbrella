@@ -1,34 +1,42 @@
-= ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
-  %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name },
-  %{ to: Routes.version_index_path(@socket, :index), name: @current_project.name },
-  %{ to: Routes.process_index_path(@socket, :index), name: @current_version.name }],
-  last_item: %{ to: "", name: @process.name } ])
+
+
 .columns  
   .column
-    = if @live_action in [:edit, :new] do
-      = live_modal @socket, UserDocsWeb.StepLive.FormComponent,
-        id: "step-form",
-        parent: @process,
-        parent_id: @process.id,
-        type: Step,
-        current_version: @current_version,
-        current_team: @current_team,
-        state_opts: @state_opts,
-        parent_id: @process.id,
-        title: @page_title,
-        action: @live_action,
-        step: @step,
-        select_lists: @select_lists,
-        data: @data,
-        app_name: @app_name,
-        default_page_id: RecentPage.get_id(@steps, @step, @data.pages),
-        data: @data,
-        return_to: Routes.step_index_path(@socket, :index, @process.id),
-        select_lists: @select_lists,
-        new_element: false,
-        new_annotation: false,
-        transferred_selector: @transferred_selector,
-        transferred_strategy: @transferred_strategy
+    .is-flex.is-flex-direction-row.is-justify-content-space-between
+      = ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
+        %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name },
+        %{ to: Routes.version_index_path(@socket, :index), name: @current_project.name },
+        %{ to: Routes.process_index_path(@socket, :index), name: @current_version.name }],
+        last_item: %{ to: "", name: @process.name } ])
+      = if @live_action in [:edit, :new] do
+        = live_modal @socket, UserDocsWeb.StepLive.FormComponent,
+          id: "step-form",
+          parent: @process,
+          parent_id: @process.id,
+          type: Step,
+          current_version: @current_version,
+          current_team: @current_team,
+          state_opts: @state_opts,
+          parent_id: @process.id,
+          title: @page_title,
+          action: @live_action,
+          step: @step,
+          select_lists: @select_lists,
+          data: @data,
+          app_name: @app_name,
+          default_page_id: RecentPage.get_id(@steps, @step, @data.pages),
+          data: @data,
+          return_to: Routes.step_index_path(@socket, :index, @process.id),
+          select_lists: @select_lists,
+          new_element: false,
+          new_annotation: false,
+          transferred_selector: @transferred_selector,
+          transferred_strategy: @transferred_strategy
+
+      
+      = if not @sidebar_open do
+        button.button.is-primary phx-click="toggle-sidebar" id="automation-menu"
+          i.fa.fa-plus-square
 
     = live_component(@socket, UserDocsWeb.ProcessLive.Runner, 
       [ id: "process-" <> Integer.to_string(@process.id) <> "-runner",
@@ -67,14 +75,24 @@
 
 
     = live_patch to: Routes.step_index_path(@socket, :new, @process.id) do
-      button.button.is-primary New Step
-  .column 
-    = live_component @socket,
+      button.button.is-primary New Step 
+
+  = if @sidebar_open do
+    .column.is-3.sidebar-menu.box.py-0.px-0.mt-4
+      div.is-flex.is-flex-direction-row.is-justify-content-space-between.py-4.px-4.has-background-primary.has-text-primary-light id="automation-menu"
+        h2 Automation Manager
+        i.fa.fa-minus-square.py-1 phx-click="toggle-sidebar"
+
+      .pl-4.pt-4.pr-0
+        = live_component @socket,
+          UserDocsWeb.AutomationBrowserHandlerLive, 
       UserDocsWeb.AutomationBrowserHandlerLive, 
-      [ id: "automation-browser-handler",
-        current_user: @current_user ]
-    
-    = if @app_name == "electron" do
-      = live_component @socket,
-        UserDocsWeb.AutomationManagerLive,
-        [ id: "automation-manager", app_name: @app_name ]
+          UserDocsWeb.AutomationBrowserHandlerLive, 
+          [ id: "automation-browser-handler",
+            current_user: @current_user ]
+      
+        = live_component @socket,
+          UserDocsWeb.AutomationManagerLive,
+          [ id: "automation-manager", 
+          app_name: @app_name, 
+          job: @current_team.job ]  
