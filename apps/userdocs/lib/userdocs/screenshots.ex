@@ -160,6 +160,12 @@ defmodule UserDocs.Screenshots do
     screenshot
   end
 
+  def reject_provisional_screenshot(%Screenshot{ } = screenshot) do
+    attrs = %{ aws_diff_screenshot: nil, aws_provisional_screenshot: nil }
+    { :ok, screenshot } = update_screenshot(screenshot, attrs)
+    screenshot
+  end
+
   def diff_images(%{ data: %{ aws_screenshot: nil }} = changeset, team) do
     case Ecto.Changeset.get_change(changeset, :base_64) do
       nil -> changeset
