@@ -23,10 +23,11 @@ userdocs = {
 
 
 function main() {
-  var mainWindow = createMainWindow();
-  mainWindow = navigateToLoginPage(mainWindow);
-  mainWindow = authenticateJohnDavenport(mainWindow);
-  startQueueProcessorEventLoop()
+  createMainWindow()
+    .then( mainWindow => navigateToLoginPage(mainWindow) )
+    .then( mainWindow => authenticateJohnDavenport(mainWindow) )
+    .then( mainWindow => startQueueProcessorEventLoop() )
+    .catch( e => console.log(e))
 }
 
 function startQueueProcessorEventLoop() {
