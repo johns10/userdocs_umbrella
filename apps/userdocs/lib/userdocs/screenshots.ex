@@ -49,25 +49,32 @@ defmodule UserDocs.Screenshots do
   """
   def get_screenshot!(id), do: Repo.get!(Screenshot, id)
 
-  def get_screenshot_url(nil), do: { :no_screenshot, "" }
-  def get_screenshot_url(%Ecto.Association.NotLoaded{}), do: { :not_loaded, "" }
-  def get_screenshot_url(%Screenshot{ aws_file: nil }), do: { :nofile, "" }
-  def get_screenshot_url(%Screenshot{ aws_file: aws_file }) do
-    region =
-      Application.get_env(:userdocs, :ex_aws)
-      |> Keyword.get(:region)
-
-    bucket =
-      Application.get_env(:userdocs, :waffle)
-      |> Keyword.get(:bucket)
+  def get_screenshot_url(nil, _), do: { :no_screenshot, "" }
+  def get_screenshot_url(%Ecto.Association.NotLoaded{}, _), do: { :not_loaded, "" }
+  def get_screenshot_url(%Screenshot{ aws_screenshot: nil }, _), do: { :nofile, "" }
+  def get_screenshot_url(%Screenshot{ aws_screenshot: aws_screenshot }, team) do
+    region = team.aws_region
+    bucket = team.aws_bucket
+    path = aws_screenshot
 
     config =
       ExAws.Config.new(:s3)
       |> Map.put(:region, region)
 
-    uploads_dir =
-      Application.get_env(:userdocs, :userdocs_s3)
-      |> Keyword.get(:uploads_dir)
+    ExAws.S3.presigned_url(config, :get, bucket, path, virtual_host: true)
+  end
+
+  def get_url(nil, team), do: { :nofile, "" }
+  def get_url(aws_key, team) do
+    region = team.aws_region
+    bucket = team.aws_bucket
+
+    config =
+      ExAws.Config.new(:s3)
+      |> Map.put(:region, region)
+
+    ExAws.S3.presigned_url(config, :get, bucket, aws_key, virtual_host: true)
+  end
 
     path = uploads_dir <> "/" <> aws_file.file_name
 
