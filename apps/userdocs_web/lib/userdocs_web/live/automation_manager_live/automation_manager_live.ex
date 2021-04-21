@@ -40,7 +40,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
               i.fa.fa-trash aria-hidden="true"
         = link to: "#", class: "py-0" do
           = render_instance_status(step_instance.status)
-        = link to: "#", class: "py-0" do
+        = link to: "#", class: "py-0", style: "white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" do
           =< to_string(step_instance.order)
           | :
           =< step_instance.name
