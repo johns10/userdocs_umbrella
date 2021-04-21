@@ -43,6 +43,7 @@ function startQueueProcessorEventLoop() {
   }
 }
 
+//TODO: Fix retry mechanisms
 async function processQueue() {
   const stepInstance = userdocs.browserExecutionQueue.shift()
   if (stepInstance) {
@@ -50,7 +51,7 @@ async function processQueue() {
     completeStepInstance = await executeStepInstance(stepInstance)
     if (completeStepInstance.status === COMPLETE) {
       console.log("Step completed, processing next item")
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 250));
       await processQueue()
     } else if (completeStepInstance.status === FAILED) {
       console.log("Step Failed, stop and unshift item")
