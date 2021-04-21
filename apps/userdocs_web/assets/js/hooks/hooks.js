@@ -11,10 +11,11 @@ Hooks.fileTransfer = {
   }
 };
 
+Hooks.stepStatus = {
   mounted() {
     this.el.addEventListener("update-step", e => {
-      console.log("Got a step update")
-      this.pushEventTo('#step-' + e.detail.step_id + '-runner', "update_step", e.detail)
+      //console.log("Got a step update")
+      this.pushEventTo('#step-' + e.detail.step_id + '-status', "update_step", e.detail)
     })
   }
 };
