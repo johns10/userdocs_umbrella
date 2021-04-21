@@ -47,9 +47,9 @@ defmodule UserDocs.MixProject do
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:state_handlers, in_umbrella: true},
       {:cloak_ecto, "~> 1.1.1"},
-      {:waffle, "~> 1.1.3"},
+      {:waffle, "~> 1.1.4"},
       {:waffle_ecto, "~> 0.0.9"},
-      {:ex_aws, "~> 2.1.7"},
+      {:ex_aws, "~> 2.2.1"},
       {:ex_aws_s3, "~> 2.1.0"},
       {:hackney, "~> 1.9"},
       {:sweet_xml, "~> 0.6"}
