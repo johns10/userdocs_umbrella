@@ -31,8 +31,6 @@ function main() {
 
 function startQueueProcessorEventLoop() {
   setTimeout(startQueueProcessorEventLoop, 500);
-  console.log(userdocs.browserExecutionQueue.length)
-  console.log(userdocs.runState)
   if(userdocs.runState === 'running') {
     if (userdocs.browserExecutionQueue === undefined || userdocs.browserExecutionQueue.length == 0) {
       userdocs.runState = 'stopped'
