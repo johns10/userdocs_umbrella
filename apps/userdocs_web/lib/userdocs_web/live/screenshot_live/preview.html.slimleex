@@ -1,1 +1,32 @@
-= img_tag @img_url, width: "250 px", height: "250 px", alt: @img_alt
+css:
+  #preview-row {
+    display: flex;
+  }
+  #preview-container {
+    position: relative;
+    margin:10px; 
+    object-fit: scale-down;
+  }
+  #status-indicator {
+    position: absolute;
+    right: -15px;
+    top: -15px;
+  }
+  #preview-image {
+    object-fit: scale-down;
+    height: auto;
+  }
+
+div#preview-row
+  div#preview-container
+    div#status-indicator
+      span.fa-stack.fa
+        = if @status == :ok do
+          i.fas.fa-circle.fa-stack-2x.has-text-success
+          i.fas.fa-check.fa-stack-1x.fa-inverse
+        = if @status == :warn do
+          i.fas.fa-circle.fa-stack-2x.has-text-warning
+          i.fas.fa-exclamation-triangle.fa-stack-1x.fa-inverse
+    = img_tag @img_url, alt: @img_alt, id: "preview-image"
+= if @status == :warn do
+  = link "Review Changes", to: Routes.step_index_path(@socket, :screenshot_workflow, @screenshot.step_id)
