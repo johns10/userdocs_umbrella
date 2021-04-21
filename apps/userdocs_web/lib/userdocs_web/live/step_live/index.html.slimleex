@@ -66,12 +66,10 @@
                 = live_component(@socket, Queuer, 
                   [ id: "step-" <> Integer.to_string(step.id) <> "-queuer",
                   step: step, 
-                  app_name: @app_name,
                   step_type_name: step.step_type.name])
                 = live_component(@socket, Runner, 
                   [ id: "step-" <> Integer.to_string(step.id),
                   step: step, 
-                  app_name: @app_name,
                   current_user: @current_user,
                   step_type_name: step.step_type.name])
                 = live_patch class: "navbar-item", to: Routes.step_index_path(@socket, :edit, step.id), id: "edit-step-#{step.id}" do
