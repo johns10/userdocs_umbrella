@@ -55,6 +55,21 @@ Hooks.configure = {
     })
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Hooks.selectorTransfer = {
   mounted() {
     this.el.addEventListener("selector", e => {
