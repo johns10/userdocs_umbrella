@@ -5,8 +5,6 @@ defmodule UserDocsWeb.Configuration do
   def render(assigns) do
     ~L"""
     <div phx-hook="configuration">
-      Configuration
-      <%= inspect(@configuration) %>
     </div>
     """
   end
