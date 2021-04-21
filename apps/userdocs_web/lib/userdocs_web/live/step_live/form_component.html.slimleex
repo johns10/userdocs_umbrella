@@ -70,7 +70,6 @@
         .pl-2
           = PageLive.FormComponent.render_fields(Map.put(assigns, :field_ids, @field_ids.page),
               fp, [ prefix: @form_ids.prefix ])
-      .level
 
   = if "element_id" in @enabled_step_fields and @action not in [:new]  do
     .field.is-horizontal
@@ -96,7 +95,6 @@
             p 
               = "Transferred Selector " <> (@transferred_strategy.name || "") <> ": "
               = @transferred_selector || ""
-  .level  
 
   = if "annotation_id" in @enabled_step_fields and @action not in [:new] do
     .field.is-horizontal
@@ -114,7 +112,6 @@
         div style="border-left: 5px solid LightGray;"
           .pl-2
             = AnnotationLive.FormComponent.render_fields(assigns, fa, @form_ids.prefix)
-  .level
 
   = Layout.text_input(f, [ field_name: :url, id: @field_ids.url,
         hidden: not(("url" in @enabled_step_fields) and (page_reference(@changeset) == "url"))])
