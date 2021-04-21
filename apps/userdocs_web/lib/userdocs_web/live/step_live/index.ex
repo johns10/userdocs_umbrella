@@ -12,6 +12,7 @@ defmodule UserDocsWeb.StepLive.Index do
   alias UserDocs.Documents
   alias UserDocs.Helpers
   alias UserDocs.Web.Strategy
+  alias UserDocs.Media.Screenshot
   alias UserDocs.Automation.Process.RecentPage
 
   alias UserDocsWeb.Defaults
