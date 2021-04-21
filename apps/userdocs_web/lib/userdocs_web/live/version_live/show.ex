@@ -47,7 +47,7 @@ defmodule UserDocsWeb.VersionLive.Show do
     }
   end
 
-  @imple true
+  @impl true
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   @impl true
