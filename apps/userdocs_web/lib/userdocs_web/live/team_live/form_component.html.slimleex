@@ -13,6 +13,8 @@ h2.title = @title
 
     = Layout.text_input form, :aws_region, [], "control"
 
+    = Layout.text_input form, :aws_bucket, [], "control"
+
     = Layout.text_input form, :aws_access_key_id, [], "control"
 
     = Layout.text_input form, :aws_secret_access_key, [], "control"
