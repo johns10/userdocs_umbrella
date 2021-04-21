@@ -66,16 +66,16 @@ function id(browser) {
 
 function stepInstanceHandler(stepInstance, config) {
   const functions = {
-    "Navigate": async () => { return Step.navigate(config.browser, stepInstance.attrs.page.url) },
-    "Click": async () => { return Step.click(config.browser, stepInstance.attrs.element.selector, stepInstance.attrs.element.strategy.name) },
-    "Fill Field": async () => { return Step.setValue(config.browser, stepInstance.attrs.element.selector, stepInstance.attrs.element.strategy.name, stepInstance.attrs.text) },
-    "Set Size Explicit": async () => { return Step.setSize(config.browser, stepInstance.attrs.width, stepInstance.attrs.height) },
-    "Element Screenshot": async () => { return Step.elementScreenshot(config.browser, stepInstance.attrs.element.selector, stepInstance.attrs.element.strategy.name) },
-    "Full Screen Screenshot": async () => { return Step.fullScreenScreenshot(config.browser) },
-    "Clear Annotations": async () => { return Step.clearAnnotations(config.browser) },
+    "Navigate": async () => { return Step.navigate(config.browser, stepInstance) },
+    "Click": async () => { return Step.click(config.browser, stepInstance) },
+    "Fill Field": async () => { return Step.setValue(config.browser, stepInstance) },
+    "Set Size Explicit": async () => { return Step.setSize(config.browser, stepInstance) },
+    "Element Screenshot": async () => { return Step.elementScreenshot(config.browser, stepInstance) },
+    "Full Screen Screenshot": async () => { return Step.fullScreenScreenshot(config.browser, stepInstance) },
+    "Clear Annotations": async () => { return Step.clearAnnotations(config.browser, stepInstance) },
     "Start Process": async () => { return Step.startProcess(config.window, stepInstance) },
     "Complete Process": async () => { return Step.completeProcess(config.window, stepInstance) },
-    "Scroll to Element": async () => {  return Step.scrollIntoView(config.browser, stepInstance.attrs.element.selector, stepInstance.attrs.element.strategy.name) },
+    "Scroll to Element": async () => {  return Step.scrollIntoView(config.browser, stepInstance) },
     "Apply Annotation": async () => { 
       const applyAnnotationFunction = async function(stepInstance, done) {
         try {
