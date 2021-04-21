@@ -76,9 +76,10 @@ defmodule UserDocs.Screenshots do
     ExAws.S3.presigned_url(config, :get, bucket, aws_key, virtual_host: true)
   end
 
-    path = uploads_dir <> "/" <> aws_file.file_name
-
-    ExAws.S3.presigned_url(config, :get, bucket, path, virtual_host: true)
+  def get_screenshot_by_step_id!(step_id) do
+    Screenshot
+    |> where([s], s.step_id == ^step_id)
+    |> Repo.one!
   end
 
   @doc """
@@ -112,15 +113,6 @@ defmodule UserDocs.Screenshots do
     |> Screenshot.changeset(attrs)
     |> diff_images(team)
     |> Repo.update()
-  end
-  def update_screenshot(%Ecto.Changeset{} = screenshot) do
-    Repo.update(screenshot)
-  end
-
-  def get_screenshot_by_step_id!(step_id) do
-    Screenshot
-    |> where([s], s.step_id == ^step_id)
-    |> Repo.one!
   end
 
   def upsert_screenshot(attrs \\ %{}) do
