@@ -19,7 +19,6 @@ function browserOpened(payload) {
 function handleStepStatusUpdate(stepInstance, config) {
   console.log("handleStepStatusUpdate")
   if (stepInstance.step_id) {
-    console.log("has step id")
     config.window.send('stepStatusUpdated', stepInstance)
   }
 }
@@ -29,8 +28,6 @@ function stepStatusUpdated(stepInstance) {
     if (stepInstance.attrs.screenshot != null) {
       if (stepInstance.attrs.screenshot.base_64 != null) {
         try {
-          document
-      document  
           document
           .getElementById("screenshot-handler-component")
           .dispatchEvent(new CustomEvent("screenshot", {
@@ -50,8 +47,19 @@ function stepStatusUpdated(stepInstance) {
           detail: stepInstance 
         }))
     } catch (e) {
-      console.log("Failed to send update to step-" + stepInstance.step_id + "-runner")
+      console.log("Failed to send update to step-" + stepInstance.step_id + "-status")
     }
+  }
+  try {
+    console.log("trying to update automation manager")
+    document
+      .getElementById("automation-manager")
+      .dispatchEvent(new CustomEvent("update-step-instance", {
+        bubbles: false,
+        detail: stepInstance
+      }))
+  } catch (e) {
+    console.log("Failed to send update to step-instance: " + stepInstance.step_id)
   }
 }
 
