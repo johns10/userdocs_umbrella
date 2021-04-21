@@ -135,17 +135,22 @@ defmodule UserDocsWeb.AutomationManagerLive do
   end
 
   def execute_step(socket, %{ step_id: step_id }) do
-    socket
-    |> UserDocsWeb.ElectronWebDriver.StepInstance.execute(step_id)
+    with step = AutomationManager.get_step!(step_id),
+      { :ok, step_instance } = StepInstances.create_step_instance_from_step(step),
+      preloaded_step_instance = Map.put(step_instance, :step, step),
+      formatted_step_instance = StepInstances.format_step_instance_for_export(preloaded_step_instance)
+    do
+      socket
+      |> Phoenix.LiveView.push_event("execute", %{ step_instance: formatted_step_instance })
+    else
+      _ -> raise("Execute Step Failed in #{__MODULE__}")
+    end
   end
 
   def execute_process_instance(socket, %{ process_id: process_id }, order) do
     socket
     |> UserDocsWeb.ElectronWebDriver.ProcessInstance.execute(process_id, order)
   end
-
-
-
 
   def format_changeset_errors(changeset) do
     errors = Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
