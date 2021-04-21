@@ -128,6 +128,13 @@ defmodule UserDocsWeb.StepLive.Index do
     |> assign(:step, nil)
   end
 
+  defp apply_action(socket, :screenshot_workflow, %{"id" => id}) do
+    socket
+    |> assign(:page_title, "Edit Process")
+    |> prepare_step(String.to_integer(id))
+    |> assign_select_lists()
+  end
+
   @impl true
   def handle_info(%{topic: _, event: _, payload: %UserDocs.Documents.Content{}} = sub_data, socket) do
     { :noreply, socket } = Root.handle_info(sub_data, socket)
