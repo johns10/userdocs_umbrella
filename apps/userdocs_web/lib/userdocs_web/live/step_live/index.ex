@@ -67,6 +67,7 @@ defmodule UserDocsWeb.StepLive.Index do
     |> Loaders.content(opts)
     |> Loaders.annotations(opts)
     |> Loaders.elements(opts)
+    |> Loaders.screenshots(opts)
     |> UserDocsWeb.Loaders.versions()
     |> turn_off_broadcast_associations()
   end
