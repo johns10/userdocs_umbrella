@@ -2,6 +2,34 @@ import {handle_message} from "../commands/commands.js"
 
 let Hooks = {}
 
+Hooks.automatedBrowserCommands = {
+  mounted() {
+    this.handleEvent("open-browser", (message) => {
+      console.log("open browser")
+      window.userdocs.openBrowser()
+    })
+    this.handleEvent("close-browser", (message) => {
+      console.log("close browser")
+      window.userdocs.closeBrowser()
+    })
+  }
+};
+
+Hooks.automatedBrowserEvents = {
+  mounted() {
+    this.el.addEventListener("browser-opened", (message) => {
+      console.log("automation browser opened in hook")
+      console.log(message)
+      this.pushEventTo("#automated-browser-handler", "browser-opened", message.detail)
+    })
+    this.el.addEventListener("browser-closed", (message) => {
+      console.log("automation browser closed in hook")
+      console.log(message)
+      this.pushEventTo("#automated-browser-handler", "browser-closed", message.detail)
+    })
+  }
+};
+
 Hooks.fileTransfer = {
   mounted() {
     this.el.addEventListener("screenshot", e => {
@@ -97,28 +125,6 @@ Hooks.testSelector = {
         message.payload.activeTabId = result.activeTabId
         handle_message(message, {environment: 'extension'})
       });
-    })
-  }
-};
-Hooks.automatedBrowserHandler = {
-  mounted() {
-    this.handleEvent("open-browser", (message) => {
-      console.log("open browser")
-      window.userdocs.openBrowser()
-    })
-    this.handleEvent("close-browser", (message) => {
-      console.log("close browser")
-      window.userdocs.closeBrowser()
-    })
-    this.el.addEventListener("browser-opened", (message) => {
-      console.log("automation browser opened in hook")
-      console.log(message)
-      this.pushEventTo("#automated-browser-handler", "browser-opened", message.detail)
-    })
-    this.el.addEventListener("browser-closed", (message) => {
-      console.log("automation browser closed in hook")
-      console.log(message)
-      this.pushEventTo("#automated-browser-handler", "browser-closed", message.detail)
     })
   }
 };
