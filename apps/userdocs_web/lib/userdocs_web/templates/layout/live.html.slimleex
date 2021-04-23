@@ -1,0 +1,78 @@
+css: 
+  .with-sidebar {
+    overflow: hidden;
+  }
+
+  .with-sidebar > div {
+    display: flex;
+    flex-wrap: wrap;
+    margin: calc(var(--s1) / 2 * -1);
+    align-items: flex-start;
+  }
+
+  .with-sidebar > div > :first-child {
+    flex-basis: 0;
+    flex-grow: 999;
+    min-width: calc(50% - var(--s1));
+  }
+
+= if @auth_state == :logged_in do
+  nav.navbar role="navigation" aria-label="main navigation"
+    .navbar-brand 
+      = link to: Routes.page_path(@socket, :index), class: "navbar-item" do
+        = img_tag Routes.static_path(@socket, "/images/logo.png"), height: 28
+
+      = link to: "#", class: "navbar-burger burger", aria_label: "menu", aria_expanded: "false", data_target: "navbarBasicExample" do
+        span aria-hidden="true"
+        span aria-hidden="true"
+        span aria-hidden="true"
+
+    .navbar-menu#navbar
+      .navbar-start
+        = link "Home", to: "#", class: "navbar-item" 
+        = live_patch "Teams", class: "navbar-item", to: Routes.team_index_path(@socket, :index)
+        = live_patch "Projects", class: "navbar-item", to: Routes.project_index_path(@socket, :index)
+        = live_patch "Versions", class: "navbar-item", to: Routes.version_index_path(@socket, :index)
+        = live_patch "Content", class: "navbar-item", to: Routes.content_index_path(@socket, :index)
+        = live_patch "Documents", class: "navbar-item", to: Routes.document_index_path(@socket, :index)
+        = live_patch "Processes", class: "navbar-item", to: Routes.process_index_path(@socket, :index)
+        = live_component(@socket, UserDocsWeb.VersionPicker, 
+        [ current_user: @current_user,
+          current_project: @current_project,
+          current_version: @current_version ])
+
+      .navbar-end
+        .navbar-item
+          .buttons
+            = link "User", to: Routes.user_show_path(@socket, :show, @current_user.id), class: "button"
+            = link "Sign out", to: Routes.pow_session_path(@socket, :delete), method: :delete, class: "button is-light"
+
+  = live_component(@socket, UserDocsWeb.Configuration, 
+    [ id: "configuration",
+    image_path: @current_user.image_path,
+    strategy: @current_version.strategy.name |> to_string(),
+    test: "value" ])
+
+  = live_component(@socket, UserDocsWeb.ScreenShotHandler, 
+    [ id: "screenshot-handler-component",
+    team: @current_team ])
+
+  div phx-hook="automationManager"
+  div phx-hook="automatedBrowserCommands"
+
+  main.container role="main"
+    p.alert.alert-info role="alert" phx-click="lv:clear-flash" phx-value-key="info"
+      = live_flash(@flash, :info)
+
+    p class="alert alert-danger" role="alert" phx-click="lv:clear-flash" phx-value-key="error"
+      = live_flash(@flash, :error)
+      
+    div.with-sidebar
+      div 
+        div 
+          = @inner_content
+        = live_component(@socket, UserDocsWeb.DrawerLive, 
+          [ id: "navigation-drawer", current_user: @current_user, current_team: @current_team ])
+
+    <!--<%= UserDocsWeb.LiveHelpers.live_modal_menus(@socket, [ id: "modal-menus", form_data: @form_data ]) %>-->
+
