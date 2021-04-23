@@ -10,10 +10,6 @@
     app_name: @app_name,
     return_to: Routes.process_index_path(@socket, :index)
 
-= live_component @socket,
-  UserDocsWeb.AutomationBrowserHandlerLive, 
-  [ id: "automation-browser-handler", current_user: @current_user ]
-
 aside.menu
   p.menu-label Processes
   ul.menu-list
