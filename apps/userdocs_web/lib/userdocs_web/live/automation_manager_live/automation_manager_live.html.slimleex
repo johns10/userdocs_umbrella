@@ -1,4 +1,4 @@
-= content_tag :div, phx_hook: "automationManager", id: @id do 
+= content_tag :div, id: @id do 
   .field.has-addons   
     p.control 
       button.button 
