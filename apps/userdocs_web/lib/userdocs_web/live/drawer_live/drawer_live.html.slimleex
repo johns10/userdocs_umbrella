@@ -1,0 +1,49 @@
+css: 
+  #collapsible {
+    display: none;
+  }
+  #collapsible:checked ~ #sidebar {
+    flex-basis: 0;
+    min-width: auto;
+  }
+  #collapsible:checked ~ div > div > .text {
+    width: 0px;
+    visibility: hidden;
+  }
+  #collapsible:checked ~ div > .sidebar-content {
+    flex-basis: 0;
+    display: none;
+  }
+  .sidebar-content {
+    transition: display 250ms ease-in-out;
+    white-space: nowrap;
+  }
+  .text {
+    white-space: nowrap;
+  }
+  #sidebar {
+    margin: calc(var(--s1) / 2);
+    flex-basis: 30%;
+    flex-grow: 1;
+    min-width: 30%;
+    transition: flex-basis 250ms ease-in-out;
+  }
+
+input id="collapsible" class="toggle" type="checkbox" checked=@closed
+div#sidebar.is-flex.is-flex-direction-column
+  .box.is-flex.is-flex-direction-row.is-justify-content-space-between.py-3.px-4.has-background-primary.has-text-primary-light.is-shadowless.mb-0
+    h2.text Automation Manager
+    = if not @closed do
+      i.fa.fa-minus-square.py-1 phx-click="toggle-sidebar" phx-target="<%= @myself.cid %>"
+    - else 
+      i.fa.fa-plus-square.py-1 phx-click="toggle-sidebar" phx-target="<%= @myself.cid %>"
+  .box.pl-4.pt-4.pr-0.sidebar-content
+    = live_component @socket,
+      UserDocsWeb.AutomationBrowserHandlerLive, 
+      [ id: "automation-browser-handler",
+      current_user: @current_user ]
+  
+    = live_component @socket,
+      UserDocsWeb.AutomationManagerLive,
+      [ id: "automation-manager", 
+      job: @current_team.job ]  
