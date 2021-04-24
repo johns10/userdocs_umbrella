@@ -310,6 +310,7 @@ defmodule UserDocs.Automation do
         :element,
         :step_type,
         :process,
+        :screenshot,
         annotation: {annotation, :annotation_type},
         element: {element, :strategy},
       ]
@@ -336,6 +337,8 @@ defmodule UserDocs.Automation do
     opts = Keyword.delete(opts, :filter)
     StateHandlers.preload(state, step, opts)
   end
+
+  #def step_status(%Step{ screenshot} = step)
 
   @doc """
   Creates a step.
