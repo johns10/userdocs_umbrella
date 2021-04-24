@@ -35,16 +35,6 @@ div
       = live_component @socket, UserDocsWeb.ScreenshotLive.Approve, 
         [ id: "screenshot-approval-modal", step: @step, team: @current_team ]
 
-  = live_component(@socket, UserDocsWeb.ProcessLive.Runner, 
-    [ id: "process-" <> Integer.to_string(@process.id) <> "-runner",
-    process: @process,
-    app_name: @app_name ])
-
-  = live_component(@socket, UserDocsWeb.ProcessLive.Queuer, 
-    [ id: "process-" <> Integer.to_string(@process.id) <> "-queuer",
-    process: @process,
-    app_name: @app_name ])
-
   aside.menu 
     p.menu-label Steps
     ul.menu-list
