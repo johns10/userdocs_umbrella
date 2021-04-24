@@ -16,11 +16,11 @@ defmodule UserDocsWeb.Router do
     case conn.host do
       "dev-electron-app.user-docs.com" ->
         conn
-        |> put_root_layout({UserDocsWeb.LayoutView, :electron_root})
+        |> put_root_layout({UserDocsWeb.LayoutView, :root})
         |> assign(:app_name, :electron)
       "electron-app.user-docs.com" ->
         conn
-        |> put_root_layout({UserDocsWeb.LayoutView, :electron_root})
+        |> put_root_layout({UserDocsWeb.LayoutView, :root})
         |> assign(:app_name, :electron)
       "extension.user-docs.com" ->
         conn
