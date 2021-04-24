@@ -8,9 +8,9 @@ css:
   }
   #collapsible:checked ~ div > div > .text {
     width: 0px;
-    visibility: hidden;
+    display: none;
   }
-  #collapsible:checked ~ div > .sidebar-content {
+  #collapsible:checked ~ #sidebar > .sidebar-content {
     flex-basis: 0;
     display: none;
   }
