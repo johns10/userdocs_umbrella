@@ -40,8 +40,10 @@ div#sidebar.is-flex.is-flex-direction-column
   .box.pl-4.pt-4.pr-0.sidebar-content
     = live_component @socket,
       UserDocsWeb.AutomationBrowserHandlerLive, 
-      [ id: "automation-browser-handler",
-      current_user: @current_user ]
+      [ id: "automated-browser-controls",
+      current_user: @current_user,
+      browser_opened: @browser_opened,
+      user_opened_browser: @user_opened_browser ]
   
     = live_component @socket,
       UserDocsWeb.AutomationManagerLive,

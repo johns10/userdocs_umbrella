@@ -72,7 +72,12 @@ css:
         div 
           = @inner_content
         = live_component(@socket, UserDocsWeb.DrawerLive, 
-          [ id: "navigation-drawer", current_user: @current_user, current_team: @current_team ])
+          [ id: "navigation-drawer", 
+          current_user: @current_user, 
+          current_team: @current_team,
+          browser_opened: @browser_opened,
+          user_opened_browser: @user_opened_browser,
+          closed: @navigation_drawer_closed  ])
 
     <!--<%= UserDocsWeb.LiveHelpers.live_modal_menus(@socket, [ id: "modal-menus", form_data: @form_data ]) %>-->
 
