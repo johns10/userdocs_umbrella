@@ -23,33 +23,31 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   alias UserDocsWeb.Defaults
   alias UserDocsWeb.DocubitLive.Renderers.Base
 
-  @types [
-    UserDocs.Documents.Document,
-    UserDocs.Documents.DocumentVersion,
-    UserDocs.Web.Page,
-    UserDocs.Automation.Process,
-    UserDocs.Documents.Content,
-    UserDocs.Documents.ContentVersion,
-    UserDocs.Automation.Step,
-    UserDocs.Documents.LanguageCode,
-    UserDocs.Web.Annotation,
-    UserDocs.Documents.Docubit,
-    UserDocs.Documents.DocubitType,
-    UserDocs.Media.Screenshot,
-    UserDocs.Projects.Version,
-    UserDocs.Users.Team
-]
+  def types() do
+    [
+      UserDocs.Documents.Document,
+      UserDocs.Documents.DocumentVersion,
+      UserDocs.Web.Page,
+      UserDocs.Automation.Process,
+      UserDocs.Documents.Content,
+      UserDocs.Documents.ContentVersion,
+      UserDocs.Automation.Step,
+      UserDocs.Documents.LanguageCode,
+      UserDocs.Web.Annotation,
+      UserDocs.Documents.Docubit,
+      UserDocs.Documents.DocubitType,
+      UserDocs.Media.Screenshot,
+      UserDocs.Projects.Version,
+      UserDocs.Users.Team
+    ]
+  end
 
   @impl true
   def mount(_params, session, socket) do
-    opts = Defaults.opts(socket, @types)
-
     {
       :ok,
       socket
-      |> StateHandlers.initialize(opts)
-      |> Root.authorize(session)
-      |> (&(Root.initialize(&1, Defaults.opts(&1, @types)))).()
+      |> Root.apply(session, types())
     }
   end
 
@@ -57,7 +55,7 @@ defmodule UserDocsWeb.DocumentLive.Viewer do
   def handle_params(%{"id" => id}, _, %{ assigns: %{ auth_state: :logged_in }} = socket) do
     id = String.to_integer(id)
     document = Documents.get_document!(id, %{ document_versions: true })
-    opts = Defaults.opts(socket, @types)
+    opts = Defaults.opts(socket, types)
     {
       :noreply,
       socket

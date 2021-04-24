@@ -8,19 +8,19 @@ defmodule UserDocsWeb.UserLive.Show do
   alias UserDocs.Helpers
 
 
-  @types [
-    UserDocs.Users.User,
-    UserDocs.Users.Team,
-  ]
+  def types() do
+    [
+      UserDocs.Users.User,
+      UserDocs.Users.Team,
+    ]
+  end
 
   @impl true
   def mount(_params, session, socket) do
-    opts = Defaults.opts(socket, @types)
     {
       :ok,
       socket
-      |> Root.authorize(session)
-      |> Root.initialize(opts)
+      |> Root.apply(session, types())
     }
   end
 

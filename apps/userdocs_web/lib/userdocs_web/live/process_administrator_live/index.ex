@@ -33,19 +33,21 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
     UserDocs.Web.Page
   ]
 
-  @types [
-    UserDocs.Web.AnnotationType,
-    UserDocs.Web.Strategy,
-    UserDocs.Documents.LanguageCode,
-    UserDocs.Automation.StepType,
-    UserDocs.Documents.Content,
-    UserDocs.Documents.ContentVersion,
-    UserDocs.Automation.Process,
-    UserDocs.Automation.Step,
-    UserDocs.Web.Annotation,
-    UserDocs.Web.Element,
-    UserDocs.Web.Page
-  ]
+  def types() do
+    [
+      UserDocs.Web.AnnotationType,
+      UserDocs.Web.Strategy,
+      UserDocs.Documents.LanguageCode,
+      UserDocs.Automation.StepType,
+      UserDocs.Documents.Content,
+      UserDocs.Documents.ContentVersion,
+      UserDocs.Automation.Process,
+      UserDocs.Automation.Step,
+      UserDocs.Web.Annotation,
+      UserDocs.Web.Element,
+      UserDocs.Web.Page
+    ]
+  end
 
   defp base_opts() do
     UserDocsWeb.Defaults.state_opts()
@@ -64,12 +66,10 @@ defmodule UserDocsWeb.ProcessAdministratorLive.Index do
   def mount(_params, session, socket) do
     # Get Data from the Database
     Logger.debug("DB operations")
-    opts = base_opts()
 
     socket =
       socket
-      |> Root.authorize(session)
-      |> Root.initialize(opts)
+      |> Root.apply(session, types())
       |> initialize()
       |> assign(:form_data, %{ action: :show })
 

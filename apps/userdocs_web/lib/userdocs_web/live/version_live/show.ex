@@ -12,17 +12,18 @@ defmodule UserDocsWeb.VersionLive.Show do
   alias UserDocsWeb.Root
   alias UserDocsWeb.ComposableBreadCrumb
 
-  @types [
-    UserDocs.Projects.Version
-  ]
+  def types() do
+    [
+      UserDocs.Projects.Version
+    ]
+  end
 
   @impl true
   def mount(_params, session, socket) do
     {
       :ok,
       socket
-      |> Root.authorize(session)
-      |> Root.initialize(Defaults.base_opts(@types))
+      |> Root.apply(session, types())
       |> initialize()
     }
   end
