@@ -110,9 +110,6 @@ defmodule UserDocsWeb.StepLive.Index do
     send(self(), { :broadcast, "delete", deleted_step })
     {:noreply, socket}
   end
-  def handle_event("toggle-sidebar", _payload, socket) do
-    { :noreply, assign(socket, :sidebar_open, not socket.assigns.sidebar_open) }
-  end
 
   @impl true
   defp apply_action(socket, :edit, %{"id" => id}) do

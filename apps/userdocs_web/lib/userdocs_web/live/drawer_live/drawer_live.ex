@@ -19,9 +19,7 @@ defmodule UserDocsWeb.DrawerLive do
 
     {
       :ok,
-      socket
-      |> assign(:current_user, assigns.current_user)
-      |> assign(:current_team, assigns.current_team)
+      assign(socket, assigns)
     }
   end
 
@@ -29,8 +27,9 @@ defmodule UserDocsWeb.DrawerLive do
   def handle_event("validate",params, socket) do
     { :noreply, socket }
   end
-  def handle_event("toggle-sidebar", _payload, socket) do
-    { :noreply, assign(socket, :closed, not socket.assigns.closed) }
+  def handle_event("toggle-sidebar", _params, socket) do
+    send(self(), { :update_session, [ { "navigation_drawer_closed", not socket.assigns.closed } ] })
+    { :noreply, socket }
   end
 
   def checkbox(boolean) do

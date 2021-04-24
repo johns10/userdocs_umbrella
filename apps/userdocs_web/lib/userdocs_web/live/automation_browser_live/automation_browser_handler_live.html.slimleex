@@ -1,4 +1,4 @@
-div id="automated-browser-handler" phx-hook="automatedBrowserEvents"
+div phx-hook="automatedBrowserEvents" id="<%= @id %>"
   = if @user_opened_browser do 
     = link to: "#", phx_click: "close-browser", phx_target: @myself.cid, class: "control" do
       i.fa.fa-toggle-on.px-1
@@ -7,7 +7,7 @@ div id="automated-browser-handler" phx-hook="automatedBrowserEvents"
       i.fa.fa-toggle-off.px-1
 
 
-  = if @current_user.browser_session do 
+  = if @browser_opened do 
     i.fa.fa-chrome.pb-3.px-1.has-text-success
   - else
     i.fa.fa-chrome.pb-3.px-1 style="color:grey;"
