@@ -10,20 +10,20 @@ defmodule UserDocsWeb.ProjectLive.Index do
   alias UserDocs.Projects
   alias UserDocs.Projects.Project
   alias UserDocsWeb.ComposableBreadCrumb
-  alias UserDocsWeb.Defaults
   alias UserDocsWeb.Root
 
-  @types [
-    UserDocs.Projects.Project
-  ]
+  def types() do
+    [
+      UserDocs.Projects.Project
+    ]
+  end
 
   @impl true
   def mount(_params, session, socket) do
     {
       :ok,
       socket
-      |> Root.authorize(session)
-      |> (&(Root.initialize(&1, Defaults.opts(&1, @types)))).()
+      |> Root.apply(session, types())
       |> initialize()
     }
   end

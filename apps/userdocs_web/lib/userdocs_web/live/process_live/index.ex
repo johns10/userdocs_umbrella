@@ -14,27 +14,27 @@ defmodule UserDocsWeb.ProcessLive.Index do
   alias UserDocsWeb.Root
   alias UserDocsWeb.ProcessLive.Runner
 
-  @types [
-    UserDocs.Automation.Process,
-    UserDocs.Projects.Version,
-    UserDocs.Media.Screenshot,
-  ]
+  def types() do
+    [
+      UserDocs.Automation.Process,
+      UserDocs.Projects.Version,
+      UserDocs.Media.Screenshot,
+    ]
+  end
 
   @impl true
   def mount(_params, session, socket) do
-    opts = Defaults.opts(socket, @types)
     {
       :ok,
       socket
-      |> Root.authorize(session)
-      |> Root.initialize(opts)
+      |> Root.apply(session, types())
       |> assign(:select_lists, %{})
       |> initialize()
     }
   end
 
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
-    opts = Defaults.opts(socket, @types)
+    opts = Defaults.opts(socket, types())
 
     socket
     |> load_processes(opts)

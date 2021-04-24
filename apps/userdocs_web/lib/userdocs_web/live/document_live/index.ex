@@ -12,37 +12,34 @@ defmodule UserDocsWeb.DocumentLive.Index do
   alias UserDocsWeb.Loaders
 
 
-  @types [
-    UserDocs.Documents.Document,
-    UserDocs.Documents.DocumentVersion,
-    UserDocs.Projects.Version,
-    UserDocs.Projects.Project,
-    UserDocs.Users.Team
-  ]
+  def types() do
+    [
+      UserDocs.Documents.Document,
+      UserDocs.Documents.DocumentVersion,
+      UserDocs.Projects.Version,
+      UserDocs.Projects.Project,
+      UserDocs.Users.Team
+    ]
+  end
 
   @impl true
   def mount(_params, session, socket) do
     {
       :ok,
       socket
-      |> Root.authorize(session)
-      |> (&(Root.initialize(&1, Defaults.opts(&1, @types)))).()
+      |> Root.apply(session, types())
       |> initialize()
     }
   end
 
   def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
-    opts = Defaults.opts(socket, @types)
     socket
-    |> StateHandlers.initialize(opts)
     |> load_document_versions()
     |> load_documents()
     |> Loaders.versions()
     |> Loaders.projects()
     |> prepare_documents()
     |> projects_select_list()
-    |> assign(:state_opts, opts)
-    |> StateHandlers.inspect(opts)
   end
   def initialize(socket), do: socket
 

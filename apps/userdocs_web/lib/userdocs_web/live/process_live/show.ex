@@ -11,7 +11,6 @@ defmodule UserDocsWeb.ProcessLive.Show do
   alias UserDocs.Projects
   alias UserDocs.Documents
   alias UserDocs.Helpers
-  alias UserDocs.Automation.Process
   alias UserDocs.Web.Strategy
   alias UserDocs.Automation.Process.RecentPage
 
@@ -30,27 +29,28 @@ defmodule UserDocsWeb.ProcessLive.Show do
     UserDocs.Web.Page
   ]
 
-  @types [
-    UserDocs.Web.AnnotationType,
-    UserDocs.Web.Strategy,
-    UserDocs.Documents.LanguageCode,
-    UserDocs.Automation.StepType,
-    UserDocs.Documents.Content,
-    UserDocs.Documents.ContentVersion,
-    UserDocs.Automation.Process,
-    UserDocs.Automation.Step,
-    UserDocs.Web.Annotation,
-    UserDocs.Web.Element,
-    UserDocs.Web.Page
-  ]
+  def types() do
+    [
+      UserDocs.Web.AnnotationType,
+      UserDocs.Web.Strategy,
+      UserDocs.Documents.LanguageCode,
+      UserDocs.Automation.StepType,
+      UserDocs.Documents.Content,
+      UserDocs.Documents.ContentVersion,
+      UserDocs.Automation.Process,
+      UserDocs.Automation.Step,
+      UserDocs.Web.Annotation,
+      UserDocs.Web.Element,
+      UserDocs.Web.Page
+    ]
+  end
 
   @impl true
   def mount(_params, session, socket) do
     {
       :ok,
       socket
-      |> Root.authorize(session)
-      |> Root.initialize(Defaults.base_opts(@types))
+      |> Root.apply(session, types())
       |> initialize()
     }
   end

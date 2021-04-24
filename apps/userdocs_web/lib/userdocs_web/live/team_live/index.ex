@@ -7,24 +7,23 @@ defmodule UserDocsWeb.TeamLive.Index do
   alias UserDocs.Documents
   alias UserDocs.Users.Team
   alias UserDocs.Helpers
-  alias UserDocsWeb.Defaults
   alias UserDocsWeb.Root
   alias UserDocsWeb.ComposableBreadCrumb
 
-  @types [
-    UserDocs.Users.Team,
-    UserDocs.Users.User,
-    UserDocs.Documents.LanguageCode
-  ]
+  def types() do
+    [
+      UserDocs.Users.Team,
+      UserDocs.Users.User,
+      UserDocs.Documents.LanguageCode
+    ]
+  end
 
   @impl true
   def mount(_params, session, socket) do
-    opts = Defaults.opts(socket, @types)
     {
       :ok,
       socket
-      |> Root.authorize(session)
-      |> Root.initialize(opts)
+      |> Root.apply(session, types())
       |> initialize()
     }
   end

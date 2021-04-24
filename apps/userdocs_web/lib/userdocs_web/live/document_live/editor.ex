@@ -29,34 +29,32 @@ defmodule UserDocsWeb.DocumentLive.Editor do
 
   @allowed_step_types ["Full Screen Screenshot", "Element Screenshot", "Apply Annotation"]
 
-  @types [
-    UserDocs.Automation.Process,
-    UserDocs.Automation.Step,
-    UserDocs.Documents.Content,
-    UserDocs.Documents.ContentVersion,
-    UserDocs.Documents.Docubit,
-    UserDocs.Documents.DocubitType,
-    UserDocs.Documents.Document,
-    UserDocs.Documents.DocumentVersion,
-    UserDocs.Documents.LanguageCode,
-    UserDocs.Media.Screenshot,
-    UserDocs.Projects.Version,
-    UserDocs.Users.Team,
-    UserDocs.Web.Annotation,
-    UserDocs.Web.AnnotationType,
-    UserDocs.Web.Page,
-  ]
+  def types() do
+    [
+      UserDocs.Automation.Process,
+      UserDocs.Automation.Step,
+      UserDocs.Documents.Content,
+      UserDocs.Documents.ContentVersion,
+      UserDocs.Documents.Docubit,
+      UserDocs.Documents.DocubitType,
+      UserDocs.Documents.Document,
+      UserDocs.Documents.DocumentVersion,
+      UserDocs.Documents.LanguageCode,
+      UserDocs.Media.Screenshot,
+      UserDocs.Projects.Version,
+      UserDocs.Users.Team,
+      UserDocs.Web.Annotation,
+      UserDocs.Web.AnnotationType,
+      UserDocs.Web.Page,
+    ]
+  end
 
   @impl true
   def mount(_params, session, socket) do
-    opts = Defaults.opts(socket, @types)
-
     {
       :ok,
       socket
-      |> StateHandlers.initialize(opts)
-      |> Root.authorize(session)
-      |> (&(Root.initialize(&1, Defaults.opts(&1, @types)))).()
+      |> Root.apply(session, types())
       |> assign(:dragging, %{ type: nil, id: nil})
     }
   end

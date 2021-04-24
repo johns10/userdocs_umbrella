@@ -12,18 +12,18 @@ defmodule UserDocsWeb.VersionLive.Index do
   alias UserDocsWeb.Defaults
   alias UserDocsWeb.Root
 
-  @types [
-    UserDocs.Projects.Version
-  ]
+  def types() do
+    [
+      UserDocs.Projects.Version
+    ]
+  end
 
   @impl true
   def mount(_params, session, socket) do
-    opts = Defaults.opts(socket, @types)
     {
       :ok,
       socket
-      |> Root.authorize(session)
-      |> Root.initialize(opts)
+      |> Root.apply(session, types())
       |> initialize()
     }
   end
@@ -32,7 +32,7 @@ defmodule UserDocsWeb.VersionLive.Index do
     socket
     |> assign(:modal_action, :show)
     |> assign(:select_lists, %{})
-    |> assign(:state_opts, Defaults.opts(socket, @types))
+    |> assign(:state_opts, Defaults.opts(socket, types()))
     |> load_versions()
   end
   def initialize(socket), do: socket

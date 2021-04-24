@@ -9,21 +9,21 @@ defmodule UserDocsWeb.ProjectLive.Show do
   alias UserDocsWeb.Defaults
   alias UserDocsWeb.Root
 
-  @types [
-    UserDocs.Projects.Project
-  ]
+  def types() do
+    [
+      UserDocs.Projects.Project
+    ]
+  end
 
   @impl true
   def mount(_params, session, socket) do
     socket =
-      socket
-      |> Root.authorize(session)
-      |> Root.initialize(Defaults.base_opts(@types))
-      |> initialize()
 
     {
       :ok,
       socket
+      |> Root.apply(session, types())
+      |> initialize()
     }
   end
 
