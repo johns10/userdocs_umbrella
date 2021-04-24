@@ -1,0 +1,15 @@
+div
+  = if @screenshot.aws_screenshot do 
+    = img_tag @aws_screenshot
+
+div
+  = if @screenshot.aws_provisional_screenshot do 
+    = img_tag @aws_provisional_screenshot
+
+div
+  = if @screenshot.aws_diff_screenshot do 
+    = img_tag @aws_diff_screenshot
+
+= if @screenshot.aws_provisional_screenshot do 
+  = link "Approve", to: "#", phx_click: "approve-provisional", class: "button is-success", type: "button"
+  = link "Reject", to: "#", phx_click: "reject-provisional", class: "button is-danger", type: "button"
