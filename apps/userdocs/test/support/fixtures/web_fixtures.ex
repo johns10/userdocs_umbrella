@@ -46,9 +46,7 @@ defmodule UserDocs.WebFixtures do
 
   def element(page_id, strategy_id) when is_integer(page_id) and is_integer(strategy_id) do
     {:ok, object } =
-      element_attrs(:valid)
-      |> Map.put(:page_id, page_id)
-      |> Map.put(:strategy_id, strategy_id)
+      element_attrs(:valid, page_id, strategy_id)
       |> Web.create_element()
     object
   end
@@ -91,10 +89,21 @@ defmodule UserDocs.WebFixtures do
     }
   end
 
-  def element_attrs(:valid) do
+  def element_attrs(:valid, page_id, strategy_id) do
     %{
       name: UUID.uuid4(),
-      selector: UUID.uuid4()
+      selector: UUID.uuid4(),
+      page_id: page_id,
+      strategy_id: strategy_id
+    }
+  end
+
+  def element_attrs(:invalid, page_id, strategy_id) do
+    %{
+      name: nil,
+      selector: nil,
+      page_id: page_id,
+      strategy_id: strategy_id
     }
   end
 
