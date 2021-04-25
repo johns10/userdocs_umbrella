@@ -30,7 +30,7 @@ defmodule UserDocs.SubscriptionTest do
       project = UserDocs.ProjectsFixtures.project(team.id)
       version = UserDocs.ProjectsFixtures.version(project.id)
       page = UserDocs.WebFixtures.page(version.id)
-      content = UserDocs.DocumentVersionFixtures.content(team)
+      content = UserDocs.DocumentVersionFixtures.content(team.id)
       element = UserDocs.WebFixtures.element(page, strategy)
       |> Map.put(:page, page)
       |> Map.put(:strategy, strategy)
