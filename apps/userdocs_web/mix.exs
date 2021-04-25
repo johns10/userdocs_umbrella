@@ -38,9 +38,9 @@ defmodule UserDocsWeb.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.7"},
+      {:phoenix, "~> 1.5"},
       {:phoenix_ecto, "~> 4.2"},
-      {:phoenix_live_view, "~> 0.15.4"},
+      {:phoenix_live_view, "~> 0.15"},
       {:floki, ">= 0.27.0", only: :test},
       {:phoenix_html, "~> 2.14"},
       {:phoenix_live_reload, "~> 1.3", only: :dev},
@@ -51,7 +51,7 @@ defmodule UserDocsWeb.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.0"},
-      {:pow, "~> 1.0.22"},
+      {:pow, "~> 1.0.23"},
       {:uuid, "~> 1.1"},
       {:dialyxir, "~> 0.5.0", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
