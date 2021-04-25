@@ -29,7 +29,6 @@ defmodule UserDocs.Documents.DocumentVersion do
 
   @doc false
   def changeset(document_version, attrs) do
-    IO.puts("DV Changeset")
     document_version
     |> Map.put(:temp_id, (document_version.temp_id || attrs["temp_id"]))
     |> cast(attrs, [ :name, :document_id, :version_id, :docubit_id, :delete ])
