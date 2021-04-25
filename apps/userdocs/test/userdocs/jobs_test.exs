@@ -8,6 +8,7 @@ defmodule UserDocs.JobsTest do
   alias UserDocs.UsersFixtures
   alias UserDocs.ProjectsFixtures
   alias UserDocs.WebFixtures
+  alias UserDocs.MediaFixtures
 
   defp fixture(:user), do: UsersFixtures.user()
   defp fixture(:team), do: UsersFixtures.team()
@@ -20,10 +21,8 @@ defmodule UserDocs.JobsTest do
   defp fixture(:element, page_id, strategy_id), do: WebFixtures.element(page_id, strategy_id)
   defp fixture(:annotation, page_id), do: WebFixtures.annotation(page_id)
   defp fixture(:step_types), do: AutomationFixtures.all_valid_step_types()
-  defp fixture(:step, page_id, process_id, element_id, annotation_id, step_type_id) do
-    step = AutomationFixtures.step(page_id, process_id, element_id, annotation_id, step_type_id)
-    UserDocs.Automation.get_step!(step.id)
-  end
+  defp fixture(:step, page_id, process_id, element_id, annotation_id, step_type_id), do: AutomationFixtures.step(page_id, process_id, element_id, annotation_id, step_type_id)
+  defp fixture(:screenshot, step_id), do: MediaFixtures.screenshot(step_id)
 
   defp create_user(_), do: %{user: fixture(:user)}
   defp create_team(%{user: user}), do: %{team: fixture(:team)}
@@ -37,8 +36,10 @@ defmodule UserDocs.JobsTest do
   defp create_annotation(%{page: page}), do: %{annotation: fixture(:annotation, page.id)}
   defp create_step_types(_), do: %{step_types: fixture(:step_types)}
   defp create_step(%{page: page, process: process, element: element, annotation: annotation, step_types: step_types}) do
-    %{step: fixture(:step, page.id, process.id, element.id, annotation.id, step_types |> Enum.at(0) |> Map.get(:id))}
+    %{ step_id: fixture(:step, page.id, process.id, element.id, annotation.id, step_types |> Enum.at(0) |> Map.get(:id)) |> Map.get(:id) }
   end
+  defp create_screenshot(%{ step_id: step_id }), do: %{ screenshot: fixture(:screenshot, step_id)}
+  defp query_step(%{ step_id: step_id }), do: %{ step: UserDocs.Automation.get_step!(step_id) }
 
   describe "jobs" do
     alias UserDocs.Jobs.Job
@@ -55,7 +56,9 @@ defmodule UserDocs.JobsTest do
       :create_element,
       :create_annotation,
       :create_step_types,
-      :create_step
+      :create_step,
+      :create_screenshot,
+      :query_step
     ]
 
     test "list_job/0 returns all job instances", %{ team: team } do
