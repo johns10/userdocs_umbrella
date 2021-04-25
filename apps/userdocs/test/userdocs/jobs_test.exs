@@ -176,10 +176,10 @@ defmodule UserDocs.JobsTest do
 
     test "export_job/1 exports stuff in the right order", %{ team: team, step: step, process: process } do
       job = JobsFixtures.job(team.id)
-      pi1 = JobsFixtures.process_instance(process.id, job.id) |> Map.put(:process, process)
+      pi1 = JobsFixtures.process_instance(process.id, job.id) |> Map.put(:process, process) |> Map.put(:order, 1)
       si1 = JobsFixtures.step_instance(step.id, nil, pi1.id) |> Map.put(:step, step)
       si2 = JobsFixtures.step_instance(step.id, nil, pi1.id) |> Map.put(:step, step)
-      pi2 = JobsFixtures.process_instance(process.id, job.id) |> Map.put(:process, process)
+      pi2 = JobsFixtures.process_instance(process.id, job.id) |> Map.put(:process, process) |> Map.put(:order, 2)
       si3 = JobsFixtures.step_instance(step.id, nil, pi2.id) |> Map.put(:step, step)
       si4 = JobsFixtures.step_instance(step.id, nil, pi2.id) |> Map.put(:step, step)
       pi1 = Map.put(pi1, :step_instances, [ si1, si2 ])
