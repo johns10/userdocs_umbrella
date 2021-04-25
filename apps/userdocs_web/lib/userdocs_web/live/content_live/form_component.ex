@@ -151,6 +151,7 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
           :noreply,
           socket
           |> put_flash(:info, "Content created successfully")
+          |> push_redirect(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
