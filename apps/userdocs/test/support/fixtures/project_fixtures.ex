@@ -8,9 +8,9 @@ defmodule UserDocs.ProjectsFixtures do
       |> Projects.create_project()
       project
   end
-  def version(project_id) do
+  def version(project_id \\ nil, strategy_id \\ nil) do
     {:ok, version } =
-      version_attrs(:valid, project_id)
+      version_attrs(:valid, project_id, strategy_id)
       |> Projects.create_version()
       version
   end
@@ -23,10 +23,11 @@ defmodule UserDocs.ProjectsFixtures do
     }
   end
 
-  def version_attrs(:valid, project_id \\ nil) do
+  def version_attrs(:valid, project_id \\ nil, strategy_id \\ nil) do
     %{
       name: UUID.uuid4(),
-      project_id: project_id
+      project_id: project_id,
+      strategy_id: strategy_id
     }
   end
 
