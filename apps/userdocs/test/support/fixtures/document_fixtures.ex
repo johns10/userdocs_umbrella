@@ -64,9 +64,9 @@ defmodule UserDocs.DocumentVersionFixtures do
     empty_document_version
   end
 
-  def content(team) do
+  def content(team_id) do
     {:ok, object } =
-      content_attrs(team.id, :valid)
+      content_attrs(:valid, team_id)
       |> Documents.create_content()
     object
   end
@@ -87,9 +87,15 @@ defmodule UserDocs.DocumentVersionFixtures do
     }
   end
 
-  def content_attrs(team_id, :valid) do
+  def content_attrs(:valid, team_id) do
     %{
       name: UUID.uuid4(),
+      team_id: team_id
+    }
+  end
+  def content_attrs(:invalid, team_id) do
+    %{
+      name: nil,
       team_id: team_id
     }
   end
