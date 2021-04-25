@@ -13,7 +13,7 @@ defmodule UserDocsWeb.UserLive.LoginFormComponent do
         .container
           .columns.is-centered
             .column.is-10-tablet.is-8-desktop.is-6-widescreen
-              = form_for @changeset, path, [class: "box", as: :user], fn f ->
+              = form_for @changeset, path, [class: "box", id: "login-form", as: :user], fn f ->
                 .field
                 = label f, Pow.Ecto.Schema.user_id_field(@changeset), class: "label"
                   .control.has-icons-left
