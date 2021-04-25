@@ -25,9 +25,9 @@ defmodule UserDocs.DocumentVersionLoadTest do
 
     def state() do
       team = UsersFixtures.team()
-      content_one =  DocumentVersionFixtures.content(team)
-      content_two = DocumentVersionFixtures.content(team)
-      content_three = DocumentVersionFixtures.content(team)
+      content_one =  DocumentVersionFixtures.content(team.id)
+      content_two = DocumentVersionFixtures.content(team.id)
+      content_three = DocumentVersionFixtures.content(team.id)
       file_one = MediaFixtures.file()
       file_two = MediaFixtures.file()
       file_three = MediaFixtures.file()
