@@ -62,13 +62,9 @@ defmodule UserDocs.StateFixtures do
     user = UsersFixtures.user()
     team = UsersFixtures.team()
     team_user = UsersFixtures.team_user(user.id, team.id)
-    content_one =  DocumentVersionFixtures.content(team)
-    content_two = DocumentVersionFixtures.content(team)
-    content_three = DocumentVersionFixtures.content(team)
-    file_one = MediaFixtures.file()
-    file_two = MediaFixtures.file()
-    file_three = MediaFixtures.file()
-    file_four = MediaFixtures.file()
+    content_one =  DocumentVersionFixtures.content(team.id)
+    content_two = DocumentVersionFixtures.content(team.id)
+    content_three = DocumentVersionFixtures.content(team.id)
     badge_annotation_type = WebFixtures.annotation_type(:badge)
     outline_annotation_type = WebFixtures.annotation_type(:outline)
     page = WebFixtures.page()
@@ -122,7 +118,6 @@ defmodule UserDocs.StateFixtures do
         users: [ user ],
         teams: [ team ],
         team_users: [ team_user ],
-        files: [ file_one, file_two, file_three, file_four ],
         content: [ content_one, content_two, content_three ],
         steps: [empty_step, step_with_annotation, step_with_element, step_with_both],
         annotations: [ annotation_one, annotation_two ],
