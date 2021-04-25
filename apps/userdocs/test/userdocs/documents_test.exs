@@ -4,10 +4,23 @@ defmodule UserDocs.DocumentsTest do
   alias UserDocs.Projects
   alias UserDocs.StateFixtures
   alias UserDocs.DocumentFixtures
+  alias UserDocs.UsersFixtures
   alias UserDocs.WebFixtures
   alias UserDocs.MediaFixtures
   alias UserDocs.AutomationFixtures
   alias UserDocs.DocubitFixtures
+  alias UserDocs.ProjectsFixtures
+
+  defp fixture(:user), do: UsersFixtures.user()
+  defp fixture(:team), do: UsersFixtures.team()
+  defp fixture(:team_user, user_id, team_id), do: UsersFixtures.team_user(user_id, team_id)
+  defp fixture(:project, team_id), do: ProjectsFixtures.project(team_id)
+
+  defp create_user(_), do: %{user: fixture(:user)}
+  defp create_team(%{user: user}), do: %{team: fixture(:team)}
+  defp create_team_user(%{user: user, team: team}), do: %{team_user: fixture(:team_user, user.id, team.id)}
+  defp create_project(%{team: team}), do: %{project: fixture(:project, team.id)}
+  defp create_version(%{project: project}), do: %{version: fixture(:version, project.id)}
 
   describe "content" do
     alias UserDocs.Documents.Content
@@ -76,15 +89,22 @@ defmodule UserDocs.DocumentsTest do
     alias UserDocs.Documents.Document
     alias UserDocs.DocumentVersionFixtures, as: DocumentFixtures
 
-    test "list_documents/0 returns all documents" do
-      document = DocumentFixtures.document()
+    setup [
+      :create_user,
+      :create_team,
+      :create_team_user,
+      :create_project
+    ]
+
+    test "list_documents/0 returns all documents", %{ project: project} do
+      document = DocumentFixtures.document(project.id)
       assert Documents.list_documents() == [document]
     end
 
-    test "list_documents/2 returns all documents" do
+    test "list_documents/2 returns all documents", %{ project: project} do
       opts = [ data_type: :list, strategy: :by_type ]
       state = DocumentFixtures.state()
-      document = DocumentFixtures.document()
+      document = DocumentFixtures.document(project.id)
       assert Documents.list_documents(state, opts) == state.documents
     end
 
@@ -95,13 +115,13 @@ defmodule UserDocs.DocumentsTest do
       assert document.document_versions == state.document_versions
     end
 
-    test "get_document!/1 returns the document with given id" do
-      document = DocumentFixtures.document()
+    test "get_document!/1 returns the document with given id", %{ project: project} do
+      document = DocumentFixtures.document(project.id)
       assert Documents.get_document!(document.id) == document
     end
 
-    test "create_document/1 with valid data creates a document" do
-      attrs = DocumentFixtures.document_attrs(:valid)
+    test "create_document/1 with valid data creates a document", %{ project: project} do
+      attrs = DocumentFixtures.document_attrs(:valid, project.id)
       assert {:ok, %Document{} = document} = Documents.create_document(attrs)
       assert document.name == attrs.name
     end
@@ -111,28 +131,28 @@ defmodule UserDocs.DocumentsTest do
       assert {:error, %Ecto.Changeset{}} = Documents.create_document(attrs)
     end
 
-    test "update_document/2 with valid data updates the document" do
-      document = DocumentFixtures.document()
-      attrs = DocumentFixtures.document_attrs(:valid)
+    test "update_document/2 with valid data updates the document", %{ project: project} do
+      document = DocumentFixtures.document(project.id)
+      attrs = DocumentFixtures.document_attrs(:valid, project.id)
       assert {:ok, %Document{} = document} = Documents.update_document(document, attrs)
       assert document.name == attrs.name
     end
 
-    test "update_document/2 with invalid data returns error changeset" do
-      document = DocumentFixtures.document()
+    test "update_document/2 with invalid data returns error changeset", %{ project: project} do
+      document = DocumentFixtures.document(project.id)
       attrs = DocumentFixtures.document_attrs(:invalid)
       assert {:error, %Ecto.Changeset{}} = Documents.update_document(document, attrs)
       assert document == Documents.get_document!(document.id)
     end
 
-    test "delete_document/1 deletes the document" do
-      document = DocumentFixtures.document()
+    test "delete_document/1 deletes the document", %{ project: project} do
+      document = DocumentFixtures.document(project.id)
       assert {:ok, %Document{}} = Documents.delete_document(document)
       assert_raise Ecto.NoResultsError, fn -> Documents.get_document!(document.id) end
     end
 
-    test "change_document/1 returns a document changeset" do
-      document = DocumentFixtures.document()
+    test "change_document/1 returns a document changeset", %{ project: project} do
+      document = DocumentFixtures.document(project.id)
       assert %Ecto.Changeset{} = Documents.change_document(document)
     end
   end
@@ -152,7 +172,6 @@ defmodule UserDocs.DocumentsTest do
       |> DocubitFixtures.docubit_types(opts)
       |> DocumentFixtures.state(opts)
       |> WebFixtures.state(opts)
-      |> MediaFixtures.add_file_to_state(opts)
       |> AutomationFixtures.state(opts)
       |> MediaFixtures.add_screenshot_to_state(opts)
       |> DocubitFixtures.state(opts)
@@ -419,12 +438,15 @@ defmodule UserDocs.DocumentsTest do
 
     test "list_docubit_types/0 returns all docubit_types" do
       docubit_type = DocubitFixtures.docubit_type(:container)
-      assert Documents.list_docubit_types() == [docubit_type]
+      expected_result =
+        Documents.list_docubit_types()
+        |> Enum.map(fn(dt) -> dt |> Map.delete(:context) end)
+      assert expected_result == [ docubit_type |> Map.delete(:context) ]
     end
 
     test "get_docubit_type!/1 returns the docubit_type with given id" do
       docubit_type = DocubitFixtures.docubit_type(:container)
-      assert Documents.get_docubit_type!(docubit_type.id) == docubit_type
+      assert Documents.get_docubit_type!(docubit_type.id) |> Map.delete(:context) == docubit_type |> Map.delete(:context)
     end
 
     test "create_docubit_types/1 with container data creates a docubit_types" do
@@ -451,7 +473,7 @@ defmodule UserDocs.DocumentsTest do
       docubit_type = DocubitFixtures.docubit_type(:container)
       attrs = DocubitFixtures.docubit_type_attrs(:invalid)
       assert {:error, %Ecto.Changeset{}} = Documents.update_docubit_type(docubit_type, attrs)
-      assert docubit_type == Documents.get_docubit_type!(docubit_type.id)
+      assert docubit_type |> Map.delete(:context) == Documents.get_docubit_type!(docubit_type.id) |> Map.delete(:context)
     end
 
     test "delete_docubit_type/1 deletes the docubit_type" do
