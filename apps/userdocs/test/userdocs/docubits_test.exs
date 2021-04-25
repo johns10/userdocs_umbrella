@@ -238,8 +238,8 @@ defmodule UserDocs.DocubitsTest do
       docubit_type_attrs = DocubitType.li_attrs()
       { :ok, docubit_type } = Documents.create_docubit_type(docubit_type_attrs)
       docubit_type = Documents.get_docubit_type!(docubit_type.id)
-      assert docubit_type.context.settings.li_value == docubit_type_attrs.context.settings.li_value
-      assert docubit_type.context.settings.name_prefix == docubit_type_attrs.context.settings.name_prefix
+      assert docubit_type.context.settings.li_value  == docubit_type_attrs.context.settings.li_value |> to_string() # TODO: Evaluate, maybe wrong
+      assert docubit_type.context.settings.name_prefix == docubit_type_attrs.context.settings.name_prefix |> to_string()
     end
   end
 end
