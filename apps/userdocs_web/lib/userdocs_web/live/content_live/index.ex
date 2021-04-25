@@ -45,7 +45,7 @@ defmodule UserDocsWeb.ContentLive.Index do
 
   @impl true
   def handle_params(%{ "team_id" => team_id } = params, url, socket) do
-    team = Users.get_team!(String.to_integer(team_id))
+    team = Users.get_team!(team_id, %{ preloads: %{ job: %{ step_instances: true, process_instances: true }}})
     socket = assign(socket, :current_team, team)
     do_handle_params(params, url, socket)
   end
