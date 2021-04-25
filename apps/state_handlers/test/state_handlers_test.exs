@@ -288,52 +288,53 @@ defmodule StateHandlersTest do
       assert result = [ user_two, user_one ]
     end
 
-  test "StateHandlers.Upsert updates a record" do
-    list_data = Enum.map(1..2, fn(_) -> UsersFixtures.user() end)
-    opts = [ data_type: :list, strategy: :by_type ]
-    initial_state = %{ users: list_data }
-    user = StateHandlers.list(initial_state, User, opts) |> Enum.at(0) |> Map.put(:email, "test@test.com")
-    result = StateHandlers.upsert(initial_state, user, opts) |> Map.get(:users) |> Enum.at(0)
-    assert result.email == "test@test.com"
-  end
+    test "StateHandlers.Upsert updates a record" do
+      list_data = Enum.map(1..2, fn(_) -> UsersFixtures.user() end)
+      opts = [ data_type: :list, strategy: :by_type ]
+      initial_state = %{ users: list_data }
+      user = StateHandlers.list(initial_state, User, opts) |> Enum.at(0) |> Map.put(:email, "test@test.com")
+      result = StateHandlers.upsert(initial_state, user, opts) |> Map.get(:users) |> Enum.at(0)
+      assert result.email == "test@test.com"
+    end
 
-  test "StateHandlers.Upsert creates a record" do
-    list_data = Enum.map(1..2, fn(_) -> UsersFixtures.user() end)
-    opts = [ data_type: :list, strategy: :by_type ]
-    initial_state = %{ users: list_data }
-    user = StateHandlers.list(initial_state, User, opts) |> Enum.at(0) |> Map.put(:email, "test@test.com")
-    result = StateHandlers.upsert(initial_state, user, opts) |> Map.get(:users) |> Enum.at(0)
-    assert result.email == "test@test.com"
-  end
+    test "StateHandlers.Upsert creates a record" do
+      list_data = Enum.map(1..2, fn(_) -> UsersFixtures.user() end)
+      opts = [ data_type: :list, strategy: :by_type ]
+      initial_state = %{ users: list_data }
+      user = StateHandlers.list(initial_state, User, opts) |> Enum.at(0) |> Map.put(:email, "test@test.com")
+      result = StateHandlers.upsert(initial_state, user, opts) |> Map.get(:users) |> Enum.at(0)
+      assert result.email == "test@test.com"
+    end
 
-  test "StateHandlers broadcast" do
-    list_data = Enum.map(1..2, fn(_) -> UsersFixtures.user() end)
-    opts = [
-      data_type: :list,
-      strategy: :by_type,
-      broadcast: true,
-      action: "update",
-      broadcast_function: &broadcaster/3,
-      channel: :test_broadcast
-    ]
-    initial_state = %{ users: list_data }
-    user = StateHandlers.list(initial_state, User, opts) |> Enum.at(0) |> Map.put(:email, "test@test.com")
-    result = StateHandlers.broadcast(initial_state, user, opts)
-  end
+    test "StateHandlers broadcast" do
+      list_data = Enum.map(1..2, fn(_) -> UsersFixtures.user() end)
+      opts = [
+        data_type: :list,
+        strategy: :by_type,
+        broadcast: true,
+        action: "update",
+        broadcast_function: &broadcaster/3,
+        channel: :test_broadcast
+      ]
+      initial_state = %{ users: list_data }
+      user = StateHandlers.list(initial_state, User, opts) |> Enum.at(0) |> Map.put(:email, "test@test.com")
+      result = StateHandlers.broadcast(initial_state, user, opts)
+    end
 
-  test "StateHandlers broadcast related data" do
-    opts = [
-      data_type: :list,
-      strategy: :by_type,
-      broadcast: true,
-      broadcast_function: &broadcaster/3,
-      channel: :test_broadcast,
-      action: "update",
-      preloads: [ :document_versions ]
-    ]
-    state = StateFixtures.state(opts)
-    data = StateHandlers.list(state, Document, opts)
-    test = StateHandlers.preload(state, data, opts[:preloads], opts) |> Enum.at(0)
-    result = StateHandlers.broadcast(state, test, opts)
+    test "StateHandlers broadcast related data" do
+      opts = [
+        data_type: :list,
+        strategy: :by_type,
+        broadcast: true,
+        broadcast_function: &broadcaster/3,
+        channel: :test_broadcast,
+        action: "update",
+        preloads: [ :document_versions ]
+      ]
+      state = StateFixtures.state(opts)
+      data = StateHandlers.list(state, Document, opts)
+      test = StateHandlers.preload(state, data, opts[:preloads], opts) |> Enum.at(0)
+      result = StateHandlers.broadcast(state, test, opts)
+    end
   end
 end
