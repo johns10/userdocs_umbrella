@@ -114,7 +114,6 @@ defmodule UserDocsWeb.DocubitLive.Renderers.Base do
 
   defp maybe_h2(current_content, %Context{ settings: %{ show_h2: true } }, content) do
     Map.put(current_content, :h2, content.title)
-    |> IO.inspect()
   end
     defp maybe_h2(current_content, %Context{ settings: %{ show_h2: false } }, _) do
     Map.put(current_content, :h2, nil)
