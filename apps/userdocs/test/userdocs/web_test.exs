@@ -2,6 +2,28 @@ defmodule UserDocs.WebTest do
   use UserDocs.DataCase
 
   alias UserDocs.Web
+  alias UserDocs.AutomationFixtures
+  alias UserDocs.UsersFixtures
+  alias UserDocs.ProjectsFixtures
+  alias UserDocs.WebFixtures
+
+  defp fixture(:user), do: UsersFixtures.user()
+  defp fixture(:team), do: UsersFixtures.team()
+  defp fixture(:team_user, user_id, team_id), do: UsersFixtures.team_user(user_id, team_id)
+  defp fixture(:project, team_id), do: ProjectsFixtures.project(team_id)
+  defp fixture(:version, project_id), do: ProjectsFixtures.version(project_id)
+  defp fixture(:process, version_id), do: AutomationFixtures.process(version_id)
+  defp fixture(:page, version_id), do: WebFixtures.page(version_id)
+  defp fixture(:strategy), do: WebFixtures.strategy()
+
+  defp create_user(_), do: %{user: fixture(:user)}
+  defp create_team(%{user: user}), do: %{team: fixture(:team)}
+  defp create_team_user(%{user: user, team: team}), do: %{team_user: fixture(:team_user, user.id, team.id)}
+  defp create_project(%{team: team}), do: %{project: fixture(:project, team.id)}
+  defp create_version(%{project: project}), do: %{version: fixture(:version, project.id)}
+  defp create_process(%{version: version}), do: %{process: fixture(:process, version.id)}
+  defp create_page(%{version: version}), do: %{page: fixture(:page, version.id)}
+  defp create_strategy(_), do: %{strategy: fixture(:strategy)}
 
   describe "pages" do
     alias UserDocs.Web.Page
@@ -125,76 +147,62 @@ defmodule UserDocs.WebTest do
     alias UserDocs.Web.Element
     alias UserDocs.Web.Strategy
 
-    @valid_attrs %{
-      name: "some name",
-      selector: "some selector"
-    }
+    setup [
+      :create_user,
+      :create_team,
+      :create_team_user,
+      :create_project,
+      :create_version,
+      :create_process,
+      :create_page,
+      :create_strategy,
+    ]
 
-    @update_attrs %{
-      name: "some updated name",
-      selector: "some updated selector",
-    }
-
-    @invalid_attrs %{name: nil, selector: nil, strategy: nil}
-    @strategy %{ name: "strategy" }
-
-    def element_fixture(attrs \\ %{}, strategy_attrs \\ @strategy) do
-      {:ok, strategy} =
-        strategy_attrs
-        |> Web.create_strategy()
-
-      {:ok, element} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Map.put(:strategy_id, strategy.id)
-        |> Web.create_element()
-
-      element
-    end
-
-    test "list_elements/0 returns all elements" do
-      element = element_fixture()
+    test "list_elements/0 returns all elements", %{ page: page, strategy: strategy } do
+      element = WebFixtures.element(page.id, strategy.id)
       assert Web.list_elements() == [element]
     end
 
-    test "get_element!/1 returns the element with given id" do
-      element = element_fixture()
+    test "get_element!/1 returns the element with given id", %{ page: page, strategy: strategy } do
+      element = WebFixtures.element(page.id, strategy.id)
       assert Web.get_element!(element.id) == element
     end
 
-    test "create_element/1 with valid data creates a element" do
-      assert {:ok, %Strategy{} = strategy} = Web.create_strategy(@strategy)
-      attrs = Map.put(@valid_attrs, :strategy_id, strategy.id)
+    test "create_element/1 with valid data creates a element", %{ page: page, strategy: strategy } do
+      attrs = WebFixtures.element_attrs(:valid, page.id, strategy.id)
       assert {:ok, %Element{} = element} = Web.create_element(attrs)
-      assert element.name == "some name"
-      assert element.selector == "some selector"
+      assert element.name == attrs.name
+      assert element.selector == attrs.selector
     end
 
-    test "create_element/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Web.create_element(@invalid_attrs)
+    test "create_element/1 with invalid data returns error changeset", %{ page: page, strategy: strategy } do
+      attrs = WebFixtures.element_attrs(:invalid, page.id, strategy.id)
+      assert {:error, %Ecto.Changeset{}} = Web.create_element(attrs)
     end
 
-    test "update_element/2 with valid data updates the element" do
-      element = element_fixture()
-      assert {:ok, %Element{} = element} = Web.update_element(element, @update_attrs)
-      assert element.name == "some updated name"
-      assert element.selector == "some updated selector"
+    test "update_element/2 with valid data updates the element", %{ page: page, strategy: strategy } do
+      element = WebFixtures.element(page.id, strategy.id)
+      attrs = WebFixtures.element_attrs(:valid, page.id, strategy.id)
+      assert {:ok, %Element{} = element} = Web.update_element(element, attrs)
+      assert element.name == attrs.name
+      assert element.selector == attrs.selector
     end
 
-    test "update_element/2 with invalid data returns error changeset" do
-      element = element_fixture()
-      assert {:error, %Ecto.Changeset{}} = Web.update_element(element, @invalid_attrs)
+    test "update_element/2 with invalid data returns error changeset", %{ page: page, strategy: strategy } do
+      element = WebFixtures.element(page.id, strategy.id)
+      attrs = WebFixtures.element_attrs(:invalid, page.id, strategy.id)
+      assert {:error, %Ecto.Changeset{}} = Web.update_element(element, attrs)
       assert element == Web.get_element!(element.id)
     end
 
-    test "delete_element/1 deletes the element" do
-      element = element_fixture()
+    test "delete_element/1 deletes the element", %{ page: page, strategy: strategy } do
+      element = WebFixtures.element(page.id, strategy.id)
       assert {:ok, %Element{}} = Web.delete_element(element)
       assert_raise Ecto.NoResultsError, fn -> Web.get_element!(element.id) end
     end
 
-    test "change_element/1 returns a element changeset" do
-      element = element_fixture()
+    test "change_element/1 returns a element changeset", %{ page: page, strategy: strategy } do
+      element = WebFixtures.element(page.id, strategy.id)
       assert %Ecto.Changeset{} = Web.change_element(element)
     end
   end
