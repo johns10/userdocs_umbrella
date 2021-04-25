@@ -35,6 +35,7 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+"""
 config :cors_plug,
   origin: [
     "chrome-extension://mkbbhaeofgjbbhopopbjnjjjfbbnaone",
@@ -45,6 +46,7 @@ config :cors_plug,
   ],
   max_age: 86400,
   methods: ["GET", "PUT", "POST", "OPTIONS"]
+"""
 
 config :phoenix, :template_engines,
   slim: PhoenixSlime.Engine,
