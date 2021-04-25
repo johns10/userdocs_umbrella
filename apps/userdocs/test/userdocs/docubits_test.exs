@@ -29,7 +29,6 @@ defmodule UserDocs.DocubitsTest do
       |> DocubitFixtures.docubit_types(opts)
       |> DocumentFixtures.state(opts)
       |> WebFixtures.state(opts)
-      |> MediaFixtures.add_file_to_state(opts)
       |> AutomationFixtures.state(opts)
       |> MediaFixtures.add_screenshot_to_state(opts)
       |> DocubitFixtures.state(opts)
@@ -100,16 +99,6 @@ defmodule UserDocs.DocubitsTest do
       assert preloaded_docubit.content == content
     end
 
-    test "Docubit.preload preloads a file" do
-      opts = Keyword.put(state_opts(), :preloads, [ :file, :docubit_type ])
-      state = docubit_fixture()
-      ol = DocubitFixtures.docubit(:ol, state, state_opts())
-      file = Media.list_files(state, state_opts()) |> Enum.at(0)
-      docubit = Map.put(ol, :file_id, file.id)
-      preloaded_docubit = StateHandlers.preload(state, [ docubit ], opts) |> Enum.at(0)
-      assert preloaded_docubit.file == file
-    end
-
     test "Docubit.preload preloads an annotation" do
       opts = Keyword.put(state_opts(), :preloads, [ :through_annotation, :docubit_type ])
       state = docubit_fixture()
@@ -158,7 +147,7 @@ defmodule UserDocs.DocubitsTest do
       docubit = DocubitFixtures.docubit(:ol, state, state_opts())
       preloaded_docubit = Documents.get_docubit!(docubit.id, %{ docubit_type: true })
       context = %Context{ settings:  %DocubitSetting{name_prefix: true} }
-     context = Docubit.context(preloaded_docubit, context)
+      context = Docubit.context(preloaded_docubit, context)
       assert context.settings.name_prefix == context.settings.name_prefix
     end
 
