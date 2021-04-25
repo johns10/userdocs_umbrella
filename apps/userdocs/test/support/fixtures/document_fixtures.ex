@@ -21,7 +21,8 @@ defmodule UserDocs.DocumentVersionFixtures do
       |> Keyword.put(:types, [ Document, DocumentVersion, Content, ContentVersion ])
 
     v = Projects.list_versions(state, opts) |> Enum.at(0)
-    document = document()
+    p = Projects.list_projects(state, opts) |> Enum.at(0)
+    document = document(p.id)
     document_version = document_version(document.id, v.id)
     t = Users.list_teams(state, opts) |> Enum.at(0)
     content = content(t)
@@ -38,7 +39,7 @@ defmodule UserDocs.DocumentVersionFixtures do
     state = StateFixtures.base_state()
     DocubitFixtures.create_docubit_types()
     v = Enum.at(state.versions, 0)
-    d = document()
+    d = document(state.project.id)
     dv = document_version(d.id, v.id)
     state
     |> Map.put(:document, d)
