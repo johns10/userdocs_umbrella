@@ -14,6 +14,10 @@ defmodule UserDocsWeb.Endpoint do
     secure: true
   ]
 
+  @pow_config [
+    otp_app: :userdocs_web
+  ]
+
   socket "/socket", UserDocsWeb.UserSocket,
     websocket: true,
     longpoll: false
@@ -54,7 +58,6 @@ defmodule UserDocsWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug Pow.Plug.Session, otp_app: :userdocs_web
-  plug CORSPlug
+  plug Pow.Plug.Session, @pow_config
   plug UserDocsWeb.Router
 end
