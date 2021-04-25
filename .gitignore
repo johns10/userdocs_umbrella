@@ -11,7 +11,10 @@
 /doc/
 
 # Ignore .fetch files in case you like to edit your project deps locally.
-/.fetch
+/.fetch     
+
+# Ignore the dist file (where we put the electron release)
+/apps/userdocs_web/assets/dist/
 
 # If the VM crashes, it generates a dump, let's ignore it too.
 erl_crash.dump
@@ -21,6 +24,7 @@ erl_crash.dump
 
 # ignore the mnesia files
 /Mnesia.nonode@nohost/
+/apps/userdocs_web/Mnesia.nonode@nohost/
 *.LOG
 *.DCD
 *.DAT
