@@ -5,15 +5,15 @@ defmodule UserDocs.UsersFixtures do
   """
   alias UserDocs.Users
 
-  def user_attrs(:valid) do
-    password = UUID.uuid4()
+  def user_attrs(type, password)
+  def user_attrs(:valid, password) do
     %{
       email: UUID.uuid4() <> "@gmail.com",
-      password: password,
-      password_confirmation: password
+      password: "testtest",
+      password_confirmation: "testtest"
     }
   end
-  def user_attrs(:invalid) do
+  def user_attrs(:invalid, _password) do
     %{
       email: UUID.uuid4(),
       password: "",
@@ -21,9 +21,9 @@ defmodule UserDocs.UsersFixtures do
     }
   end
 
-  def user() do
+  def user(password \\ UUID.uuid4()) do
     { :ok, user } =
-      user_attrs(:valid)
+      user_attrs(:valid, password)
       |> Users.create_user()
     user
   end
