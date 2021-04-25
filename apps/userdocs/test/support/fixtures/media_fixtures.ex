@@ -10,37 +10,17 @@ defmodule UserDocs.MediaFixtures do
 
   alias UserDocs.Automation
 
-  def add_file_to_state(state, opts) do
-    opts =
-      opts
-      |> Keyword.put(:types, [ File ])
-
-    file =  file()
-
-    state
-    |> StateHandlers.initialize(opts)
-    |> StateHandlers.load([file], File, opts)
-  end
-
   def add_screenshot_to_state(state, opts) do
     opts =
       opts
       |> Keyword.put(:types, [ Screenshot ])
 
     s = Automation.list_steps(state, opts) |> Enum.at(0)
-    f = Media.list_files(state, opts) |> Enum.at(0)
     screenshot = screenshot(s.id)
 
     state
     |> StateHandlers.initialize(opts)
     |> StateHandlers.load([screenshot], Screenshot, opts)
-  end
-
-  def file() do
-    {:ok, object } =
-      file_attrs(:valid)
-      |> Media.create_file()
-    object
   end
 
   def screenshot(step_id) do
@@ -60,14 +40,6 @@ defmodule UserDocs.MediaFixtures do
     %{
       name: nil,
       step_id: step_id
-    }
-  end
-  def file_attrs(:valid) do
-    %{
-      content_type: ".png",
-      filename: UUID.uuid4(),
-      hash: UUID.uuid4(),
-      size: 100
     }
   end
 end
