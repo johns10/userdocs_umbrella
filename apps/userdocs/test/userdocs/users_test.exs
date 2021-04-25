@@ -73,7 +73,6 @@ defmodule UserDocs.UsersTest do
       team = UsersFixtures.team()
       team_user = UsersFixtures.team_user(user.id, team.id)
       preloads = [ teams: :teams ]
-      team_one = UsersFixtures.team_user(user.id, team.id)
       state = %{ teams: [team], users: [user], team_users: [team_user]}
       result = Users.get_user!(user.id, preloads, [], state, @opts)
       assert result.teams == [team]
