@@ -38,11 +38,12 @@ defmodule UserDocs.UsersTest do
     end
 
     test "update_user/2 with valid data updates the user" do
-      user = UsersFixtures.user()
+      password = UUID.uuid4()
+      user = UsersFixtures.user(password)
       attrs = UsersFixtures.user_attrs(:valid)
       attrs =
         attrs
-        |> Map.put(:current_password, user.password)
+        |> Map.put(:current_password, password)
       assert {:ok, %User{} = user} = Users.update_user(user, attrs)
       assert user.email == attrs.email
     end

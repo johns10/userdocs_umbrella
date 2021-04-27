@@ -9,15 +9,15 @@ defmodule UserDocs.WebTest do
 
   defp fixture(:user), do: UsersFixtures.user()
   defp fixture(:team), do: UsersFixtures.team()
+  defp fixture(:strategy), do: WebFixtures.strategy()
   defp fixture(:team_user, user_id, team_id), do: UsersFixtures.team_user(user_id, team_id)
   defp fixture(:project, team_id), do: ProjectsFixtures.project(team_id)
   defp fixture(:version, project_id), do: ProjectsFixtures.version(project_id)
   defp fixture(:process, version_id), do: AutomationFixtures.process(version_id)
   defp fixture(:page, version_id), do: WebFixtures.page(version_id)
-  defp fixture(:strategy), do: WebFixtures.strategy()
 
   defp create_user(_), do: %{user: fixture(:user)}
-  defp create_team(%{user: user}), do: %{team: fixture(:team)}
+  defp create_team(_), do: %{team: fixture(:team)}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: fixture(:team_user, user.id, team.id)}
   defp create_project(%{team: team}), do: %{project: fixture(:project, team.id)}
   defp create_version(%{project: project}), do: %{version: fixture(:version, project.id)}
@@ -145,7 +145,6 @@ defmodule UserDocs.WebTest do
 
   describe "elements" do
     alias UserDocs.Web.Element
-    alias UserDocs.Web.Strategy
 
     setup [
       :create_user,

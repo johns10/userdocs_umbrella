@@ -3,120 +3,134 @@ defmodule UserDocsWeb.TeamLiveTest do
 
   import Phoenix.LiveViewTest
 
-  alias UserDocs.Users
+  alias UserDocs.UsersFixtures
+  alias UserDocs.WebFixtures
+  alias UserDocs.ProjectsFixtures
 
-  @create_user_attrs %{
-    email: "user@domain.com",
-    password: "password",
-    password_confirmation: "password"
-  }
+  defp create_user(%{ password: password }), do: %{user: UsersFixtures.user(password)}
+  defp create_team(_), do: %{team: UsersFixtures.team()}
+  defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
+  defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
+  defp create_project(%{ team: team }) do
+    attrs = ProjectsFixtures.project_attrs(:default, team.id)
+    { :ok, project } = UserDocs.Projects.create_project(attrs)
+    %{ project: project }
+  end
+  defp create_version(%{ project: project, strategy: strategy }), do: %{version: ProjectsFixtures.version(project.id, strategy.id)}
 
-
-  @initial_attrs %{name: "initial name", users: []}
-  @create_attrs %{name: "some name", users: []}
-  @update_attrs %{name: "some updated name", users: []}
-  @invalid_attrs %{name: nil, users: []}
-
-  defp first_user_id() do
-    Users.list_users()
-    |> Enum.at(0)
-    |> Map.get(:id)
+  defp create_password(_), do: %{ password: UUID.uuid4()}
+  defp grevious_workaround(%{ conn: conn, user: user, password: password }) do
+    conn = post(conn, "session", %{ user: %{ email: user.email, password: password } })
+    :timer.sleep(100)
+    %{ authed_conn: conn }
   end
 
-  defp fixture(:user) do
-    {:ok, user} = Users.create_user(@create_user_attrs)
-    user
-  end
-
-  defp fixture(:team) do
-    {:ok, team} = Users.create_team(@initial_attrs)
-    team
-  end
-
-  defp create_user(_) do
-    user = fixture(:user)
+  defp make_selections(%{ user: user, team: team, project: project, version: version }) do
+    { :ok, user } = UserDocs.Users.update_user_selections(user, %{
+      selected_team_id: team.id,
+      selected_project_id: project.id,
+      selected_version_id: version.id
+    })
     %{user: user}
   end
 
-  defp create_team(_) do
-    team = fixture(:team)
-    %{team: team}
-  end
-
   describe "Index" do
-    setup [:create_user, :create_team]
+    setup [
+      :create_password,
+      :create_user,
+      :create_team,
+      :create_strategy,
+      :create_team_user,
+      :create_project,
+      :create_version,
+      :make_selections,
+      :grevious_workaround
+    ]
 
-    test "lists all teams", %{conn: conn, team: team} do
+    test "lists all teams", %{authed_conn: conn, team: team} do
       {:ok, _index_live, html} = live(conn, Routes.team_index_path(conn, :index))
 
       assert html =~ "Listing Teams"
       assert html =~ team.name
     end
 
-    test "saves new team", %{conn: conn} do
+    test "saves new team", %{authed_conn: conn} do
       {:ok, index_live, _html} = live(conn, Routes.team_index_path(conn, :index))
 
-      assert index_live
-      |> element("a", "New Team")
-      |> render_click() =~ "New Team"
+      assert index_live |> element("a", "New Team") |> render_click() =~ "New Team"
 
       assert_patch(index_live, Routes.team_index_path(conn, :new))
 
       assert index_live
-      |> form("#team-form", team: @invalid_attrs)
+      |> form("#team-form", team: UsersFixtures.team_attrs(:invalid))
       |> render_change() =~ "can&apos;t be blank"
+
+      valid_attrs = UsersFixtures.team_attrs(:valid)
 
       {:ok, _, html} =
         index_live
-        |> form("#team-form", team: @create_attrs)
+        |> form("#team-form", team: valid_attrs)
         |> render_submit()
         |> follow_redirect(conn, Routes.team_index_path(conn, :index))
 
       assert html =~ "Team created successfully"
-      assert html =~ "some name"
+      assert html =~ valid_attrs.name
     end
 
-    test "updates team in listing", %{conn: conn, team: team} do
+    test "updates team in listing", %{authed_conn: conn, team: team} do
       {:ok, index_live, _html} = live(conn, Routes.team_index_path(conn, :index))
 
-      assert index_live |> element("#team-#{team.id} a", "Edit") |> render_click() =~
+      assert index_live |> element("#edit-team-" <> to_string(team.id)) |> render_click() =~
                "Edit Team"
 
       assert_patch(index_live, Routes.team_index_path(conn, :edit, team))
 
       assert index_live
-             |> form("#team-form", team: @invalid_attrs)
+             |> form("#team-form", team: UsersFixtures.team_attrs(:invalid))
              |> render_change() =~ "can&apos;t be blank"
+
+      valid_attrs = UsersFixtures.team_attrs(:valid)
 
       {:ok, _, html} =
         index_live
-        |> form("#team-form", team: @update_attrs)
+        |> form("#team-form", team: valid_attrs)
         |> render_submit()
         |> follow_redirect(conn, Routes.team_index_path(conn, :index))
 
       assert html =~ "Team updated successfully"
-      assert html =~ @update_attrs.name
+      assert html =~ valid_attrs.name
     end
 
-    test "deletes team in listing", %{conn: conn, team: team} do
+    test "deletes team in listing", %{authed_conn: conn, team: team} do
       {:ok, index_live, _html} = live(conn, Routes.team_index_path(conn, :index))
 
-      assert index_live |> element("#team-#{team.id} a", "Delete") |> render_click()
-      refute has_element?(index_live, "#team-#{team.id}")
+      assert index_live |> element("#delete-team-" <>  to_string(team.id)) |> render_click()
+      refute has_element?(index_live, "#team-" <> to_string(team.id))
     end
   end
 
   describe "Show" do
-    setup [:create_user, :create_team]
+    setup [
+      :create_password,
+      :create_user,
+      :create_team,
+      :create_strategy,
+      :create_team_user,
+      :create_project,
+      :create_version,
+      :make_selections,
+      :grevious_workaround
+    ]
 
-    test "displays team", %{conn: conn, team: team} do
+    test "displays team", %{authed_conn: conn, team: team} do
       {:ok, _show_live, html} = live(conn, Routes.team_show_path(conn, :show, team))
 
       assert html =~ "Show Team"
       assert html =~ team.name
     end
-    # TODO : Figure out why this requires team[users][]
-    test "updates team within modal", %{conn: conn, team: team} do
+    """
+    # We don't support a form on this page yet
+    test "updates team within modal", %{authed_conn: conn, team: team} do
       {:ok, show_live, _html} = live(conn, Routes.team_show_path(conn, :show, team))
 
       assert show_live
@@ -127,20 +141,20 @@ defmodule UserDocsWeb.TeamLiveTest do
       assert_patch(show_live, Routes.team_show_path(conn, :edit, team))
 
       assert show_live
-      |> form("#team-form", team: @invalid_attrs)
-      |> render_change() =~
-        "can&apos;t be blank"
+      |> form("#team-form", team: UsersFixtures.team_attrs(:invalid))
+      |> render_change() =~ "can&apos;t be blank"
 
-      team_attrs = Map.put(@update_attrs, :users, [first_user_id()])
+      valid_attrs = UsersFixtures.team_attrs(:valid)
 
       {:ok, _, html} =
         show_live
-        |> form("#team-form", team: team_attrs)
+        |> form("#team-form", team: valid_attrs)
         |> render_submit()
         |> follow_redirect(conn, Routes.team_show_path(conn, :show, team))
 
       assert html =~ "Team updated successfully"
-      assert html =~ "some updated name"
+      assert html =~ valid_attrs.name
     end
+    """
   end
 end

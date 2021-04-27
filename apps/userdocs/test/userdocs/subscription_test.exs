@@ -5,7 +5,6 @@ defmodule UserDocs.SubscriptionTest do
 
     alias UserDocs.Subscription
     alias UserDocs.Automation
-    alias UserDocs.Automation.Step
 
     def step_attrs(step_id, annotation_id, content_id) do
       %{
@@ -24,9 +23,7 @@ defmodule UserDocs.SubscriptionTest do
     def step_fixture() do
       strategy = UserDocs.WebFixtures.strategy()
       step_type = UserDocs.AutomationFixtures.step_type()
-      user = UserDocs.UsersFixtures.user()
       team = UserDocs.UsersFixtures.team()
-      team_user = UserDocs.UsersFixtures.team_user(user.id, team.id)
       project = UserDocs.ProjectsFixtures.project(team.id)
       version = UserDocs.ProjectsFixtures.version(project.id)
       page = UserDocs.WebFixtures.page(version.id)
@@ -48,7 +45,7 @@ defmodule UserDocs.SubscriptionTest do
     end
 
     test "check_changes" do
-      step = step_fixture
+      step = step_fixture()
       attrs = step_attrs(step.id, step.annotation.id, step.annotation.content.id)
       changeset = Automation.change_step(step, attrs)
       result = Subscription.check_changes(changeset)
@@ -56,7 +53,7 @@ defmodule UserDocs.SubscriptionTest do
     end
 
     test "traverse_changes" do
-      step = step_fixture
+      step = step_fixture()
       attrs = step_attrs(step.id, step.annotation.id, step.annotation.content.id)
       changeset = Automation.change_step(step, attrs)
       broadcast_actions = Subscription.check_changes(changeset)
@@ -71,11 +68,11 @@ defmodule UserDocs.SubscriptionTest do
     end
 
     test "broadcast_result" do
-      step = step_fixture
+      step = step_fixture()
       attrs = step_attrs(step.id, step.annotation.id, step.annotation.content.id)
       changeset = Automation.change_step(step, attrs)
       { :ok, updated_step } = Repo.update(changeset)
-      result = Subscription.broadcast_children(updated_step, changeset, [])
+      Subscription.broadcast_children(updated_step, changeset, [])
     end
   end
 end

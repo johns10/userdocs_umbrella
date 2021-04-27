@@ -4,7 +4,6 @@ defmodule UserDocs.DocubitsTest do
   describe "docubits" do
     alias UserDocs.Web
     alias UserDocs.Documents
-    alias UserDocs.Media
     alias UserDocs.Documents.Docubit, as: Docubit
     alias UserDocs.Documents.Docubit.Context
     alias UserDocs.Documents.DocubitType
@@ -12,7 +11,6 @@ defmodule UserDocs.DocubitsTest do
 
     alias UserDocs.DocubitFixtures
     alias UserDocs.WebFixtures
-    alias UserDocs.UsersFixtures
     alias UserDocs.AutomationFixtures
     alias UserDocs.DocumentVersionFixtures, as: DocumentFixtures
     alias UserDocs.MediaFixtures
@@ -87,8 +85,6 @@ defmodule UserDocs.DocubitsTest do
       assert docubit.context.settings.name_prefix == attrs.settings.name_prefix
     end
 
-    alias UserDocs.Documents.Content
-
     test "Docubit.preload preloads a content" do
       opts = Keyword.put(state_opts(), :preloads, [ :content, :docubit_type ])
       state = docubit_fixture()
@@ -123,7 +119,6 @@ defmodule UserDocs.DocubitsTest do
     end
 
     test "context gets the parent context and overwrites a nil settings context" do
-      opts = Keyword.put(state_opts(), :preloads, [ :docubit_type ])
       state = docubit_fixture()
       docubit = DocubitFixtures.docubit(:ol, state, state_opts())
       preloaded_docubit = Documents.get_docubit!(docubit.id, %{ docubit_type: true })
@@ -138,8 +133,8 @@ defmodule UserDocs.DocubitsTest do
       preloaded_docubit = Documents.get_docubit!(docubit.id, %{ docubit_type: true })
       context = %Context{ settings:  %DocubitSetting{li_value: "test_value"} }
       context = Docubit.context(preloaded_docubit, context)
-      context.settings.li_value == "test_value"
-      context.settings.name_prefix == False
+      assert context.settings.li_value == "test_value"
+      assert context.settings.name_prefix == nil
     end
 
     test "context respects the heirarchy of parent over type" do
@@ -184,7 +179,7 @@ defmodule UserDocs.DocubitsTest do
         |> Map.put(:delete, true)
 
       new_attrs = %{ docubits: [ docubit_to_delete ] }
-      result = Documents.update_docubit_internal(preloaded_docubit, new_attrs)
+      Documents.update_docubit_internal(preloaded_docubit, new_attrs)
       assert_raise Ecto.NoResultsError, fn -> Documents.get_docubit!(docubit_to_delete.id) end
     end
 
@@ -218,7 +213,7 @@ defmodule UserDocs.DocubitsTest do
       zero = preloaded_docubit.docubits |> Enum.at(0) |> Map.take(Docubit.__schema__(:fields))
       two = preloaded_docubit.docubits |> Enum.at(2) |> Map.take(Docubit.__schema__(:fields))
       new_attrs = %{ docubits: [ zero, docubit_to_delete, two ] }
-      result = Documents.update_docubit_internal(preloaded_docubit, new_attrs)
+      Documents.update_docubit_internal(preloaded_docubit, new_attrs)
       assert Documents.get_docubit!(zero.id) |> Map.get(:order) == 0
       assert Documents.get_docubit!(two.id) |> Map.get(:order) == 1
     end

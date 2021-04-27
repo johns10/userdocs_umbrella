@@ -1,9 +1,7 @@
 defmodule UserDocs.AutomationTest do
   use UserDocs.DataCase
 
-  alias UserDocs.Jobs
   alias UserDocs.AutomationFixtures
-  alias UserDocs.JobsFixtures
   alias UserDocs.UsersFixtures
   alias UserDocs.ProjectsFixtures
   alias UserDocs.WebFixtures
@@ -11,23 +9,21 @@ defmodule UserDocs.AutomationTest do
 
   defp fixture(:user), do: UsersFixtures.user()
   defp fixture(:team), do: UsersFixtures.team()
-  defp fixture(:team_user, user_id, team_id), do: UsersFixtures.team_user(user_id, team_id)
+  defp fixture(:step_types), do: AutomationFixtures.all_valid_step_types()
+  defp fixture(:strategy), do: WebFixtures.strategy()
+
   defp fixture(:project, team_id), do: ProjectsFixtures.project(team_id)
   defp fixture(:version, project_id), do: ProjectsFixtures.version(project_id)
   defp fixture(:process, version_id), do: AutomationFixtures.process(version_id)
   defp fixture(:page, version_id), do: WebFixtures.page(version_id)
-  defp fixture(:strategy), do: WebFixtures.strategy()
-  defp fixture(:element, page_id, strategy_id), do: WebFixtures.element(page_id, strategy_id)
   defp fixture(:annotation, page_id), do: WebFixtures.annotation(page_id)
-  defp fixture(:step_types), do: AutomationFixtures.all_valid_step_types()
-  defp fixture(:step, page_id, process_id, element_id, annotation_id, step_type_id) do
-    step = AutomationFixtures.step(page_id, process_id, element_id, annotation_id, step_type_id)
-    UserDocs.Automation.get_step!(step.id)
-  end
   defp fixture(:screenshot, step_id), do: MediaFixtures.screenshot(step_id)
 
+  defp fixture(:element, page_id, strategy_id), do: WebFixtures.element(page_id, strategy_id)
+  defp fixture(:team_user, user_id, team_id), do: UsersFixtures.team_user(user_id, team_id)
+
   defp create_user(_), do: %{user: fixture(:user)}
-  defp create_team(%{user: user}), do: %{team: fixture(:team)}
+  defp create_team(_), do: %{team: fixture(:team)}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: fixture(:team_user, user.id, team.id)}
   defp create_project(%{team: team}), do: %{project: fixture(:project, team.id)}
   defp create_version(%{project: project}), do: %{version: fixture(:version, project.id)}
@@ -37,10 +33,6 @@ defmodule UserDocs.AutomationTest do
   defp create_element(%{page: page, strategy: strategy}), do: %{element: fixture(:element, page.id, strategy.id)}
   defp create_annotation(%{page: page}), do: %{annotation: fixture(:annotation, page.id)}
   defp create_step_types(_), do: %{step_types: fixture(:step_types)}
-  defp create_step(%{page: page, process: process, element: element, annotation: annotation, step_types: step_types}) do
-    %{step: fixture(:step, page.id, process.id, element.id, annotation.id, step_types |> Enum.at(0) |> Map.get(:id))}
-  end
-  defp create_screenshot(%{ step: step }), do: %{ screenshot: fixture(:screenshot, step.id)}
 
   alias UserDocs.Automation
 
@@ -159,7 +151,7 @@ defmodule UserDocs.AutomationTest do
 
     test "delete_step/1 deletes the step" do
       step = AutomationFixtures.step()
-      assert {:ok, %Step{} = deleted_step} = Automation.delete_step(step)
+      assert {:ok, %Step{}} = Automation.delete_step(step)
       assert_raise Ecto.NoResultsError, fn -> Automation.get_step!(step.id) end
     end
 

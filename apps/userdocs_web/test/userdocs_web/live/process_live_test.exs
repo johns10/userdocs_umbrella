@@ -3,51 +3,57 @@ defmodule UserDocsWeb.ProcessLiveTest do
 
   import Phoenix.LiveViewTest
 
-  alias UserDocs.Automation
-  alias UserDocs.Projects
+  alias UserDocs.UsersFixtures
+  alias UserDocs.WebFixtures
+  alias UserDocs.ProjectsFixtures
+  alias UserDocs.AutomationFixtures
 
-  @create_version_attrs %{name: "version name"}
+  defp create_user(%{ password: password }), do: %{user: UsersFixtures.user(password)}
+  defp create_team(_), do: %{team: UsersFixtures.team()}
+  defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
+  defp create_team_user(%{ user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
+  defp create_project(%{ team: team }), do: %{project: ProjectsFixtures.project(team.id)}
+  defp create_version(%{ project: project, strategy: strategy }), do: %{version: ProjectsFixtures.version(project.id, strategy.id)}
+  defp create_process(%{ version: version }), do: %{ process: AutomationFixtures.process(version.id)}
 
-  @create_attrs %{name: "some name"}
-  @update_attrs %{name: "some updated name"}
-  @invalid_attrs %{name: nil}
-
-  defp first_version_id() do
-    Projects.list_versions()
-    |> Enum.at(0)
-    |> Map.get(:id)
+  defp create_password(_), do: %{ password: UUID.uuid4()}
+  defp grevious_workaround(%{ conn: conn, user: user, password: password }) do
+    conn = post(conn, "session", %{ user: %{ email: user.email, password: password } })
+    :timer.sleep(100)
+    %{ authed_conn: conn }
   end
 
-  defp fixture(:version) do
-    {:ok, version} = Projects.create_version(@create_version_attrs)
-    version
-  end
-  defp fixture(:process) do
-    {:ok, process} = Automation.create_process(@create_attrs)
-    process
-  end
-
-  defp create_version(_) do
-    version = fixture(:version)
-    %{version: version}
-  end
-
-  defp create_process(_) do
-    process = fixture(:process)
-    %{process: process}
+  defp make_selections(%{ user: user, team: team, project: project, version: version }) do
+    { :ok, user } = UserDocs.Users.update_user_selections(user, %{
+      selected_team_id: team.id,
+      selected_project_id: project.id,
+      selected_version_id: version.id
+    })
+    %{user: user}
   end
 
   describe "Index" do
-    setup [:create_version, :create_process]
+    setup [
+      :create_password,
+      :create_user,
+      :create_team,
+      :create_strategy,
+      :create_team_user,
+      :create_project,
+      :create_version,
+      :create_process,
+      :make_selections,
+      :grevious_workaround
+    ]
 
-    test "lists all processes", %{conn: conn, process: process} do
+    test "lists all processes", %{authed_conn: conn, process: process} do
       {:ok, _index_live, html} = live(conn, Routes.process_index_path(conn, :index))
 
       assert html =~ "Listing Processes"
       assert html =~ process.name
     end
 
-    test "saves new process", %{conn: conn} do
+    test "saves new process", %{authed_conn: conn, version: version} do
       {:ok, index_live, _html} = live(conn, Routes.process_index_path(conn, :index))
 
       assert index_live
@@ -57,99 +63,51 @@ defmodule UserDocsWeb.ProcessLiveTest do
       assert_patch(index_live, Routes.process_index_path(conn, :new))
 
       assert index_live
-      |> form("#process-new-form", process: @invalid_attrs)
+      |> form("#process-form", process: AutomationFixtures.process_attrs(:invalid, version.id))
       |> render_change() =~ "can&apos;t be blank"
 
-      create_attrs = Map.put(
-        @create_attrs,
-        :version_id,
-        first_version_id()
-      )
+      valid_attrs = AutomationFixtures.process_attrs(:valid, version.id)
 
       {:ok, _, html} =
         index_live
-        |> form("#process-new-form", process: create_attrs)
+        |> form("#process-form", process: valid_attrs)
         |> render_submit()
         |> follow_redirect(conn, Routes.process_index_path(conn, :index))
 
       assert html =~ "Process created successfully"
-      assert html =~ "some name"
+      assert html =~ valid_attrs.name
     end
 
-    test "updates process in listing", %{conn: conn, process: process} do
+    test "updates process in listing", %{authed_conn: conn, process: process, version: version} do
       {:ok, index_live, _html} = live(conn, Routes.process_index_path(conn, :index))
 
       assert index_live
-      |> element("#process-#{process.id} a", "Edit")
+      |> element("#edit-process-" <> to_string(process.id))
       |> render_click() =~ "Edit Process"
 
       assert_patch(index_live, Routes.process_index_path(conn, :edit, process))
 
       assert index_live
-      |> form("#process-#{process.id}-form", process: @invalid_attrs)
+      |> form("#process-form", process: AutomationFixtures.process_attrs(:invalid, version.id))
       |> render_change() =~ "can&apos;t be blank"
 
-      update_attrs = Map.put(
-        @update_attrs,
-        :version_id,
-        first_version_id()
-      )
+      valid_attrs = AutomationFixtures.process_attrs(:valid, version.id)
 
       {:ok, _, html} =
         index_live
-        |> form("#process-#{process.id}-form", process: update_attrs)
+        |> form("#process-form", process: valid_attrs)
         |> render_submit()
         |> follow_redirect(conn, Routes.process_index_path(conn, :index))
 
       assert html =~ "Process updated successfully"
-      assert html =~ "some updated name"
+      assert html =~ valid_attrs.name
     end
 
-    test "deletes process in listing", %{conn: conn, process: process} do
+    test "deletes process in listing", %{authed_conn: conn, process: process} do
       {:ok, index_live, _html} = live(conn, Routes.process_index_path(conn, :index))
 
-      assert index_live |> element("#process-#{process.id} a", "Delete") |> render_click()
-      refute has_element?(index_live, "#process-#{process.id}")
-    end
-  end
-
-  describe "Show" do
-    setup [:create_version, :create_process]
-
-    test "displays process", %{conn: conn, process: process} do
-      {:ok, _show_live, html} = live(conn, Routes.process_show_path(conn, :show, process))
-
-      assert html =~ "Show Process"
-      assert html =~ process.name
-    end
-
-    test "updates process within modal", %{conn: conn, process: process} do
-      {:ok, show_live, _html} = live(conn, Routes.process_show_path(conn, :show, process))
-
-      assert show_live
-      |> element("a", "Edit")
-      |> render_click() =~ "Edit Process"
-
-      assert_patch(show_live, Routes.process_show_path(conn, :edit, process))
-
-      assert show_live
-      |> form("#process-#{process.id}-form", process: @invalid_attrs)
-      |> render_change() =~ "can&apos;t be blank"
-
-      update_attrs = Map.put(
-        @update_attrs,
-        :version_id,
-        first_version_id()
-      )
-
-      {:ok, _, html} =
-        show_live
-        |> form("##process-#{process.id}-form", process: update_attrs)
-        |> render_submit()
-        |> follow_redirect(conn, Routes.process_show_path(conn, :show, process))
-
-      assert html =~ "Process updated successfully"
-      assert html =~ "some updated name"
+      assert index_live |> element("#delete-process-" <> to_string(process.id)) |> render_click()
+      refute has_element?(index_live, "#process-" <> to_string(process.id))
     end
   end
 end

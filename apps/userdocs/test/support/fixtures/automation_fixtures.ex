@@ -142,7 +142,7 @@ defmodule UserDocs.AutomationFixtures do
     %{
       name: nil,
       order: nil,
-      version_id: nil
+      version_id: version_id
     }
   end
 
