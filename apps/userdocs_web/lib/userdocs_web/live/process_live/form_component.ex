@@ -51,6 +51,7 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
           :noreply,
           socket
           |> put_flash(:info, "Process updated successfully")
+          |> push_redirect(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -66,6 +67,7 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
           :noreply,
           socket
           |> put_flash(:info, "Process created successfully")
+          |> push_redirect(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
