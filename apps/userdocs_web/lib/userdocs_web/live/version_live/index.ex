@@ -78,7 +78,7 @@ defmodule UserDocsWeb.VersionLive.Index do
 
   defp apply_action(socket, :edit, %{ "id" => id }) do
     socket
-    |> assign(:page_title, "Edit Process")
+    |> assign(:page_title, "Edit Version")
     |> assign(:version, Projects.get_version!(String.to_integer(id), socket, socket.assigns.state_opts))
   end
 
