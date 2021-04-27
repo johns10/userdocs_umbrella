@@ -28,8 +28,8 @@
 
         <td>
           <span><%= live_redirect "Show", to: Routes.user_show_path(@socket, :show, user) %></span>
-          <span><%= live_patch "Edit", to: Routes.user_index_path(@socket, :edit, user) %></span>
-          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: user.id, data: [confirm: "Are you sure?"] %></span>
+          <span><%= live_patch "Edit", id: "edit-user-#{user.id}", to: Routes.user_index_path(@socket, :edit, user) %></span>
+          <span><%= link "Delete", id: "delete-user-#{user.id}", to: "#", phx_click: "delete", phx_value_id: user.id, data: [confirm: "Are you sure?"] %></span>
         </td>
       </tr>
     <% end %>
