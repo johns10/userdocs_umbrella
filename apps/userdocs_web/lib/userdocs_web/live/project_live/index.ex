@@ -56,10 +56,11 @@ defmodule UserDocsWeb.ProjectLive.Index do
   end
 
   defp apply_action(socket, :index, %{ "team_id" => team_id}) do
+    team = Users.get_team!(team_id, %{ preloads: %{ job: %{ step_instances: true, process_instances: true }}})
     socket
     |> assign(:page_title, "Listing Projects")
     |> assign(:project, nil)
-    |> assign(:current_team, Users.get_team!(team_id))
+    |> assign(:current_team, team)
     |> prepare_index(team_id)
   end
   defp apply_action(socket, :index, _params) do
