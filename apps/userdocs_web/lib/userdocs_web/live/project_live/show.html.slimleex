@@ -8,7 +8,10 @@ div.py-2
     = "Project " <> @project.name
 div.py-2
   h3.is-size-5 Default Version
-  = @project.default_version.name
+  = if @project.default_version == %UserDocs.Projects.Version{} do 
+    = @project.default_version.name
+  - else 
+    p Not Selected
 
 = live_component(@socket, UserDocsWeb.VersionLive.IndexComponent,
   [ live_action: @live_action,
