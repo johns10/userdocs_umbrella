@@ -293,7 +293,7 @@ defmodule UserDocsWeb.DocumentLive.Editor do
     socket
     |> assign(:current_page, page)
     |> assign(:current_process, process)
-    |> assign_current_version()
+    #|> assign_current_version() happens at the root
   end
 
   defp assign_current_version(socket) do
