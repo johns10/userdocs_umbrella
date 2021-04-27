@@ -24,11 +24,11 @@ aside.menu
             = team.name
           .is-flex.is-flex-direction-row.is-flex-grow-0
             = live_redirect to: Routes.team_show_path(@socket, :show, team) do
-              i.fa.fa-lg.fa-search
-            = live_patch to: Routes.team_index_path(@socket, :edit, team) do
-              i.fa.fa-lg.fa-edit
-            = link to: "#", phx_click: "delete", phx_value_id: team.id, data: [confirm: "Are you sure?"] do
-              i.fa.fa-lg.fa-trash
+              i.fa.fa-search
+            = live_patch to: Routes.team_index_path(@socket, :edit, team), id: "edit-team-#{team.id}" do
+              i.fa.fa-edit
+            = link to: "#", phx_click: "delete", phx_value_id: team.id, id: "delete-team-#{team.id}", data: [confirm: "Are you sure?"] do
+              i.fa.fa-trash
 
 = if @current_user.email == "johns10davenport@gmail.com" do 
   = live_patch to: Routes.team_index_path(@socket, :new) do
