@@ -3,7 +3,6 @@ defmodule StateHandlers.Delete do
   alias StateHandlers.Helpers
 
   def apply(state, data, opts) when is_struct(data) do
-    IO.puts("Deleting an opbect")
     loader = opts[:loader] || &Map.put/3
     schema = data.__meta__.schema
     state
@@ -18,7 +17,6 @@ defmodule StateHandlers.Delete do
   def apply(_, _, opts), do: raise(RuntimeError, "State.Update.apply failed to find a matching clause with options #{inspect(opts)}")
 
   def delete([ { state, key, state_type } | breadcrumb ], data, data_type) do
-    IO.puts("delete state parser")
     [ { delete(state, data, data_type), key, state_type} | breadcrumb ]
   end
   def delete(state, data, :list) do
