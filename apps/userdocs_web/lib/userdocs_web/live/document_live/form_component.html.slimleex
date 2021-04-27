@@ -1,3 +1,5 @@
+h2.title =@title
+
 = f = form_for @changeset, "#",
   id: "document-form",
   phx_target: @myself.cid,
@@ -35,7 +37,7 @@
   = if f.data.id do 
     .field
       = link to: "#", phx_click: "add-document-version", phx_target: @myself.cid do
-        i.fa.fa-lg.fa-plus-square 
+        i.fa.fa-plus-square 
         span< Add Document Version
 
   .buttons
