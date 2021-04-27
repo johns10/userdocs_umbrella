@@ -20,12 +20,12 @@ Hooks.automatedBrowserEvents = {
     this.el.addEventListener("browser-opened", (message) => {
       console.log("automation browser opened in hook")
       console.log(message)
-      this.pushEventTo("#automated-browser-handler", "browser-opened", message.detail)
+      this.pushEventTo("#automated-browser-controls", "browser-opened", message.detail)
     })
     this.el.addEventListener("browser-closed", (message) => {
       console.log("automation browser closed in hook")
       console.log(message)
-      this.pushEventTo("#automated-browser-handler", "browser-closed", message.detail)
+      this.pushEventTo("#automated-browser-controls", "browser-closed", message.detail)
     })
   }
 };
