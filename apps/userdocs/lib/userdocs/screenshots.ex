@@ -64,7 +64,7 @@ defmodule UserDocs.Screenshots do
     ExAws.S3.presigned_url(config, :get, bucket, path, virtual_host: true)
   end
 
-  def get_url(nil, team), do: { :nofile, "" }
+  def get_url(nil, _team), do: { :nofile, "" }
   def get_url(aws_key, team) do
     region = team.aws_region
     bucket = team.aws_bucket
@@ -203,7 +203,7 @@ defmodule UserDocs.Screenshots do
     Enum.each(names, fn({ field, file_name }) ->
       aws_key = Map.get(screenshot, field)
       case ExAws.S3.download_file(bucket, aws_key, file_name) |> ExAws.request(opts) do
-        { :ok, done } -> true
+        { :ok, _ } -> true
         e -> raise("#{__MODULE__}.prepare_all_files failed because #{e}")
       end
     end)
@@ -230,11 +230,11 @@ defmodule UserDocs.Screenshots do
     end
   end
 
-  def handle_changes(%{ score: score, diff: diff, updated: updated, team: team } = state, changeset) do
+  def handle_changes(%{ score: score, diff: diff, updated: updated, team: team }, changeset) do
     case score do
       "inf" -> changeset
       _ ->
-        IO.puts("The file is different, creating provisional and diff")
+        Logger.debug("The file is different, creating provisional and diff")
         provisional_file_name = file_name(changeset.data, :provisional)
         put_encoded_string_in_aws_object(File.read!(updated), team, path(provisional_file_name))
         diff_file_name = file_name(changeset.data, :diff)
