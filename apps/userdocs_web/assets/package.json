@@ -1,13 +1,25 @@
 {
+  "name": "UserDocs",
+  "description": "An application for automating the collection of screenshots from web applications.",
+  "main": "js/electron/main.js",
+  "version": "0.0.1",
   "repository": {},
-  "description": " ",
   "license": "MIT",
+  "author": "John Davenport",
+  "build": {
+    "appId": "johns10@gmail.com",
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    }
+  },
   "scripts": {
     "deploy": "webpack --mode production",
     "watch": "webpack --mode development --watch",
     "watch_extension": "webpack js/chrome.js -o js/chrome_app.js --mode development --watch",
     "watch_browser": "webpack js/browser.js -o js/browser_app.js --mode development --watch",
-    "start_electron": "electron js/electron/main.js"
+    "start_electron": "electron js/electron/main.js",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "dependencies": {
     "@medv/finder": "^2.0.0",
@@ -15,7 +27,6 @@
     "bulma": "^0.9.1",
     "bulma-switch": "^2.0.0",
     "chrome-remote-interface": "^0.30.0",
-    "electron-reload": "^1.5.0",
     "fs": "^0.0.1-security",
     "nprogress": "^0.2.0",
     "phoenix": "file:../../../deps/phoenix",
@@ -24,6 +35,8 @@
     "puppeteer": "^8.0.0"
   },
   "devDependencies": {
+    "electron-builder": "^22.10.5",
+    "electron-reload": "^1.5.0",
     "@babel/core": "^7.10.5",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/preset-env": "^7.10.4",
