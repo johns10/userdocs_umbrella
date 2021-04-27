@@ -3,7 +3,6 @@ defmodule StateHandlers.Create do
   alias StateHandlers.Helpers
 
   def apply(state, data, opts) when is_struct(data) do
-    IO.puts("Creating an opbect")
     loader = opts[:loader] || &Map.put/3
     schema = data.__meta__.schema
     state
@@ -16,7 +15,6 @@ defmodule StateHandlers.Create do
     |> Helpers.socket_or_state(loader)
   end
   def create([ { state, key, state_type } | breadcrumb ], data, data_type) do
-    IO.puts("create state parser")
     [ { create(state, data, data_type), key, state_type} | breadcrumb ]
   end
   def create(state, data, :list) do
