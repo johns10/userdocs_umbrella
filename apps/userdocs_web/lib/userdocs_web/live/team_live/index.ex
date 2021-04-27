@@ -29,7 +29,6 @@ defmodule UserDocsWeb.TeamLive.Index do
   end
 
   def initialize(%{ assigns: %{ auth_state: :logged_in, state_opts: opts }} = socket) do
-    IO.puts("initialize team")
     socket
     |> assign(:modal_action, :show)
     |> load_teams()
@@ -47,7 +46,6 @@ defmodule UserDocsWeb.TeamLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    IO.puts("apply_action team")
     team = Users.get_team!(id, %{ preloads: [ users: true, projects: true, team_users: true ] })
     socket
     |> assign(:page_title, "Edit Team")
