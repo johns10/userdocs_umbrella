@@ -11,6 +11,7 @@ defmodule UserDocsWeb.ContentLive.FormComponent do
   @impl true
   def render(assigns) do
     ~L"""
+      <h2 class="title"><%= @title %></h2>
       <%= form = form_for @changeset, "#",
         id: "content-form",
         phx_target: @myself.cid,
