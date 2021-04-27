@@ -16,7 +16,7 @@ defmodule StateHandlers.Broadcast do
   end
 
   def precheck_opt(opts, name, nil) do
-    Logger.warn("Broadcast missing #{name} opt")
+    Logger.debug("Broadcast missing #{name} opt")
     Keyword.replace(opts, :broadcast, false)
   end
   def precheck_opt(opts, _, _), do: opts
