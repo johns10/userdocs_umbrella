@@ -1,3 +1,4 @@
+h2.title =@title
 = f = form_for @changeset, "#",
   id: @id,
   phx_target: @myself.cid,
