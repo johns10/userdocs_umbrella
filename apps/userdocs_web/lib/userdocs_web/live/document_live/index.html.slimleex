@@ -24,11 +24,11 @@ aside.menu
             = document.name
           div.is-flex.is-flex-direction-row.is-flex-grow-0
             = live_patch to: Routes.document_editor_path(@socket, :edit, document) do
-              i.fa.fa-lg.fa-search
-            = content_tag :a, to: "#", phx_click: "delete", phx_value_id: document.id do
-              i.fa.fa-lg.fa-minus-square
-            = live_patch to: Routes.document_index_path(@socket, :edit, document) do
-              i.fa.fa-lg.fa-edit
+              i.fa.fa-search
+            = live_patch id: "edit-document-#{document.id}", to: Routes.document_index_path(@socket, :edit, document) do
+              i.fa.fa-edit
+            = link id: "delete-document-#{document.id}", to: "#", phx_click: "delete", phx_value_id: document.id do
+              i.fa.fa-trash
         ul
           = for document_version <- document.document_versions do
             li.is-flex
@@ -36,7 +36,7 @@ aside.menu
                 = document_version.version.name
               div.is-flex.is-flex-direction-row.is-flex-grow-0
                 = link to: Routes.document_version_download_path(@socket, :show, document_version.id) do
-                  i.fa.fa-lg.fa-cloud-download
+                  i.fa.fa-cloud-download
 
 = live_patch to: Routes.document_index_path(@socket, :new) do
   button.button.is-primary New Document
