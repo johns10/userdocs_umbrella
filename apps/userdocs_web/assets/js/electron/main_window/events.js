@@ -1,5 +1,5 @@
 function browserClosed(payload) {
-  const element = document.querySelector('#automated-browser-handler');
+  const element = document.querySelector('#automated-browser-controls');
   const event = new CustomEvent("browser-closed", {
       bubbles: false,
       detail: payload
@@ -8,7 +8,7 @@ function browserClosed(payload) {
 }
 
 function browserOpened(payload) {
-  const element = document.querySelector('#automated-browser-handler');
+  const element = document.querySelector('#automated-browser-controls');
   const event = new CustomEvent("browser-opened", {
       bubbles: false,
       detail: payload
@@ -53,7 +53,7 @@ function stepStatusUpdated(stepInstance) {
   try {
     console.log("trying to update automation manager")
     document
-      .getElementById("automation-manager")
+      .getElementById("automation-manager-hook")
       .dispatchEvent(new CustomEvent("update-step-instance", {
         bubbles: false,
         detail: stepInstance
