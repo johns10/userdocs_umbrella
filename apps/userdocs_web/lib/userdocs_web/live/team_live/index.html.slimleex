@@ -30,6 +30,6 @@ aside.menu
             = link to: "#", phx_click: "delete", phx_value_id: team.id, id: "delete-team-#{team.id}", data: [confirm: "Are you sure?"] do
               i.fa.fa-trash
 
-= if @current_user.email == "johns10davenport@gmail.com" do 
+= if @current_user.email == "johns10davenport@gmail.com" or Mix.env() in [ :dev, :test ] do 
   = live_patch to: Routes.team_index_path(@socket, :new) do
-      button.button.is-primary New Step
+      button.button.is-primary New Team
