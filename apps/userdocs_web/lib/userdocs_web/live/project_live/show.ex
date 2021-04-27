@@ -17,8 +17,6 @@ defmodule UserDocsWeb.ProjectLive.Show do
 
   @impl true
   def mount(_params, session, socket) do
-    socket =
-
     {
       :ok,
       socket
