@@ -40,7 +40,7 @@ defmodule UserDocsWeb.VersionLive.Index do
   @impl true
   def handle_params(%{ "project_id" => project_id } = params, url, socket) do
     project = Projects.get_project!(project_id)
-    team = Users.get_team!(project.team_id)
+    team = Users.get_team!(project.team_id, %{ preloads: %{ job: %{ step_instances: true, process_instances: true }}})
     socket =
       socket
       |> assign(:current_project, project)
