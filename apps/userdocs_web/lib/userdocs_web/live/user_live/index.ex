@@ -29,7 +29,13 @@ defmodule UserDocsWeb.UserLive.Index do
     socket
     |> assign(:users, list_users())
   end
-  def initialize(socket), do: socket
+  def initialize(socket) do
+    if Mix.env() in [:dev, :test] do
+      assign(socket, :users, list_users())
+    else
+      socket
+    end
+  end
 
   @impl true
   def handle_params(params, _url, socket) do
