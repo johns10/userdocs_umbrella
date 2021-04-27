@@ -100,7 +100,12 @@ defmodule UserDocsWeb.ProcessLive.Index do
   def handle_event("delete", %{"id" => id}, socket) do
     process = Automation.get_process!(id)
     { :ok, _ } = Automation.delete_process(process)
-    { :noreply, load_processes(socket, socket.assigns.state_opts) }
+    {
+      :noreply,
+      socket
+      |> load_processes(socket.assigns.state_opts)
+      |> prepare_processes(process.version_id)
+    }
   end
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
