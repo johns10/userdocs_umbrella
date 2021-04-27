@@ -40,7 +40,10 @@ defmodule UserDocsWeb.UserLive.FormComponent do
   end
   def render(%{ action: action } = assigns) when action in [ :new, :edit ] do
     ~L"""
-      <%= form_for @changeset, Routes.pow_registration_path(@socket, :update), [as: :user], fn f -> %>
+      <h2 class="title"><%= @title %>
+      <%= form_for @changeset, Routes.pow_registration_path(@socket, :update), [
+        phx_target: @myself.cid, phx_change: "validate", phx_submit: "save", id: "user-form", as: :user
+      ], fn f -> %>
         <%= Layout.text_input(f, Pow.Ecto.Schema.user_id_field(@changeset), [], "control") %>
 
         <div class="field">
