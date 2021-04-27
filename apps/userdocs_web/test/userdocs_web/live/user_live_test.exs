@@ -3,33 +3,58 @@ defmodule UserDocsWeb.UserLiveTest do
 
   import Phoenix.LiveViewTest
 
-  alias UserDocs.Users
+  alias UserDocs.UsersFixtures
+  alias UserDocs.WebFixtures
+  alias UserDocs.ProjectsFixtures
 
-  @create_attrs %{default_team_id: 42, email: "some email", password: "some password", password_confirmation: "some password_confirmation"}
-  @update_attrs %{default_team_id: 43, email: "some updated email", password: "some updated password", password_confirmation: "some updated password_confirmation"}
-  @invalid_attrs %{default_team_id: nil, email: nil, password: nil, password_confirmation: nil}
+  defp create_user(%{ password: password }), do: %{user: UsersFixtures.user(password)}
+  defp create_team(_), do: %{team: UsersFixtures.team()}
+  defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
+  defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
+  defp create_project(%{ team: team }) do
+    attrs = ProjectsFixtures.project_attrs(:default, team.id)
+    { :ok, project } = UserDocs.Projects.create_project(attrs)
+    %{ project: project }
+  end
+  defp create_version(%{ project: project, strategy: strategy }), do: %{version: ProjectsFixtures.version(project.id, strategy.id)}
 
-  defp fixture(:user) do
-    {:ok, user} = Users.create_user(@create_attrs)
-    user
+  defp create_password(_), do: %{ password: UUID.uuid4()}
+  defp grevious_workaround(%{ conn: conn, user: user, password: password }) do
+    conn = post(conn, "session", %{ user: %{ email: user.email, password: password } })
+    :timer.sleep(100)
+    %{ authed_conn: conn }
   end
 
-  defp create_user(_) do
-    user = fixture(:user)
+  defp make_selections(%{ user: user, team: team, project: project, version: version }) do
+    { :ok, user } = UserDocs.Users.update_user_selections(user, %{
+      selected_team_id: team.id,
+      selected_project_id: project.id,
+      selected_version_id: version.id
+    })
     %{user: user}
   end
 
   describe "Index" do
-    setup [:create_user]
+    setup [
+      :create_password,
+      :create_user,
+      :create_team,
+      :create_strategy,
+      :create_team_user,
+      :create_project,
+      :create_version,
+      :make_selections,
+      :grevious_workaround
+    ]
 
-    test "lists all users", %{conn: conn, user: user} do
+    test "lists all users", %{authed_conn: conn, user: user} do
       {:ok, _index_live, html} = live(conn, Routes.user_index_path(conn, :index))
 
       assert html =~ "Listing Users"
       assert html =~ user.email
     end
 
-    test "saves new user", %{conn: conn} do
+    test "saves new user", %{authed_conn: conn} do
       {:ok, index_live, _html} = live(conn, Routes.user_index_path(conn, :index))
 
       assert index_live |> element("a", "New User") |> render_click() =~
@@ -37,80 +62,83 @@ defmodule UserDocsWeb.UserLiveTest do
 
       assert_patch(index_live, Routes.user_index_path(conn, :new))
 
-      assert index_live
-             |> form("#user-form", user: @invalid_attrs)
-             |> render_change() =~ "can&apos;t be blank"
+      valid_attrs = UsersFixtures.user_attrs(:valid)
 
       {:ok, _, html} =
         index_live
-        |> form("#user-form", user: @create_attrs)
+        |> form("#user-form", user: valid_attrs)
         |> render_submit()
         |> follow_redirect(conn, Routes.user_index_path(conn, :index))
 
       assert html =~ "User created successfully"
-      assert html =~ "some email"
+      assert html =~ valid_attrs.email
     end
 
-    test "updates user in listing", %{conn: conn, user: user} do
+    test "updates user in listing", %{authed_conn: conn, user: user, password: password} do
       {:ok, index_live, _html} = live(conn, Routes.user_index_path(conn, :index))
 
-      assert index_live |> element("#user-#{user.id} a", "Edit") |> render_click() =~
+      assert index_live |> element("#edit-user-" <> to_string(user.id), "Edit") |> render_click() =~
                "Edit User"
 
       assert_patch(index_live, Routes.user_index_path(conn, :edit, user))
 
-      assert index_live
-             |> form("#user-form", user: @invalid_attrs)
-             |> render_change() =~ "can&apos;t be blank"
+      valid_attrs = UsersFixtures.user_attrs(:valid) |> Map.put(:current_password, password)
 
       {:ok, _, html} =
         index_live
-        |> form("#user-form", user: @update_attrs)
+        |> form("#user-form", user: valid_attrs)
         |> render_submit()
         |> follow_redirect(conn, Routes.user_index_path(conn, :index))
 
       assert html =~ "User updated successfully"
-      assert html =~ "some updated email"
+      assert html =~ valid_attrs.email
     end
 
-    test "deletes user in listing", %{conn: conn, user: user} do
+    test "deletes user in listing", %{authed_conn: conn, user: user} do
       {:ok, index_live, _html} = live(conn, Routes.user_index_path(conn, :index))
 
-      assert index_live |> element("#user-#{user.id} a", "Delete") |> render_click()
-      refute has_element?(index_live, "#user-#{user.id}")
+      assert index_live |> element("#delete-user-" <> to_string(user.id), "Delete") |> render_click()
+      refute has_element?(index_live, "#user-" <> to_string(user.id))
     end
   end
 
   describe "Show" do
-    setup [:create_user]
+    setup [
+      :create_password,
+      :create_user,
+      :create_team,
+      :create_strategy,
+      :create_team_user,
+      :create_project,
+      :create_version,
+      :make_selections,
+      :grevious_workaround
+    ]
 
-    test "displays user", %{conn: conn, user: user} do
+    test "displays user", %{authed_conn: conn, user: user} do
       {:ok, _show_live, html} = live(conn, Routes.user_show_path(conn, :show, user))
 
       assert html =~ "Show User"
       assert html =~ user.email
     end
 
-    test "updates user within modal", %{conn: conn, user: user} do
+    test "updates user within modal", %{authed_conn: conn, user: user, password: password} do
       {:ok, show_live, _html} = live(conn, Routes.user_show_path(conn, :show, user))
 
-      assert show_live |> element("a", "Edit") |> render_click() =~
-               "Edit User"
+      assert show_live |> element("a", "Edit") |> render_click() =~ "Edit User"
 
       assert_patch(show_live, Routes.user_show_path(conn, :edit, user))
 
-      assert show_live
-             |> form("#user-form", user: @invalid_attrs)
-             |> render_change() =~ "can&apos;t be blank"
+      valid_attrs = UsersFixtures.user_attrs(:valid) |> Map.put(:current_password, password)
 
       {:ok, _, html} =
         show_live
-        |> form("#user-form", user: @update_attrs)
+        |> form("#user-form", user: valid_attrs)
         |> render_submit()
         |> follow_redirect(conn, Routes.user_show_path(conn, :show, user))
 
       assert html =~ "User updated successfully"
-      assert html =~ "some updated email"
+      assert html =~ valid_attrs.email
     end
   end
 end

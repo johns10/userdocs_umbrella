@@ -1,8 +1,6 @@
 defmodule UserDocs.StepInstancesTest do
   use UserDocs.DataCase
 
-  alias UserDocs.Jobs
-
   alias UserDocs.AutomationFixtures
   alias UserDocs.JobsFixtures
   alias UserDocs.UsersFixtures
@@ -11,22 +9,25 @@ defmodule UserDocs.StepInstancesTest do
 
   defp fixture(:user), do: UsersFixtures.user()
   defp fixture(:team), do: UsersFixtures.team()
-  defp fixture(:team_user, user_id, team_id), do: UsersFixtures.team_user(user_id, team_id)
+  defp fixture(:strategy), do: WebFixtures.strategy()
+  defp fixture(:step_types), do: AutomationFixtures.all_valid_step_types()
+
   defp fixture(:project, team_id), do: ProjectsFixtures.project(team_id)
   defp fixture(:version, project_id), do: ProjectsFixtures.version(project_id)
   defp fixture(:process, version_id), do: AutomationFixtures.process(version_id)
   defp fixture(:page, version_id), do: WebFixtures.page(version_id)
-  defp fixture(:strategy), do: WebFixtures.strategy()
-  defp fixture(:element, page_id, strategy_id), do: WebFixtures.element(page_id, strategy_id)
   defp fixture(:annotation, page_id), do: WebFixtures.annotation(page_id)
-  defp fixture(:step_types), do: AutomationFixtures.all_valid_step_types()
+
+  defp fixture(:team_user, user_id, team_id), do: UsersFixtures.team_user(user_id, team_id)
+  defp fixture(:element, page_id, strategy_id), do: WebFixtures.element(page_id, strategy_id)
+
   defp fixture(:step, page_id, process_id, element_id, annotation_id, step_type_id) do
     step = AutomationFixtures.step(page_id, process_id, element_id, annotation_id, step_type_id)
     UserDocs.Automation.get_step!(step.id)
   end
 
   defp create_user(_), do: %{user: fixture(:user)}
-  defp create_team(%{user: user}), do: %{team: fixture(:team)}
+  defp create_team(_), do: %{team: fixture(:team)}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: fixture(:team_user, user.id, team.id)}
   defp create_project(%{team: team}), do: %{project: fixture(:project, team.id)}
   defp create_version(%{project: project}), do: %{version: fixture(:version, project.id)}
@@ -42,7 +43,6 @@ defmodule UserDocs.StepInstancesTest do
 
   describe "step_instances" do
     alias UserDocs.StepInstances
-    alias UserDocs.Jobs.Job
     alias UserDocs.StepInstances.StepInstance
 
     setup [
@@ -77,15 +77,13 @@ defmodule UserDocs.StepInstancesTest do
     end
 
     test "create_step_instance_from_job_and_step/2 with valid data creates a step instance with the job set", %{ step: step, team: team } do
-      attrs = JobsFixtures.step_instance_attrs(:valid, step.id)
+      _attrs = JobsFixtures.step_instance_attrs(:valid, step.id)
       job = JobsFixtures.job(team.id)
-      assert {:ok, %StepInstance{} = step_instance} = StepInstances.create_step_instance_from_job_and_step(step, job, 0)
+      assert {:ok, %StepInstance{}} = StepInstances.create_step_instance_from_job_and_step(step, job, 0)
     end
 
-    test "create_step_instance_from_step/2 with valid data creates a step instance with the step preloaded", %{ step: step, team: team } do
-      attrs = JobsFixtures.step_instance_attrs(:valid, step.id)
-      job = JobsFixtures.job(team.id)
-      {:ok, %StepInstance{} = step_instance} = StepInstances.create_step_instance_from_step(step, 0)
+    test "create_step_instance_from_step/2 with valid data creates a step instance with the step preloaded", %{ step: step } do
+      {:ok, %StepInstance{}} = StepInstances.create_step_instance_from_step(step, 0)
     end
 
     test "create_step_instance/1 with invalid data returns error changeset", %{ step: step } do
@@ -108,8 +106,8 @@ defmodule UserDocs.StepInstancesTest do
     end
 
     test "update_step_instance/2 with a screenshot attr updates the screenshot", %{ step: step } do
-      step_instance = JobsFixtures.step_instance(step.id)
-      attrs = JobsFixtures.step_instance_attrs(:valid, step.id)
+      _step_instance = JobsFixtures.step_instance(step.id)
+      _attrs = JobsFixtures.step_instance_attrs(:valid, step.id)
     end
 
     test "delete_step_instance/1 deletes the step instance", %{ step: step } do
@@ -124,7 +122,6 @@ defmodule UserDocs.StepInstancesTest do
     end
 
     test "format_step_instance_for_export/1 returns a step instance with attrs", %{ step: step, team: team } do
-      attrs = JobsFixtures.step_instance_attrs(:valid, step.id)
       job = JobsFixtures.job(team.id)
       {:ok, %StepInstance{} = step_instance} = StepInstances.create_step_instance_from_job_and_step(step, job, 0)
       step_instance =

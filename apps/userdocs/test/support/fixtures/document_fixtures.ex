@@ -25,7 +25,7 @@ defmodule UserDocs.DocumentVersionFixtures do
     document = document(p.id)
     document_version = document_version(document.id, v.id)
     t = Users.list_teams(state, opts) |> Enum.at(0)
-    content = content(t)
+    content = content(t.id)
 
     state
     |> StateHandlers.initialize(opts)
@@ -81,8 +81,8 @@ defmodule UserDocs.DocumentVersionFixtures do
   end
   def document_attrs(:invalid, project_id) do
     %{
-      name: None,
-      title: None,
+      name: nil,
+      title: nil,
       project_id: project_id
     }
   end

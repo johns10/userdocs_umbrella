@@ -1,8 +1,6 @@
 defmodule UserDocs.ProcessInstancesTest do
   use UserDocs.DataCase
 
-  alias UserDocs.Jobs
-
   alias UserDocs.AutomationFixtures
   alias UserDocs.JobsFixtures
   alias UserDocs.UsersFixtures
@@ -11,22 +9,25 @@ defmodule UserDocs.ProcessInstancesTest do
 
   defp fixture(:user), do: UsersFixtures.user()
   defp fixture(:team), do: UsersFixtures.team()
-  defp fixture(:team_user, user_id, team_id), do: UsersFixtures.team_user(user_id, team_id)
+  defp fixture(:strategy), do: WebFixtures.strategy()
+  defp fixture(:step_types), do: AutomationFixtures.all_valid_step_types()
+
   defp fixture(:project, team_id), do: ProjectsFixtures.project(team_id)
   defp fixture(:version, project_id), do: ProjectsFixtures.version(project_id)
   defp fixture(:process, version_id), do: AutomationFixtures.process(version_id)
   defp fixture(:page, version_id), do: WebFixtures.page(version_id)
-  defp fixture(:strategy), do: WebFixtures.strategy()
-  defp fixture(:element, page_id, strategy_id), do: WebFixtures.element(page_id, strategy_id)
   defp fixture(:annotation, page_id), do: WebFixtures.annotation(page_id)
-  defp fixture(:step_types), do: AutomationFixtures.all_valid_step_types()
+
+  defp fixture(:team_user, user_id, team_id), do: UsersFixtures.team_user(user_id, team_id)
+  defp fixture(:element, page_id, strategy_id), do: WebFixtures.element(page_id, strategy_id)
+
   defp fixture(:step, page_id, process_id, element_id, annotation_id, step_type_id) do
     step = AutomationFixtures.step(page_id, process_id, element_id, annotation_id, step_type_id)
     UserDocs.Automation.get_step!(step.id)
   end
 
   defp create_user(_), do: %{user: fixture(:user)}
-  defp create_team(%{user: user}), do: %{team: fixture(:team)}
+  defp create_team(_), do: %{team: fixture(:team)}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: fixture(:team_user, user.id, team.id)}
   defp create_project(%{team: team}), do: %{project: fixture(:project, team.id)}
   defp create_version(%{project: project}), do: %{version: fixture(:version, project.id)}

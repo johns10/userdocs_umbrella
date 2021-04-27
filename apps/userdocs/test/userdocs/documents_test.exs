@@ -17,10 +17,9 @@ defmodule UserDocs.DocumentsTest do
   defp fixture(:project, team_id), do: ProjectsFixtures.project(team_id)
 
   defp create_user(_), do: %{user: fixture(:user)}
-  defp create_team(%{user: user}), do: %{team: fixture(:team)}
+  defp create_team(_), do: %{team: fixture(:team)}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: fixture(:team_user, user.id, team.id)}
   defp create_project(%{team: team}), do: %{project: fixture(:project, team.id)}
-  defp create_version(%{project: project}), do: %{version: fixture(:version, project.id)}
 
   describe "content" do
     alias UserDocs.Documents.Content
@@ -101,10 +100,9 @@ defmodule UserDocs.DocumentsTest do
       assert Documents.list_documents() == [document]
     end
 
-    test "list_documents/2 returns all documents", %{ project: project} do
+    test "list_documents/2 returns all documents" do
       opts = [ data_type: :list, strategy: :by_type ]
       state = DocumentFixtures.state()
-      document = DocumentFixtures.document(project.id)
       assert Documents.list_documents(state, opts) == state.documents
     end
 
@@ -193,7 +191,6 @@ defmodule UserDocs.DocumentsTest do
 
     test "create_document_version/1 with valid data creates a document_version" do
       state = document_version_fixture()
-      docubit_type = Documents.get_docubit_type!("container")
       d = Documents.list_documents(state, state_opts()) |> Enum.at(0)
       v = Projects.list_versions(state, state_opts()) |> Enum.at(0)
       attrs = DocumentFixtures.document_version_attrs(:valid, d.id, v.id)
@@ -267,11 +264,11 @@ defmodule UserDocs.DocumentsTest do
     @content_attrs %{ name: "cname" }
     @version_attrs %{name: "some name"}
 
-    def content_version_fixture(attrs \\ %{}, lc_attrs \\ @language_code_attrs) do
+    def content_version_fixture(attrs \\ %{}, _lc_attrs \\ @language_code_attrs) do
       {:ok, content_version} =
         attrs
         |> Enum.into(@valid_attrs)
-        |> required_attrs(create_required)
+        |> required_attrs(create_required())
         |> Documents.create_content_version()
 
       content_version
@@ -334,7 +331,7 @@ defmodule UserDocs.DocumentsTest do
     test "create_content_version/1 with valid data creates a content_version" do
       attrs =
         @valid_attrs
-        |> required_attrs(create_required)
+        |> required_attrs(create_required())
 
       assert {:ok, %ContentVersion{} = content_version} =
         Documents.create_content_version(attrs)

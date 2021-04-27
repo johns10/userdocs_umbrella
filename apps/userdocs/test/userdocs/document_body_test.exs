@@ -2,21 +2,14 @@ defmodule UserDocs.DocumentVersionBodyTest do
   use UserDocs.DataCase
 
   describe "document_version_body" do
-    alias UserDocs.Documents.Docubit
 
     alias UserDocs.DocubitFixtures
-    alias UserDocs.WebFixtures
-    alias UserDocs.UsersFixtures
-    alias UserDocs.AutomationFixtures
     alias UserDocs.DocumentVersionFixtures, as: DocumentFixtures
-    alias UserDocs.MediaFixtures
     alias UserDocs.StateFixtures
 
     alias UserDocs.Documents
-    alias UserDocs.Documents.DocumentVersion
-    alias UserDocs.Documents.DocubitType
 
-    def empty_document_version(), do: DocumentVersionFixtures.empty_document_version
+    def empty_document_version(), do: DocumentFixtures.empty_document_version
 
     def state_opts() do
       [ data_type: :list, strategy: :by_type, location: :data ]
@@ -42,11 +35,11 @@ defmodule UserDocs.DocumentVersionBodyTest do
     def document_version_with_one_row do
       document_version = empty_document_version()
       body = Documents.get_docubit!(document_version.body.id, %{docubits: true})
-      row =
-        body
-        |> add_row(document_version.id)
-        |> Map.get(:docubits)
-        |> Enum.at(0)
+
+      body
+      |> add_row(document_version.id)
+      |> Map.get(:docubits)
+      |> Enum.at(0)
 
       Documents.get_document_version!(document_version.id, %{ docubits: true })
     end
@@ -60,9 +53,8 @@ defmodule UserDocs.DocumentVersionBodyTest do
         |> Map.get(:docubits)
         |> Enum.at(0)
 
-      row =
-        Documents.get_docubit!(row.id, %{docubits: true})
-        |> add_column(document_version.id)
+      Documents.get_docubit!(row.id, %{docubits: true})
+      |> add_column(document_version.id)
 
       Documents.get_document_version!(document_version.id, %{ docubits: true })
     end
@@ -76,9 +68,8 @@ defmodule UserDocs.DocumentVersionBodyTest do
         |> Map.get(:docubits)
         |> Enum.at(0)
 
-      row =
-        Documents.get_docubit!(row.id, %{docubits: true})
-        |> add_columns(document_version.id)
+      Documents.get_docubit!(row.id, %{docubits: true})
+      |> add_columns(document_version.id)
 
       Documents.get_document_version!(document_version.id, %{ docubits: true })
     end
@@ -86,46 +77,50 @@ defmodule UserDocs.DocumentVersionBodyTest do
     def document_version_with_rows do
       document_version = empty_document_version()
       body = Documents.get_docubit!(document_version.body.id, %{docubits: true})
-      row =
-        body
-        |> add_rows(document_version.id)
-        |> Map.get(:docubits)
-        |> Enum.at(0)
+
+      body
+      |> add_rows(document_version.id)
+      |> Map.get(:docubits)
+      |> Enum.at(0)
 
       Documents.get_document_version!(document_version.id, %{ docubits: true })
     end
 
     def add_row(docubit, document_version_id) do
+      docubit_type = Documents.get_docubit_type!("row")
       attrs = %{ docubits: [
-        DocubitFixtures.docubit_attrs(:row, document_version_id)
+        DocubitFixtures.docubit_attrs(:row, document_version_id, docubit_type.id)
       ] }
       { :ok, docubit } = Documents.update_docubit(docubit, attrs)
       docubit
     end
 
     def add_rows(docubit, document_version_id) do
+      docubit_type = Documents.get_docubit_type!("row")
       attrs = %{ docubits: [
-        DocubitFixtures.docubit_attrs(:row, document_version_id),
-        DocubitFixtures.docubit_attrs(:row, document_version_id),
-        DocubitFixtures.docubit_attrs(:row, document_version_id),
+        DocubitFixtures.docubit_attrs(:row, document_version_id, docubit_type.id),
+        DocubitFixtures.docubit_attrs(:row, document_version_id, docubit_type.id),
+        DocubitFixtures.docubit_attrs(:row, document_version_id, docubit_type.id),
       ] }
       { :ok, docubit } = Documents.update_docubit(docubit, attrs)
       docubit
     end
 
     def add_column(docubit, document_version_id) do
+      docubit_type = Documents.get_docubit_type!("column")
       attrs = %{ docubits: [
-        DocubitFixtures.docubit_attrs(:column, document_version_id)
+        DocubitFixtures.docubit_attrs(:column, document_version_id, docubit_type.id)
       ]}
       { :ok, docubit } = Documents.update_docubit(docubit, attrs)
       docubit
     end
 
     def add_columns(docubit, document_version_id) do
+      docubit_type = Documents.get_docubit_type!("column")
       attrs = %{ docubits: [
-        DocubitFixtures.docubit_attrs(:column, document_version_id),
-        DocubitFixtures.docubit_attrs(:column, document_version_id),
-        DocubitFixtures.docubit_attrs(:column, document_version_id),
+        DocubitFixtures.docubit_attrs(:column, document_version_id, docubit_type.id),
+        DocubitFixtures.docubit_attrs(:column, document_version_id, docubit_type.id),
+        DocubitFixtures.docubit_attrs(:column, document_version_id, docubit_type.id),
       ]}
       { :ok, docubit } = Documents.update_docubit(docubit, attrs)
       docubit
