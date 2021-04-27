@@ -62,6 +62,17 @@ defmodule UserDocsWeb.VersionLive.Index do
   end
 
   @impl true
+  def handle_event("delete", %{"id" => id}, socket) do
+    version = Projects.get_version!(String.to_integer(id))
+    {:ok, _} = Projects.delete_version(version)
+
+    {
+      :noreply,
+      socket
+      |> load_versions()
+      |> prepare_versions(socket.assigns.current_project.id)
+    }
+  end
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
 
