@@ -97,6 +97,11 @@ defmodule UserDocsWeb.UserLive.FormComponent do
 
     {:noreply, assign(socket, :changeset, changeset)}
   end
+  @impl true
+  def handle_event("validate", %{"user" => _user_params}, socket) do
+    # blank validation, for tests
+    {:noreply, socket}
+  end
 
   def handle_event("save", %{"user" => user_params}, socket) do
     save_user(socket, socket.assigns.action, user_params)
