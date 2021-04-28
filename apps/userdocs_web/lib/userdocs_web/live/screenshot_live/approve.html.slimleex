@@ -28,6 +28,7 @@ css:
         .card-footer
           = link "Approve", to: "#", phx_target: @myself.cid, phx_click: "approve-provisional", class: "card-footer-item is-success"
           = link "Reject", to: "#", phx_target: @myself.cid, phx_click: "reject-provisional", class: "card-footer-item is-danger"
+          = link "Cancel", to: "#", phx_target: @myself.cid, phx_click: "cancel-review", class: "card-footer-item is-danger"
 
 
   
