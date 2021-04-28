@@ -6,9 +6,24 @@ defmodule UserDocs.StepInstances do
 
   alias UserDocs.StepInstances.StepInstance
 
-  def list_step_instances() do
+  def load_step_instances(state, opts) do
+    StateHandlers.load(state, list_step_instances(opts[:params]), StepInstance, opts)
+  end
+
+  def list_step_instances(params \\ %{}) do
+    filters = Map.get(params, :filters, [])
     base_step_instances_query()
+    |> maybe_filter_step_instances_by_version_id(filters[:process_id])
     |> Repo.all()
+  end
+
+  def maybe_filter_step_instances_by_version_id(query, nil), do: query
+  def maybe_filter_step_instances_by_version_id(query, version_id) do
+    from(step_instance in query,
+      left_join: step in assoc(step_instance, :step),
+      left_join: process in assoc(step, :process),
+      where: process.version_id == ^version_id
+    )
   end
 
   defp base_step_instances_query(), do: from(step_instances in StepInstance)
