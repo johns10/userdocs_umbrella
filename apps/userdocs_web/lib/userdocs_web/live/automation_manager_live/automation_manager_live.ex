@@ -5,7 +5,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
   alias UserDocs.AutomationManager
   alias UserDocs.StepInstances
 
-  alias UserDocs.Jobs.Job
   alias UserDocs.StepInstances.StepInstance
   alias UserDocs.ProcessInstances.ProcessInstance
 
