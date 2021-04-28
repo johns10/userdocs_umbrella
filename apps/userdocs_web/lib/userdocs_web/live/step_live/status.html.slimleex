@@ -1,0 +1,19 @@
+div id=@id
+  = if Screenshots.get_screenshot_status(@step.screenshot) in [ :warn ]  do 
+    = screenshot_status_element(@socket, @step.screenshot)
+  = if step_instances_status(@step.step_instances) in [ :warn ] do
+    = step_instances_status_element(@socket, @step.step_instances, @myself.cid)
+  = if @display_errors_modal do 
+    .modal.is-active
+      .modal-background phx-click="toggle_errors_modal" phx-target=@myself.cid
+      .section 
+        .card.m-4
+          .card-content
+            = for step_instance <- @step.step_instances do 
+              h2.title
+                => step_instance.name
+              h2.subtitle
+                = step_instance.status
+              p
+                = render_errors(step_instance.errors)
+      button.modal-close.is-large aria-label="close" phx-click="toggle_errors_modal" phx-target=@myself.cid
