@@ -328,10 +328,16 @@ defmodule UserDocs.Web do
   """
   def get_element!(id, _params \\ %{}, _filters \\ %{})
   def get_element!(id, params, filters) when is_map(params) and is_map(filters) do
-    Repo.get!(Element, id)
+    base_element_query(id)
+    |> maybe_preload_strategy(params[:strategy])
+    |> Repo.one!()
   end
   def get_element!(id, state, opts) when is_list(opts) do
     StateHandlers.get(state, id, Element, opts)
+  end
+
+  defp base_element_query(id) do
+    from(element in Element, where: element.id == ^id)
   end
 
 
