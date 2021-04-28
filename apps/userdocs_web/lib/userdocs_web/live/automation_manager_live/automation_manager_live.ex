@@ -114,7 +114,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
   end
   def handle_event("add-process-instance", %{ "process-id" => process_id }, socket) do
     case Jobs.add_process_instance_to_job(socket.assigns.job, String.to_integer(process_id)) do
-      { :ok, job } -> { :noreply, socket |> assign(:job, job) }
+      { :ok, job } -> { :noreply, socket |> assign(:job, Jobs.get_job!(job.id, %{ preloads: "*"})) }
       { :error, changeset } ->
         formatted_errors = format_changeset_errors(changeset)
         { :noreply, Phoenix.LiveView.put_flash(socket, :error,  formatted_errors) }
