@@ -6,7 +6,15 @@ const { currentPage } = require('./helpers.js')
 const Step = require('./step.js')
 
 async function openBrowser() {
-  const browser = await puppeteer.launch({ headless: false });
+  const args = 
+    puppeteer
+      .defaultArgs()
+      .filter(arg => String(arg).toLowerCase() !== '--disable-extensions')
+      .filter(arg => String(arg).toLowerCase() !== '--headless')
+      
+  args.push('--user-data-dir=C:\\userdocs_chrome_data');
+
+  const browser = await puppeteer.launch({ ignoreDefaultArgs: true, args: args });
   return browser
 }
 
