@@ -5,7 +5,6 @@ defmodule UserDocs.ProcessInstances do
   alias UserDocs.Repo
 
   alias UserDocs.StepInstances
-  alias UserDocs.StepInstances.StepInstance
   alias UserDocs.ProcessInstances.ProcessInstance
 
   def list_process_instances() do
@@ -54,7 +53,6 @@ defmodule UserDocs.ProcessInstances do
   def create_process_instance(attrs) do
     create_process_instance(attrs, %ProcessInstance{ expanded: false })
   end
-
   def create_process_instance(attrs \\ %{}, %ProcessInstance{} = process_instance) do
     process_instance
     |> ProcessInstance.changeset(attrs)
@@ -125,7 +123,7 @@ defmodule UserDocs.ProcessInstances do
           { [ StepInstances.base_step_instance_attrs(step, inner_order) | acc ], inner_order + 1 }
         end)
 
-    step_instance_attrs = Enum.reverse(step_instance_attrs)
+    Enum.reverse(step_instance_attrs)
   end
 
   def delete_process_instance(%ProcessInstance{} = process_instance) do
