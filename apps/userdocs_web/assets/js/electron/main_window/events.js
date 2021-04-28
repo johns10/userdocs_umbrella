@@ -17,13 +17,14 @@ function browserOpened(payload) {
 }
 
 function handleStepStatusUpdate(stepInstance, config) {
-  console.log("handleStepStatusUpdate")
+  //console.log("handleStepStatusUpdate")
   if (stepInstance.step_id) {
     config.window.send('stepStatusUpdated', stepInstance)
   }
 }
 
 function stepStatusUpdated(stepInstance) {
+  /*
   if (stepInstance.step_id) {
     if (stepInstance.attrs.screenshot != null) {
       if (stepInstance.attrs.screenshot.base_64 != null) {
@@ -35,7 +36,7 @@ function stepStatusUpdated(stepInstance) {
             detail: stepInstance
           }))
         } catch(e) {
-          console.log("Failed to update screenshot for step " + stepInstance.step_id)
+          //console.log("Failed to update screenshot for step " + stepInstance.step_id)
         }
       }
     }
@@ -47,11 +48,12 @@ function stepStatusUpdated(stepInstance) {
           detail: stepInstance 
         }))
     } catch (e) {
-      console.log("Failed to send update to step-" + stepInstance.step_id + "-status")
+      //console.log("Failed to send update to step-" + stepInstance.step_id + "-status")
     }
   }
+  */
   try {
-    console.log("trying to update automation manager")
+    //console.log("trying to update automation manager")
     document
       .getElementById("automation-manager-hook")
       .dispatchEvent(new CustomEvent("update-step-instance", {
