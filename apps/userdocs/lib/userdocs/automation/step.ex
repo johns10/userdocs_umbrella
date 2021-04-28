@@ -11,6 +11,7 @@ defmodule UserDocs.Automation.Step do
   alias UserDocs.Automation.Process
   alias UserDocs.Media.Screenshot
   alias UserDocs.Automation.Step.Name
+  alias UserDocs.StepInstances.StepInstance
 
   alias UserDocs.Automation.Step.Changeset
 
@@ -32,6 +33,8 @@ defmodule UserDocs.Automation.Step do
     belongs_to :element, Element, on_replace: :update
     belongs_to :annotation, Annotation, on_replace: :update
     belongs_to :step_type, StepType
+
+    has_many :step_instances, StepInstance
 
     timestamps()
   end
