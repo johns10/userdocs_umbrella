@@ -59,6 +59,7 @@ css:
 
   div phx-hook="automationManager" id="automation-manager-hook"
   div phx-hook="automatedBrowserCommands" id="automated-browser-commands"
+  div phx-hook="testSelector" id="selector-tester"
 
   main.container role="main"
     p.alert.alert-info role="alert" phx-click="lv:clear-flash" phx-value-key="info"
