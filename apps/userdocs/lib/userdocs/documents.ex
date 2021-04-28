@@ -30,7 +30,7 @@ defmodule UserDocs.Documents do
   def list_content(params, filters) when is_map(params) and is_map(filters) do
     base_content_query()
     |> maybe_preload_content_versions(params[:content_versions])
-    |> maybe_filter_by_team(filters[:team_id])
+    |> maybe_filter_content_by_team(filters[:team_id])
     |> maybe_filter_by_user(filters[:user_id])
     |> Repo.all()
   end
@@ -47,22 +47,14 @@ defmodule UserDocs.Documents do
   defp maybe_preload_content_versions(query, nil), do: query
   defp maybe_preload_content_versions(query, _), do: from(version in query, preload: [:content_versions])
 
-  defp maybe_filter_by_team(query, nil), do: query
-  defp maybe_filter_by_team(query, team_id) do
+
+  defp maybe_filter_content_by_team(query, nil), do: query
+  defp maybe_filter_content_by_team(query, team_id) do
     from(content in query,
       where: content.team_id == ^team_id
     )
   end
-
-  defp maybe_filter_by_user(query, nil), do: query
-  defp maybe_filter_by_team(query, user_id) do
-    from(content in query,
-      left_join: team in assoc(content, :team),
-      left_join: user in assoc(team, :users),
-      where: user.id == ^user_id
-    )
-  end
-
+  """
   defp maybe_filter_by_team(query, nil), do: query
   defp maybe_filter_by_team(query, team_id) do
     from(step in query,
@@ -71,6 +63,15 @@ defmodule UserDocs.Documents do
       left_join: project in assoc(version, :project),
       where: project.team_id == ^team_id,
       order_by: step.order
+    )
+  end
+"""
+  defp maybe_filter_by_user(query, nil), do: query
+  defp maybe_filter_by_user(query, user_id) do
+    from(content in query,
+      left_join: team in assoc(content, :team),
+      left_join: user in assoc(team, :users),
+      where: user.id == ^user_id
     )
   end
 
