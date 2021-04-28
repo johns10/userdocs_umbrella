@@ -67,7 +67,7 @@ defmodule UserDocsWeb.StepLive.Status do
     )
   end
 
-  def step_instances_status([ _ ] = items) do
+  def step_instances_status([ _ | _ ] = items) do
     Enum.reduce(items, :ok, fn(step_instance, acc) ->
       case step_instance.status do
         "failed" ->
