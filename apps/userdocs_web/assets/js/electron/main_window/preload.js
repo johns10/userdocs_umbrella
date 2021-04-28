@@ -11,7 +11,8 @@ contextBridge.exposeInMainWorld('userdocs', {
   execute: (step_instance) => { ipcRenderer.send('execute', step_instance) },
   executeProcess: (process) => { ipcRenderer.send('executeProcess', process) },
   putJob: (job) => { ipcRenderer.send('putJob', job)},
-  start: () => { ipcRenderer.send('start')}
+  start: () => { ipcRenderer.send('start')},
+  testSelector: (message) => { ipcRenderer.send('testSelector', message)}
 })
 
 ipcRenderer.on('browserOpened', (event, payload) => browserOpened(payload))
