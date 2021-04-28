@@ -45,8 +45,7 @@ div
               = step.name
             .is-flex.is-flex-direction-row.is-flex-grow-0
               = live_component(@socket, Status, 
-                [ id: "step-" <> Integer.to_string(step.id) <> "-status", 
-                step: step ])
+                [ id: "step-" <> Integer.to_string(step.id) <> "-status", step: step ])
               = live_component(@socket, Queuer, 
                 [ id: "step-" <> Integer.to_string(step.id) <> "-queuer",
                 step: step, 
