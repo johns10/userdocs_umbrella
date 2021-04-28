@@ -16,4 +16,7 @@ defmodule UserDocsWeb.PageLive do
 
   @impl true
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
+
+  @impl true
+  def handle_info(n, s), do: Root.handle_info(n, s)
 end
