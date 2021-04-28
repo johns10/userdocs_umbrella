@@ -15,7 +15,6 @@ defmodule UserDocsWeb.StepLive.Index do
   alias UserDocs.Media.Screenshot
   alias UserDocs.Automation.Process.RecentPage
 
-  alias UserDocsWeb.Defaults
   alias UserDocsWeb.Root
   alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.ProcessLive.Loaders
@@ -37,7 +36,8 @@ defmodule UserDocsWeb.StepLive.Index do
       UserDocs.Web.Annotation,
       UserDocs.Web.Element,
       UserDocs.Web.Page,
-      UserDocs.Media.Screenshot
+      UserDocs.Media.Screenshot,
+      UserDocs.StepInstances.StepInstance
     ]
   end
 
@@ -64,6 +64,7 @@ defmodule UserDocsWeb.StepLive.Index do
     |> Web.load_strategies(opts)
     |> Documents.load_language_codes(opts)
     |> Automation.load_step_types(opts)
+    |> Loaders.step_instances(opts)
     |> Loaders.steps(opts)
     |> Loaders.processes(opts)
     |> Loaders.pages(opts)
@@ -256,6 +257,7 @@ defmodule UserDocsWeb.StepLive.Index do
         :annotation,
         :element,
         :process,
+        :step_instances,
         [ annotation: :annotation_type ],
         [ annotation: :content ],
         [ element: :strategy ],
@@ -285,6 +287,7 @@ defmodule UserDocsWeb.StepLive.Index do
         :page,
         :annotation,
         :element,
+        :step_instances,
         [ annotation: :content ],
         [ annotation: :annotation_type ],
         [ element: :strategy ],
