@@ -47,27 +47,44 @@ function startQueueProcessorEventLoop() {
 }
 
 //TODO: Fix retry mechanisms
-async function processQueue() {
+async function processQueue(retries) {
   const stepInstance = userdocs.browserExecutionQueue.shift()
+  const max_retries = 10
+  const base_backoff = 1
   if (stepInstance) {
     console.log("Shifted " + stepInstance.name)
     completeStepInstance = await executeStepInstance(stepInstance)
     if (completeStepInstance.status === COMPLETE) {
       console.log("Step completed, processing next item")
-      await new Promise(resolve => setTimeout(resolve, 250));
-      await processQueue()
-    } else if (completeStepInstance.status === FAILED) {
-      console.log("Step Failed, stop and unshift item")
-      userdocs.runState = 'stopped'
+      // await new Promise(resolve => setTimeout(resolve, 250)); This is the wait I'm trying to eliminate
+      await processQueue(null)
+    } else if ((completeStepInstance.status === FAILED) && retries <= max_retries) {
+      console.log(`Step Failed, stop and unshift item. On retry ${retries}. Waiting ${backoffTime(retries)}ms before continuing.`)
       userdocs.browserExecutionQueue.unshift(completeStepInstance)
+      await new Promise(resolve => setTimeout(resolve, backoffTime(retries)));
+      if (retries != null) {
+        retries = retries + 1
+      } else {
+        retries = 1
+      }
+      await processQueue(retries)
+    } else if ((completeStepInstance.status === FAILED) && retries == max_retries) {
+      console.log(`Step Failed, after ${max_retries}.`)
+      userdocs.browserExecutionQueue.unshift(completeStepInstance)
+      userdocs.runState = 'stopped'
     } else {
       console.log("Uncaught condition, stop")
+      userdocs.browserExecutionQueue.unshift(completeStepInstance)
       userdocs.runState = 'stopped'
     }
   } else {
     console.log("Probably null stepinstance, stop")
     userdocs.runState = 'stopped'
   }
+}
+
+function backoffTime(retry) {
+  return retry * retry * retry
 }
 
 ipcMain.on('openBrowser', async (event) => { 
