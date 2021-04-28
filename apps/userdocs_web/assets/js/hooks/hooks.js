@@ -2,6 +2,13 @@ import {handle_message} from "../commands/commands.js"
 
 let Hooks = {}
 
+Hooks.testSelector = {
+  mounted() {
+    this.handleEvent("test_selector", (message) => {
+      window.userdocs.testSelector(message)
+    })
+  }
+};
 Hooks.automatedBrowserCommands = {
   mounted() {
     this.handleEvent("open-browser", (message) => {
@@ -113,18 +120,6 @@ Hooks.selectorTransfer = {
       console.log("Got a selector")
       console.log(e.detail)
       this.pushEventTo('#selector-handler', "transfer_selector", e.detail)
-    })
-  }
-};
-Hooks.testSelector = {
-  mounted() {
-    this.handleEvent("test_selector", (message) => {
-      console.log("Testing Selector");
-      console.log(message)
-      chrome.storage.local.get(['activeTabId'], function (result) {
-        message.payload.activeTabId = result.activeTabId
-        handle_message(message, {environment: 'extension'})
-      });
     })
   }
 };
