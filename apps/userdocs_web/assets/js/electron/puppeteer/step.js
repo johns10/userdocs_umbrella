@@ -48,6 +48,7 @@ async function elementScreenshot(browser, stepInstance) {
   strategy = stepInstance.attrs.element.strategy.name
   file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order
 
+  await new Promise(resolve => setTimeout(resolve, 500));
   let handle = await getElementHandle(browser, selector, strategy)
   let base_64 = await handle.screenshot({ encoding: "base64"});
   if (stepInstance.attrs.screenshot === null) { 
@@ -55,7 +56,7 @@ async function elementScreenshot(browser, stepInstance) {
   } else {
     stepInstance.attrs.screenshot.base_64 = base_64
   }
-  handle.screenshot({path: userdocs.configuration.image_path + "\\" + file_name + ".png"});
+  await writeFile(userdocs.configuration.image_path + "\\" + file_name + ".png", base_64)
   return stepInstance
 }
 
@@ -63,8 +64,15 @@ async function fullScreenScreenshot(browser, stepInstance) {
   file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order
   const page = await currentPage(browser)
 
-  buffer = await page.screenshot();
-  await writeFile(userdocs.configuration.image_path + "\\" + file_name + ".png", buffer)
+  let base64 = buffer = await page.screenshot({ encoding: "base64"});
+  if (stepInstance.attrs.screenshot === null) { 
+    stepInstance.attrs.screenshot = { base_64: base_64}
+  } else {
+    stepInstance.attrs.screenshot.base_64 = base_64
+  }
+  await new Promise(resolve => setTimeout(resolve, 500));
+  handle.screenshot({path: userdocs.configuration.image_path + "\\" + file_name + ".png"});
+  await writeFile(userdocs.configuration.image_path + "\\" + file_name + ".png", base64)
   return stepInstance
 }
 
