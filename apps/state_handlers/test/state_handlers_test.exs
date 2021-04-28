@@ -2,19 +2,14 @@ defmodule StateHandlers.StateFixtures do
 
   alias UserDocs.DocumentVersionFixtures, as: DocumentFixtures
   alias UserDocs.UsersFixtures
-  alias UserDocs.MediaFixtures
-  alias UserDocs.WebFixtures
-  alias UserDocs.AutomationFixtures
   alias UserDocs.ProjectsFixtures
   alias UserDocs.DocubitFixtures
 
   alias UserDocs.Users.User
   alias UserDocs.Users.TeamUser
   alias UserDocs.Users.Team
-  alias UserDocs.Projects
   alias UserDocs.Projects.Project
   alias UserDocs.Projects.Version
-  alias UserDocs.Documents
   alias UserDocs.Documents.Document
   alias UserDocs.Documents.DocubitType
   alias UserDocs.Documents.DocumentVersion
@@ -57,15 +52,13 @@ defmodule StateHandlersTest do
     alias UserDocs.Projects.Project
     alias UserDocs.Projects.Version
     alias UserDocs.UsersFixtures
-    alias UserDocs.ProjectsFixtures
-    alias UserDocs.DocumentVersionFixtures, as: DocumentFixtures
     alias StateHandlers.StateFixtures
-    alias UserDocs.Documents
     alias UserDocs.Documents.Document
     alias UserDocs.Documents.DocumentVersion
 
-    def broadcaster(channel, action, data) do
+    def broadcaster(_channel, _action, data) do
       case data do
+        %{objects: [ object | _ ]} -> IO.inspect(object.__meta__.schema)
         [ object | _ ] -> IO.inspect(object.__meta__.schema)
         object -> IO.inspect(object.__meta__.schema)
       end
@@ -84,7 +77,7 @@ defmodule StateHandlersTest do
       ]
       Enum.each(state_opts,
         fn({opts, result}) ->
-          IO.puts("Running StateHandlers.Initialize with {inspect(opts)}")
+          #IO.puts("Running StateHandlers.Initialize with {inspect(opts)}")
           state = StateHandlers.initialize(%{}, opts)
           assert state == result
         end
@@ -98,7 +91,7 @@ defmodule StateHandlersTest do
       ]
       Enum.each(state_opts,
         fn({opts, initial_state}) ->
-          IO.puts("Running StateHandlers.Load with {inspect(opts)}")
+          #IO.puts("Running StateHandlers.Load with {inspect(opts)}")
           data = Enum.map(1..2, fn(_) -> UsersFixtures.user() end)
           state = StateHandlers.load(initial_state, data, User, opts)
           assert StateHandlers.list(state, User, opts) == data
@@ -114,7 +107,7 @@ defmodule StateHandlersTest do
       ]
       Enum.each(state_opts,
         fn({ opts, initial_state}) ->
-          IO.puts("Running StateHandlers.List with {inspect(opts)}")
+          #IO.puts("Running StateHandlers.List with {inspect(opts)}")
           result = StateHandlers.list(initial_state, User, opts)
           assert result == [user]
         end
@@ -129,7 +122,7 @@ defmodule StateHandlersTest do
       ]
       Enum.each(state_opts,
         fn({ opts, initial_state}) ->
-          IO.puts("Running StateHandlers.Get with {inspect(opts)}")
+          #IO.puts("Running StateHandlers.Get with {inspect(opts)}")
           id = list_data |> Enum.at(0) |> Map.get(:id)
           result = StateHandlers.get(initial_state, id, User, opts)
           assert result == list_data |> Enum.at(0)
@@ -145,7 +138,7 @@ defmodule StateHandlersTest do
       ]
       Enum.each(state_opts,
         fn({ opts, initial_state}) ->
-          IO.puts("Running StateHandlers.Create with {inspect(opts)}")
+          #IO.puts("Running StateHandlers.Create with {inspect(opts)}")
           user = UsersFixtures.user()
           result = StateHandlers.create(initial_state, user, opts)
           case { opts[:data_type], opts[:location] } do
@@ -164,7 +157,7 @@ defmodule StateHandlersTest do
       ]
       Enum.each(state_opts,
         fn({ opts, initial_state}) ->
-          IO.puts("Running StateHandlers.Create with {inspect(opts)}")
+          #IO.puts("Running StateHandlers.Create with {inspect(opts)}")
           users = StateHandlers.list(initial_state, User, opts)
           [ user | expected_result ] = users
           state = StateHandlers.delete(initial_state, user, opts)
@@ -213,7 +206,6 @@ defmodule StateHandlersTest do
         ]
       ]
       state = StateFixtures.state(opts)
-      project_id = StateHandlers.list(state, Project, opts) |> Enum.at(0) |> Map.get(:id)
       data = StateHandlers.list(state, Project, opts)
       StateHandlers.preload(state, data, opts[:preloads], opts)
     end
@@ -239,7 +231,7 @@ defmodule StateHandlersTest do
       ]
       Enum.each(state_opts,
         fn({ opts, initial_state}) ->
-          IO.puts("Running StateHandlers.Update with {inspect(opts)}")
+          #IO.puts("Running StateHandlers.Update with {inspect(opts)}")
           user = StateHandlers.list(initial_state, User, opts) |> Enum.at(0) |> Map.put(:email, "test@test.com")
           result = StateHandlers.update(initial_state, user, opts)
           case { opts[:data_type], opts[:location] } do
@@ -262,7 +254,7 @@ defmodule StateHandlersTest do
       ]
       Enum.each(state_opts,
         fn({ opts, initial_state}) ->
-          IO.puts("Running StateHandlers.Update with {inspect(opts)}")
+          #IO.puts("Running StateHandlers.Update with {inspect(opts)}")
           user1 = StateHandlers.list(initial_state, User, opts) |> Enum.at(0) |> Map.put(:email, "test@test.com")
           user2 = StateHandlers.list(initial_state, User, opts) |> Enum.at(1) |> Map.put(:email, "test2@test.com")
           result = StateHandlers.update(initial_state, %{ objects: [ user1, user2 ]}, opts)
@@ -285,7 +277,7 @@ defmodule StateHandlersTest do
       opts = [ types: [User], data_type: :list, strategy: :by_type, order: [ %{ field: :id, order: :desc } ] ]
       state = %{} |> StateHandlers.initialize(opts) |> StateHandlers.load(users, User, opts)
       result = StateHandlers.list(state, User, opts)
-      assert result = [ user_two, user_one ]
+      assert result == [ user_two, user_one ]
     end
 
     test "StateHandlers.Upsert updates a record" do
@@ -318,7 +310,7 @@ defmodule StateHandlersTest do
       ]
       initial_state = %{ users: list_data }
       user = StateHandlers.list(initial_state, User, opts) |> Enum.at(0) |> Map.put(:email, "test@test.com")
-      result = StateHandlers.broadcast(initial_state, user, opts)
+      StateHandlers.broadcast(initial_state, user, opts)
     end
 
     test "StateHandlers broadcast related data" do
@@ -334,7 +326,7 @@ defmodule StateHandlersTest do
       state = StateFixtures.state(opts)
       data = StateHandlers.list(state, Document, opts)
       test = StateHandlers.preload(state, data, opts[:preloads], opts) |> Enum.at(0)
-      result = StateHandlers.broadcast(state, test, opts)
+      StateHandlers.broadcast(state, test, opts)
     end
   end
 end
