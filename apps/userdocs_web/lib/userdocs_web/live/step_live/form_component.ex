@@ -169,24 +169,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     element = UserDocs.Web.get_element!(element_id, %{ strategy: true }, %{})
 
     payload =  %{
-      type: "step",
-      payload: %{
-        process: %{
-          steps: [
-            %{
-              id: 0,
-              selector: element.selector,
-              strategy: element.strategy,
-              step_type: %{
-                name: "Test Selector"
-              }
-            }
-          ],
-        },
-        element_id: socket.assigns.id,
-        status: "not_started",
-        active_annotations: []
-      }
+      selector: element.selector,
+      strategy: element.strategy.name
     }
 
     {
