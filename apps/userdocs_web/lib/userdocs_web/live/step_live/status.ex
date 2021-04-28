@@ -77,4 +77,5 @@ defmodule UserDocsWeb.StepLive.Status do
       end
     end)
   end
+  def step_instances_status([]), do: :ok
 end
