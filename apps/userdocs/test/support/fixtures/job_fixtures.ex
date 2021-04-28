@@ -38,7 +38,7 @@ defmodule UserDocs.JobsFixtures do
     }
   end
 
-  def process_instance(process_id \\ nil, job_id \\ nil, step_instances \\ []) do
+  def process_instance(process_id \\ nil, job_id \\ nil, _step_instances \\ []) do
     {:ok, process_instance } =
       process_instance_attrs(:valid, process_id, job_id)
       |> ProcessInstances.create_process_instance()
