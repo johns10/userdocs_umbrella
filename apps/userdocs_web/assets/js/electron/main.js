@@ -160,4 +160,9 @@ ipcMain.on('configure', async (event, message) => {
   userdocs.configuration = message
 })
 
+ipcMain.on('testSelector', async (event, message) => {
+  automationModule = puppeteer
+  automationModule.testSelector(userdocs.browser, message)
+})
+
 app.whenReady().then(main)
