@@ -53,6 +53,10 @@ async function processQueue(retries) {
   const base_backoff = 1
   if (stepInstance) {
     console.log("Shifted " + stepInstance.name)
+    if (retries > 0) {
+      console.log("We're retrying, so delete the errors so we don't spam")
+      stepInstance.errors = []
+    }
     completeStepInstance = await executeStepInstance(stepInstance)
     if (completeStepInstance.status === COMPLETE) {
       console.log("Step completed, processing next item")
