@@ -1,5 +1,5 @@
 
-defmodule UserDocs.Repo.Migrations.AddDefaultProjectRelation do
+defmodule UserDocs.Repo.Migrations.AddTeamAwsFields do
   use Ecto.Migration
 
   def change do
