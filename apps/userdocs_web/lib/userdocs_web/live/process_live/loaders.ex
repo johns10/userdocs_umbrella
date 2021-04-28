@@ -4,6 +4,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   alias UserDocs.Automation
   alias UserDocs.Web
   alias UserDocs.Screenshots
+  alias UserDocs.StepInstances
 
   def content(socket, opts) do
     opts =
@@ -71,6 +72,11 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
       |> Keyword.put(:filters, %{version_id: socket.assigns.current_version.id})
 
     Screenshots.load_screenshots(socket, opts)
+  end
+
+  def step_instances(socket, opts) do
+    opts = Keyword.put(opts, :params, %{ filters: %{version_id: socket.assigns.current_version.id } })
+    StepInstances.load_step_instances(socket, opts)
   end
 
 end
