@@ -10,6 +10,7 @@ defmodule UserDocsWeb.ScreenshotLive.Preview do
       :ok,
       socket
       |> assign(assigns)
+      |> assign(:status, nil)
       |> assign(:img_url, "")
       |> assign(:img_alt, "Screenshot not created")
     }
@@ -34,4 +35,5 @@ defmodule UserDocsWeb.ScreenshotLive.Preview do
 
   def status(%Screenshot{ aws_screenshot: _, aws_provisional_screenshot: nil, aws_diff_screenshot: nil }), do: :ok
   def status(%Screenshot{ aws_screenshot: _, aws_provisional_screenshot: _, aws_diff_screenshot: _ }), do: :warn
+  def status(%Screenshot{}), do: nil
 end
