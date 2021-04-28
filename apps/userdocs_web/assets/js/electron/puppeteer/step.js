@@ -1,5 +1,5 @@
 const { succeed, fail, start } = require('../../step/step_instance.js');
-  const { currentPage, getElementHandle } = require('./helpers.js')
+const { currentPage, getElementHandle } = require('./helpers.js')
 const Puppeteer = require('./puppeteer.js')
 const { writeFile  } = require('fs/promises')
 
@@ -88,7 +88,7 @@ async function clearAnnotations(browser, stepInstance) {
 }
 
 async function applyAnnotation(browser, stepInstance, applyAnnotationFunction) {
-  console.log("apply Annotation " + stepInstance.attrs.annotation.annotation_type.name)
+  //console.log("apply Annotation " + stepInstance.attrs.annotation.annotation_type.name)
   let page = await currentPage(browser) 
   const preloadStatus  = await Puppeteer.hasPreloads(browser)
   if ( !preloadStatus ) { browser = await Puppeteer.preload(browser) }
@@ -110,7 +110,6 @@ async function scrollIntoView(browser, stepInstance) {
 
   const page = await currentPage(browser)
   let handle = await getElementHandle(browser, selector, strategy)
-  console.log(handle)
   if (handle != undefined) {
     await page.evaluate(handle => { handle.scrollIntoView() }, handle) 
     return stepInstance
@@ -120,7 +119,6 @@ async function scrollIntoView(browser, stepInstance) {
 }
 
 async function startProcess(window, stepInstance) { 
-  console.log("Updating Process status")
   window.webContents.send('processStatusUpdated', start(stepInstance))
   return stepInstance
 }
