@@ -65,12 +65,7 @@ defmodule UserDocs.AutomationFixtures do
     strategy = WebFixtures.strategy()
     page = WebFixtures.page()
     annotation_type = WebFixtures.annotation_type(:badge)
-
-    element_attrs =
-      WebFixtures.element_attrs(:valid)
-      |> Map.put(:strategy_id, strategy.id)
-      |> Map.put(:page_id, page.id)
-
+    element_attrs = WebFixtures.element_attrs(:valid, page.id, strategy.id)
     annotation_attrs =
       WebFixtures.annotation_attrs(:valid)
       |> Map.put(:annotation_type_id, annotation_type.id)
