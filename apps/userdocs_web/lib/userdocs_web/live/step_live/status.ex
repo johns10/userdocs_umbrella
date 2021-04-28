@@ -1,6 +1,8 @@
 defmodule UserDocsWeb.StepLive.Status do
-  use UserDocsWeb, :live_component
+  use UserDocsWeb, :live_slime_component
   use Phoenix.HTML
+
+  alias UserDocs.Screenshots
 
   @impl true
   def mount(socket) do
@@ -9,50 +11,45 @@ defmodule UserDocsWeb.StepLive.Status do
       socket
       |> assign(:errors, [])
       |> assign(:status, :ok)
+      |> assign(:display_errors_modal, false)
     }
   end
 
   @impl true
-  def render(assigns) do
-    ~L"""
-    <%= content_tag(:div, status_opts(@status, @errors, @id)) do %>
-
-      <span class="icon">
-        <%= status_icon(@status) %>
-      </span>
-
-    <%= end %>
-    """
+  def handle_event("toggle_errors_modal", _, socket) do
+    { :noreply, socket |> assign(:display_errors_modal, not socket.assigns.display_errors_modal)}
   end
 
-  @impl true
-  def handle_event("update_step", %{ "status" => status } = payload, socket) do
-    {
-      :noreply,
-      socket
-      |> assign(:status, String.to_atom(status))
-      |> assign(:errors, payload["errors"])
-      |> assign(:warnings, payload["warnings"])
-    }
+  def screenshot_status_element(socket, screenshot) do
+    kwargs = [
+      to: Routes.step_index_path(socket, :screenshot_workflow, screenshot.step_id),
+      class: "navbar-item has-tooltip-left",
+      data_tooltip: "Screenshot has changed, click warning to review changes."
+    ]
+
+    link(kwargs) do
+      status_icon(Screenshots.get_screenshot_status(screenshot))
+    end
   end
 
-  def status_icon(:ok), do: ""
+  def step_instances_status_element(_socket, [ _ | _ ] = step_instances, cid) do
+    kwargs = [
+      to: "#", phx_target: cid,
+      phx_click: "toggle_errors_modal",
+      class: "navbar-item has-tooltip-left",
+      data_tooltip: "One or more step instances failed their last execution. Click for a summary."
+    ]
+
+    link(kwargs) do
+      status_icon(step_instances_status(step_instances))
+    end
+  end
+
+  def status_icon(:ok), do: content_tag(:i, "", [class: "fa fa-check", aria_hidden: "true"])
   def status_icon(:failed), do: content_tag(:i, "", [class: "fa fa-times", aria_hidden: "true"])
-  def status_icon(:warn), do: content_tag(:i, "", [class: "fa fa-exlamation-triangle", aria_hidden: "true"])
+  def status_icon(:warn), do: content_tag(:i, "", [class: "fas fa-exclamation-triangle", aria_hidden: "true"])
   def status_icon(:started), do: content_tag(:i, "", [class: "fa fa-spinner", aria_hidden: "true"])
   def status_icon(:complete), do: content_tag(:i, "", [class: "fa fa-check", aria_hidden: "true"])
-
-  def status_opts(status, _errors, id) when status in [ :ok, :started, :complete ] do
-    [ id: id, class: "navbar-item", phx_hook: "stepStatus" ]
-  end
-  def status_opts(status, errors, id) when status in [ :failed, :warn ] do
-    [
-      id: id,
-      class: "navbar-item has-tooltip-left",
-      data_tooltip: render_errors(errors),
-      phx_hook: "stepStatus"
-    ]
-  end
 
   def render_errors(errors) do
     Enum.reduce(errors, "",
@@ -68,5 +65,16 @@ defmodule UserDocsWeb.StepLive.Status do
         acc <> k <> ": " <> to_string(v) <> "\n"
       end
     )
+  end
+
+  def step_instances_status([ _ ] = items) do
+    Enum.reduce(items, :ok, fn(step_instance, acc) ->
+      case step_instance.status do
+        "failed" ->
+          :warn
+        _ ->
+          acc
+      end
+    end)
   end
 end
