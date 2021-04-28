@@ -3,6 +3,7 @@ defmodule UserDocsWeb.ProcessLive.IndexComponent do
 
   use UserdocsWeb.LiveViewPowHelper
   alias UserDocsWeb.ProcessLive.Runner
+  alias UserDocsWeb.ProcessLive.Queuer
 
   @impl true
   def update(assigns, socket) do
