@@ -64,6 +64,11 @@ defmodule UserDocs.Screenshots do
     ExAws.S3.presigned_url(config, :get, bucket, path, virtual_host: true)
   end
 
+  def get_screenshot_status(%Screenshot{ aws_screenshot: _, aws_provisional_screenshot: nil, aws_diff_screenshot: nil }), do: :ok
+  def get_screenshot_status(%Screenshot{ aws_screenshot: _, aws_provisional_screenshot: _, aws_diff_screenshot: _ }), do: :warn
+  def get_screenshot_status(%Screenshot{}), do: nil
+  def get_screenshot_status(nil), do: nil
+
   def get_url(nil, _team), do: { :nofile, "" }
   def get_url(aws_key, team) do
     region = team.aws_region
