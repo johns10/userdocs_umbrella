@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const { annotations, badge, styleLabel, styleBadge, styleWrapper, outline, 
   createOutlineElement, badgeOutline, blur } = require('../../annotation/annotation.js')
 const { getElement, waitForElement, elementSize, ElementNotFound } = require('../../commands/elements.js')
-const { currentPage } = require('./helpers.js')
+const { currentPage, getElementHandle } = require('./helpers.js')
 const Step = require('./step.js')
 
 async function openBrowser() {
@@ -72,6 +72,33 @@ function id(browser) {
   return browser.process().pid.toString()
 }
 
+async function testSelector(browser, message) {
+  let handle = await getElementHandle(browser, message.selector, message.strategy)
+  const page = await currentPage(browser)
+  if (handle != undefined) {
+    await page.evaluate(handle => { 
+      console.log(window.test_annotation)
+      if (window.test_annotation) { document.body.removeChild(window.test_annotation) };
+      let rect = handle.getBoundingClientRect();
+      const overlay = document.createElement('div');
+      overlay.style.position = 'fixed';
+      overlay.style.width = Math.round(rect.width).toString() + 'px'
+      overlay.style.height = Math.round(rect.height).toString() + 'px'
+      overlay.style.outline = 'orange solid 1px';
+      overlay.style.top = Math.round(rect.top).toString() + 'px';
+      overlay.style.left = Math.round(rect.left).toString() + 'px';
+      overlay.style.backgroundColor = 'orange';
+      overlay.style.opacity = 0.2;
+      overlay.style.zIndex = 99999;
+      window.test_annotation = overlay;
+      document.body.appendChild(overlay);
+
+    }, handle) 
+  } else {
+    throw new Error("Element not found")
+  }
+}
+
 function stepInstanceHandler(stepInstance, config) {
   const functions = {
     "Navigate": async () => { return Step.navigate(config.browser, stepInstance) },
@@ -121,6 +148,7 @@ module.exports.openBrowser = openBrowser
 module.exports.hasPreloads = hasPreloads
 module.exports.preload = preload
 module.exports.id = id
+module.exports.testSelector = testSelector
 /*
 module.exports.navigate = navigate
 module.exports.setSize = setSize
