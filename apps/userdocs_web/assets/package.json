@@ -23,10 +23,8 @@
   },
   "dependencies": {
     "@medv/finder": "^2.0.0",
-    "bufferutil": "^4.0.3",
     "bulma": "^0.9.1",
     "bulma-switch": "^2.0.0",
-    "chrome-remote-interface": "^0.30.0",
     "fs": "^0.0.1-security",
     "nprogress": "^0.2.0",
     "phoenix": "file:../../../deps/phoenix",
