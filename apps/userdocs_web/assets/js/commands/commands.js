@@ -286,6 +286,7 @@ function clearAnnotations(job, configuration, proceed) {
       document.body.removeChild(window.active_annotations[i]);
     }
     window.active_annotations = []
+    window.test_annotation = null
     success(job, configuration, proceed)
   } catch(error) {
     step.status = "failed"
