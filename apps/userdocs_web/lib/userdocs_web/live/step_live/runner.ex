@@ -21,7 +21,6 @@ defmodule UserDocsWeb.StepLive.Runner do
       id="<%= @id %>-runner"
       phx-click="execute_step"
       phx-value-step-id="<%= @step.id %>"
-      phx-hook="executeStep"
       phx-target="<%= @myself.cid %>"
     >
       <span class="icon">
