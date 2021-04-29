@@ -20,6 +20,14 @@ defmodule UserDocs.Jobs do
     |> Repo.all()
   end
 
+  defp maybe_preload_step_instances(query, nil), do: query
+  defp maybe_preload_step_instances(query, _), do: from(users in query, preload: [:step_instances])
+
+  defp maybe_preload_process_instances(query, nil), do: query
+  defp maybe_preload_process_instances(query, _), do: from(users in query, preload: [:process_instances])
+
+  defp base_jobs_query(), do: from(jobs in Job)
+
   def get_job!(id, params \\ %{})
   def get_job!(id, %{ preloads: "*" }) do
     from(j in Job, as: :job)
@@ -86,14 +94,6 @@ defmodule UserDocs.Jobs do
   defp base_job_query(id) do
     from(job in Job, where: job.id == ^id)
   end
-
-  defp maybe_preload_step_instances(query, nil), do: query
-  defp maybe_preload_step_instances(query, _), do: from(users in query, preload: [:step_instances])
-
-  defp maybe_preload_process_instances(query, nil), do: query
-  defp maybe_preload_process_instances(query, _), do: from(users in query, preload: [:process_instances])
-
-  defp base_jobs_query(), do: from(jobs in Job)
 
   def create_job(attrs \\ %{}) do
     %Job{}
