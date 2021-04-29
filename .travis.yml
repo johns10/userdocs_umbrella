@@ -16,7 +16,7 @@ cache:
     - $HOME/.cache/electron-builder
 
 before_script:
-  - yarn add electron-builder
+  - yarn global add electron-builder
   
 script:
   - yarn --cwd apps/userdocs_web/assets/ dist
