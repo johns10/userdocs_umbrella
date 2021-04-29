@@ -9,6 +9,8 @@
   "build": {
     "appId": "johns10@gmail.com",
     "mac": {
+      "target": "dmg",
+      "icon": "build/icon.png",
       "category": "public.app-category.developer-tools"
     }
   },
@@ -19,13 +21,17 @@
     "watch_browser": "webpack js/browser.js -o js/browser_app.js --mode development --watch",
     "start_electron": "electron js/electron/main.js",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "dist-mac": "electron-builder -m"
   },
   "dependencies": {
     "@medv/finder": "^2.0.0",
+    "bufferutil": "^4.0.3",
     "bulma": "^0.9.1",
     "bulma-switch": "^2.0.0",
+    "chrome-remote-interface": "^0.30.0",
     "electron-is-dev": "^2.0.0",
+    "fs": "^0.0.1-security",
     "nprogress": "^0.2.0",
     "phoenix": "file:../../../deps/phoenix",
     "phoenix_html": "file:../../../deps/phoenix_html",
