@@ -15,8 +15,11 @@ cache:
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
 
+before_script:
+  - yarn add electron-builder
+  
 script:
-  - yarn release --cwd apps/userdocs_web/assets/
+  - yarn --cwd apps/userdocs_web/assets/ dist
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
 
