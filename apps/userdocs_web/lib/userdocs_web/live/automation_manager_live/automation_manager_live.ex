@@ -133,6 +133,11 @@ defmodule UserDocsWeb.AutomationManagerLive do
     socket = maybe_update_step(socket, payload)
     { :noreply, assign(socket, :job, job) }
   end
+  def handle_event("create-job", %{ "team-id" => team_id } = payload, socket) do
+    IO.puts("Create job for #{team_id}")
+    { :ok, job } = UserDocs.Jobs.create_job(%{ team_id: team_id })
+    { :noreply, assign(socket, :job, job) }
+  end
 
   def maybe_update_step(socket, %{ "status" => status, "step_id" => step_id, "attrs" => attrs })
   when status == "complete" do
