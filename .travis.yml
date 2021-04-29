@@ -28,7 +28,7 @@ script:
         -v ~/.cache/electron:/root/.cache/electron \
         -v ~/.cache/electron-builder:/root/.cache/electron-builder \
         electronuserland/builder:wine \
-        /bin/bash -c "yarn --cwd apps/userdocs_web/assets/ --link-duplicates --pure-lockfile && yarn --cwd apps/userdocs_web/assets/ dist-mac"
+        /bin/bash -c "yarn --cwd apps/userdocs_web/assets/ --link-duplicates --pure-lockfile && yarn --cwd apps/userdocs_web/assets/ dist"
     else
       yarn release
     fi
