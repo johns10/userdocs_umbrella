@@ -9,14 +9,13 @@ matrix:
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
 
 cache:
-  yarn: true
   directories:
     - node_modules
     - $HOME/.cache/electron
     - $HOME/.cache/electron-builder
 
 script:
-  - yarn --cwd apps/userdocs_web/assets/ dist-mac
+  - yarn release --cwd apps/userdocs_web/assets/
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
 
