@@ -22,6 +22,7 @@
     "start_electron": "electron js/electron/main.js",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
+    "dist-mac": "electron-builder -m",
     "dist-all": "electron-builder -wm"
   },
   "dependencies": {
