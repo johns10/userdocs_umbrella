@@ -32,7 +32,6 @@
     "bulma-switch": "^2.0.0",
     "chrome-remote-interface": "^0.30.0",
     "electron-is-dev": "^2.0.0",
-    "fs": "^0.0.1-security",
     "nprogress": "^0.2.0",
     "phoenix": "^1.5.8",
     "phoenix_html": "^2.14.2",
