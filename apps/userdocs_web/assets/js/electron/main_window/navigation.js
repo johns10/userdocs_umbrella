@@ -2,8 +2,8 @@ const { BrowserWindow } = require('electron')
 const isDev = require('electron-is-dev');
 
 if (isDev) {
-  SESSION_URL = "https://dev-electron-app.user-docs.com:4002/session/new"
-  APPLICATION_URL = "https://dev-electron-app.user-docs.com:4002"
+  SESSION_URL = "https://dev.user-docs.com:4002/session/new"
+  APPLICATION_URL = "https://dev.user-docs.com:4002"
 } else {
   SESSION_URL = "https://app.user-docs.com/session/new"
   APPLICATION_URL = "https://app.user-docs.com"
