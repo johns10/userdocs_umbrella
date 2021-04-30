@@ -142,7 +142,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
   def maybe_update_step(socket, %{ "status" => status, "step_id" => step_id, "attrs" => attrs })
   when status == "complete" do
     { :ok, _screenshot } = maybe_update_screenshot(attrs["screenshot"], socket.assigns.team)
-    { :ok, _step } = update_step_status(step_id, status)
+    # { :ok, _step } = update_step_status(step_id, status)
     socket
   end
   def maybe_update_step(socket, %{ "status" => status, "step_id" => step_id }) when status == "failed" do
