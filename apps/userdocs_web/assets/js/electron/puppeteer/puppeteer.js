@@ -1,11 +1,23 @@
 const puppeteer = require('puppeteer');
 const { annotations, badge, styleLabel, styleBadge, styleWrapper, outline, 
-  createOutlineElement, badgeOutline, blur } = require('../../annotation/annotation.js')
-const { getElement, waitForElement, elementSize, ElementNotFound } = require('../../commands/elements.js')
-const { currentPage, getElementHandle } = require('./helpers.js')
-const Step = require('./step.js')
+  createOutlineElement, badgeOutline, blur } = require('../../annotation/annotation.js');
+const { getElement, waitForElement, elementSize, ElementNotFound } = require('../../commands/elements.js');
+const { currentPage, getElementHandle } = require('./helpers.js');
+const Step = require('./step.js');
+const app = require('electron').app;
+const isDev = require('electron-is-dev');
 
 async function openBrowser() {
+  console.log(app.getAppPath())
+  if (isDev) {
+    var executablePath = puppeteer.executablePath()
+  } else {
+    var executablePath = 
+      puppeteer
+        .executablePath()
+        .replace("app.asar", "app.asar.unpacked")
+    console.log(executablePath)
+  }
   const args = 
     puppeteer
       .defaultArgs()
@@ -14,7 +26,12 @@ async function openBrowser() {
       
   args.push('--user-data-dir=C:\\userdocs_chrome_data');
 
-  const browser = await puppeteer.launch({ ignoreDefaultArgs: true, args: args });
+  const browser = await puppeteer.launch({ 
+    executablePath: executablePath, 
+    ignoreDefaultArgs: true, 
+    args: args 
+  });
+
   return browser
 }
 
