@@ -1,7 +1,6 @@
 const { succeed, fail, start } = require('../../step/step_instance.js');
 const { currentPage, getElementHandle } = require('./helpers.js')
 const Puppeteer = require('./puppeteer.js')
-const { writeFile  } = require('fs/promises')
 
 async function navigate(browser, stepInstance) { 
   url = stepInstance.attrs.page.url
@@ -49,30 +48,29 @@ async function elementScreenshot(browser, stepInstance) {
   file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order
 
   await new Promise(resolve => setTimeout(resolve, 500));
+  const path = userdocs.configuration.image_path + "\\" + file_name + ".png"
   let handle = await getElementHandle(browser, selector, strategy)
-  let base_64 = await handle.screenshot({ encoding: "base64"});
+  let base_64 = await handle.screenshot({ path: path, encoding: "base64"});
   if (stepInstance.attrs.screenshot === null) { 
     stepInstance.attrs.screenshot = { base_64: base_64}
   } else {
     stepInstance.attrs.screenshot.base_64 = base_64
   }
-  await writeFile(userdocs.configuration.image_path + "\\" + file_name + ".png", base_64)
   return stepInstance
 }
 
 async function fullScreenScreenshot(browser, stepInstance) {
-  file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order
+  const file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order
+  const path = userdocs.configuration.image_path + "\\" + file_name + ".png"
   const page = await currentPage(browser)
 
-  let base64 = buffer = await page.screenshot({ encoding: "base64"});
+  let base64 = buffer = await page.screenshot({ path: path, encoding: "base64"});
   if (stepInstance.attrs.screenshot === null) { 
     stepInstance.attrs.screenshot = { base_64: base_64}
   } else {
     stepInstance.attrs.screenshot.base_64 = base_64
   }
   await new Promise(resolve => setTimeout(resolve, 500));
-  handle.screenshot({path: userdocs.configuration.image_path + "\\" + file_name + ".png"});
-  await writeFile(userdocs.configuration.image_path + "\\" + file_name + ".png", base64)
   return stepInstance
 }
 
