@@ -432,7 +432,7 @@ defmodule UserDocs.TestDataset do
         team_id: loreline_team_id
       }
 
-    {:ok, the_internet_project = %Project{id: _the_internet_project_id}} =
+    {:ok, the_internet_project = %Project{id: the_internet_project_id}} =
       %Project{}
       |> Project.changeset(the_internet_project)
       |> Repo.insert()
@@ -455,12 +455,12 @@ defmodule UserDocs.TestDataset do
     version_0_0_1 = %{
       name: "0.0.1",
       order: 1,
-      project_id: userdocs_project_id,
+      project_id: the_internet_project_id,
       strategy_id: css_strategy_id
     }
 
     version_0_0_2 = %{
-      name: "0_0_2",
+      name: "0.0.2",
       order: 2,
       project_id: userdocs_project_id,
       strategy_id: css_strategy_id
@@ -501,7 +501,7 @@ defmodule UserDocs.TestDataset do
     # Pages
 
     add_remove_page = %{
-      name: "Setup",
+      name: "Add Remove Elements Page",
       order: 1,
       url: "https://the-internet.herokuapp.com/add_remove_elements/",
       version_id: version_0_0_1_id
@@ -577,13 +577,13 @@ defmodule UserDocs.TestDataset do
       add_element = %{
         name: "Add Element Button",
         page_id: add_remove_page_id,
-        selector: "//buton[.='Add Element']",
+        selector: "//button[.='Add Element']",
         strategy_id: xpath_strategy_id
       },
       _delete_element = %{
-        name: "Operator Terminal Type Selection Button",
+        name: "Delete Button",
         page_id: add_remove_page_id,
-        selector: "//buton[.='Delete]",
+        selector: "//button[.='Delete]",
         strategy_id: xpath_strategy_id
       }
     ]
