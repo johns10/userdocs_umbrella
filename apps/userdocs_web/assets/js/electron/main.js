@@ -30,7 +30,7 @@ userdocs = {
 function main() {
   createMainWindow()
     .then( mainWindow => navigateToLoginPage(mainWindow) )
-    .then( mainWindow => { if(isDev) authenticateJohnDavenport(mainWindow) } )
+    .then( mainWindow => { if(isDev) { authenticateJohnDavenport(mainWindow) } else { return mainWindow }  } )
     .then( mainWindow => startQueueProcessorEventLoop() )
     .catch( e => console.log(e))
 }
