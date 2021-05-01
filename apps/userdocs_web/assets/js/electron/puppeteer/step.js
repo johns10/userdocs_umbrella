@@ -45,10 +45,10 @@ async function setSize(browser, stepInstance) {
 async function elementScreenshot(browser, stepInstance) {
   selector = stepInstance.attrs.element.selector
   strategy = stepInstance.attrs.element.strategy.name
-  file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order
+  file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order + ".png"
 
   await new Promise(resolve => setTimeout(resolve, 500));
-  const path = userdocs.configuration.image_path + "\\" + file_name + ".png"
+  const path = path.join(userdocs.configuration.image_path, file_name)
   let handle = await getElementHandle(browser, selector, strategy)
   let base_64 = await handle.screenshot({ path: path, encoding: "base64"});
   if (stepInstance.attrs.screenshot === null) { 
@@ -60,8 +60,8 @@ async function elementScreenshot(browser, stepInstance) {
 }
 
 async function fullScreenScreenshot(browser, stepInstance) {
-  const file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order
-  const path = userdocs.configuration.image_path + "\\" + file_name + ".png"
+  const file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order + ".png"
+  const path = path.join(userdocs.configuration.image_path, file_name)
   const page = await currentPage(browser)
 
   let base64 = buffer = await page.screenshot({ path: path, encoding: "base64"});
