@@ -16,6 +16,7 @@ if (process.env.NODE_ENV === 'development') {
     electron: path.join(__dirname, '..', '..', 'node_modules', '.bin', 'electron')
   });
 }
+const isDev = require('electron-is-dev');
 
 userdocs = {
   browser: null,
@@ -29,7 +30,7 @@ userdocs = {
 function main() {
   createMainWindow()
     .then( mainWindow => navigateToLoginPage(mainWindow) )
-    .then( mainWindow => authenticateJohnDavenport(mainWindow) )
+    .then( mainWindow => { if(isDev) authenticateJohnDavenport(mainWindow) } )
     .then( mainWindow => startQueueProcessorEventLoop() )
     .catch( e => console.log(e))
 }
