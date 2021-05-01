@@ -146,15 +146,17 @@ defmodule UserDocsWeb.AutomationManagerLive do
     socket
   end
   def maybe_update_step(socket, %{ "status" => status, "step_id" => step_id }) when status == "failed" do
-    update_step_status(step_id, status)
+    #update_step_status(step_id, status)
     socket
   end
   def maybe_update_step(socket, _attrs), do: socket
 
+  """
   def update_step_status(step_id, status) do
     UserDocs.Automation.get_step!(step_id)
     |> UserDocs.Automation.update_step_status(%{ status: status })
   end
+  """
 
   def maybe_update_screenshot(%{ "id" => id, "base_64" => _ } = attrs, team) do
     IO.puts("Got a base64 string")
