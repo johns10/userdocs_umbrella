@@ -28,11 +28,18 @@ userdocs = {
 
 
 function main() {
-  createMainWindow()
-    .then( mainWindow => navigateToLoginPage(mainWindow) )
-    .then( mainWindow => { if(isDev) { authenticateJohnDavenport(mainWindow) } else { return mainWindow }  } )
-    .then( mainWindow => startQueueProcessorEventLoop() )
-    .catch( e => console.log(e))
+  if(isDev) {
+    createMainWindow()
+      .then( mainWindow => navigateToLoginPage(mainWindow) )
+      .then( mainWindow => authenticateJohnDavenport(mainWindow))
+      .then( mainWindow => startQueueProcessorEventLoop() )
+      .catch( e => console.log(e))
+  } else {
+    createMainWindow()
+      .then( mainWindow => navigateToLoginPage(mainWindow) )
+      .then( mainWindow => startQueueProcessorEventLoop() )
+      .catch( e => console.log(e))
+  }
 }
 
 function startQueueProcessorEventLoop() {
