@@ -1,6 +1,7 @@
 const { succeed, fail, start } = require('../../step/step_instance.js');
 const { currentPage, getElementHandle } = require('./helpers.js')
 const Puppeteer = require('./puppeteer.js')
+const path = require('path')
 
 async function navigate(browser, stepInstance) { 
   url = stepInstance.attrs.page.url
