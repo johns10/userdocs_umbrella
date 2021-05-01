@@ -47,11 +47,14 @@ css:
             = link "User", to: Routes.user_show_path(@socket, :show, @current_user.id), class: "button"
             = link "Sign out", to: Routes.pow_session_path(@socket, :delete), method: :delete, class: "button is-light"
 
-  = live_component(@socket, UserDocsWeb.Configuration, 
-    [ id: "configuration",
-    image_path: @current_user.image_path,
-    strategy: @current_version.strategy.name |> to_string(),
-    test: "value" ])
+  = if is_struct(@current_version, UserDocs.Projects.Version) do 
+    = live_component(@socket, UserDocsWeb.Configuration, 
+      [ id: "configuration",
+      image_path: @current_user.image_path,
+      strategy: @current_version.strategy.name |> to_string(),
+      test: "value" ])
+  - else 
+    p Select a Version, your configs aren't being passed.
 
   = live_component(@socket, UserDocsWeb.ScreenShotHandler, 
     [ id: "screenshot-handler-component",
