@@ -66,7 +66,7 @@ async function fullScreenScreenshot(browser, stepInstance) {
   const page = await currentPage(browser)
 
   await new Promise(resolve => setTimeout(resolve, 500));
-  let base64 = buffer = await page.screenshot({ path: filePath, encoding: "base64"});
+  const base_64 = buffer = await page.screenshot({ path: filePath, encoding: "base64"});
   if (stepInstance.attrs.screenshot === null) { 
     stepInstance.attrs.screenshot = { base_64: base_64}
   } else {
