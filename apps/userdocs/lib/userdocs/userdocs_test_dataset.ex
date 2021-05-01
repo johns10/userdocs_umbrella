@@ -864,7 +864,3 @@ defmodule UserDocs.TestDataset do
   end
 
 end
-
-git filter-branch --force --index-filter \
-  "git rm --cached --ignore-unmatch apps/userdocs/lib/userdocs/userdocs_test_dataset.ex" \
-  --prune-empty --tag-name-filter cat -- --all
