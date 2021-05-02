@@ -145,6 +145,7 @@ defmodule UserDocs.Users do
     |> join(:left, [u, tu, t, p], p in Project, on: p.team_id == t.id)
     |> join(:left, [u, tu, t, p, v], v in Version, on: v.project_id == p.id)
     |> preload(    [u, tu, t, p, v], [ team_users: tu ])
+    |> preload(    [u, tu, t, p, v], [ teams: t ])
     |> preload(    [u, tu, t, p, v], [ team_users: { tu, team: t } ])
     |> preload(    [u, tu, t, p, v], [ team_users: { tu, team: { t, projects: p } } ])
     |> preload(    [u, tu, t, p, v], [ team_users: { tu, team: { t, projects: { p, versions: v } } } ])
