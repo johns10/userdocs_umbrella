@@ -35,7 +35,8 @@ css:
         = live_patch "Versions", class: "navbar-item", to: Routes.version_index_path(@socket, :index)
         = live_patch "Content", class: "navbar-item", to: Routes.content_index_path(@socket, :index)
         = live_patch "Documents", class: "navbar-item", to: Routes.document_index_path(@socket, :index)
-        = live_patch "Processes", class: "navbar-item", to: Routes.process_index_path(@socket, :index)
+        = if is_struct(@current_version, UserDocs.Projects.Version) do
+          = live_patch "Processes", class: "navbar-item", to: Routes.process_index_path(@socket, :index)
         = live_component(@socket, UserDocsWeb.VersionPicker, 
         [ current_user: @current_user,
           current_project: @current_project,
