@@ -504,6 +504,17 @@ defmodule UserDocs.Users do
     |> maybe_preload(opts[:preloads], state, opts)
   end
 
+  def get_step_instance_team!(id) do
+    from(t in Team, as: :team)
+    |> join(:left, [team: t], p in assoc(t, :projects), as: :projects)
+    |> join(:left, [projects: p], v in assoc(p, :versions), as: :versions)
+    |> join(:left, [versions: v], p in assoc(v, :processes), as: :processes)
+    |> join(:left, [processes: p], s in assoc(p, :steps), as: :steps)
+    |> join(:left, [steps: s], si in assoc(s, :step_instances), as: :step_instance)
+    |> where([step_instance: si], si.id == ^id)
+    |> Repo.one()
+  end
+
   defp maybe_preload(object, nil, _, _), do: object
   defp maybe_preload(object, preloads, state, opts) do
     StateHandlers.preload(state, object, preloads, opts)
