@@ -40,9 +40,8 @@ h2.title = @title
         = link(to: "#", phx_click: "remove-user", phx_value_remove: tuf.data.temp_id, phx_target: @myself.cid) do 
           span x
 
-      = if @current_user.email == "johns10davenport@gmail.com" do 
-        = link to: "#", phx_event: "add-user" do
-          p text
+  = link to: "#", phx_click: "add-user", phx_target: @myself.cid do
+    p New User
 
   .field 
     .control
