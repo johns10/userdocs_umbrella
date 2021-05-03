@@ -48,9 +48,9 @@ defmodule UserDocsWeb.ProcessLive.Index do
     { :noreply, socket }
   end
   def handle_params(%{ "version_id" => version_id } = params, _url, socket) do
-    version = Projects.get_version!(version_id)
+    version = Projects.get_version!(version_id, %{strategy: true})
     project = Projects.get_project!(version.project_id)
-    team = Users.get_team!(project.team_id)
+    team = Users.get_team!(project.team_id, %{ preloads: %{ job: %{ step_instances: true, process_instances: true }}})
     socket
     |> assign(:current_version, version)
     |> assign(:current_project, project)
