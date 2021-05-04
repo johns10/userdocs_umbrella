@@ -14,6 +14,7 @@ defmodule UserDocs.Users.User do
 
     field :browser_session, :string
     field :image_path, :string
+    field :user_data_dir_path, :string
 
     field :default_team_id, :integer
     embeds_one :default_team, Team
@@ -49,7 +50,7 @@ defmodule UserDocs.Users.User do
 
   def change_options(user, attrs) do
     user
-    |> cast(attrs, [ :default_team_id, :selected_team_id, :selected_project_id, :selected_version_id, :image_path ])
+    |> cast(attrs, [ :default_team_id, :selected_team_id, :selected_project_id, :selected_version_id, :image_path, :user_data_dir_path ])
     |> cast_assoc(:team_users)
     |> ChangesetHelpers.check_only_one_default(:team_users)
   end
