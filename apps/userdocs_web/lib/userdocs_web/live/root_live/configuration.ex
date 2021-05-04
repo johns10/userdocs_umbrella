@@ -13,7 +13,8 @@ defmodule UserDocsWeb.Configuration do
   def update(assigns, socket) do
     configuration = %{
       image_path: assigns.image_path || "/images/",
-      strategy: assigns.strategy || "xpath"
+      strategy: assigns.strategy || "xpath",
+      user_data_dir_path: assigns.user_data_dir_path || nil
     }
     {
       :ok,

@@ -245,7 +245,8 @@ defmodule UserDocsWeb.Root do
     configuration = [
       id: "configuration",
       image_path: socket.assigns.current_user.image_path,
-      strategy: version.strategy.name |> to_string
+      strategy: version.strategy.name |> to_string,
+      user_data_dir_path: socket.assigns.current_user.user_data_dir_path
     ]
     send_update(UserDocsWeb.Configuration, configuration)
 

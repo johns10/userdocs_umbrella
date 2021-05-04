@@ -53,6 +53,7 @@ css:
       [ id: "configuration",
       image_path: @current_user.image_path,
       strategy: @current_version.strategy.name |> to_string(),
+      user_data_dir_path: @current_user.user_data_dir_path,
       test: "value" ])
   - else 
     p Select a Version, your configs aren't being passed.
