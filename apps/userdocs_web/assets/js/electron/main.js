@@ -107,7 +107,7 @@ ipcMain.on('openBrowser', async (event) => {
 async function openBrowser() {
   automationModule = puppeteer
 
-  var browser = await automationModule.openBrowser()
+  var browser = await automationModule.openBrowser(userdocs.configuration)
   browser = await automationModule.preload(browser) 
   browser = await automationModule.configureDisconnectEvent(browser, mainWindow())
   mainWindow().webContents.send('browserOpened', { sessionId: automationModule.id(browser) })  
@@ -168,7 +168,6 @@ ipcMain.on('executeProcess', async (event, job) => {
 
 ipcMain.on('configure', async (event, message) => {
   console.log("configuring")
-  console.log(message)
   userdocs.configuration = message
 })
 
