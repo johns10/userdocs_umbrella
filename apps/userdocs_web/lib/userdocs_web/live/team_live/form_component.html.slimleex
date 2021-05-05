@@ -11,7 +11,7 @@ h2.title = @title
 
     = Layout.select_input(form, :default_language_code_id, @language_codes_select_options, [], "control")
 
-    = Layout.text_input form, :aws_region, [], "control"
+    = Layout.select_input(form, :aws_region, @aws_region_select_options, [], "control")
 
     = Layout.text_input form, :aws_bucket, [], "control"
 

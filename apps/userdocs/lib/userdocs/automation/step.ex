@@ -75,6 +75,7 @@ defmodule UserDocs.Automation.Step do
   # |> update annotation fk's
     |> cast_assoc(:annotation, with: &Annotation.content_id_changeset/2)
     |> Changeset.update_foreign_keys(action)
+    |> cast_assoc(:screenshot)
   # |> final changes
     |> Changeset.cast_changeset_params([ :process_id, :step_type_id ])
     |> Changeset.cast_changeset_params([ :name, :order, :url, :text, :width, :height, :page_reference ])

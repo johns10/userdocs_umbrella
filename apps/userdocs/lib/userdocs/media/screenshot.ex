@@ -27,7 +27,6 @@ defmodule UserDocs.Media.Screenshot do
     |> cast(attrs, [:name, :step_id, :base_64, :aws_screenshot, :aws_provisional_screenshot, :aws_diff_screenshot])
     |> foreign_key_constraint(:step_id)
     |> unique_constraint(:step_id)
-    |> validate_required([:name])
   end
 
   def safe(annotation, handlers \\ %{})

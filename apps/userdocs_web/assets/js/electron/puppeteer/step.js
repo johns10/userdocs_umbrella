@@ -1,6 +1,7 @@
 const { succeed, fail, start } = require('../../step/step_instance.js');
 const { currentPage, getElementHandle } = require('./helpers.js')
 const Puppeteer = require('./puppeteer.js')
+const { writeFile  } = require('fs/promises')
 const path = require('path')
 
 async function navigate(browser, stepInstance) { 
@@ -57,6 +58,9 @@ async function elementScreenshot(browser, stepInstance) {
   } else {
     stepInstance.attrs.screenshot.base_64 = base_64
   }
+  writeFile(filePath, base_64, 'base64', function(err) {
+    console.log(err);
+  });
   return stepInstance
 }
 
@@ -65,13 +69,16 @@ async function fullScreenScreenshot(browser, stepInstance) {
   const filePath = path.join(userdocs.configuration.image_path, file_name)
   const page = await currentPage(browser)
 
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const base_64 = buffer = await page.screenshot({ path: filePath, encoding: "base64"});
+  await new Promise(resolve => setTimeout(resolve, 500));   
+  let base_64 = await page.screenshot({ encoding: "base64" });  
   if (stepInstance.attrs.screenshot === null) { 
     stepInstance.attrs.screenshot = { base_64: base_64}
   } else {
     stepInstance.attrs.screenshot.base_64 = base_64
   }
+  writeFile(filePath, base_64, 'base64', function(err) {
+    console.log(err);
+  });
   return stepInstance
 }
 

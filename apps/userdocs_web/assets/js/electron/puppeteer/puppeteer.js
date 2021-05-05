@@ -37,7 +37,7 @@ async function openBrowser(configuration) {
 }
 
 async function closeBrowser(browser) {
-  await browser.close()
+  browser.close()
 }
 
 async function preload(browser) {
