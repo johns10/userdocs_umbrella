@@ -59,6 +59,7 @@ defmodule UserDocsWeb.MixProject do
       {:pbkdf2_elixir, "~> 1.0"},
       {:phoenix_slime, "~> 0.13.1"},
       {:userdocs, in_umbrella: true},
+      {:credo, "~> 1.5", only: [:dev, :test], runtime: false}
     ]
   end
 

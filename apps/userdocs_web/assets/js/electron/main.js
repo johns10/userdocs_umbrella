@@ -16,6 +16,7 @@ if (process.env.NODE_ENV === 'development') {
     electron: path.join(__dirname, '..', '..', 'node_modules', '.bin', 'electron')
   });
 }
+const isDev = require('electron-is-dev');
 
 userdocs = {
   browser: null,
@@ -27,11 +28,18 @@ userdocs = {
 
 
 function main() {
-  createMainWindow()
-    .then( mainWindow => navigateToLoginPage(mainWindow) )
-    .then( mainWindow => authenticateJohnDavenport(mainWindow) )
-    .then( mainWindow => startQueueProcessorEventLoop() )
-    .catch( e => console.log(e))
+  if(isDev) {
+    createMainWindow()
+      .then( mainWindow => navigateToLoginPage(mainWindow) )
+      .then( mainWindow => authenticateJohnDavenport(mainWindow))
+      .then( mainWindow => startQueueProcessorEventLoop() )
+      .catch( e => console.log(e))
+  } else {
+    createMainWindow()
+      .then( mainWindow => navigateToLoginPage(mainWindow) )
+      .then( mainWindow => startQueueProcessorEventLoop() )
+      .catch( e => console.log(e))
+  }
 }
 
 function startQueueProcessorEventLoop() {
@@ -99,7 +107,7 @@ ipcMain.on('openBrowser', async (event) => {
 async function openBrowser() {
   automationModule = puppeteer
 
-  var browser = await automationModule.openBrowser()
+  var browser = await automationModule.openBrowser(userdocs.configuration)
   browser = await automationModule.preload(browser) 
   browser = await automationModule.configureDisconnectEvent(browser, mainWindow())
   mainWindow().webContents.send('browserOpened', { sessionId: automationModule.id(browser) })  
@@ -160,7 +168,6 @@ ipcMain.on('executeProcess', async (event, job) => {
 
 ipcMain.on('configure', async (event, message) => {
   console.log("configuring")
-  console.log(message)
   userdocs.configuration = message
 })
 

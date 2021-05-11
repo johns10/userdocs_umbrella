@@ -141,25 +141,45 @@ defmodule UserDocsWeb.AutomationManagerLive do
 
   def maybe_update_step(socket, %{ "status" => status, "step_id" => step_id, "attrs" => attrs })
   when status == "complete" do
-    { :ok, _screenshot } = maybe_update_screenshot(attrs["screenshot"], socket.assigns.team)
+    IO.puts("maybe_update_step")
+    IO.inspect(attrs["screenshot"])
     # { :ok, _step } = update_step_status(step_id, status)
+    case attrs["screenshot"] do
+      nil -> socket
+      %{ "id" => id, "base_64" => _ } = attrs ->
+        { :ok, screenshot } = UserDocs.Screenshots.get_screenshot!(id)
+        |> UserDocs.Screenshots.update_screenshot(attrs, socket.assigns.team)
+        send(self(), { :broadcast, "update", screenshot })
     socket
+      %{ "base_64" => _ } = attrs ->
+        { :ok, screenshot } = UserDocs.Screenshots.create_screenshot(%{ step_id: step_id })
+        { :ok, screenshot } = UserDocs.Screenshots.update_screenshot(screenshot, attrs, socket.assigns.team)
+        send(self(), { :broadcast, "update", screenshot })
+        socket
+    end
   end
   def maybe_update_step(socket, %{ "status" => status, "step_id" => step_id }) when status == "failed" do
-    update_step_status(step_id, status)
+    #update_step_status(step_id, status)
     socket
   end
   def maybe_update_step(socket, _attrs), do: socket
 
+  """
   def update_step_status(step_id, status) do
     UserDocs.Automation.get_step!(step_id)
     |> UserDocs.Automation.update_step_status(%{ status: status })
   end
+  """
 
   def maybe_update_screenshot(%{ "id" => id, "base_64" => _ } = attrs, team) do
-    IO.puts("Got a base64 string")
+    IO.inspect("updating sscreenshot")
     UserDocs.Screenshots.get_screenshot!(id)
     |> UserDocs.Screenshots.update_screenshot(attrs, team)
+  end
+  def maybe_update_screenshot(%{ "base_64" => _ } = attrs, team) do
+    IO.inspect("creating sscreenshot")
+    { :ok, screenshot } = UserDocs.Screenshots.create_screenshot(attrs)
+    UserDocs.Screenshots.update_screenshot(screenshot, attrs, team)
   end
   def maybe_update_screenshot(attrs, _team), do: { :ok, attrs }
 

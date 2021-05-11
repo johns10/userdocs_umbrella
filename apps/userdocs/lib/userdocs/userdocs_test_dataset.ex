@@ -61,10 +61,10 @@ defmodule UserDocs.TestDataset do
 
   def create_base_data() do
     strategies = [
-      xpath_strategy = %{
+      _xpath_strategy = %{
         name: "xpath"
       },
-      css_strategy = %{
+      _css_strategy = %{
         name: "css"
       }
     ]
@@ -158,10 +158,10 @@ defmodule UserDocs.TestDataset do
     |> Strategy.changeset(xpath_strategy)
     |> Repo.insert()
 
-    {:ok, %Strategy{ id: css_strategy_id}} =
-      %Strategy{}
-      |> Strategy.changeset(css_strategy)
-      |> Repo.insert()
+  {:ok, %Strategy{ id: css_strategy_id}} =
+    %Strategy{}
+    |> Strategy.changeset(css_strategy)
+    |> Repo.insert()
 
   # Annotation_types
 
@@ -271,12 +271,12 @@ defmodule UserDocs.TestDataset do
     |> StepType.changeset(click)
     |> Repo.insert()
 
-  {:ok, %StepType{id: fill_field_id}} =
+  {:ok, %StepType{id: _fill_field_id}} =
     %StepType{}
     |> StepType.changeset(fill_field)
     |> Repo.insert()
 
-  {:ok, %StepType{id: apply_annotation_id}} =
+  {:ok, %StepType{id: _apply_annotation_id}} =
     %StepType{}
     |> StepType.changeset(apply_annotation)
     |> Repo.insert()
@@ -303,7 +303,7 @@ defmodule UserDocs.TestDataset do
 
     # User Data
 
-    default_password = "A7B!2#x2y"
+    default_password = "userdocs"
 
     user_1 =
       %{
@@ -355,9 +355,9 @@ defmodule UserDocs.TestDataset do
 
     # Team Data
 
-    funnel_cloud_team =
+    userdocs_team =
       %{
-        name: "FunnelCloud"
+        name: "UserDocs"
       }
 
     loreline_team =
@@ -365,9 +365,9 @@ defmodule UserDocs.TestDataset do
         name: "LoreLine"
       }
 
-    {:ok, funnel_cloud_team = %Team{id: funnel_cloud_team_id}} =
+    {:ok, userdocs_team = %Team{id: userdocs_team_id}} =
       %Team{}
-      |> Team.changeset(funnel_cloud_team)
+      |> Team.changeset(userdocs_team)
       |> Repo.insert()
 
     {:ok, loreline_team = %Team{id: loreline_team_id}} =
@@ -377,23 +377,23 @@ defmodule UserDocs.TestDataset do
 
     Users.update_user(
       user_1,
-      %{ default_team_id: funnel_cloud_team_id, current_password: default_password }
+      %{ default_team_id: userdocs_team_id, current_password: default_password }
     )
 
     Users.update_user(
       user_2,
-      %{ default_team_id: funnel_cloud_team_id, current_password: default_password }
+      %{ default_team_id: userdocs_team_id, current_password: default_password }
     )
 
     # Team Users
 
     team_users = [
       %{
-        team_id: funnel_cloud_team_id,
+        team_id: userdocs_team_id,
         user_id: user1_id
       },
       %{
-        team_id: funnel_cloud_team_id,
+        team_id: userdocs_team_id,
         user_id: user2_id
       },
       %{
@@ -412,17 +412,17 @@ defmodule UserDocs.TestDataset do
 
     # Projects
 
-    funnelcloud_manager_project =
+    the_internet_project =
       %{
-        base_url: "https://staging.app.funnelcloud.io",
-        name: "FunnelCloud Manager",
-        team_id: funnel_cloud_team_id
+        base_url: "https://the-internet.herokuapp.com",
+        name: "The Internet",
+        team_id: userdocs_team_id
       }
-    funnelcloud_operator_project =
+    userdocs_project =
       %{
-        base_url: "https://staging.app.funnelcloud.io/#/operator",
-        name: "FunnelCloud Operator",
-        team_id: funnel_cloud_team_id
+        base_url: "https://app.user-docs.com",
+        name: "Userdocs",
+        team_id: userdocs_team_id
       }
 
     john_davenport_rocks_project =
@@ -432,14 +432,14 @@ defmodule UserDocs.TestDataset do
         team_id: loreline_team_id
       }
 
-    {:ok, funnelcloud_manager_project = %Project{id: funnelcloud_manager_project_id}} =
+    {:ok, the_internet_project = %Project{id: the_internet_project_id}} =
       %Project{}
-      |> Project.changeset(funnelcloud_manager_project)
+      |> Project.changeset(the_internet_project)
       |> Repo.insert()
 
-    {:ok, funnelcloud_operator_project = %Project{id: _funnelcloud_operator_project_id}} =
+    {:ok, userdocs_project = %Project{id: userdocs_project_id}} =
       %Project{}
-      |> Project.changeset(funnelcloud_operator_project)
+      |> Project.changeset(userdocs_project)
       |> Repo.insert()
 
     {:ok, john_davenport_rocks_project = %Project{id: john_davenport_rocks_project_id}} =
@@ -448,21 +448,21 @@ defmodule UserDocs.TestDataset do
       |> Repo.insert()
 
 
-    Users.update_team(funnel_cloud_team, %{ default_project_id: funnelcloud_manager_project_id})
+    Users.update_team(userdocs_team, %{ default_project_id: userdocs_project_id})
 
     # Versions
 
-    version_2020_1 = %{
-      name: "2020.2.1",
+    version_0_0_1 = %{
+      name: "0.0.1",
       order: 1,
-      project_id: funnelcloud_manager_project_id,
+      project_id: the_internet_project_id,
       strategy_id: css_strategy_id
     }
 
-    version_2020_2 = %{
-      name: "2020.2.2",
+    version_0_0_2 = %{
+      name: "0.0.2",
       order: 2,
-      project_id: funnelcloud_manager_project_id,
+      project_id: userdocs_project_id,
       strategy_id: css_strategy_id
     }
 
@@ -472,14 +472,14 @@ defmodule UserDocs.TestDataset do
       strategy_id: css_strategy_id
     }
 
-    {:ok, _version_2020_1 = %Version{id: version_2020_1_id}} =
+    {:ok, _version_0_0_1 = %Version{id: version_0_0_1_id}} =
       %Version{}
-      |> Version.changeset(version_2020_1)
+      |> Version.changeset(version_0_0_1)
       |> Repo.insert()
 
-    {:ok, _version_2020_2 = %Version{id: version_2020_2_id}} =
+    {:ok, _version_0_0_2 = %Version{id: version_0_0_2_id}} =
       %Version{}
-      |> Version.changeset(version_2020_2)
+      |> Version.changeset(version_0_0_2)
       |> Repo.insert()
 
     {:ok, _version_1 = %Version{id: version_1_id}} =
@@ -487,40 +487,47 @@ defmodule UserDocs.TestDataset do
       |> Version.changeset(version_1)
       |> Repo.insert()
 
-    Projects.update_project(funnelcloud_manager_project, %{default_version_id: version_2020_1_id})
-    Projects.update_project(funnelcloud_operator_project, %{default_version_id: version_2020_2_id})
+    Projects.update_project(the_internet_project, %{default_version_id: version_0_0_1_id})
+    Projects.update_project(userdocs_project, %{default_version_id: version_0_0_2_id})
     Projects.update_project(john_davenport_rocks_project, %{default_version_id: version_1_id})
+
+    { :ok, _user_1 } = Users.update_user(user_1, %{
+      current_password: default_password,
+      selected_team_id: userdocs_team_id,
+      selected_project_id: userdocs_project_id,
+      selected_version_id: version_0_0_1_id
+    })
 
     # Pages
 
-    setup_page = %{
-      name: "Setup",
+    add_remove_page = %{
+      name: "Add Remove Elements Page",
       order: 1,
-      url: "https://staging.app.funnelcloud.io/#/setup",
-      version_id: version_2020_1_id
+      url: "https://the-internet.herokuapp.com/add_remove_elements/",
+      version_id: version_0_0_1_id
     }
 
-    login_page = %{
+    processes_page = %{
       name: "Login",
       order: 2,
-      url: "https://staging.app.funnelcloud.io/#/login",
-      version_id: version_2020_1_id
+      url: "https://app.user-docs.com/processes",
+      version_id: version_0_0_2_id
     }
 
-    {:ok, %Page{id: setup_page_id}} =
+    {:ok, %Page{id: add_remove_page_id}} =
       %Page{}
-      |> Page.changeset(setup_page)
+      |> Page.changeset(add_remove_page)
       |> Repo.insert()
 
-    {:ok, %Page{id: login_page_id}} =
+    {:ok, %Page{id: _processes_page_id}} =
       %Page{}
-      |> Page.changeset(login_page)
+      |> Page.changeset(processes_page)
       |> Repo.insert()
 
     #
 
     _annotations = [
-      next_button_outline = %{
+      add_outline = %{
         annotation_type_id: outline_id,
         color: "#7FBE7F",
         content_id: nil,
@@ -529,7 +536,7 @@ defmodule UserDocs.TestDataset do
         font_size: nil,
         label: "1",
         name: "Outline",
-        page_id: setup_page_id,
+        page_id: add_remove_page_id,
         size: nil,
         thickness: 12,
         x_offset: nil,
@@ -537,7 +544,7 @@ defmodule UserDocs.TestDataset do
         y_offset: nil,
         y_orientation: nil
       },
-      badge_manager_button = %{
+      badge_remove_button = %{
         annotation_type_id: outline_id,
         color: "#7FBE7F",
         content_id: nil,
@@ -546,7 +553,7 @@ defmodule UserDocs.TestDataset do
         font_size: nil,
         label: "2",
         name: "Label",
-        page_id: setup_page_id,
+        page_id: add_remove_page_id,
         size: 12,
         thickness: nil,
         x_offset: 0,
@@ -556,128 +563,62 @@ defmodule UserDocs.TestDataset do
       }
     ]
 
-    {:ok, %Annotation{id: next_button_outline_id}} =
+    {:ok, %Annotation{id: add_outline_id}} =
       %Annotation{}
-      |> Annotation.changeset(next_button_outline)
+      |> Annotation.changeset(add_outline)
       |> Repo.insert()
 
-    {:ok, %Annotation{id: badge_manager_button_id}} =
+    {:ok, %Annotation{id: badge_remove_button_id}} =
       %Annotation{}
-      |> Annotation.changeset(badge_manager_button)
+      |> Annotation.changeset(badge_remove_button)
       |> Repo.insert()
 
     _elements = [
-      setup_next = %{
-        name: "Setup Next",
-        page_id: setup_page_id,
-        selector: "/html/body/div[@class='ember-view']/div[9]/div//form//button[contains(.,'Next')]",
+      add_element = %{
+        name: "Add Element Button",
+        page_id: add_remove_page_id,
+        selector: "//button[.='Add Element']",
         strategy_id: xpath_strategy_id
       },
-      operator_button = %{
-        name: "Operator Terminal Type Selection Button",
-        page_id: setup_page_id,
-        selector: "//body/div[@class='ember-view']/div[9]/div/div//form//div[@class='modal-container']/div/div[@class='content']/div/div[3]/div[3]",
-        strategy_id: xpath_strategy_id
-      },
-      manager_button = %{
-        name: "Manager Terminal Type Selection Button",
-        page_id: setup_page_id,
-        selector: "/html/body/div[@class='ember-view']/div[9]/div//form//div[@class='modal-container']/div/div[@class='content']/div/div[1]/div[3]",
-        strategy_id: xpath_strategy_id
-      },
-      setup_next_2 = %{
-        name: "Setup Next Page",
-        page_id: setup_page_id,
-        selector: "/html/body/div[@class='ember-view']/div[9]/div//form//button[contains(.,'Next Page')]",
-        strategy_id: xpath_strategy_id
-      },
-      setup_save = %{
-        name: "Setup Save Button",
-        page_id: setup_page_id,
-        selector: "/html/body/div[@class='ember-view']/div[9]/div//form//button[contains(.,'Save')]",
-        strategy_id: xpath_strategy_id
-      },
-      login_button = %{
-        name: "Login Button",
-        page_id: login_page_id,
-        selector: "/html/body/div[@class='ember-view']/div[9]//form//button",
-        strategy_id: xpath_strategy_id
-      },
-      user_name_field = %{
-        name: "User Name Field",
-        page_id: login_page_id,
-        selector: "/html/body/div[@class='ember-view']/div[9]/div//form//input[@placeholder='Username']",
-        strategy_id: xpath_strategy_id
-      },
-      password_field = %{
-        name: "Password",
-        page_id: login_page_id,
-        selector: "/html/body/div[@class='ember-view']/div[9]/div//form//input[@placeholder='Password']",
+      _delete_element = %{
+        name: "Delete Button",
+        page_id: add_remove_page_id,
+        selector: "//button[.='Delete]",
         strategy_id: xpath_strategy_id
       }
     ]
 
-    {:ok, %Element{id: setup_next_id}} =
+    {:ok, %Element{id: add_element_id}} =
       %Element{}
-      |> Element.changeset(setup_next)
+      |> Element.changeset(add_element)
       |> Repo.insert()
 
-    {:ok, %Element{id: _operator_button_id}} =
+    {:ok, %Element{id: _add_element_id}} =
       %Element{}
-      |> Element.changeset(operator_button)
-      |> Repo.insert()
-
-    {:ok, %Element{id: manager_button_id}} =
-      %Element{}
-      |> Element.changeset(manager_button)
-      |> Repo.insert()
-
-    {:ok, %Element{id: setup_next_2_id}} =
-      %Element{}
-      |> Element.changeset(setup_next_2)
-      |> Repo.insert()
-
-    {:ok, %Element{id: setup_save_id}} =
-      %Element{}
-      |> Element.changeset(setup_save)
-      |> Repo.insert()
-
-    {:ok, %Element{id: login_button_id}} =
-      %Element{}
-      |> Element.changeset(login_button)
-      |> Repo.insert()
-
-    {:ok, %Element{id: user_name_field_id}} =
-      %Element{}
-      |> Element.changeset(user_name_field)
-      |> Repo.insert()
-
-    {:ok, %Element{id: password_field_id}} =
-      %Element{}
-      |> Element.changeset(password_field)
+      |> Element.changeset(add_element)
       |> Repo.insert()
 
     _processes = [
-      setup_process = %{
-        name: "Setup Manager Session",
+      add_remove_process = %{
+        name: "Add and Remove Elements",
         order: 1,
-        version_id: version_2020_1_id
+        version_id: version_0_0_1_id
       },
-      login_process = %{
-        name: "Login",
+      add_process = %{
+        name: "Add Process",
         order: 2,
-        version_id: version_2020_1_id
+        version_id: version_0_0_2_id
       }
     ]
 
-    {:ok, %Process{id: setup_process_id}} =
+    {:ok, %Process{id: add_remove_process_id}} =
       %Process{}
-      |> Process.changeset(setup_process)
+      |> Process.changeset(add_remove_process)
       |> Repo.insert()
 
-    {:ok, %Process{id: login_process_id}} =
+    {:ok, %Process{id: _add_process_id}} =
       %Process{}
-      |> Process.changeset(login_process)
+      |> Process.changeset(add_process)
       |> Repo.insert()
 
     # Processes
@@ -687,14 +628,13 @@ defmodule UserDocs.TestDataset do
         annotation_id: nil,
         element_id: nil,
         height: nil,
-        name: "Navigate to Setup",
+        name: "Navigate to Add Remove Elements",
         order: 10,
         page_id: nil,
         page_reference: nil,
-        process_id: setup_process_id,
+        process_id: add_remove_process_id,
         step_type_id: navigate_id,
         text: nil,
-        url: "https://staging.app.funnelcloud.io/#/setup",
         width: nil
       },
       %{
@@ -705,7 +645,7 @@ defmodule UserDocs.TestDataset do
         order: 20,
         page_id: nil,
         page_reference: nil,
-        process_id: setup_process_id,
+        process_id: add_remove_process_id,
         step_type_id: set_size_explicit_id,
         text: nil,
         url: nil,
@@ -719,7 +659,7 @@ defmodule UserDocs.TestDataset do
         order: 35,
         page_id: nil,
         page_reference: nil,
-        process_id: setup_process_id,
+        process_id: add_remove_process_id,
         step_type_id: full_screen_screenshot_id,
         text: nil,
         url: nil,
@@ -733,7 +673,7 @@ defmodule UserDocs.TestDataset do
         order: 37,
         page_id: nil,
         page_reference: nil,
-        process_id: setup_process_id,
+        process_id: add_remove_process_id,
         step_type_id: clear_annotations_id,
         text: nil,
         url: nil,
@@ -741,13 +681,13 @@ defmodule UserDocs.TestDataset do
       },
       %{
         annotation_id: nil,
-        element_id: setup_next_id,
+        element_id: add_element_id,
         height: nil,
-        name: "Click Next",
+        name: "Click Add Element",
         order: 40,
         page_id: nil,
         page_reference: nil,
-        process_id: setup_process_id,
+        process_id: add_remove_process_id,
         step_type_id: click_id,
         text: nil,
         url: nil,
@@ -761,7 +701,7 @@ defmodule UserDocs.TestDataset do
         order: 45,
         page_id: nil,
         page_reference: nil,
-        process_id: setup_process_id,
+        process_id: add_remove_process_id,
         step_type_id: full_screen_screenshot_id,
         text: nil,
         url: nil,
@@ -775,7 +715,7 @@ defmodule UserDocs.TestDataset do
         order: 47,
         page_id: nil,
         page_reference: nil,
-        process_id: setup_process_id,
+        process_id: add_remove_process_id,
         step_type_id: clear_annotations_id,
         text: nil,
         url: nil,
@@ -783,126 +723,14 @@ defmodule UserDocs.TestDataset do
       },
       %{
         annotation_id: nil,
-        element_id: manager_button_id,
+        element_id: add_element_id,
         height: nil,
-        name: "Click Manager Terminal",
+        name: "Click Delete",
         order: 50,
         page_id: nil,
         page_reference: nil,
-        process_id: setup_process_id,
+        process_id: add_remove_process_id,
         step_type_id: click_id,
-        text: nil,
-        url: nil,
-        width: nil
-      },
-      %{
-        annotation_id: nil,
-        element_id: setup_next_2_id,
-        height: nil,
-        name: "Click Next Page",
-        order: 60,
-        page_id: nil,
-        page_reference: nil,
-        process_id: setup_process_id,
-        step_type_id: click_id,
-        text: nil,
-        url: nil,
-        width: nil
-      },
-      %{
-        annotation_id: nil,
-        element_id: setup_save_id,
-        height: nil,
-        name: "Click Save Setup",
-        order: 70,
-        page_id: nil,
-        page_reference: nil,
-        process_id: setup_process_id,
-        step_type_id: click_id,
-        text: nil,
-        url: nil,
-        width: nil
-      },
-      %{
-        annotation_id: nil,
-        element_id: nil,
-        height: nil,
-        name: "Navigate to Login",
-        order: 1,
-        page_id: nil,
-        page_reference: nil,
-        process_id: login_process_id,
-        step_type_id: navigate_id,
-        text: nil,
-        url: "https://staging.app.funnelcloud.io/#/login",
-        width: nil
-      },
-      %{
-        annotation_id: nil,
-        element_id: login_button_id,
-        height: nil,
-        name: "Click Login",
-        order: 2,
-        page_id: nil,
-        page_reference: nil,
-        process_id: login_process_id,
-        step_type_id: click_id,
-        text: nil,
-        url: nil,
-        width: nil
-      },
-      %{
-        annotation_id: nil,
-        element_id: user_name_field_id,
-        height: nil,
-        name: "Enter Username",
-        order: 3,
-        page_id: nil,
-        page_reference: nil,
-        process_id: login_process_id,
-        step_type_id: fill_field_id,
-        text: "admin@funnelcloud.io",
-        url: nil,
-        width: nil
-      },
-      %{
-        annotation_id: nil,
-        element_id: password_field_id,
-        height: nil,
-        name: "Enter Password",
-        order: 4,
-        page_id: nil,
-        page_reference: nil,
-        process_id: login_process_id,
-        step_type_id: fill_field_id,
-        text: "FirstTimer",
-        url: nil,
-        width: nil
-      },
-      %{
-        annotation_id: next_button_outline_id,
-        element_id: setup_next_id,
-        height: nil,
-        name: "Outline Next",
-        order: 30,
-        page_id: setup_page_id,
-        page_reference: nil,
-        process_id: setup_process_id,
-        step_type_id: apply_annotation_id,
-        text: nil,
-        url: nil,
-        width: nil
-      },
-      %{
-        annotation_id: badge_manager_button_id,
-        element_id: manager_button_id,
-        height: nil,
-        name: "Badge Manager Terminal",
-        order: 42,
-        page_id: setup_page_id,
-        page_reference: nil,
-        process_id: setup_process_id,
-        step_type_id: apply_annotation_id,
         text: nil,
         url: nil,
         width: nil
@@ -918,43 +746,26 @@ defmodule UserDocs.TestDataset do
     )
 
     _content = [
-      login_button = %{
-        name: "login button",
-        team_id: funnel_cloud_team_id
+      add_element_button = %{
+        name: "Add Element Button",
+        team_id: userdocs_team_id
       },
-      manager_button = %{
-        name: "Manager button",
-        team_id: funnel_cloud_team_id
-      },
-      operator_button = %{
-        name: "Operator button",
-        team_id: funnel_cloud_team_id
-      },
-      john_rocks = %{
-        name: "John Rocks",
-        team_id: loreline_team_id
+      delete_button = %{
+        name: "Delete Element button",
+        team_id: userdocs_team_id
       }
     ]
 
-    {:ok, %Content{id: login_button_id}} =
+    {:ok, %Content{id: add_element_button_id}} =
       %Content{}
-      |> Content.changeset(login_button)
+      |> Content.changeset(add_element_button)
       |> Repo.insert()
 
-    {:ok, %Content{id: manager_button_id}} =
+    {:ok, %Content{id: delete_button_id}} =
       %Content{}
-      |> Content.changeset(manager_button)
+      |> Content.changeset(delete_button)
       |> Repo.insert()
 
-    {:ok, %Content{id: operator_button_id}} =
-      %Content{}
-      |> Content.changeset(operator_button)
-      |> Repo.insert()
-
-    {:ok, %Content{id: john_rocks_id}} =
-      %Content{}
-      |> Content.changeset(john_rocks)
-      |> Repo.insert()
 
     english_language_code = %{
       name: "en-US"
@@ -974,8 +785,8 @@ defmodule UserDocs.TestDataset do
       |> LanguageCode.changeset(great_britain_language_code)
       |> Repo.insert()
 
-    {:ok, _funnel_cloud_team = %Team{}} =
-      funnel_cloud_team
+    {:ok, _userdocs_team = %Team{}} =
+      userdocs_team
       |> Users.update_team(%{default_language_code_id: english_language_code_id})
 
     {:ok, _loreline_team = %Team{}} =
@@ -984,53 +795,32 @@ defmodule UserDocs.TestDataset do
 
     content_versions = [
       _login_button_2020_1_en_us = %{
-        language_code_id: english_language_code_id,
-        name: "Login Button",
-        body: "The login button will log you in.",
-        content_id: login_button_id,
-        version_id: version_2020_1_id,
+        language_code_id: add_element_button_id,
+        name: "Add Element",
+        body: "The add element button adds an element",
+        content_id: add_element_button_id,
+        version_id: version_0_0_1_id,
       },
       _login_button_2020_1_en_gb = %{
         language_code_id: great_britain_language_code_id,
-        name: "Login Button",
-        body: "This login button shall log you in.",
-        content_id: login_button_id,
-        version_id: version_2020_1_id,
+        name: "Add Element",
+        body: "The add element button shall add an element",
+        content_id: add_element_button_id,
+        version_id: version_0_0_1_id,
       },
       _manager_button_2020_1_en_us = %{
         language_code_id: english_language_code_id,
-        name: "Manager Button",
-        body: "This manager button picks the manager terminal type.",
-        content_id: manager_button_id,
-        version_id: version_2020_1_id,
+        name: "Delete Button",
+        body: "This button deletes an element",
+        content_id: delete_button_id,
+        version_id: version_0_0_1_id,
       },
       _manager_button_2020_1_en_gb = %{
         language_code_id: great_britain_language_code_id,
-        name: "Manager Button",
-        body: "This manager button picks thine manager terminal type.",
-        content_id: manager_button_id,
-        version_id: version_2020_1_id,
-      },
-      _operator_button_2020_1_en_us = %{
-        language_code_id: english_language_code_id,
-        name: "Operator Button",
-        body: "The operator button picks the manager terminal type.",
-        content_id: operator_button_id,
-        version_id: version_2020_1_id,
-      },
-      _operator_button_2020_1_en_gb = %{
-        language_code_id: great_britain_language_code_id,
-        name: "Operator Button",
-        body: "The operator button picks thine manager terminal type.",
-        content_id: operator_button_id,
-        version_id: version_2020_1_id,
-      },
-      _loreline_content = %{
-        language_code_id: english_language_code_id,
-        name: "Test",
-        body: "Shouldn't show up on the main screen.",
-        content_id: john_rocks_id,
-        version_id: version_2020_1_id,
+        name: "Delete Button",
+        body: "This button shall delete an element",
+        content_id: delete_button_id,
+        version_id: version_0_0_1_id,
       }
     ]
 
@@ -1046,7 +836,7 @@ defmodule UserDocs.TestDataset do
     document_attrs = %{
       name: "Cycle Profile Form Reference",
       title: "Cycle Profile Form Reference",
-      project_id: funnelcloud_manager_project_id
+      project_id: userdocs_project_id
     }
 
     { :ok, %Document{id: document_id} } =
@@ -1064,7 +854,7 @@ defmodule UserDocs.TestDataset do
     document_version = %{
       name: "test",
       title: "test",
-      version_id: version_2020_1_id,
+      version_id: version_0_0_1_id,
       document_id: document_id
     }
 

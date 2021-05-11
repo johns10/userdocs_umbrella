@@ -7,8 +7,7 @@ const Step = require('./step.js');
 const app = require('electron').app;
 const isDev = require('electron-is-dev');
 
-async function openBrowser() {
-  console.log(app.getAppPath())
+async function openBrowser(configuration) {
   if (isDev) {
     var executablePath = puppeteer.executablePath()
   } else {
@@ -24,7 +23,9 @@ async function openBrowser() {
       .filter(arg => String(arg).toLowerCase() !== '--disable-extensions')
       .filter(arg => String(arg).toLowerCase() !== '--headless')
       
-  args.push('--user-data-dir=C:\\userdocs_chrome_data');
+  if (configuration.user_data_dir_path) {
+    args.push('--user-data-dir=' + configuration.user_data_dir_path);
+  }
 
   const browser = await puppeteer.launch({ 
     executablePath: executablePath, 
@@ -36,7 +37,7 @@ async function openBrowser() {
 }
 
 async function closeBrowser(browser) {
-  await browser.close()
+  browser.close()
 }
 
 async function preload(browser) {

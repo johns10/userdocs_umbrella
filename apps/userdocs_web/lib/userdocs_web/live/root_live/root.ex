@@ -60,8 +60,12 @@ defmodule UserDocsWeb.Root do
   end
 
   def subscribe(socket) do
-    UserDocsWeb.Endpoint.subscribe(Defaults.channel(socket))
-    socket
+    case Defaults.channel(socket) do
+      channel when is_binary(channel) ->
+        UserDocsWeb.Endpoint.subscribe(channel)
+        socket
+      _ -> socket
+    end
   end
 
   def validate_logged_in(socket, session) do
@@ -119,7 +123,7 @@ defmodule UserDocsWeb.Root do
       default_team,
       current_user.selected_team
       || default_team
-      || %Team{}
+      || current_user.teams |> Enum.at(0)
     }
   end
 
@@ -140,7 +144,7 @@ defmodule UserDocsWeb.Root do
       default_version,
       current_user.selected_version
       || default_version
-      || %Version{}
+      || nil
     }
   end
 
@@ -241,7 +245,8 @@ defmodule UserDocsWeb.Root do
     configuration = [
       id: "configuration",
       image_path: socket.assigns.current_user.image_path,
-      strategy: version.strategy.name |> to_string
+      strategy: version.strategy.name |> to_string,
+      user_data_dir_path: socket.assigns.current_user.user_data_dir_path
     ]
     send_update(UserDocsWeb.Configuration, configuration)
 

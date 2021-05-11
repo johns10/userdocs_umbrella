@@ -35,7 +35,8 @@ css:
         = live_patch "Versions", class: "navbar-item", to: Routes.version_index_path(@socket, :index)
         = live_patch "Content", class: "navbar-item", to: Routes.content_index_path(@socket, :index)
         = live_patch "Documents", class: "navbar-item", to: Routes.document_index_path(@socket, :index)
-        = live_patch "Processes", class: "navbar-item", to: Routes.process_index_path(@socket, :index)
+        = if is_struct(@current_version, UserDocs.Projects.Version) do
+          = live_patch "Processes", class: "navbar-item", to: Routes.process_index_path(@socket, :index)
         = live_component(@socket, UserDocsWeb.VersionPicker, 
         [ current_user: @current_user,
           current_project: @current_project,
@@ -47,11 +48,15 @@ css:
             = link "User", to: Routes.user_show_path(@socket, :show, @current_user.id), class: "button"
             = link "Sign out", to: Routes.pow_session_path(@socket, :delete), method: :delete, class: "button is-light"
 
-  = live_component(@socket, UserDocsWeb.Configuration, 
-    [ id: "configuration",
-    image_path: @current_user.image_path,
-    strategy: @current_version.strategy.name |> to_string(),
-    test: "value" ])
+  = if is_struct(@current_version, UserDocs.Projects.Version) do 
+    = live_component(@socket, UserDocsWeb.Configuration, 
+      [ id: "configuration",
+      image_path: @current_user.image_path,
+      strategy: @current_version.strategy.name |> to_string(),
+      user_data_dir_path: @current_user.user_data_dir_path,
+      test: "value" ])
+  - else 
+    p Select a Version, your configs aren't being passed.
 
   = live_component(@socket, UserDocsWeb.ScreenShotHandler, 
     [ id: "screenshot-handler-component",
@@ -72,13 +77,14 @@ css:
       div 
         div 
           = @inner_content
-        = live_component(@socket, UserDocsWeb.DrawerLive, 
-          [ id: "navigation-drawer", 
-          current_user: @current_user, 
-          current_team: @current_team,
-          browser_opened: @browser_opened,
-          user_opened_browser: @user_opened_browser,
-          closed: @navigation_drawer_closed  ])
+        = if is_struct(@current_user, UserDocs.Users.User) and is_struct(@current_team, UserDocs.Users.Team) do
+          = live_component(@socket, UserDocsWeb.DrawerLive, 
+            [ id: "navigation-drawer", 
+            current_user: @current_user, 
+            current_team: @current_team,
+            browser_opened: @browser_opened,
+            user_opened_browser: @user_opened_browser,
+            closed: @navigation_drawer_closed  ])
 
     <!--<%= UserDocsWeb.LiveHelpers.live_modal_menus(@socket, [ id: "modal-menus", form_data: @form_data ]) %>-->
 

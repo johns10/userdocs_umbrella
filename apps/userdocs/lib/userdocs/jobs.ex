@@ -273,6 +273,7 @@ defmodule UserDocs.Jobs do
     ++ job.process_instances
     |> Enum.sort(fn(o1, o2) -> o1.order < o2.order end)
   end
+  def get_executable_items(%Ecto.Association.NotLoaded{}), do: [] # TODO: Fix root cause, thiss is bs
 
   def max_order(%Job{ } = job) do
     job.step_instances

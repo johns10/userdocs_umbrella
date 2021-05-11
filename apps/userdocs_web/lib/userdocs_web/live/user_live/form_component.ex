@@ -17,6 +17,7 @@ defmodule UserDocsWeb.UserLive.FormComponent do
 
         <%= Layout.text_input f, :email, [], "control" %>
         <%= Layout.text_input f, :image_path, [], "control" %>
+        <%= Layout.text_input f, :user_data_dir_path, [], "control" %>
 
         <%= inputs_for f, :team_users, fn tuf -> %>
           <div class="field is-grouped">

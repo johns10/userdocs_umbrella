@@ -1,6 +1,8 @@
 const { succeed, fail, start } = require('../../step/step_instance.js');
 const { currentPage, getElementHandle } = require('./helpers.js')
 const Puppeteer = require('./puppeteer.js')
+const { writeFile  } = require('fs/promises')
+const path = require('path')
 
 async function navigate(browser, stepInstance) { 
   url = stepInstance.attrs.page.url
@@ -45,32 +47,38 @@ async function setSize(browser, stepInstance) {
 async function elementScreenshot(browser, stepInstance) {
   selector = stepInstance.attrs.element.selector
   strategy = stepInstance.attrs.element.strategy.name
-  file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order
+  file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order + ".png"
 
   await new Promise(resolve => setTimeout(resolve, 500));
-  const path = userdocs.configuration.image_path + "\\" + file_name + ".png"
+  const filePath = path.join(userdocs.configuration.image_path, file_name)
   let handle = await getElementHandle(browser, selector, strategy)
-  let base_64 = await handle.screenshot({ path: path, encoding: "base64"});
+  let base_64 = await handle.screenshot({ path: filePath, encoding: "base64"});
   if (stepInstance.attrs.screenshot === null) { 
     stepInstance.attrs.screenshot = { base_64: base_64}
   } else {
     stepInstance.attrs.screenshot.base_64 = base_64
   }
+  writeFile(filePath, base_64, 'base64', function(err) {
+    console.log(err);
+  });
   return stepInstance
 }
 
 async function fullScreenScreenshot(browser, stepInstance) {
-  const file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order
-  const path = userdocs.configuration.image_path + "\\" + file_name + ".png"
+  const file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order + ".png"
+  const filePath = path.join(userdocs.configuration.image_path, file_name)
   const page = await currentPage(browser)
 
-  let base64 = buffer = await page.screenshot({ path: path, encoding: "base64"});
+  await new Promise(resolve => setTimeout(resolve, 500));   
+  let base_64 = await page.screenshot({ encoding: "base64" });  
   if (stepInstance.attrs.screenshot === null) { 
     stepInstance.attrs.screenshot = { base_64: base_64}
   } else {
     stepInstance.attrs.screenshot.base_64 = base_64
   }
-  await new Promise(resolve => setTimeout(resolve, 500));
+  writeFile(filePath, base_64, 'base64', function(err) {
+    console.log(err);
+  });
   return stepInstance
 }
 

@@ -175,6 +175,7 @@ defmodule UserDocs.Screenshots do
     case Ecto.Changeset.get_change(changeset, :base_64) do
       nil -> changeset
       base_64 ->
+        IO.inspect("Got a base 64 image")
         contents = Base.decode64!(base_64)
         file_name = file_name(changeset.data, :production)
         aws_path = put_encoded_string_in_aws_object(contents, team, path(file_name))

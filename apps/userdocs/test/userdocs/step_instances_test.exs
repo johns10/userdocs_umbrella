@@ -70,7 +70,14 @@ defmodule UserDocs.StepInstancesTest do
       assert StepInstances.get_step_instance!(step_instance.id) == step_instance
     end
 
-    test "create_step_instance/1 with valid data creates a step instance", %{ step: step } do
+    #TODO: Potentially move to teams test
+    test "get_step_instance_team!/1 returns the step instance with the breadcrumb to the team preloaded", %{ team: team, step: step } do
+      step_instance = JobsFixtures.step_instance(step.id)
+      step_instance_team = UserDocs.Users.get_step_instance_team!(step_instance.id)
+      assert step_instance_team.id == team.id
+    end
+
+    test "create_step_instance/1 with valid data creates a step instance", %{ team: team, step: step } do
       attrs = JobsFixtures.step_instance_attrs(:valid, step.id)
       assert {:ok, %StepInstance{} = step_instance} = StepInstances.create_step_instance(attrs)
       assert step_instance.name == attrs.name

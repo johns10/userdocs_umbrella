@@ -145,6 +145,7 @@ defmodule UserDocs.Users do
     |> join(:left, [u, tu, t, p], p in Project, on: p.team_id == t.id)
     |> join(:left, [u, tu, t, p, v], v in Version, on: v.project_id == p.id)
     |> preload(    [u, tu, t, p, v], [ team_users: tu ])
+    |> preload(    [u, tu, t, p, v], [ teams: t ])
     |> preload(    [u, tu, t, p, v], [ team_users: { tu, team: t } ])
     |> preload(    [u, tu, t, p, v], [ team_users: { tu, team: { t, projects: p } } ])
     |> preload(    [u, tu, t, p, v], [ team_users: { tu, team: { t, projects: { p, versions: v } } } ])
@@ -501,6 +502,17 @@ defmodule UserDocs.Users do
   def get_team!(id, state, opts) when is_list(opts) do
     StateHandlers.get(state, id, Team, opts)
     |> maybe_preload(opts[:preloads], state, opts)
+  end
+
+  def get_step_instance_team!(id) do
+    from(t in Team, as: :team)
+    |> join(:left, [team: t], p in assoc(t, :projects), as: :projects)
+    |> join(:left, [projects: p], v in assoc(p, :versions), as: :versions)
+    |> join(:left, [versions: v], p in assoc(v, :processes), as: :processes)
+    |> join(:left, [processes: p], s in assoc(p, :steps), as: :steps)
+    |> join(:left, [steps: s], si in assoc(s, :step_instances), as: :step_instance)
+    |> where([step_instance: si], si.id == ^id)
+    |> Repo.one()
   end
 
   defp maybe_preload(object, nil, _, _), do: object
