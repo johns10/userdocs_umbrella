@@ -2,7 +2,6 @@ defmodule UserDocs.Screenshot do
   use UserDocs.DataCase
 
   alias UserDocs.AutomationFixtures
-  alias UserDocs.JobsFixtures
   alias UserDocs.UsersFixtures
   alias UserDocs.ProjectsFixtures
   alias UserDocs.WebFixtures
@@ -45,6 +44,15 @@ defmodule UserDocs.Screenshot do
 
   defp single_white_pixel(), do: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAAAMSURBVBhXY/j//z8ABf4C/qc1gYQAAAAASUVORK5CYII="
   defp single_black_pixel(), do: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAAANSURBVBhXY8jPz/8PAATrAk3xWKD8AAAAAElFTkSuQmCC"
+
+  def aws_opts(team) do
+    [
+      region: team.aws_region,
+      access_key_id: team.aws_access_key_id,
+      secret_access_key: team.aws_secret_access_key
+    ]
+  end
+
   describe "screenshot" do
     alias UserDocs.Screenshots
     alias UserDocs.Media.Screenshot
@@ -63,6 +71,37 @@ defmodule UserDocs.Screenshot do
       :create_step_types,
       :create_step
     ]
+
+    def score_uploaded_single_white_screenshot(aws_path, team) do
+      downloaded = "./test/support/downloads/downloaded_single_white_pixel.png"
+      original = "./test/support/fixtures/single_white_pixel.png"
+      diff = "./test/support/downloads/diff.png"
+      ExAws.S3.download_file(team.aws_bucket, aws_path, downloaded) |> ExAws.request(aws_opts(team))
+      %{ score: score } = Screenshots.score_files(%{ original: original, updated: downloaded, diff: diff })
+      #File.rm(downloaded)
+      #File.rm(diff)
+      score
+    end
+    def score_uploaded_single_black_screenshot(aws_path, team) do
+      downloaded = "./test/support/downloads/downloaded_single_black_pixel.png"
+      original = "./test/support/fixtures/single_black_pixel.png"
+      diff = "./test/support/downloads/diff.png"
+      ExAws.S3.download_file(team.aws_bucket, aws_path, downloaded) |> ExAws.request(aws_opts(team))
+      %{ score: score } = Screenshots.score_files(%{ original: original, updated: downloaded, diff: diff })
+      #File.rm(downloaded)
+      #File.rm(diff)
+      score
+    end
+    def score_uploaded_diff(aws_path, team) do
+      downloaded = "./test/support/downloads/downloaded_diff.png"
+      original = "./test/support/fixtures/diff.png"
+      diff = "./test/support/downloads/diff.png"
+      ExAws.S3.download_file(team.aws_bucket, aws_path, downloaded) |> ExAws.request(aws_opts(team))
+      %{ score: score } = Screenshots.score_files(%{ original: original, updated: downloaded, diff: diff })
+      #File.rm(downloaded)
+      #File.rm(diff)
+      score
+    end
 
     test "list_screenshots/0 returns all screenshots", %{ step: step } do
       screenshot = MediaFixtures.screenshot(step.id)
@@ -96,8 +135,54 @@ defmodule UserDocs.Screenshot do
     end
 
     test "create_screenshot/1 with invalid data returns error changeset", %{ step: step } do
-      attrs = JobsFixtures.step_instance_attrs(:invalid, step.id)
+      attrs = MediaFixtures.screenshot_attrs(:invalid, step.id)
       assert {:error, %Ecto.Changeset{}} = Screenshots.create_screenshot(attrs)
+    end
+
+    test "create_screenshot/1 with a base64 string creates a screenshot named with an id", %{ team: team, step: step } do
+      attrs = MediaFixtures.screenshot_attrs(:nameless, step.id, single_white_pixel())
+      assert {:ok, %Screenshot{} = screenshot} = Screenshots.create_screenshot(attrs)
+      score = score_uploaded_single_white_screenshot(screenshot.aws_screenshot, team)
+      "screenshots/" <> file_name = screenshot.aws_screenshot
+
+      assert String.slice(file_name, 0..-5) == to_string(screenshot.id)
+      assert score == "inf"
+    end
+
+    test "bypassing the default create_screenshot (as we would in cast_assoc from step) results in a screenshot named with a uuid", %{ team: team, step: step } do
+      attrs = MediaFixtures.screenshot_attrs(:nameless, step.id, single_white_pixel())
+      { :ok, screenshot } = %Screenshot{} |> Screenshot.changeset(attrs) |> UserDocs.Repo.insert()
+      score = score_uploaded_single_white_screenshot(screenshot.aws_screenshot, team)
+      file_name = Screenshots.unpath(screenshot.aws_screenshot)
+      { status, _ } = file_name |> String.slice(0..-5) |> UUID.info()
+      assert status == :ok
+      assert score == "inf"
+    end
+
+    test "updating a screenshot created with a uuid name, renames the file in the struct, and on aws to the id of the screenshot", %{ team: team, step: step } do
+      attrs = MediaFixtures.screenshot_attrs(:nameless, step.id, single_white_pixel())
+      { :ok, screenshot } = %Screenshot{} |> Screenshot.changeset(attrs) |> UserDocs.Repo.insert()
+      attrs = MediaFixtures.screenshot_attrs(:nameless, step.id, single_white_pixel())
+      { :ok, screenshot } = screenshot |> Screenshots.update_screenshot(attrs)
+      file_name = Screenshots.unpath(screenshot.aws_screenshot)
+      score = score_uploaded_single_white_screenshot("screenshots/" <> to_string(screenshot.id) <> ".png", team)
+
+      assert file_name |> String.slice(0..-5) == screenshot.id |> to_string()
+      assert score == "inf"
+    end
+
+    test "updating a screenshot (created with a uuid name, renamed to an id) with an explicitn name does the right thing", %{ team: team, step: step } do
+      attrs = MediaFixtures.screenshot_attrs(:nameless, step.id, single_white_pixel())
+      { :ok, screenshot } = %Screenshot{} |> Screenshot.changeset(attrs) |> UserDocs.Repo.insert()
+      attrs = MediaFixtures.screenshot_attrs(:nameless, step.id, single_white_pixel())
+      { :ok, screenshot } = screenshot |> Screenshots.update_screenshot(attrs)
+      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base_64, single_white_pixel())
+      { :ok, screenshot } = screenshot |> Screenshots.update_screenshot(attrs)
+      file_name = Screenshots.unpath(screenshot.aws_screenshot)
+      score = score_uploaded_single_white_screenshot("screenshots/" <> to_string(screenshot.name) <> ".png", team)
+
+      assert file_name |> String.slice(0..-5) == screenshot.name |> to_string()
+      assert score == "inf"
     end
 
     test "update_screenshot/2 with valid data updates the screenshot", %{ step: step } do
@@ -107,12 +192,34 @@ defmodule UserDocs.Screenshot do
       assert screenshot.name == attrs.name
     end
 
-    #TODO: Add actual file validation from aws
     test "update_screenshot/2 with no aws_screenshot creates a file on aws", %{ step: step, team: team } do
       screenshot = MediaFixtures.screenshot(step.id)
       attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base_64, single_white_pixel())
       { :ok, screenshot } = Screenshots.update_screenshot(screenshot, attrs, team)
-      assert screenshot.aws_screenshot == "screenshots/" <> to_string(screenshot.id) <> ".png"
+      score = score_uploaded_single_white_screenshot(screenshot.aws_screenshot, team)
+      assert score == "inf"
+      assert screenshot.aws_screenshot
+    end
+
+    test "file_name/1 is the name of the screenshot when it has one", %{ step: step } do
+      changeset = MediaFixtures.screenshot(step.id) |> Screenshots.change_screenshot(%{})
+      assert Screenshots.file_name(changeset, :production) == changeset.data.name <> ".png"
+    end
+
+    test "file_name/1 is the id of the screenshot when it has no name", %{ step: step } do
+      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.delete(:name)
+      { :ok, screenshot } = Screenshots.create_screenshot(attrs)
+      changeset = screenshot |> Screenshots.change_screenshot(%{})
+      assert Screenshots.file_name(changeset, :production) == to_string(screenshot.id) <> ".png"
+    end
+
+    test "file_name/1 is a uuid when it has no name nor id", %{ step: step } do
+      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.delete(:name)
+      changeset = Screenshots.change_screenshot(%Screenshot{}, attrs)
+      file_name = Screenshots.file_name(changeset, :production)
+      name = file_name |> String.slice(0..-5)
+      { status, _ } = UUID.info(name)
+      assert status == :ok
     end
 
     test "update_screenshot/2 with a different file creates a provisional and diff screenshot", %{ step: step, team: team } do
@@ -122,8 +229,14 @@ defmodule UserDocs.Screenshot do
       updated_screenshot = updated_screenshot |> Map.put(:base_64, nil)
       attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base_64, single_black_pixel())
       { :ok, final_screenshot } = Screenshots.update_screenshot(updated_screenshot, attrs, team)
-      assert final_screenshot.aws_provisional_screenshot == "screenshots/" <> to_string(updated_screenshot.id) <> "-provisional.png"
-      assert final_screenshot.aws_diff_screenshot == "screenshots/" <> to_string(updated_screenshot.id) <> "-diff.png"
+
+      provisional_score = score_uploaded_single_black_screenshot(final_screenshot.aws_provisional_screenshot, team)
+      diff_score = score_uploaded_diff(final_screenshot.aws_diff_screenshot, team)
+
+      assert final_screenshot.aws_provisional_screenshot == "screenshots/" <> final_screenshot.name <> "-provisional.png"
+      assert final_screenshot.aws_diff_screenshot == "screenshots/" <> final_screenshot.name <> "-diff.png"
+      assert provisional_score == "inf"
+      assert diff_score == "inf"
     end
 
     test "update_screenshot/2 with the same file doesn't create a provisional or a diff", %{ step: step, team: team } do
@@ -146,10 +259,11 @@ defmodule UserDocs.Screenshot do
       final_screenshot = Screenshots.apply_provisional_screenshot(screenshot, team)
       aws_key = "screenshots/" <> to_string(screenshot.id) <> ".png"
       opts = Screenshots.aws_opts(team)
-      ExAws.S3.download_file(team.aws_bucket, aws_key, "test.png") |> ExAws.request(opts)
+      { :ok, _ } = ExAws.S3.download_file(team.aws_bucket, final_screenshot.aws_screenshot, "test.png") |> ExAws.request(opts)
       assert File.read!("test.png") |> Base.encode64() == single_black_pixel()
       assert final_screenshot.aws_diff_screenshot == nil
       assert final_screenshot.aws_provisional_screenshot == nil
+      File.rm("test.png")
     end
 
     test "update_screenshot/2 with invalid data returns error changeset", %{ step: step } do
