@@ -4,6 +4,8 @@ defmodule UserDocs.Media.Screenshot do
   use Waffle.Ecto.Schema
 
   alias UserDocs.Automation.Step
+  alias UserDocs.Screenshots
+  alias UserDocs.Media.Screenshot
 
   schema "screenshots" do
     field :name, :string
@@ -62,7 +64,7 @@ defmodule UserDocs.Media.Screenshot do
   end
 
   def safe(annotation, handlers \\ %{})
-  def safe(screenshot = %UserDocs.Media.Screenshot{}, _handlers) do
+  def safe(screenshot = %Screenshot{}, _handlers) do
     base_safe(screenshot)
   end
   def safe(nil, _), do: nil
