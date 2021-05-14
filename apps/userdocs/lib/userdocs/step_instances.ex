@@ -95,7 +95,6 @@ defmodule UserDocs.StepInstances do
       order: order,
       step_id: step.id,
       name: step.name,
-      step: step,
       attrs: %{},
       status: "not_started",
       errors: [],
