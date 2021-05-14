@@ -165,6 +165,16 @@ defmodule UserDocs.Screenshots do
     screenshot
   end
 
+  def prepare_files(screenshot, names, bucket, opts) do
+    Enum.each(names, fn({ field, file_name }) ->
+      aws_key = Map.get(screenshot, field)
+      case ExAws.S3.download_file(bucket, aws_key, file_name) |> ExAws.request(opts) do
+        { :ok, _ } -> true
+        e -> raise("#{__MODULE__}.prepare_all_files failed because #{e}")
+      end
+    end)
+  end
+
   def reject_provisional_screenshot(%Screenshot{ } = screenshot) do
     attrs = %{ aws_diff_screenshot: nil, aws_provisional_screenshot: nil }
     { :ok, screenshot } = update_screenshot(screenshot, attrs)
@@ -202,17 +212,8 @@ defmodule UserDocs.Screenshots do
         |> score_files()
         |> handle_changes(changeset)
         |> delete_files(state)
-    end
-  end
 
-  def prepare_files(screenshot, names, bucket, opts) do
-    Enum.each(names, fn({ field, file_name }) ->
-      aws_key = Map.get(screenshot, field)
-      case ExAws.S3.download_file(bucket, aws_key, file_name) |> ExAws.request(opts) do
-        { :ok, _ } -> true
-        e -> raise("#{__MODULE__}.prepare_all_files failed because #{e}")
       end
-    end)
   end
 
   def prepare_aws_file(%{ aws: aws, original: original, updated: updated,
