@@ -45,22 +45,29 @@ async function setSize(browser, stepInstance) {
 }
 
 async function elementScreenshot(browser, stepInstance) {
-  selector = stepInstance.attrs.element.selector
-  strategy = stepInstance.attrs.element.strategy.name
-  file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order + ".png"
+  const selector = stepInstance.attrs.element.selector
+  const strategy = stepInstance.attrs.element.strategy.name
+  const file_name = stepInstance.attrs.process.name + " " + stepInstance.attrs.order + ".png"
 
   await new Promise(resolve => setTimeout(resolve, 500));
   const filePath = path.join(userdocs.configuration.image_path, file_name)
+
   let handle = await getElementHandle(browser, selector, strategy)
+  if (!handle) raise("Element not found, couldn't take the screenshot.  Check the selector on the element for this step.")
+
   let base_64 = await handle.screenshot({ path: filePath, encoding: "base64"});
   if (stepInstance.attrs.screenshot === null) { 
     stepInstance.attrs.screenshot = { base_64: base_64}
   } else {
     stepInstance.attrs.screenshot.base_64 = base_64
   }
-  writeFile(filePath, base_64, 'base64', function(err) {
-    console.log(err);
-  });
+  try {
+    writeFile(filePath, base_64, 'base64', function(err) {
+      console.log(err);
+    });
+  } catch(error) {
+    console.log(error)
+  }
   return stepInstance
 }
 
@@ -70,15 +77,21 @@ async function fullScreenScreenshot(browser, stepInstance) {
   const page = await currentPage(browser)
 
   await new Promise(resolve => setTimeout(resolve, 500));   
+
   let base_64 = await page.screenshot({ encoding: "base64" });  
+
   if (stepInstance.attrs.screenshot === null) { 
     stepInstance.attrs.screenshot = { base_64: base_64}
   } else {
     stepInstance.attrs.screenshot.base_64 = base_64
   }
-  writeFile(filePath, base_64, 'base64', function(err) {
-    console.log(err);
-  });
+  try {
+    writeFile(filePath, base_64, 'base64', function(err) {
+      console.log(err);
+    });
+  } catch(error) {
+    console.log(error)
+  }
   return stepInstance
 }
 
