@@ -29,7 +29,7 @@ defmodule UserDocs.Media.ScreenshotHelpers do
 
   def save_file({ :ok, %Screenshot{} = screenshot }, raw) do
     Logger.debug("Handling Screenshot File")
-    step = Automation.get_step!(screenshot.step_id)
+    # step = Automation.get_step!(screenshot.step_id)
     file_name = Integer.to_string(screenshot.id) <> ".jpeg"
     case FileHelpers.encode_hash_save_file(raw, file_name) do
       %{ filename: filename } -> { :ok, screenshot, filename }
@@ -38,10 +38,7 @@ defmodule UserDocs.Media.ScreenshotHelpers do
 
   # This is some bullshit I put in for the inconsistency after we get done.  Same deal as handle_file_disposition
   def maybe_resize_image(state = { :ok, %Screenshot{}, filename }, "Element Screenshot", %{ "size"=> _ } = element) do
-    IO.puts("Resizing image")
     geometry = "#{element["size"]["width"]}x#{element["size"]["height"]}+#{element["size"]["x"]}+#{element["size"]["y"]}"
-
-    IO.puts(geometry)
 
     @path <> filename
     |> Mogrify.open()
@@ -51,7 +48,6 @@ defmodule UserDocs.Media.ScreenshotHelpers do
     state
   end
   def maybe_resize_image(state, stn, e) do
-    IO.puts("Not maybe_resize_image")
     state
   end
 
