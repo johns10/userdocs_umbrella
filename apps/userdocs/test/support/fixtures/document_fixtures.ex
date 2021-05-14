@@ -90,12 +90,14 @@ defmodule UserDocs.DocumentVersionFixtures do
   def content_attrs(:valid, team_id) do
     %{
       name: UUID.uuid4(),
+      title: UUID.uuid4(),
       team_id: team_id
     }
   end
   def content_attrs(:invalid, team_id) do
     %{
       name: nil,
+      title: UUID.uuid4(),
       team_id: team_id
     }
   end
