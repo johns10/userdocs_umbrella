@@ -11,12 +11,13 @@ const {
   createMainWindow } = require('./main_window/navigation.js')
 const puppeteer = require('./puppeteer/puppeteer.js')
 const path = require('path')
-if (process.env.NODE_ENV === 'development') {
+const isDev = require('electron-is-dev');
+
+if (isDev) {
   require('electron-reload')(__dirname, {
     electron: path.join(__dirname, '..', '..', 'node_modules', '.bin', 'electron')
   });
 }
-const isDev = require('electron-is-dev');
 
 userdocs = {
   browser: null,
