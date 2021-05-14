@@ -98,7 +98,8 @@ defmodule UserDocs.StepInstances do
       attrs: %{},
       status: "not_started",
       errors: [],
-      warnings: []
+      warnings: [],
+      type: "step_instance"
     }
   end
 
