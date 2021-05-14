@@ -70,14 +70,23 @@ defmodule UserDocs.StepInstancesTest do
       assert StepInstances.get_step_instance!(step_instance.id) == step_instance
     end
 
-    #TODO: Potentially move to teams test
-    test "get_step_instance_team!/1 returns the step instance with the breadcrumb to the team preloaded", %{ team: team, step: step } do
+    test "get_step_instance!/2 with preload: * returns the step instance with the preloads", %{ step: step, element: element, annotation: annotation } do
       step_instance = JobsFixtures.step_instance(step.id)
-      step_instance_team = UserDocs.Users.get_step_instance_team!(step_instance.id)
-      assert step_instance_team.id == team.id
+      result = StepInstances.get_step_instance!(step_instance.id, %{ preloads: "*"})
+      assert result.step.id == step.id
+      assert result.step.element.id == element.id
+      assert result.step.annotation.id == annotation.id
     end
 
-    test "create_step_instance/1 with valid data creates a step instance", %{ team: team, step: step } do
+    #TODO: Potentially move to teams test
+    test "list_step_instance_team_users/1 returns the step instance with the breadcrumb to the team preloaded", %{ user: user, team: team, step: step } do
+      step_instance = JobsFixtures.step_instance(step.id)
+      step_instance_team_users = UserDocs.Users.list_step_instance_team_users(step_instance.id)
+      assert step_instance_team_users |> Enum.at(0) |> Map.get(:team_id) == team.id
+      assert step_instance_team_users |> Enum.at(0) |> Map.get(:user_id) == user.id
+    end
+
+    test "create_step_instance/1 with valid data creates a step instance", %{ step: step } do
       attrs = JobsFixtures.step_instance_attrs(:valid, step.id)
       assert {:ok, %StepInstance{} = step_instance} = StepInstances.create_step_instance(attrs)
       assert step_instance.name == attrs.name
