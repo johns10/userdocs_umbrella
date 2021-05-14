@@ -26,6 +26,7 @@ defmodule UserDocs.StepInstances.StepInstance do
     |> foreign_key_constraint(:step_id)
     |> foreign_key_constraint(:job_id)
     |> foreign_key_constraint(:process_instance_id)
+    |> cast_assoc(:step)
     |> validate_required([ :order, :status, :step_id ])
   end
 end
