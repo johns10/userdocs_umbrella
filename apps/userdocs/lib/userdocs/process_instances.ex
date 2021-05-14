@@ -18,6 +18,48 @@ defmodule UserDocs.ProcessInstances do
     base_process_instance_query(id)
     |> Repo.one!()
   end
+  def get_process_instance!(id, %{ preloads: "*"}) do
+    from(pi in ProcessInstance, as: :process_instance)
+    |> where([process_instance: pi], pi.id == ^id)
+    |> join(:left, [process_instance: pi], si in assoc(pi, :step_instances), as: :step_instances)
+    |> join(:left, [step_instances: si], s in assoc(si, :step), as: :step)
+    |> join(:left, [step: s], st in assoc(s, :step_type), as: :step_type)
+    |> join(:left, [step: s], a in assoc(s, :annotation), as: :annotation)
+    |> join(:left, [step: s], p in assoc(s, :page), as: :page)
+    |> join(:left, [step: s], e in assoc(s, :element), as: :element)
+    |> join(:left, [step: s], s in assoc(s, :screenshot), as: :screenshot)
+    |> join(:left, [step: s], pr in assoc(s, :process), as: :process)
+    |> join(:left, [element: e], st in assoc(e, :strategy), as: :strategy)
+    |> join(:left, [annotation: a], at in assoc(a, :annotation_type), as: :annotation_type)
+    |> preload(
+      [
+        process_instance: process_instance,
+        step_instances: step_instances,
+        step: step,
+        step_type: step_type,
+        element: element,
+        strategy: strategy,
+        annotation: annotation,
+        annotation_type: annotation_type,
+        page: page,
+        process: process,
+        screenshot: screenshot
+      ],
+      [
+        step_instances: { step_instances, [
+          step: { step, [
+            step_type: step_type,
+            element: { element, strategy: strategy },
+            annotation: { annotation, annotation_type: annotation_type },
+            page: page,
+            process: process,
+            screenshot: screenshot
+          ]}
+        ]}
+      ]
+    )
+    |> Repo.one!()
+  end
 
   defp base_process_instance_query(id) do
     from(process_instance in ProcessInstance, where: process_instance.id == ^id)
