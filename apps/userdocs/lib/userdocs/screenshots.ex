@@ -242,10 +242,9 @@ defmodule UserDocs.Screenshots do
     case score do
       "inf" -> changeset
       _ ->
-        Logger.debug("The file is different, creating provisional and diff")
-        provisional_file_name = file_name(changeset.data, :provisional)
+        provisional_file_name = file_name(changeset, :provisional)
         put_encoded_string_in_aws_object(File.read!(updated), team, path(provisional_file_name))
-        diff_file_name = file_name(changeset.data, :diff)
+        diff_file_name = file_name(changeset, :diff)
         put_encoded_string_in_aws_object(File.read!(diff), team, path(diff_file_name))
         changeset
         |> Ecto.Changeset.put_change(:aws_provisional_screenshot, path(provisional_file_name))
@@ -278,20 +277,29 @@ defmodule UserDocs.Screenshots do
     ]
   end
 
-  defp path(file_name) do
-    "screenshots/" <> file_name
+  @screenshots_directory "screenshots"
+  def path(file_name) do
+    @screenshots_directory <> "/" <> file_name
+  end
+  def unpath(path) do
+    @screenshots_directory <> "/" <> file_name = path
+    file_name
   end
 
-  defp file_name(screenshot, :diff) do
-    to_string(screenshot.id)
-    <> "-diff.png"
+  def file_name(screenshot, :diff), do: file_name(screenshot) <> "-diff.png"
+  def file_name(screenshot, :provisional), do: file_name(screenshot) <> "-provisional.png"
+  def file_name(screenshot, :production), do: file_name(screenshot) <> ".png"
+  defp file_name(%Ecto.Changeset{} = changeset) do
+    case Ecto.Changeset.get_field(changeset, :name, nil) do
+      nil -> case Ecto.Changeset.get_field(changeset, :id, nil) do
+        nil -> UUID.uuid4()
+        id -> Integer.to_string(id)
   end
-  defp file_name(screenshot, :provisional) do
-    to_string(screenshot.id)
-    <> "-provisional.png"
+      name -> name
   end
-  defp file_name(screenshot, :production) do
-    to_string(screenshot.id)
-    <> ".png"
   end
+  defp file_name(%Screenshot{ name: nil, id: nil }), do: UUID.uuid4()
+  defp file_name(%Screenshot{ name: nil, id: id }) when is_integer(id), do: Integer.to_string(id)
+  defp file_name(%Screenshot{ name: name }), do: name
+
 end
