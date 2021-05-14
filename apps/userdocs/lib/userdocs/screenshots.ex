@@ -113,10 +113,9 @@ defmodule UserDocs.Screenshots do
     |> Screenshot.changeset(attrs)
     |> Repo.update()
   end
-  def update_screenshot(%Screenshot{ base_64: _base_64 } = screenshot, attrs, %UserDocs.Users.Team{} = team) do
+  def update_screenshot(%Screenshot{ base_64: _base_64 } = screenshot, attrs, %UserDocs.Users.Team{} = _team) do
     screenshot
     |> Screenshot.changeset(attrs)
-    |> diff_images(team)
     |> Repo.update()
   end
 
