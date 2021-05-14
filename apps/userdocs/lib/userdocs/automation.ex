@@ -485,6 +485,7 @@ defmodule UserDocs.Automation do
     base_processes_query()
     |> maybe_filter_by_version(filters[:version_id])
     |> maybe_filter_processes_by_user_id(filters[:user_id])
+    |> maybe_filter_processes_by_team_id(filters[:team_id])
     |> Repo.all()
   end
 
@@ -506,6 +507,16 @@ defmodule UserDocs.Automation do
     )
   end
 
+  defp maybe_filter_processes_by_team_id(query, nil), do: query
+  defp maybe_filter_processes_by_team_id(query, team_id) do
+    from(process in query,
+      left_join: version in assoc(process, :version),
+      left_join: project in assoc(version, :project),
+      left_join: team in assoc(project, :team),
+      where: team.id == ^team_id
+    )
+  end
+
 
   defp base_processes_query(), do: from(processes in Process)
 
@@ -523,6 +534,29 @@ defmodule UserDocs.Automation do
       ** (Ecto.NoResultsError)
 
   """
+  def get_process!(id, %{ preloads: "*"}) do
+    Repo.one! from process in Process,
+      where: process.id == ^id,
+      left_join: step in assoc(process, :steps),
+      left_join: page in assoc(step, :page),
+      left_join: screenshot in assoc(step, :screenshot),
+      left_join: step_type in assoc(step, :step_type),
+      left_join: annotation in assoc(step, :annotation),
+      left_join: annotation_type in assoc(annotation, :annotation_type),
+      left_join: element in assoc(step, :element),
+      left_join: strategy in assoc(element, :strategy),
+      preload: [
+        steps: { step,
+          page: page,
+          annotation: annotation,
+          element: element,
+          step_type: step_type,
+          process: process,
+          screenshot: screenshot,
+          annotation: { annotation, annotation_type: annotation_type }
+        }
+      ]
+  end
   def get_process!(id, params \\ %{})
   def get_process!(id, params) do
     base_process_query(id)
