@@ -46,7 +46,8 @@ defmodule UserDocs.ProcessInstances do
       attrs: %{},
       status: "not_started",
       errors: [],
-      warnings: []
+      warnings: [],
+      type: "process_instance"
     }
   end
 
