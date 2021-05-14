@@ -217,15 +217,15 @@ defmodule UserDocs.Screenshots do
       end
   end
 
-  def prepare_aws_file(%{ aws: aws, original: original, updated: updated,
+  def prepare_aws_file(%{ aws: aws_path, original: local_path, updated: updated,
     bucket: bucket, base_64: base_64, opts: opts } = state
   ) do
-    path = "screenshots/" <> aws
-    case ExAws.S3.download_file(bucket, path, original) |> ExAws.request(opts) do
-      { :ok, :done} ->
+    case ExAws.S3.download_file(bucket, aws_path, local_path) |> ExAws.request(opts) do
+      { :ok, :done } ->
         File.write(updated, Base.decode64!(base_64))
         state
-      _ -> raise("#{__MODULE__}.diff_images failed")
+      { :error, reason } -> raise("#{__MODULE__}.prepare_aws_file failed because: #{reason}")
+      _ -> raise("#{__MODULE__}.prepare_aws_file failed")
     end
   end
 
