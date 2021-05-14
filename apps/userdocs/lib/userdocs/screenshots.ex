@@ -269,6 +269,16 @@ defmodule UserDocs.Screenshots do
     end
   end
 
+  def rename_aws_object(src_path, dest_path, team) do
+    opts = aws_opts(team)
+    case ExAws.S3.put_object_copy(team.aws_bucket, dest_path, team.aws_bucket, src_path, opts) |> ExAws.request(opts) do
+      { :ok, _response } ->
+        ExAws.S3.delete_object(team.aws_bucket, src_path) |> ExAws.request(opts)
+        { :ok, dest_path }
+      e -> raise("#{__MODULE__}.rename_aws_object failed because #{inspect(e)}")
+    end
+  end
+
   def aws_opts(team) do
     [
       region: team.aws_region,
