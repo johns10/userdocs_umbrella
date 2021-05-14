@@ -4,6 +4,7 @@ defmodule UserDocsWeb.API.Resolvers.Screenshot do
   alias UserDocs.Screenshots
   alias UserDocs.Automation.Step
   alias UserDocs.Users
+  alias UserDocs.Authorization
 
   def get_screenshot!(%Step{ screenshot: %Screenshot{} = screenshot }, _args, _resolution) do
     { :ok, screenshot }
@@ -15,7 +16,7 @@ defmodule UserDocsWeb.API.Resolvers.Screenshot do
 
   def update_screenshot(_parent, %{ id: id } = args, %{ context: context }) do
     IO.puts("Update Screenshot")
-    Users.check_auths(%Screenshot{ id: id }, context) do
+    Authorization.check(%Screenshot{ id: id }, context) do
       fn() ->
         Screenshots.get_screenshot!(id)
         |> Screenshots.update_screenshot(map_base_64(args))
@@ -24,7 +25,7 @@ defmodule UserDocsWeb.API.Resolvers.Screenshot do
   end
 
   def delete_screenshot(_parent, %{ id: id }, %{ context: context }) do
-    Users.check_auths(%Screenshot{ id: id }, context) do
+    Authorization.check(%Screenshot{ id: id }, context) do
       fn() ->
         Screenshots.get_screenshot!(id)
         |> Screenshots.delete_screenshot()
@@ -33,7 +34,7 @@ defmodule UserDocsWeb.API.Resolvers.Screenshot do
   end
 
   def create_screenshot(_parent, %{ step_id: step_id } = args, %{ context: context }) do
-    Users.check_auths(%Step{ id: step_id }, context) do
+    Authorization.check(%Step{ id: step_id }, context) do
       fn() ->
         case Screenshots.create_screenshot(map_base_64(args)) do
           { :ok, initial_screenshot } -> { :ok, initial_screenshot }
