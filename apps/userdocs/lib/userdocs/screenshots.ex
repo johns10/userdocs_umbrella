@@ -181,26 +181,27 @@ defmodule UserDocs.Screenshots do
     screenshot
   end
 
-  def diff_images(%{ data: %{ aws_screenshot: nil }} = changeset, team) do
-    case Ecto.Changeset.get_change(changeset, :base_64) do
-      nil -> changeset
-      base_64 ->
-        IO.inspect("Got a base 64 image")
+  def create_aws_screenshot(%{ data: data, changes: %{ base_64: base_64 } } = changeset) do
+    case Ecto.Changeset.get_field(changeset, :step_id) do
+      nil -> throw("Screenshot has no step id")
+      step_id ->
+        team = UserDocs.Users.get_step_team!(step_id)
         contents = Base.decode64!(base_64)
-        file_name = file_name(changeset.data, :production)
+        file_name = file_name(changeset, :production)
         aws_path = put_encoded_string_in_aws_object(contents, team, path(file_name))
         Ecto.Changeset.put_change(changeset, :aws_screenshot, aws_path)
     end
   end
-  def diff_images(%{ data: %{ aws_screenshot: _aws_screenshot }} = changeset, team) do
-    case Ecto.Changeset.get_change(changeset, :base_64) do
-      nil -> changeset
-      base_64 ->
+  def update_aws_screenshot(%{ data: %{ aws_screenshot: screenshot_path }, changes: %{ base_64: base_64 } } = changeset) do
+    case Ecto.Changeset.get_field(changeset, :step_id) do
+      nil -> throw("Screenshot has no step id")
+      step_id ->
+        team = UserDocs.Users.get_step_team!(step_id)
         state = %{
-          aws: file_name(changeset.data, :production),
-          original: UUID.uuid4() <> ".png",
-          updated: UUID.uuid4() <> ".png",
-          diff: UUID.uuid4() <> ".png",
+          aws: screenshot_path,
+          original: "./tmp/" <> UUID.uuid4() <> ".png",
+          updated: "./tmp/" <> UUID.uuid4() <> ".png",
+          diff: "./tmp/" <> UUID.uuid4() <> ".png",
           opts: aws_opts(team),
           bucket: team.aws_bucket,
           base_64: base_64,
