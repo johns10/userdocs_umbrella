@@ -30,6 +30,3 @@ erl_crash.dump
 
 # Ignore any lockfiles
 mix.lock
-
-
-# Ignore certs
