@@ -3,11 +3,7 @@ defmodule UserDocsWeb.VersionPicker do
   use Phoenix.HTML
   use UserdocsWeb.LiveViewPowHelper
 
-  alias UserDocsWeb.Defaults
-
-  alias UserDocs.Users
-
-  def dropdown_trigger(assigns, name, highlight, do: block) do
+  def dropdown_trigger(assigns, name, _highlight, do: block) do
     ~L"""
       <div class="nested navbar-item dropdown">
         <div class="dropdown-trigger">
@@ -75,8 +71,8 @@ defmodule UserDocsWeb.VersionPicker do
   def update(assigns, socket) do
     current_version_name =
       case assigns.current_version do
-        %UserDocs.Projects.Version{ name: nil } = version -> "None Selected"
-        %UserDocs.Projects.Version{ name: name } = version -> name
+        %UserDocs.Projects.Version{ name: nil } = _version -> "None Selected"
+        %UserDocs.Projects.Version{ name: name } = _version -> name
         _ -> "None Selected"
       end
 
