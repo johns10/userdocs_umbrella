@@ -1,3 +1,15 @@
+css: 
+  .job-process-toggle:checked + .job-process .job-process-steps {
+    max-height: 0px;
+    overflow: hidden;
+    transition: max-height .25s ease-in-out;
+  }
+  .job-process-toggle:checked + .job-process .job-process-expanded {
+    transform: rotate(180deg);
+  }
+  .job-process-steps {
+    transition: max-height .25s ease-in-out;
+  }
 = content_tag :div, id: @id do 
   .field.has-addons   
     p.control 
@@ -16,11 +28,12 @@
       button.button 
         = link to: "#", phx_click: "reset-job",  phx_target: @myself.cid do
           = content_tag(:i, "", [class: "fa fa-refresh", aria_hidden: "true"])
-
-  aside.menu
-    ul.menu-list
-      = for item <- Jobs.get_executable_items(@job) do 
-        = render_job_item(item, @myself.cid)
         
-  = if @job == nil do
+  = if @job_id != nil do
+    aside.menu
+      ul.menu-list
+        = for item <- Jobs.get_executable_items(@job) do 
+          = render_job_item(item, @myself.cid)
+  - else 
     = link "Create Job", to: "#", phx_click: "create-job", phx_value_team_id: @team.id, phx_target: @myself.cid, class: "button"
+  
