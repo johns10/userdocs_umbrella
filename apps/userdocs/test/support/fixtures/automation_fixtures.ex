@@ -136,7 +136,7 @@ defmodule UserDocs.AutomationFixtures do
   def process_attrs(:invalid, version_id) do
     %{
       name: nil,
-      order: nil,
+      order: 1,
       version_id: version_id
     }
   end
