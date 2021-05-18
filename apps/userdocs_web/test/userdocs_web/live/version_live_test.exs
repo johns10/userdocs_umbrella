@@ -65,7 +65,7 @@ defmodule UserDocsWeb.VersionLiveTest do
 
       assert index_live
       |> form("#version-form", version: ProjectFixtures.version_attrs(:invalid, project.id, strategy.id))
-      |> render_change() =~ "can&apos;t be blank"
+      |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = ProjectFixtures.version_attrs(:valid, project.id, strategy.id)
 
@@ -90,7 +90,7 @@ defmodule UserDocsWeb.VersionLiveTest do
 
       assert index_live
       |> form("#version-form", version: ProjectFixtures.version_attrs(:invalid, project.id, strategy.id))
-      |> render_change() =~ "can&apos;t be blank"
+      |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = ProjectFixtures.version_attrs(:valid, project.id, strategy.id)
 
@@ -145,7 +145,7 @@ defmodule UserDocsWeb.VersionLiveTest do
 
       assert show_live
              |> form("#version-form", version: @invalid_attrs)
-             |> render_change() =~ "can&apos;t be blank"
+             |> render_change() =~ "can&#39;t be blank"
 
       update_attrs = Map.put(@update_attrs, :project_id, first_project_id())
 

@@ -66,7 +66,7 @@ defmodule UserDocsWeb.DocumentLiveTest do
 
       assert index_live
              |> form("#document-form", document: DocumentFixtures.document_attrs(:invalid, project.id))
-             |> render_change() =~ "can&apos;t be blank"
+             |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = DocumentFixtures.document_attrs(:valid, project.id)
 
@@ -90,7 +90,7 @@ defmodule UserDocsWeb.DocumentLiveTest do
 
       assert index_live
              |> form("#document-form", document: DocumentFixtures.document_attrs(:invalid, project.id))
-             |> render_change() =~ "can&apos;t be blank"
+             |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = DocumentFixtures.document_attrs(:valid, project.id)
 

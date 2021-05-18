@@ -136,7 +136,7 @@ defmodule UserDocsWeb.StepLiveTest do
 
       assert index_live
       |> form("#step-form", step: invalid_attrs(process.id))
-      |> render_change() =~ "can&apos;t be blank"
+      |> render_change() =~ "can&#39;t be blank"
 
       step_attrs = valid_attrs(process.id, step_type.id)
 
@@ -160,7 +160,7 @@ defmodule UserDocsWeb.StepLiveTest do
 
       assert index_live
              |> form("#step-form", step: invalid_attrs(process.id))
-             |> render_change() =~ "can&apos;t be blank"
+             |> render_change() =~ "can&#39;t be blank"
 
       {:ok, _, html} =
         index_live

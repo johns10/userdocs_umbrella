@@ -80,7 +80,7 @@ defmodule UserDocsWeb.ContentLiveTest do
 
       assert index_live
              |> form("#content-form", content: invalid_attrs(team.id))
-             |> render_change() =~ "can&apos;t be blank"
+             |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = valid_attrs(team.id)
 
@@ -104,7 +104,7 @@ defmodule UserDocsWeb.ContentLiveTest do
 
       assert index_live
              |> form("#content-form", content: invalid_attrs(team.id))
-             |> render_change() =~ "can&apos;t be blank"
+             |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = valid_attrs(team.id)
 
@@ -157,7 +157,7 @@ defmodule UserDocsWeb.ContentLiveTest do
 
       assert show_live
              |> form("#content-form", content: @invalid_attrs)
-             |> render_change() =~ "can&apos;t be blank"
+             |> render_change() =~ "can&#39;t be blank"
 
       {:ok, _, html} =
         show_live

@@ -66,7 +66,7 @@ defmodule UserDocsWeb.ProjectLiveTest do
 
       assert index_live
              |> form("#project-form", project: ProjectsFixtures.project_attrs(:invalid, team.id))
-             |> render_change() =~ "can&apos;t be blank"
+             |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = ProjectsFixtures.project_attrs(:valid, team.id)
 
@@ -90,7 +90,7 @@ defmodule UserDocsWeb.ProjectLiveTest do
 
       assert index_live
              |> form("#project-form", project: ProjectsFixtures.project_attrs(:invalid, team.id))
-             |> render_change() =~ "can&apos;t be blank"
+             |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = ProjectsFixtures.project_attrs(:valid, team.id)
 

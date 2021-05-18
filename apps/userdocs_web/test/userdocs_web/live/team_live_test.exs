@@ -63,7 +63,7 @@ defmodule UserDocsWeb.TeamLiveTest do
 
       assert index_live
       |> form("#team-form", team: UsersFixtures.team_attrs(:invalid))
-      |> render_change() =~ "can&apos;t be blank"
+      |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = UsersFixtures.team_attrs(:valid)
 
@@ -87,7 +87,7 @@ defmodule UserDocsWeb.TeamLiveTest do
 
       assert index_live
              |> form("#team-form", team: UsersFixtures.team_attrs(:invalid))
-             |> render_change() =~ "can&apos;t be blank"
+             |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = UsersFixtures.team_attrs(:valid)
 
@@ -142,7 +142,7 @@ defmodule UserDocsWeb.TeamLiveTest do
 
       assert show_live
       |> form("#team-form", team: UsersFixtures.team_attrs(:invalid))
-      |> render_change() =~ "can&apos;t be blank"
+      |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = UsersFixtures.team_attrs(:valid)
 
