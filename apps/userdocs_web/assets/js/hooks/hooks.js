@@ -76,7 +76,7 @@ Hooks.automationManager = {
     this.handleEvent("start-running", (message) => {
       window.userdocs.start(message)
     })
-    this.handleEvent("execute", (message) => { window.userdocs.execute(message.step_instance) })
+    this.handleEvent("execute", (message) => { window.userdocs.execute(message.step) })
     this.el.addEventListener("update-step-instance", (message) => {
       this.pushEventTo("#automation-manager", "update-step-instance", message.detail)
     })
