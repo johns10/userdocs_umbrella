@@ -37,7 +37,11 @@ npm-debug.log
 # this depending on your deployment strategy.
 /priv/static/
 
-
 /Mnesia.nonode@nohost/
 
 /assets/dist/
+
+# Ignore Lockfiles
+assets/yarn.lock
+assets/js/electron/yarn.lock
+assets/js/runner/yarn.lock
