@@ -7,7 +7,7 @@ defmodule UserDocsWeb.StepLive.Queuer do
     ~L"""
     <a class="navbar-item"
       id="<%= @id %>"
-      phx-click="add-step-instance"
+      phx-click="create-job-step"
       phx-value-step-id="<%= @step.id %>"
       phx-target="#automation-manager"
     >
