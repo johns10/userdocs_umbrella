@@ -1,10 +1,20 @@
 import { gql } from 'graphql-request'
 
 export interface Screenshot {
+  id?: string
   name?: string,
   base64: string,
-  order?: number
+  order?: number,
+  stepId: string
 } 
+
+export function allowedFields(screenshot: Screenshot) {
+  return {
+    id: screenshot.id,
+    stepId: screenshot.stepId,
+    base64: screenshot.base64
+  }
+}
 
 export const ALL_SCREENSHOT_FIELDS = gql`
   fragment AllScreenshotFields on Screenshot {

@@ -2,7 +2,7 @@
 import { AnnotationType } from './annotation_type'
 
 export interface Annotation {
-  id: number,
+  id: string,
   name: string,
   label: string,
   x_orientation: string,

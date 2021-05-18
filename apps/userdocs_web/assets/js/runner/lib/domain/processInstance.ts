@@ -1,35 +1,29 @@
 import { Process } from './process'
 import * as StepInstance from './stepInstance'
 import { Configuration } from '../automation/automation'
+import { gql } from 'graphql-request'
 
 export interface ProcessInstance {
-  id: number,
+  id?: string,
   order: number,
   status: string,
   name: string,
   type: string,
-  process: Process,
-  stepInstances: Array<StepInstance.StepInstance>,
-  errors: Array<Error>,
-  warnings: Array<Error>
+  process?: Process,
+  processId: string,
+  stepInstances?: Array<StepInstance.StepInstance>,
+  errors?: Array<Error>,
+  warnings?: Array<Error>,
+  startedAt?: Date,
+  finishedAt?: Date
 }
 
 export async function execute(processInstance: ProcessInstance, handlerName: string, configuration: Configuration) {
-  const statusHandlers: { [ key: string ]: Function } = {
-    "not_started": async (processInstance: ProcessInstance, handlerName: string, configuration: Configuration) => { 
-      start(processInstance)
-      return ( await run(processInstance, handlerName, configuration) )
-    },
-    "complete": async (processInstance: ProcessInstance, handlerName: string, configuration: Configuration) => { 
-      return processInstance
-    },
-    "failed": async (processInstance: ProcessInstance, handlerName: string, configuration: Configuration) => { 
-      start(processInstance)
-      return ( await run(processInstance, handlerName, configuration) )
-    }
+  const handler = async(processInstance: ProcessInstance, handlerName: string, configuration: Configuration) => { 
+    start(processInstance)
+    return ( await run(processInstance, handlerName, configuration) )
   }
 
-  const handler = statusHandlers[processInstance.status]
   try {
     return ( await handler(processInstance, handlerName, configuration) )
   } catch (error) {
@@ -47,7 +41,7 @@ function start(processInstance: ProcessInstance) {
 async function run(processInstance: ProcessInstance, handlerName: string, configuration: Configuration) {
   for(const stepInstance of processInstance.stepInstances) {
 
-    const stepInstanceHandler = (StepInstance as { [key: string]: Function })[handlerName]
+    const stepInstanceHandler = StepInstance[handlerName]
     const completedStepInstance = await stepInstanceHandler(stepInstance, configuration)
 
     if (completedStepInstance.status == 'failed') {
@@ -60,7 +54,7 @@ async function run(processInstance: ProcessInstance, handlerName: string, config
     }
   }
 
-  processInstance.status = 'success'
+  processInstance.status = 'complete'
   return processInstance
 }
 
@@ -73,3 +67,24 @@ export function stepFailedError(processInstance: ProcessInstance, stepInstance: 
   error.stack = ""
   return error
 }
+
+export function allowedFields(processInstance: ProcessInstance) {
+  var stepInstances = []
+  for(const stepInstance of processInstance.stepInstances) {
+    stepInstances.push(StepInstance.allowedFields(stepInstance))
+  } 
+  return {
+    id: processInstance.id,
+    status: processInstance.status,
+    stepInstances:  stepInstances
+  }
+}
+
+export const UPDATE_PROCESS_INSTANCE = gql `
+  mutation UpdateProcessInstance($id: ID!, $status: String!, $stepInstances: [ StepInstanceInput ] ) {
+    updateProcessInstance(id: $id, status: $status, stepInstances: $stepInstances) {
+      id
+      status
+    }
+  }
+`
