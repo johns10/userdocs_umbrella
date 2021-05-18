@@ -4,13 +4,13 @@ defmodule UserDocsWeb.API.Resolvers.Job do
 
   def get_job!(_parent, %{id: id}, _resolution) do
     IO.puts("Get job call")
-    { :ok, Jobs.get_job!(id, %{ preloads: "*" }) }
+    { :ok, Jobs.get_job!(id, %{ preloads: %{ steps: true, processes: true} }) }
   end
 
   def update_job(_parent, args, _resolution) do
     IO.puts("Update Job Call")
     IO.inspect(args)
-    job = Jobs.get_job!(args.id, %{ preloads: "*" })
+    job = Jobs.get_job!(args.id, %{ preloads: %{ steps: true, processes: true} })
     Jobs.update_job(job, args)
     |> IO.inspect()
   end
