@@ -2,10 +2,13 @@ defmodule UserDocs.Jobs.Job do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias UserDocs.Jobs.JobStep
+  alias UserDocs.Jobs.JobProcess
+  alias UserDocs.Users.Team
 
+  #Probably gets deprecated
   alias UserDocs.StepInstances.StepInstance
   alias UserDocs.ProcessInstances.ProcessInstance
-  alias UserDocs.Users.Team
 
   schema "jobs" do
     field :order, :integer
@@ -16,6 +19,9 @@ defmodule UserDocs.Jobs.Job do
 
     has_many :process_instances, ProcessInstance, on_replace: :nilify
     has_many :step_instances, StepInstance, on_replace: :nilify
+
+    has_many :job_steps, JobStep, on_delete: :delete_all
+    has_many :job_processes, JobProcess, on_delete: :delete_all
 
     belongs_to :team, Team
 
