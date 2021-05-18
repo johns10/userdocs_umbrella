@@ -3,7 +3,7 @@ defmodule UserDocs.Automation.Process.Safe do
   def apply(step, handlers \\ %{})
   def apply(process = %UserDocs.Automation.Process{}, handlers) do
     base_safe(process)
-    |> maybe_safe_steps(handlers[:steps], process.steps, handlers)
+    |> maybe_safe_steps(handlers[:step], process.steps, handlers)
   end
   def apply(nil, _), do: nil
 
@@ -15,9 +15,13 @@ defmodule UserDocs.Automation.Process.Safe do
     }
   end
 
-  defp maybe_safe_steps(step, %Ecto.Association.NotLoaded{}, _, _), do: step
-  defp maybe_safe_steps(step, nil, _, _), do: step
-  defp maybe_safe_steps(step, handler, steps, handlers) do
-    Map.put(step, :steps, handler.(steps, handlers))
+  defp maybe_safe_steps(process, _, %Ecto.Association.NotLoaded{}, _), do: process
+  defp maybe_safe_steps(process, nil, _, _), do: process
+  defp maybe_safe_steps(process, handler, steps, handlers) do
+    steps = Enum.map(steps,
+      fn(step) ->
+        handler.(step, handlers)
+      end)
+    Map.put(process, :steps, steps)
   end
 end
