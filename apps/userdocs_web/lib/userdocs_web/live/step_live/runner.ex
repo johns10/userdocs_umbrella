@@ -2,8 +2,6 @@ defmodule UserDocsWeb.StepLive.Runner do
   use UserDocsWeb, :live_component
   use Phoenix.HTML
 
-  alias UserDocs.Automation.Runner
-
   @impl true
   def mount(socket) do
     {
@@ -20,8 +18,8 @@ defmodule UserDocsWeb.StepLive.Runner do
     <a class="navbar-item has-tooltip-left"
       id="<%= @id %>-runner"
       phx-click="execute_step"
-      phx-value-step-id="<%= @step.id %>"
-      phx-target="<%= @myself.cid %>"
+      phx-value-id="<%= @step.id %>"
+      phx-target="#automation-manager"
     >
       <span class="icon">
         <%= case @status do
@@ -33,16 +31,5 @@ defmodule UserDocsWeb.StepLive.Runner do
       </span>
     </a>
     """
-  end
-
-  @impl true
-  def handle_event("execute_step", %{"step-id" => step_id}, socket) do
-    send self(), {:execute_step, %{ step_id: String.to_integer(step_id) }}
-    { :noreply, socket }
-  end
-  def handle_event("execute_step", %{ "app" => "electron", "step-id" => step_id }, socket) do
-    IO.inspect("Electron execute step #{step_id}")
-    send self(), {:execute_step, %{ step_id: String.to_integer(step_id) }}
-    { :noreply, socket }
   end
 end
