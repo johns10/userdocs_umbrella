@@ -35,6 +35,11 @@ div
       = live_component @socket, UserDocsWeb.ScreenshotLive.Approve, 
         [ id: "screenshot-approval-modal", step: @step, team: @current_team ]
 
+  .is-flex.is-justify-content-space-between
+    p.title = @process.name
+    = live_component(@socket, UserDocsWeb.ProcessLive.Runner, 
+      [ id: "process-" <> Integer.to_string(@process.id), process: @process ])
+
   aside.menu 
     p.menu-label Steps
     ul.menu-list
