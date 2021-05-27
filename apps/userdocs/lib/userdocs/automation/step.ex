@@ -27,12 +27,14 @@ defmodule UserDocs.Automation.Step do
     field :height, :integer
     field :page_reference, :string
 
-    has_one :screenshot, Screenshot
     belongs_to :page, Page, on_replace: :update
     belongs_to :process, Process
     belongs_to :element, Element, on_replace: :update
     belongs_to :annotation, Annotation, on_replace: :update
     belongs_to :step_type, StepType
+
+    has_one :screenshot, Screenshot
+    has_one :last_step_instance, StepInstance, on_replace: :nilify
 
     has_many :step_instances, StepInstance
 
@@ -45,6 +47,13 @@ defmodule UserDocs.Automation.Step do
     |> assoc_changeset()
     |> names_changeset()
     |> validate_required([:order])
+  end
+
+  def runner_changeset(step, attrs) do
+    step
+    |> cast(attrs, [])
+    |> cast_assoc(:screenshot)
+    |> cast_assoc(:last_step_instance, with: &UserDocs.StepInstances.StepInstance.changeset/2)
   end
 
   def nested_changeset(step, last_step, attrs, state, action) do
@@ -102,6 +111,7 @@ defmodule UserDocs.Automation.Step do
     |> cast_assoc(:element)
     |> cast_assoc(:annotation)
     |> cast_assoc(:page)
+    |> cast_assoc(:screenshot)
   end
 
   def names_changeset(changeset) do
