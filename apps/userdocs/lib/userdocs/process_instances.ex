@@ -41,6 +41,10 @@ defmodule UserDocs.ProcessInstances do
 
   defp base_process_instances_query(), do: from(process_instances in ProcessInstance)
 
+  def get_process_instance_by_uuid(uuid) do
+    uuid_process_instance_query(uuid)
+    |> Repo.one!()
+  end
   def get_process_instance!(id) do
     base_process_instance_query(id)
     |> Repo.one!()
@@ -90,6 +94,10 @@ defmodule UserDocs.ProcessInstances do
 
   defp base_process_instance_query(id) do
     from(process_instance in ProcessInstance, where: process_instance.id == ^id)
+  end
+
+  defp uuid_process_instance_query(uuid) do
+    from(process_instances in ProcessInstance, where: process_instances.uuid == ^uuid)
   end
 
   alias UserDocs.Automation.Process
