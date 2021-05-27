@@ -520,16 +520,6 @@ defmodule UserDocs.Users do
       where: annotation.id == ^id
   end
 
-  # TODO: Move this into base query
-  def get_step_team!(id) do
-    Repo.one from team in Team,
-      left_join: project in UserDocs.Projects.Project, on: project.team_id == team.id,
-      left_join: version in UserDocs.Projects.Version, on: version.project_id == project.id,
-      left_join: process in UserDocs.Automation.Process, on: process.version_id == version.id,
-      left_join: step in UserDocs.Automation.Step, on: step.process_id == process.id,
-      where: step.id == ^id
-  end
-
   def team_default_project(nil), do: nil
   def team_default_project(%Team{} = team) do
     try do
