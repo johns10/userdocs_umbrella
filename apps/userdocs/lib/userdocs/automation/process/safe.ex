@@ -4,6 +4,7 @@ defmodule UserDocs.Automation.Process.Safe do
   def apply(process = %UserDocs.Automation.Process{}, handlers) do
     base_safe(process)
     |> maybe_safe_steps(handlers[:step], process.steps, handlers)
+    |> maybe_safe_process_instance(handlers[:process_instance], process.last_process_instance, handlers)
   end
   def apply(nil, _), do: nil
 
@@ -23,5 +24,11 @@ defmodule UserDocs.Automation.Process.Safe do
         handler.(step, handlers)
       end)
     Map.put(process, :steps, steps)
+  end
+
+  defp maybe_safe_process_instance(process, _, %Ecto.Association.NotLoaded{}, _), do: process
+  defp maybe_safe_process_instance(process, nil, _, _), do: process
+  defp maybe_safe_process_instance(process, handler, process_instance, handlers) do
+    Map.put(process, :last_process_instance, handler.(process_instance, handlers))
   end
 end
