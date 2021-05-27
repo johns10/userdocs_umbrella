@@ -115,9 +115,8 @@ defmodule UserDocs.ProcessInstances do
 
   def base_process_instance_attrs(process, step_instance_attrs, order) do
     %{
-      order: order,
+      order: order || process.order,
       process_id: process.id,
-      process: process,
       step_instances: step_instance_attrs,
       name: process.name,
       attrs: %{},
