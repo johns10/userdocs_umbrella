@@ -4,12 +4,14 @@ defmodule UserDocs.Jobs.JobStep do
 
   alias UserDocs.Automation.Step
   alias UserDocs.Jobs.Job
+  alias UserDocs.StepInstances.StepInstance
 
   schema "job_steps" do
     field :order, :integer
 
     belongs_to :job, Job
     belongs_to :step, Step
+    belongs_to :step_instance, StepInstance
 
     timestamps()
   end
