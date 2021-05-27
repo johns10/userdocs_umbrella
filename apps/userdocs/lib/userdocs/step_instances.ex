@@ -84,34 +84,24 @@ defmodule UserDocs.StepInstances do
     from(step_instance in StepInstance, where: step_instance.uuid == ^uuid)
   end
 
-  """
-  alias UserDocs.Jobs.Job
+
   alias UserDocs.Automation.Step
-
-  def create_step_instance_from_job_and_step(%Step{} = step, %Job{} = job, order \\ 0) do
-    step_instance = Ecto.build_assoc(job, :step_instances)
-    attrs = base_step_instance_attrs(step, order)
-    create_step_instance(attrs, step_instance)
-  end
-
-  def create_step_instance_from_step(step, order \\ 0) do
+  def create_step_instance_from_step(%Step{} = step, order \\ nil) do
     attrs = base_step_instance_attrs(step, order)
     create_step_instance(attrs)
   end
 
   def base_step_instance_attrs(step, order) do
     %{
-      order: order,
+      order: order || step.order,
       step_id: step.id,
       name: step.name,
-      attrs: %{},
       status: "not_started",
       errors: [],
       warnings: [],
-      type: "step_instance"
+      type: "stepInstance"
     }
   end
-
   def create_step_instance(attrs) do
     create_step_instance(attrs, %StepInstance{})
   end
