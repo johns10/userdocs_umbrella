@@ -7,10 +7,6 @@ defmodule UserDocs.Automation do
 
   import Ecto.Query, warn: false
   alias UserDocs.Repo
-  alias UserDocs.Subscription
-
-  alias UserDocs.Documents
-  alias UserDocs.Web
   alias UserDocs.Web.Page
   alias UserDocs.Web.Annotation
   alias UserDocs.Web.Element
