@@ -128,12 +128,6 @@ defmodule UserDocs.StepInstances do
     |> Repo.update()
   end
 
-  def format_step_instance_for_export(%StepInstance{} = step_instance) do
-    step_instance
-    |> Map.put(:attrs, UserDocs.Automation.Runner.parse(step_instance.step))
-    |> Map.take(StepInstance.__schema__(:fields))
-    |> Map.put(:type, StepInstance |> to_string() |> String.split(".") |> Enum.at(-1))
-  end
 
   def delete_step_instance(%StepInstance{} = step_instance) do
     Repo.delete(step_instance)
@@ -179,3 +173,20 @@ defmodule UserDocs.StepInstances do
   end
   def count_status([], _) , do: 0
 end
+
+"""
+def format_step_instance_for_export(%StepInstance{} = step_instance) do
+  step_instance
+  |> Map.put(:attrs, UserDocs.Automation.Runner.parse(step_instance.step))
+  |> Map.take(StepInstance.__schema__(:fields))
+  |> Map.put(:type, StepInstance |> to_string() |> String.split(".") |> Enum.at(-1))
+end
+alias UserDocs.Jobs.Job
+alias UserDocs.Automation.Step
+
+def create_step_instance_from_job_and_step(%Step{} = step, %Job{} = job, order \\ 0) do
+  step_instance = Ecto.build_assoc(job, :step_instances)
+  attrs = base_step_instance_attrs(step, order)
+  create_step_instance(attrs, step_instance)
+end
+"""
