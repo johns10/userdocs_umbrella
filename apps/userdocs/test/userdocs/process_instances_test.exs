@@ -60,6 +60,17 @@ defmodule UserDocs.ProcessInstancesTest do
       :create_step
     ]
 
+    test "list_process_process_instances/1 returns only 5 process instances", %{ user: user, version: version, process: process } do
+      process_two = fixture(:process, version.id)
+      Enum.each(1..7, fn(pi) -> JobsFixtures.process_instance(process.id) end)
+      Enum.each(1..7, fn(pi) -> JobsFixtures.process_instance(process_two.id) end)
+      pis = ProcessInstances.list_user_process_instances(user.id)
+      process_one_pis = Enum.filter(pis, fn(pi) -> pi.process_id == process.id end)
+      process_two_pis = Enum.filter(pis, fn(pi) -> pi.process_id == process_two.id end)
+      assert process_one_pis |> Enum.count() == 5
+      assert process_two_pis |> Enum.count() == 5
+    end
+
     test "list_process_instance/0 returns all process instances", %{ process: process } do
       process_instance = JobsFixtures.process_instance(process.id)
       assert ProcessInstances.list_process_instances() == [ process_instance ]
@@ -68,6 +79,11 @@ defmodule UserDocs.ProcessInstancesTest do
     test "get_process_instance!/1 returns the process_instance with given id", %{ process: process } do
       process_instance = JobsFixtures.process_instance(process.id)
       assert ProcessInstances.get_process_instance!(process_instance.id) == process_instance
+    end
+
+    test "get_process_instance_by_uuid!/1 returns a process instance", %{ process: process } do
+      process_instance = JobsFixtures.process_instance(process.id)
+      assert ProcessInstances.get_process_instance_by_uuid(process_instance.uuid) == process_instance
     end
 
     test "create_process_instance/1 with valid data creates a process instance", %{ process: process } do

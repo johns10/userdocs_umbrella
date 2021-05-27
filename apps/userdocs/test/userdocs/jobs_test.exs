@@ -46,6 +46,8 @@ defmodule UserDocs.JobsTest do
 
   describe "jobs" do
     alias UserDocs.Jobs.Job
+    alias UserDocs.Jobs.JobStep
+    alias UserDocs.Jobs.JobProcess
 
     setup [
       :create_user,
@@ -63,15 +65,40 @@ defmodule UserDocs.JobsTest do
       :create_screenshot,
       :query_step
     ]
-
+"""
     test "list_job/0 returns all job instances", %{ team: team } do
       job = JobsFixtures.job(team.id)
-      assert Jobs.list_jobs() == [ job ]
+      [ result_job ] = Jobs.list_jobs() # BULLSHIT, remove
+      assert job == result_job
     end
 
     test "get_job!/1 returns the job with given id", %{ team: team } do
       job = JobsFixtures.job(team.id)
       assert Jobs.get_job!(job.id) == job
+    end
+
+    test "get_job!/1 returns the preloaded job with given id", %{ process: process, team: team } do
+      job = JobsFixtures.job(team.id)
+      process_instance_one = JobsFixtures.process_instance(process.id)
+      process_instance_two = JobsFixtures.process_instance(process.id)
+
+      { :ok, job_process_one } = Jobs.create_job_process(job, process.id, process_instance_one.id)
+      { :ok, job_process_two } = Jobs.create_job_process(job, process.id, process_instance_two.id)
+
+      job = Jobs.get_job!(job.id, %{ preloads: [ steps: true, processes: true, last_job_instance: true ]})
+
+      job_instance = UserDocs.JobInstances.create_job_instance(job)
+
+      job =
+        Jobs.get_job!(job.id, %{ preloads: [ steps: true, processes: true, last_job_instance: true ]})
+        |> Jobs.prepare_for_execution()
+
+      job.job_processes |> Enum.at(0) |> Map.get(:process) |> Map.get(:last_process_instance) |> Map.get(:id)
+      job.job_processes |> Enum.at(1) |> Map.get(:process) |> Map.get(:last_process_instance) |> Map.get(:id)
+
+      job.job_processes |> Enum.at(0) |> Map.get(:process) |> Map.get(:steps) |> Enum.at(0) |> Map.get(:last_step_instance) |> Map.get(:id)
+      job.job_processes |> Enum.at(1) |> Map.get(:process) |> Map.get(:steps) |> Enum.at(0) |> Map.get(:last_step_instance) |> Map.get(:id)
+
     end
 
     test "create_job/1 with valid data creates a job instance", %{ team: team } do
@@ -110,13 +137,195 @@ defmodule UserDocs.JobsTest do
       assert %Ecto.Changeset{} = Jobs.change_job(job)
     end
 
+    test "create_job_step/2 adds a step to the job", %{ team: team, step: step } do
+      job = JobsFixtures.job(team.id)
+      { :ok, job_step } = Jobs.create_job_step(job, step.id)
+      job = Jobs.get_job!(job.id, %{ preloads: [ steps: true ] })
+      assert job.job_steps |> Enum.at(0) |> Map.get(:step) |> Map.get(:id) == step.id
+    end
+
+    test "create_job_process/2 adds a process to the job", %{ team: team, process: process } do
+      job = JobsFixtures.job(team.id)
+      { :ok, job_process } = Jobs.create_job_process(job, process.id)
+      job = Jobs.get_job!(job.id, %{ preloads: [ processes: true ] })
+      assert job.job_processes |> Enum.at(0) |> Map.get(:process) |> Map.get(:id) == process.id
+    end
+
+    test "delete_job_step/2 deletes a step from the job", %{ team: team, step: step } do
+      job = JobsFixtures.job(team.id)
+      { :ok, job_step } = Jobs.create_job_step(job, step.id)
+      assert { :ok, %JobStep{}} = Jobs.delete_job_step(job_step)
+      assert_raise Ecto.NoResultsError, fn -> Jobs.get_job_step!(job_step.id) end
+      job = Jobs.get_job!(job.id, %{ preloads: [ steps: true ] })
+      assert job.job_steps == []
+    end
+
+    test "delete_job_process/2 deletes a process from the job", %{ team: team, process: process } do
+      job = JobsFixtures.job(team.id)
+      { :ok, job_process } = Jobs.create_job_process(job, process.id)
+      assert { :ok, %JobProcess{}} = Jobs.delete_job_process(job_process)
+      assert_raise Ecto.NoResultsError, fn -> Jobs.get_job_process!(job_process.id) end
+      job = Jobs.get_job!(job.id, %{ preloads: [ processes: true ] })
+      assert job.job_processes == []
+    end
+
+    test "expand_job_process/2 expands the instance", %{ team: team, process: process } do
+      job = JobsFixtures.job(team.id)
+      { :ok, job_process } = Jobs.create_job_process(job, process.id)
+      job = Jobs.get_job!(job.id, %{ preloads: %{ processes: true }})
+      { :ok, job } = Jobs.expand_job_process(job, process.id)
+      assert job.job_processes |> Enum.at(0) |> Map.get(:collapsed) == true
+    end
+    test "export_job/1 exports stuff in the right order", %{ team: team, step: step, process: process } do
+      job = JobsFixtures.job(team.id)
+
+      { :ok, job_step1 } = Jobs.create_job_step(job, step.id)
+      { :ok, job_process2 } = Jobs.create_job_process(job, process.id)
+      { :ok, job_process3 } = Jobs.create_job_process(job, process.id)
+      { :ok, job_step4 } = Jobs.create_job_step(job, step.id)
+      { :ok, job_step5 } = Jobs.create_job_step(job, step.id)
+
+      job = Jobs.get_job!(job.id, %{ preloads: %{ processes: true, steps: true }})
+
+      result = Jobs.export_job(job)
+      job_steps = Enum.map(result.job_steps, fn(job_step) -> %{ id: job_step.id, order: job_step.order } end)
+      job_processes = Enum.map(result.job_processes, fn(job_process) -> %{ id: job_process.id, order: job_process.order } end)
+
+      assert job_steps == [
+          %{ id: job_step1.id, order: 1 },
+          %{ id: job_step4.id, order: 4 },
+          %{ id: job_step5.id, order: 5 },
+        ]
+
+      assert job_processes = [
+        %{ id: job_process2.id, order: 2 },
+        %{ id: job_process3.id, order: 3 },
+      ]
+    end
+
+    test "prepare_job_for_execution/2 attaches the instances correctly", %{ page: page, version: version, team: team, step: step, process: process } do
+      process_two = AutomationFixtures.process(version.id)
+      step_two = AutomationFixtures.step(page.id, process.id)
+      step_three = AutomationFixtures.step(page.id, process_two.id)
+      step_four = AutomationFixtures.step(page.id, process_two.id)
+      step_five = AutomationFixtures.step()
+      step_six = AutomationFixtures.step()
+      job = JobsFixtures.job(team.id)
+
+      process = UserDocs.AutomationManager.get_process!(process.id)
+      process_two = UserDocs.AutomationManager.get_process!(process_two.id)
+
+      { :ok, process_instance_one } =
+        process
+        |> UserDocs.ProcessInstances.create_process_instance_from_process(Jobs.max_order(job) + 1)
+
+      { :ok, process_instance_two } =
+        process_two
+        |> UserDocs.ProcessInstances.create_process_instance_from_process(Jobs.max_order(job) + 1)
+
+      { :ok, job_process } = Jobs.create_job_process(job, process.id, process_instance_one.id)
+      { :ok, job_process } = Jobs.create_job_process(job, process_two.id, process_instance_two.id)
+
+
+      { :ok, job_step } = Jobs.create_job_step(job, step.id)
+      { :ok, job_step } = Jobs.create_job_step(job, step.id)
+      { :ok, job_step } = Jobs.create_job_step(job, step_five.id)
+      { :ok, job_step } = Jobs.create_job_step(job, step_six.id)
+
+      job = Jobs.get_job!(job.id, %{ preloads: [ processes: true, steps: true ] })
+      { :ok, job_instance } = UserDocs.JobInstances.create_job_instance(job)
+      job = Jobs.get_job!(job.id, %{ preloads: [ steps: true, processes: true, last_job_instance: true ]})
+      job = Jobs.prepare_for_execution(job)
+
+
+      first_process_process_instance = job.job_processes |> Enum.at(0) |> Map.get(:process) |> Map.get(:last_process_instance)
+      first_process_instance = job_instance.process_instances |> Enum.at(0)
+      second_process_process_instance = job.job_processes |> Enum.at(1) |> Map.get(:process) |> Map.get(:last_process_instance)
+      second_process_instance = job_instance.process_instances |> Enum.at(1)
+
+      assert first_process_process_instance == first_process_instance
+      assert second_process_process_instance == second_process_instance
+
+      step_one_one_step_instance = job.job_processes |> Enum.at(0) |> Map.get(:process) |> Map.get(:steps) |> Enum.at(0) |> Map.get(:last_step_instance)
+      step_instance_one_one = job_instance.process_instances |> Enum.at(0) |> Map.get(:step_instances) |> Enum.at(0)
+
+      assert step_one_one_step_instance == step_instance_one_one
+
+      step_one_two_step_instance = job.job_processes |> Enum.at(0) |> Map.get(:process) |> Map.get(:steps) |> Enum.at(1) |> Map.get(:last_step_instance)
+      step_instance_one_two = job_instance.process_instances |> Enum.at(0) |> Map.get(:step_instances) |> Enum.at(1)
+
+      assert step_one_two_step_instance == step_instance_one_two
+
+      step_two_one_step_instance = job.job_processes |> Enum.at(1) |> Map.get(:process) |> Map.get(:steps) |> Enum.at(0) |> Map.get(:last_step_instance)
+      step_instance_two_one = job_instance.process_instances |> Enum.at(1) |> Map.get(:step_instances) |> Enum.at(0)
+
+      assert step_two_one_step_instance == step_instance_two_one
+
+      step_two_two_step_instance = job.job_processes |> Enum.at(0) |> Map.get(:process) |> Map.get(:steps) |> Enum.at(1) |> Map.get(:last_step_instance)
+      step_instance_two_two = job_instance.process_instances |> Enum.at(0) |> Map.get(:step_instances) |> Enum.at(1)
+
+      assert step_two_two_step_instance == step_instance_two_two
+
+      { :ok, process_instance_three } =
+        process
+        |> UserDocs.ProcessInstances.create_process_instance_from_process(Jobs.max_order(job) + 1)
+
+      { :ok, process_instance_four } =
+        process_two
+        |> UserDocs.ProcessInstances.create_process_instance_from_process(Jobs.max_order(job) + 1)
+
+      { :ok, job_process } = Jobs.create_job_process(job, process.id, process_instance_three.id)
+      { :ok, job_process } = Jobs.create_job_process(job, process_two.id, process_instance_four.id)
+
+      job = Jobs.get_job!(job.id, %{ preloads: [ steps: true, processes: true, last_job_instance: true ]})
+      job = Jobs.prepare_for_execution(job)
+
+
+    end
+"""
+    test "update_job_step_instance/2 updates the job", %{ team: team, step: step, process: process } do
+      job = JobsFixtures.job(team.id)
+      process = UserDocs.AutomationManager.get_process!(process.id)
+      job = Jobs.get_job!(job.id, %{ preloads: [ steps: true, processes: true, last_job_instance: true ]})
+      job_instance = UserDocs.JobInstances.create_job_instance(job)
+      { :ok, process_instance } =
+        UserDocs.ProcessInstances.create_process_instance_from_process(process, Jobs.max_order(job) + 1)
+
+      { :ok, job_process } = Jobs.create_job_process(job, process.id, process_instance.id)
+
+      job =
+        Jobs.get_job!(job.id, %{ preloads: [ steps: true, processes: true, last_job_instance: true ]})
+        |> Jobs.prepare_for_execution()
+
+      step_instance =
+        job.job_processes
+        |> Enum.at(0)
+        |> Map.get(:process)
+        |> Map.get(:steps)
+        |> Enum.at(0)
+        |> Map.get(:last_step_instance)
+        |> Map.put(:status, "complete")
+
+      job = Jobs.update_job_step_instance(job, step_instance)
+
+      assert job.job_processes
+        |> Enum.at(0)
+        |> Map.get(:process)
+        |> Map.get(:steps)
+        |> Enum.at(0)
+        |> Map.get(:last_step_instance)
+        |> Map.get(:status)
+        == "complete"
+    end
+
+    """
+    Deprecated
     test "add_step_instance_to_job/2 adds a step instance to the queue", %{ team: team, step: step } do
       job = JobsFixtures.job(team.id)
       job = Jobs.get_job!(job.id, %{ preloads: %{ step_instances: true, process_instances: true }})
       { :ok, job } = Jobs.add_step_instance_to_job(job, step.id)
       assert job.step_instances |> Enum.at(0) |> Map.get(:job_id) == job.id
     end
-
     test "add_process_instance_to_job/2 adds a process instance to the queue", %{ team: team, process: process } do
       job = JobsFixtures.job(team.id)
       job = Jobs.get_job!(job.id, %{ preloads: %{ step_instances: true, process_instances: true }})
@@ -144,15 +353,7 @@ defmodule UserDocs.JobsTest do
       assert job.process_instances == []
       assert_raise Ecto.NoResultsError, fn -> UserDocs.ProcessInstances.get_process_instance!(process_instance.id) end
     end
-
-    test "expand_process_instance/2 expands the instance", %{ team: team, process: process } do
-      job = JobsFixtures.job(team.id)
-      process_instance = JobsFixtures.process_instance(process.id, job.id)
-      job = Jobs.get_job!(job.id, %{ preloads: %{ process_instances: true }})
-      { :ok, job } = Jobs.expand_process_instance(job, process_instance.id)
-      assert job.process_instances |> Enum.at(0) |> Map.get(:expanded) == true
-    end
-
+    Deprecated
     test "clear_job_status/1 sets all process and step instances status to not_started", %{ team: team, step: step, process: process } do
       job = JobsFixtures.job(team.id)
       { :ok, process_instance } =
@@ -179,24 +380,6 @@ defmodule UserDocs.JobsTest do
       assert job.process_instances |> Enum.at(0) |> Map.get(:step_instances) |> Enum.at(0) |> Map.get(:status) == "not_started"
       assert job.step_instances |> Enum.at(0) |> Map.get(:status) == "not_started"
     end
-
-    test "export_job/1 exports stuff in the right order", %{ team: team, step: step, process: process } do
-      job = JobsFixtures.job(team.id)
-      pi1 = JobsFixtures.process_instance(process.id, job.id) |> Map.put(:process, process) |> Map.put(:order, 1)
-      si1 = JobsFixtures.step_instance(step.id, nil, pi1.id) |> Map.put(:step, step)
-      si2 = JobsFixtures.step_instance(step.id, nil, pi1.id) |> Map.put(:step, step)
-      pi2 = JobsFixtures.process_instance(process.id, job.id) |> Map.put(:process, process) |> Map.put(:order, 2)
-      si3 = JobsFixtures.step_instance(step.id, nil, pi2.id) |> Map.put(:step, step)
-      si4 = JobsFixtures.step_instance(step.id, nil, pi2.id) |> Map.put(:step, step)
-      pi1 = Map.put(pi1, :step_instances, [ si1, si2 ])
-      pi2 = Map.put(pi2, :step_instances, [ si3, si4 ])
-      job =
-        Jobs.get_job!(job.id, %{ preloads: %{ step_instances: true }})
-        |> Map.put(:process_instances, [ pi1, pi2 ])
-        |> Map.put(:step_instances, [])
-
-      queue = Jobs.export_job(job)
-      assert queue |> Enum.at(1) |> Map.get(:process_instance_id) == pi1.id
-    end
+    """
   end
 end
