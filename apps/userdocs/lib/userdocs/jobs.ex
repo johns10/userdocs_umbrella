@@ -203,89 +203,11 @@ defmodule UserDocs.Jobs do
   end
 
   alias UserDocs.Jobs.JobInstance
-  def prepare_for_execution(
-    %Job{ job_processes: job_processes, job_steps: job_steps, last_job_instance:
-      %JobInstance{ process_instances: process_instances, step_instances: step_instances } = job_instance } = job
-  ) do
-    log_string = "
-      Preparing a job for execution.  There are #{Enum.count(job_processes)} processes on the job.  There are
-      #{Enum.count(process_instances)} process instances on the job instance.  If those don't match, there will
-      be some new process instances created.  Similarly, there are #{Enum.count(job_steps)} job steps on the job.
-      There are #{Enum.count(step_instances)} on the job.  If those don't match, there will be some new step instances
-      created.
-    "
-    """
-    Logger.info(log_string)
-    job_processes = zip_job_processes([], job_processes, process_instances, job_instance.id)
-    job_steps = zip_job_steps([], job_steps, step_instances)
-
-    job
-    |> Map.put(:job_processes, job_processes)
-    |> Map.put(:job_steps, job_steps)
-    """
-    Enum.each(job_processes, fn(jp) -> IO.inspect(jp) end)
-    job
-  end
-  def prepare_for_execution(%Job{ last_job_instance: nil } = job), do: job
   alias UserDocs.Jobs.JobProcess
-  def zip_job_processes(result,
-    [ %JobProcess{} = job_process | job_processes_tail ] = job_processes,
-    [ %ProcessInstance{} = process_instance | process_instances_tail ] = process_instances,
-    job_instance_id
-  ) do
-    #IO.inspect("zip_job_processes list")
-    case job_process.process.id == process_instance.process_id do
-      false ->
-        #IO.inspect("zip_job_processes list false")
-        tail = zip_job_processes(result, job_processes_tail, process_instances, job_instance_id)
-        [ put_new_process_instance(job_process, job_instance_id) | tail ]
-      true ->
-        #IO.inspect("zip_job_processes list true")
-        tail = zip_job_processes(result, job_processes_tail, process_instances_tail, job_instance_id)
-        [ match_job_process(job_process, process_instance ) | tail ]
-    end
-  end
-  def zip_job_processes(result,
-    [ %JobProcess{} = job_process ],
-    [ %ProcessInstance{} = process_instance ],
-    job_instance_id
-  ) do
-    #IO.inspect("zip_job_processes single")
-    case job_process.process.id == process_instance.process_id do
-      false -> raise("Last processes don't match in zip_job_processes")
-      true -> [ match_job_process(job_process, process_instance ) | result ]
-    end
-  end
-  def zip_job_processes(result,
-    [] = job_processes,
-    [ %ProcessInstance{} = process_instance| process_instances_tail ],
-    job_instance_id
-  ) do
-    #IO.inspect("zip_job_processes extra process instances")
-    tail = zip_job_processes(result, job_processes, process_instances_tail, job_instance_id)
-    { :ok, _ } = delete_process_instance(process_instance)
-    tail
-  end
-  def zip_job_processes(result,
-    [],
-    [ %ProcessInstance{} = process_instance ],
-    job_instance_id
-  ) do
-    #IO.inspect("zip_job_processes extra process instances")
-    { :ok, _ } = delete_process_instance(process_instance)
-    result
-  end
-  def zip_job_processes(result,
-    [ %JobProcess{} = job_process | job_processes_tail ],
-    [] = process_instances, job_instance_id
-  ) do
-    #IO.inspect("zip_job_processes extra process")
-    tail = zip_job_processes(result, job_processes_tail, process_instances, job_instance_id)
-    [ put_new_process_instance(job_process, job_instance_id) | tail ]
-  end
-  def zip_job_processes(result, [], [], job_instance_id) do
-    result
-  end
+  alias UserDocs.ProcessInstances.ProcessInstance
+  alias UserDocs.StepInstances.StepInstance
+  alias UserDocs.Automation.Step
+  alias UserDocs.Automation.Process
 
   def put_new_process_instance(%JobProcess{} = job_process, job_instance_id) do
     IO.puts("put_new_process_instance")
