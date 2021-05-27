@@ -381,6 +381,16 @@ defmodule UserDocs.Automation do
     |> Repo.update()
   end
 
+  def put_blank_step_instance(%Step{} = step, process_instance_id \\ nil) do
+    attrs = %{ status: "not_started", step_id: step.id, name: step.name, order: step.order, process_instance_id: process_instance_id }
+    { :ok, step_instance } = UserDocs.StepInstances.create_step_instance(attrs)
+    Map.put(step, :last_step_instance, step_instance)
+  end
+
+  def clear_last_step_instance(%Step{} = step) do
+    Map.put(step, :last_step_instance, nil)
+  end
+
   def new_step_element(step, changeset) do
     new_step_nested_object(step, changeset, :element_id, :element, %Element{})
   end
