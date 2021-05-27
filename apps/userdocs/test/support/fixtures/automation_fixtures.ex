@@ -96,6 +96,7 @@ defmodule UserDocs.AutomationFixtures do
   def step_attrs(attr_types, page_id \\ nil, process_id \\ nil, element_id \\ nil, annotation_id \\ nil, step_type_id \\ nil)
   def step_attrs(:valid, page_id, process_id, element_id, annotation_id, step_type_id) do
     %{
+      name: UUID.uuid4(),
       order: Enum.random(1..100),
       page_id: page_id,
       process_id: process_id,

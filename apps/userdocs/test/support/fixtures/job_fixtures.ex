@@ -3,6 +3,7 @@ defmodule UserDocs.JobsFixtures do
   alias UserDocs.Jobs
   alias UserDocs.StepInstances
   alias UserDocs.ProcessInstances
+  alias UserDocs.JobInstances
 
   def step_instance(step_id \\ nil, job_id \\ nil, process_instance_id \\ nil) do
     {:ok, step_instance } =
@@ -15,6 +16,7 @@ defmodule UserDocs.JobsFixtures do
   def step_instance_attrs(_type, step_id \\ nil, job_id \\ nil, process_instance_id \\ nil)
   def step_instance_attrs(:valid, step_id, job_id, process_instance_id) do
     %{
+      uuid: UUID.uuid4(),
       order: 1,
       status: "not_started",
       name: UUID.uuid4(),
@@ -27,6 +29,7 @@ defmodule UserDocs.JobsFixtures do
   end
   def step_instance_attrs(:invalid, step_id, job_id, process_instance_id) do
     %{
+      uuid: nil,
       order: nil,
       status: nil,
       name: nil,
@@ -47,8 +50,9 @@ defmodule UserDocs.JobsFixtures do
   end
 
   def process_instance_attrs(status, process_id \\ nil, job_id \\ nil)
-  def process_instance_attrs(:valid, process_id, job_id) do
+  def process_instance_attrs(:valid, process_id, job_instance_id) do
     %{
+      uuid: UUID.uuid4(),
       order: 1,
       status: "not_started",
       name: UUID.uuid4(),
@@ -56,11 +60,12 @@ defmodule UserDocs.JobsFixtures do
       warnings: [],
       expanded: false,
       process_id: process_id,
-      job_id: job_id
+      job_instance_id: job_instance_id
     }
   end
-  def process_instance_attrs(:invalid, process_id, job_id) do
+  def process_instance_attrs(:invalid, process_id, job_instance_id) do
     %{
+      uuid: nil,
       order: nil,
       status: nil,
       name: nil,
@@ -68,7 +73,7 @@ defmodule UserDocs.JobsFixtures do
       warnings: [],
       expanded: false,
       process_id: process_id,
-      job_id: job_id
+      job_instance_id: job_instance_id
     }
   end
 
@@ -98,6 +103,36 @@ defmodule UserDocs.JobsFixtures do
       name: nil,
       errors: %{},
       warnings: []
+    }
+  end
+
+  def job_instance(job_id \\ nil) do
+    {:ok, job_instance } =
+      job_instance_attrs(:valid, job_id)
+      |> JobInstances.create_job_instance()
+
+    job_instance
+  end
+
+  def job_instance_attrs(_type, job_id \\ nil)
+  def job_instance_attrs(:valid, job_id) do
+    %{
+      order: 1,
+      status: "not_started",
+      name: UUID.uuid4(),
+      errors: [],
+      warnings: [],
+      job_id: job_id
+    }
+  end
+  def job_instance_attrs(:invalid, job_id) do
+    %{
+      order: nil,
+      status: nil,
+      name: nil,
+      errors: [],
+      warnings: [],
+      job_id: job_id
     }
   end
 end
