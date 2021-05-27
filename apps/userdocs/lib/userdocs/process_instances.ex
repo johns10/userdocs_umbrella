@@ -7,9 +7,36 @@ defmodule UserDocs.ProcessInstances do
   alias UserDocs.StepInstances
   alias UserDocs.ProcessInstances.ProcessInstance
 
-  def list_process_instances() do
+  def load_user_process_instances(state, opts) do
+    user_id = opts[:filters].user_id
+    process_instances = list_user_process_instances(user_id)
+    StateHandlers.load(state, process_instances, ProcessInstance, opts)
+  end
+
+  def list_process_instances(params \\ %{}) do
+    _filters = Map.get(params, :filters, [])
     base_process_instances_query()
     |> Repo.all()
+  end
+
+  alias UserDocs.Users.User
+  def list_user_process_instances(user_id) do
+    from(u in User, as: :user)
+    |> join(:left, [ user: u ], t in assoc(u, :teams), as: :teams)
+    |> join(:left, [ teams: t ], p in assoc(t, :projects), as: :projects)
+    |> join(:left, [ projects: p ], v in assoc(p, :versions), as: :versions)
+    |> join(:left, [ versions: v ], p in assoc(v, :processes), as: :processes)
+    |> join(:inner_lateral, [ processes: p ], pi in subquery(five_process_instances_subquery()), as: :process_instances)
+    |> where([user: u], u.id == ^user_id)
+    |> select([process_instances: pi], %ProcessInstance{
+        id: pi.id, order: pi.order, status: pi.status, name: pi.name, type: pi.type,
+        errors: pi.errors, warnings: pi.warnings, process_id: pi.process_id
+      })
+    |> Repo.all()
+  end
+
+  def five_process_instances_subquery() do
+    from pi in ProcessInstance, where: parent_as(:processes).id == pi.process_id, limit: 5, order_by: [ desc: pi.id ]
   end
 
   defp base_process_instances_query(), do: from(process_instances in ProcessInstance)
