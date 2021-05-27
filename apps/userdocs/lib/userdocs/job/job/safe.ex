@@ -5,6 +5,7 @@ defmodule UserDocs.Jobs.Job.Safe do
     base_safe(job)
     |> maybe_safe_job_steps(handlers[:job_step], job.job_steps, handlers)
     |> maybe_safe_job_processes(handlers[:job_process], job.job_processes, handlers)
+    |> maybe_safe_job_instance(handlers[:job_instance], job.last_job_instance, handlers)
   end
   def apply(nil, _), do: nil
 
@@ -35,5 +36,10 @@ defmodule UserDocs.Jobs.Job.Safe do
       end)
 
     Map.put(job, :job_processes, job_processes)
+  end
+
+  defp maybe_safe_job_instance(job, nil, _, _), do: job
+  defp maybe_safe_job_instance(job, handler, job_instance, handlers) do
+    Map.put(job, :last_job_instance, handler.(job_instance, handlers))
   end
 end
