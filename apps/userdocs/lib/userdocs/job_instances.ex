@@ -84,7 +84,6 @@ defmodule UserDocs.JobInstances do
 
         { :ok, step_instance } = UserDocs.StepInstances.create_step_instance(step_instance_attrs)
 
-        #TODO: this can be factored out later, and should
         job_step_attrs = %{ step_instance_id: step_instance.id, order: job_step.order }
         { :ok, _job_step } = UserDocs.Jobs.update_job_step(job_step, job_step_attrs)
 
@@ -104,7 +103,6 @@ defmodule UserDocs.JobInstances do
 
         { :ok, process_instance } = UserDocs.ProcessInstances.create_process_instance(process_instance_attrs)
 
-        #TODO: this can be factored out later, and should
         job_process_attrs = %{ process_instance_id: process_instance.id, order: job_process.order }
         { :ok, _job_process } = UserDocs.Jobs.update_job_process(job_process, job_process_attrs)
 
