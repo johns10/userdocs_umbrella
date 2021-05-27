@@ -136,13 +136,6 @@ defmodule UserDocs.ProcessInstances do
     |> Repo.insert()
   end
 
-  def toggle_process_instance_expanded(%ProcessInstance{ expanded: nil } = process_instance) do
-    update_process_instance(process_instance, %{ expanded: true })
-  end
-  def toggle_process_instance_expanded(%ProcessInstance{} = process_instance) do
-    update_process_instance(process_instance, %{ expanded: not process_instance.expanded })
-  end
-
   def update_process_instance(%ProcessInstance{} = process_instance, attrs) do
     process_instance
     |> ProcessInstance.changeset(attrs)
@@ -191,23 +184,11 @@ defmodule UserDocs.ProcessInstances do
     ++ [ complete_attrs ]
   end
 
-  def step_instance_attrs(process) do
-    { step_instance_attrs, _max_order } =
-      process.steps
-      |> Enum.sort(fn(x, y) -> x.order < y.order end)
-      |> Enum.reduce({ [], 1 },
-        fn(step, { acc, inner_order }) ->
-          { [ StepInstances.base_step_instance_attrs(step, inner_order) | acc ], inner_order + 1 }
-        end)
-
-    Enum.reverse(step_instance_attrs)
+    def toggle_process_instance_expanded(%ProcessInstance{ expanded: nil } = process_instance) do
+      update_process_instance(process_instance, %{ expanded: true })
+  end
+    def toggle_process_instance_expanded(%ProcessInstance{} = process_instance) do
+      update_process_instance(process_instance, %{ expanded: not process_instance.expanded })
   end
 
-  def delete_process_instance(%ProcessInstance{} = process_instance) do
-    Repo.delete(process_instance)
-  end
-
-  def change_process_instance(%ProcessInstance{} = process_instance, attrs \\ %{}) do
-    ProcessInstance.changeset(process_instance, attrs)
-  end
-end
+"""
