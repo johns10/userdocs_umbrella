@@ -63,27 +63,12 @@ defmodule UserDocs.Jobs do
     |> join(:left, [job: j], jp in assoc(j, :job_processes), as: :job_processes)
     |> join(:left, [job_processes: jp], jp in assoc(jp, :process), as: :processes)
     |> order_by([job_processes: jp], asc: jp.order)
-    |> join(:left, [processes: p], step in assoc(p, :steps), as: :jp_steps)
-    |> order_by([jp_steps: s], asc: s.order)
-    |> join(:left, [jp_steps: s], st in assoc(s, :step_type), as: :jp_step_type)
-    |> join(:left, [jp_steps: s], a in assoc(s, :annotation), as: :jp_annotation)
-    |> join(:left, [jp_steps: s], p in assoc(s, :page), as: :jp_page)
-    |> join(:left, [jp_steps: s], e in assoc(s, :element), as: :jp_element)
-    |> join(:left, [jp_steps: s], pr in assoc(s, :screenshot), as: :jp_screenshot)
-    |> join(:left, [jp_steps: s], pr in assoc(s, :process), as: :jp_process)
-    |> join(:left, [jp_element: e], st in assoc(e, :strategy), as: :jp_strategy)
-    |> join(:left, [jp_annotation: a ], at in assoc(a, :annotation_type), as: :jp_annotation_type)
-    |> preload([ job_processes: jp, processes: p, jp_steps: s, jp_step_type: st, jp_element: e, jp_strategy: strategy,
-        jp_annotation: a, jp_annotation_type: at, jp_page: page, jp_process: process, jp_screenshot: screenshot ],
+    |> preload([ job_processes: jp, processes: p ],
       [ job_processes: { jp,
+        process_instance: ^preload_process_instance(),
           process: { p, [
-            steps: { s, [
-              step_type: st,
-              element: { e, strategy: strategy },
-              annotation: { a, annotation_type: at },
-              page: page,
-              process: process,
-              screenshot: screenshot ]} ]} } ])
+          steps: ^preload_steps_query()
+      ]} } ])
   end
 
   defp maybe_preload_last_job_instance(query, nil), do: query
@@ -91,22 +76,52 @@ defmodule UserDocs.Jobs do
     from(job in query, preload: [ last_job_instance: ^preload_last_job_instance_query() ])
   end
 
+  defp preload_process_instance() do
+    from(process_instance in UserDocs.ProcessInstances.ProcessInstance)
+    |> order_by(asc: :order)
+    |> preload([ step_instances: ^preload_step_instances_query() ])
+  end
+
   defp preload_last_job_instance_query() do
-    from(job_instance in UserDocs.Jobs.JobInstance, as: :job_instance)
-    |> order_by([ job_instance: ji], desc: ji.id)
-    |> limit([ job_instance: ji ], 1)
-    |> preload([ step_instances: ^preload_step_instances_query(), process_instances: ^preload_process_instances_query ])
+    from(job_instance in UserDocs.Jobs.JobInstance)
+    |> order_by(desc: :id)
+    |> limit(1)
+    |> preload([
+      step_instances: ^preload_step_instances_query(),
+      process_instances: ^preload_process_instances_query
+    ])
   end
 
   defp preload_process_instances_query() do
-    from(process_instances in UserDocs.ProcessInstances.ProcessInstance, as: :process_instances)
-    |> order_by([ process_instances: pi], asc: pi.order)
+    from(process_instances in UserDocs.ProcessInstances.ProcessInstance)
+    |> order_by(asc: :order)
     |> preload([ step_instances: ^preload_step_instances_query() ])
   end
 
   defp preload_step_instances_query() do
-    from(step_instances in UserDocs.StepInstances.StepInstance, as: :step_instances)
-    |> order_by([ step_instances: si], asc: si.order)
+    from(step_instances in UserDocs.StepInstances.StepInstance)
+    |> order_by(asc: :order)
+  end
+
+  defp preload_steps_query() do
+    from(step in UserDocs.Automation.Step, as: :steps)
+    |> order_by([steps: s], asc: s.order)
+    |> join(:left, [steps: s], st in assoc(s, :step_type), as: :step_type)
+    |> join(:left, [steps: s], a in assoc(s, :annotation), as: :annotation)
+    |> join(:left, [steps: s], p in assoc(s, :page), as: :page)
+    |> join(:left, [steps: s], e in assoc(s, :element), as: :element)
+    |> join(:left, [steps: s], sc in assoc(s, :screenshot), as: :screenshot)
+    |> join(:left, [steps: s], pr in assoc(s, :process), as: :process)
+    |> join(:left, [element: e], st in assoc(e, :strategy), as: :strategy)
+    |> join(:left, [annotation: a ], at in assoc(a, :annotation_type), as: :annotation_type)
+    |> preload([ step_type: step_type ], [ step_type: step_type ])
+    |> preload([ annotation: annotation ], [ annotation: annotation ])
+    |> preload([ page: page ], [ page: page ])
+    |> preload([ element: element ], [ element: element ])
+    |> preload([ screenshot: screenshot ], [ screenshot: screenshot ])
+    |> preload([ process: process ], [ process: process ])
+    |> preload([ annotation: a, annotation_type: at ], [ annotation: { a, annotation_type: at } ])
+    |> preload([ element: e, strategy: st ], [ element: { e, strategy: st } ])
   end
 
   defp base_jobs_query(), do: from(jobs in Job, as: :job)
