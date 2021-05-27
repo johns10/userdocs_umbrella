@@ -210,6 +210,28 @@ defmodule StateHandlersTest do
       StateHandlers.preload(state, data, opts[:preloads], opts)
     end
 
+    test "StateHandlers.Preload limits nested relationships" do
+      opts = [ data_type: :list, strategy: :by_type, location: :data,
+        preloads: [
+          :documents,
+          [ documents: :document_versions ],
+          ],
+        limit: [
+          1,
+          documents: 1,
+          documents: [ document_versions: 1 ]
+        ]
+      ]
+      state = StateFixtures.state(opts)
+      data = StateHandlers.list(state, Project, opts)
+      result = StateHandlers.preload(state, data, opts[:preloads], opts)
+      documents = result |> Enum.at(0) |> Map.get(:documents)
+      document_versions = documents |> Enum.at(0) |> Map.get(:document_versions)
+      assert Enum.count(result) == 1
+      assert Enum.count(documents) == 1
+      assert Enum.count(document_versions) == 1
+    end
+
     test "StateHandlers.Preload ignores nested ordering for invalid preloads" do
       opts = [ data_type: :list, strategy: :by_type, location: :data,
         preloads: [ :document_versions ],
