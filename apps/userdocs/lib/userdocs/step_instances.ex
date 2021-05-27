@@ -28,6 +28,10 @@ defmodule UserDocs.StepInstances do
 
   defp base_step_instances_query(), do: from(step_instances in StepInstance)
 
+  def get_step_instance_by_uuid(id) do
+    uuid_step_instance_query(id)
+    |> Repo.one!()
+  end
   def get_step_instance!(id) do
     base_step_instance_query(id)
     |> Repo.one!()
@@ -76,6 +80,11 @@ defmodule UserDocs.StepInstances do
     from(step_instance in StepInstance, where: step_instance.id == ^id)
   end
 
+  defp uuid_step_instance_query(uuid) do
+    from(step_instance in StepInstance, where: step_instance.uuid == ^uuid)
+  end
+
+  """
   alias UserDocs.Jobs.Job
   alias UserDocs.Automation.Step
 
