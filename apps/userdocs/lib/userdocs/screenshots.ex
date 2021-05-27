@@ -90,7 +90,18 @@ defmodule UserDocs.Screenshots do
   @doc """
   Creates a screenshot.
   """
-  def create_screenshot(attrs \\ %{}) do
+  def create_screenshot(attrs \\ %{})
+  def create_screenshot(%{ step_id: step_id, base_64: _ } = attrs) do
+    result = %Screenshot{}
+    |> Screenshot.changeset(%{ step_id: step_id })
+    |> Repo.insert()
+
+    case result do
+      { :ok, screenshot } -> update_screenshot(screenshot, attrs)
+      result -> result
+    end
+  end
+  def create_screenshot(attrs) do
     %Screenshot{}
     |> Screenshot.changeset(attrs)
     |> Repo.insert()
