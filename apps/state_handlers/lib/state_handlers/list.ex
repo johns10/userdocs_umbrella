@@ -75,6 +75,12 @@ defmodule StateHandlers.List do
     )
   end
 
+  defp handle_limit_clause(data, nil, _), do: data
+  defp handle_limit_clause(data, { _, _}, _), do: data
+  defp handle_limit_clause(data, limit, :list) when is_number(limit) do
+    Enum.take(data, limit)
+  end
+
   def filter_map_by_field(data, { field, value}) do
     Enum.filter(data, fn({_, o}) -> Map.get(o, field) == value end)
   end
