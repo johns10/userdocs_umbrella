@@ -66,7 +66,7 @@ defmodule UserDocs.Jobs do
     |> preload([ job_processes: jp, processes: p ],
       [ job_processes: { jp,
         process_instance: ^preload_process_instance(),
-          process: { p, [
+        process: { p, [
           steps: ^preload_steps_query()
       ]} } ])
   end
