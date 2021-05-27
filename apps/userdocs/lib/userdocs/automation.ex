@@ -623,6 +623,20 @@ defmodule UserDocs.Automation do
     |> Repo.update()
   end
 
+  def put_blank_process_and_step_instances(%Process{} = process) do
+    attrs = %{ status: "not_started", process_id: process.id, name: process.name, order: process.order }
+    { :ok, process_instance } = UserDocs.ProcessInstances.create_process_instance(attrs)
+    steps = Enum.map(process.steps, fn(step) -> put_blank_step_instance(step, process_instance.id) end)
+
+    process
+    |> Map.put(:last_process_instance, process_instance)
+    |> Map.put(:steps, steps)
+  end
+
+  def clear_last_process_instance(%Process{} = process) do
+    Map.put(process, :last_process_instance, nil)
+  end
+
   @doc """
   Deletes a process.
 
