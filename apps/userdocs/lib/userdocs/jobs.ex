@@ -347,8 +347,14 @@ defmodule UserDocs.Jobs do
     |> Repo.one!()
   end
 
-  def create_job_process(%Job{} = job, process_id) when is_integer(process_id) do
-    attrs = %{ job_id: job.id, process_id: process_id, order: max_order(job) + 1 }
+  def create_job_process(%Job{} = job, process_id, process_instance_id \\ nil) when is_integer(process_id) do
+    attrs = %{
+      job_id: job.id,
+      process_id: process_id,
+      order: max_order(job) + 1,
+      process_instance_id: process_instance_id
+    }
+
     %JobProcess{}
     |> JobProcess.changeset(attrs)
     |> Repo.insert()
