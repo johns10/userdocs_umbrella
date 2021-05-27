@@ -236,9 +236,9 @@ end
 
     def toggle_process_instance_expanded(%ProcessInstance{ expanded: nil } = process_instance) do
       update_process_instance(process_instance, %{ expanded: true })
-  end
+    end
     def toggle_process_instance_expanded(%ProcessInstance{} = process_instance) do
       update_process_instance(process_instance, %{ expanded: not process_instance.expanded })
-  end
+    end
 
 """
