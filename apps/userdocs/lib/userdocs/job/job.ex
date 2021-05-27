@@ -6,9 +6,6 @@ defmodule UserDocs.Jobs.Job do
   alias UserDocs.Jobs.JobProcess
   alias UserDocs.Users.Team
 
-  #Probably gets deprecated
-  alias UserDocs.StepInstances.StepInstance
-  alias UserDocs.ProcessInstances.ProcessInstance
 
   schema "jobs" do
     field :order, :integer
@@ -17,8 +14,7 @@ defmodule UserDocs.Jobs.Job do
     field :errors, { :array, :map }
     field :warnings, { :array, :map }
 
-    has_many :process_instances, ProcessInstance, on_replace: :nilify
-    has_many :step_instances, StepInstance, on_replace: :nilify
+    has_one :last_job_instance, JobInstance
 
     has_many :job_steps, JobStep, on_delete: :delete_all
     has_many :job_processes, JobProcess, on_delete: :delete_all
