@@ -141,7 +141,57 @@ defmodule UserDocs.ProcessInstances do
     |> ProcessInstance.changeset(attrs)
     |> Repo.update()
   end
+  def step_instance_attrs(process, process_instance_id \\ nil) do
+    { step_instance_attrs, _max_order } =
+      process.steps
+      |> Enum.sort(fn(x, y) -> x.order < y.order end)
+      |> Enum.reduce({ [], 1 },
+        fn(step, { acc, inner_order }) ->
+          { [ StepInstances.base_step_instance_attrs(step, inner_order) | acc ], inner_order + 1 }
+        end)
 
+    Enum.reverse(step_instance_attrs)
+  end
+
+  def delete_process_instance(%ProcessInstance{} = process_instance) do
+    Repo.delete(process_instance)
+  end
+
+  def change_process_instance(%ProcessInstance{} = process_instance, attrs \\ %{}) do
+    ProcessInstance.changeset(process_instance, attrs)
+  end
+
+  def process_instances_status([]), do: :none
+  def process_instances_status([ %ProcessInstance{ status: "failed" } | _ ]), do: :fail
+  def process_instances_status([ %ProcessInstance{ status: "started" } | _ ]), do: :started
+  def process_instances_status([ %ProcessInstance{ status: "not_started" } | _ ]), do: :warn
+  def process_instances_status([ %ProcessInstance{ status: "warn" } | _ ]), do: :warn
+  def process_instances_status([ %ProcessInstance{ status: "complete" } | rest ]) do
+    rest
+    |> status_counts()
+    |> rest_status()
+  end
+
+  def rest_status(%{ failed: 0, started: _, not_started: _, warn: 0, complete: _ }), do: :ok
+  def rest_status(_), do: :warn
+
+  def status_counts(process_instances) when is_list(process_instances) do
+    %{
+      failed: count_status(process_instances, "failed"),
+      started: count_status(process_instances, "started"),
+      not_started: count_status(process_instances, "not_started"),
+      warn: count_status(process_instances, "warn"),
+      complete: count_status(process_instances, "complete")
+    }
+  end
+
+  def count_status([ %ProcessInstance{} | _ ] = process_instances, status) do
+    Enum.count(process_instances, fn(pi) -> pi.status == status end)
+  end
+  def count_status([ ], _), do: 0
+end
+
+"""
   def format_process_instance_for_export(%ProcessInstance{} = process_instance) do
     start_attrs = %{
       order: 0,
