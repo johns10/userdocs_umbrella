@@ -142,4 +142,40 @@ defmodule UserDocs.StepInstances do
   def change_step_instance(%StepInstance{} = step_instance, attrs \\ %{}) do
     StepInstance.changeset(step_instance, attrs)
   end
+
+  def step_instances_status([]), do: :none
+  def step_instances_status([ %StepInstance{ status: "failed" } | _ ]), do: :fail
+  def step_instances_status([ %StepInstance{ status: "started" } | _ ]), do: :started
+  def step_instances_status([ %StepInstance{ status: "not_started" } | _ ]), do: :warn
+  def step_instances_status([ %StepInstance{ status: "warn" } | _ ]), do: :warn
+  def step_instances_status([ %StepInstance{ status: "complete" } | rest ]) do
+    rest
+    |> status_counts()
+    |> rest_status()
+  end
+
+  def rest_status(%{ failed: 0, started: _, not_started: _, warn: 0, complete: _ }), do: :ok
+  def rest_status(_), do: :warn
+
+  @spec status_counts(list(%StepInstance{})) :: %{
+    complete: non_neg_integer,
+    failed: non_neg_integer,
+    not_started: non_neg_integer,
+    started: non_neg_integer,
+    warn: non_neg_integer
+  }
+  def status_counts(step_instances) when is_list(step_instances) do
+    %{
+      failed: count_status(step_instances, "failed"),
+      started: count_status(step_instances, "started"),
+      not_started: count_status(step_instances, "not_started"),
+      warn: count_status(step_instances, "warn"),
+      complete: count_status(step_instances, "complete")
+    }
+  end
+
+  def count_status([ %StepInstance{} | _ ] = step_instances, status) do
+    Enum.count(step_instances, fn(si) -> si.status == status end)
+  end
+  def count_status([], _) , do: 0
 end
