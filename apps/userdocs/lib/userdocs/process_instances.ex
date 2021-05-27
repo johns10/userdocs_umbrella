@@ -104,7 +104,7 @@ defmodule UserDocs.ProcessInstances do
   alias UserDocs.Jobs.Job
   def create_process_instance_from_job_and_process(%Process{} = process, %Job{} = job, order \\ 0) do
     process_instance = Ecto.build_assoc(job, :process_instances)
-    attrs = base_process_instance_attrs(process, step_instance_attrs(process), order)
+    attrs = base_process_instance_attrs(process, step_instance_attrs(process, process_instance.id), order)
     create_process_instance(attrs, process_instance)
   end
 
