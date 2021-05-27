@@ -480,6 +480,7 @@ defmodule UserDocs.Automation do
   def list_processes(params \\ %{}, filters \\ %{})
   def list_processes(state, opts) when is_list(opts) do
     StateHandlers.list(state, Process, opts)
+    |> maybe_preload_process(opts[:preloads], state, opts)
   end
   def list_processes(params, filters) when is_map(params) and is_map(filters) do
     base_processes_query()
@@ -487,6 +488,13 @@ defmodule UserDocs.Automation do
     |> maybe_filter_processes_by_user_id(filters[:user_id])
     |> maybe_filter_processes_by_team_id(filters[:team_id])
     |> Repo.all()
+  end
+
+
+  defp maybe_preload_process(process, nil, _, _), do: process
+  defp maybe_preload_process(process, _preloads, state, opts) do
+    opts = Keyword.delete(opts, :filter)
+    StateHandlers.preload(state, process, opts)
   end
 
   defp maybe_filter_by_version(query, nil), do: query
