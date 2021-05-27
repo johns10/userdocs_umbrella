@@ -67,6 +67,19 @@ defmodule StateHandlers.Preload do
     #IO.puts("preparing preload opts for #{schema}")
     opts
     |> prepare_order_clause(opts[:order], schema.__schema__(:associations), preload)
+    |> prepare_limit_clause(opts[:limit], schema.__schema__(:associations), preload)
+  end
+
+  defp prepare_limit_clause(opts, nil, _, _), do: opts
+  defp prepare_limit_clause(opts, limit_clause, fields, preload) do
+    #IO.puts("Preparing limit clause ")
+    updated_limit_clause =
+      Enum.reduce(limit_clause, [],
+        fn(limit_opt, inner_opts) ->
+          handle_limit_option(inner_opts, limit_opt, fields, preload)
+        end
+      )
+    Keyword.put(opts, :limit, updated_limit_clause)
   end
 
   defp prepare_order_clause(opts, nil, _, _), do: opts
@@ -104,6 +117,29 @@ defmodule StateHandlers.Preload do
   end
   def handle_order_option([], _, _, _), do: []
 
+  def handle_limit_option(limit_opts, limit, _fields, _preload) when is_number(limit) do
+    #IO.puts("Rejecting limit option")
+    limit_opts
+  end
+  def handle_limit_option(limit_opts, {association, limit_opt}, associations, preload) when is_number(limit_opt) do
+    #IO.puts("handle_limit_option")
+    case (association in associations) and association == preload do
+      true -> [ limit_opt | limit_opts ]
+      false ->
+        # Logger.warn("handle_limit_option was passed an invalid association: #{association}, or it didn't match the preload: #{inspect(preload)}.  Available associations are #{inspect(associations)}")
+        limit_opts
+    end
+  end
+  def handle_limit_option(limit_opts, {association, [ _ ] = limit_opt}, _associations, _preload) do
+    #IO.puts("Handling Limit Option for a deeply nested limit call: #{association}, #{inspect(limit_opt)}.  The current opts are #{inspect(limit_opts)}.")
+    limit_opts ++ limit_opt
+  end
+  def handle_limit_option(limit_opts, {association, limit_opt}, _associations, _preload) do
+    #IO.puts("Handling Limit Option for a nested limit call: #{association}: #{inspect(limit_opt)}")
+    [ limit_opt | limit_opts ]
+  end
+  def handle_limit_option([], _, _, _), do: []
+
   defp handle_assoc(state, source, association, opts) do
     case association do
       %Ecto.Association.ManyToMany{} -> preload_many_to_many(state, association, source, opts)
@@ -128,14 +164,24 @@ defmodule StateHandlers.Preload do
   end
 
   defp preload_has_many(state, source, association, opts) do
-    #IO.puts("Preloading has_many from #{inspect(association.owner)} to #{inspect(association.queryable)}")
     owner = schema_atom(association.owner)
     owner_key = association.queryable.__schema__(:association, owner).owner_key
+
+    _log_string = """
+      Preloading has_many from owner: #{inspect(association.owner)} to child: #{inspect(association.queryable)}.
+      We'll query on owner key #{owner_key}, with value #{source.id}
+    """
 
     state
     |> StateHandlers.list(association.queryable, opts)
     |> Enum.filter(fn(o) -> Map.get(o, owner_key) == source.id end)
+    |> maybe_limit(opts[:limit])
   end
+
+  def maybe_limit(data, [ limit ] ) do
+    Enum.take(data, limit)
+  end
+  def maybe_limit(data, _limit), do: data
 
   defp preload_has_one(state, source, association, opts) do
     # should be similar to has many
