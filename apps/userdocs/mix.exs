@@ -54,6 +54,7 @@ defmodule UserDocs.MixProject do
       {:hackney, "~> 1.9"},
       {:sweet_xml, "~> 0.6"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
+      {:inflex, "~> 2.0.0"}
     ]
   end
 
