@@ -209,123 +209,49 @@ defmodule UserDocs.Jobs do
   alias UserDocs.Automation.Step
   alias UserDocs.Automation.Process
 
-  def put_new_process_instance(%JobProcess{} = job_process, job_instance_id) do
-    IO.puts("put_new_process_instance")
-    attrs = %{
-      status: "not_started", process_id: job_process.process.id,
-      name: job_process.process.name, order: job_process.process.order,
-      job_instance_id: job_instance_id
-    }
-    { :ok, new_process_instance } = ProcessInstances.create_process_instance(attrs)
-    new_process_instance = Map.put(new_process_instance, :step_instances, [])
-    steps = zip_steps([], job_process.process.steps, new_process_instance.step_instances, new_process_instance.id)
-    process = Map.put(job_process.process, :last_process_instance, new_process_instance)
-    Map.put(job_process, :process, process)
-  end
-
-  def match_job_process(%JobProcess{} = job_process, %ProcessInstance{} = process_instance) do
-    log_string = "
-      Matching Job Process.  Next we'll handle the steps.  This process has #{Enum.count(job_process.process.steps)} steps and
-      #{Enum.count(process_instance.step_instances)} step instances
-    "
-    Logger.info(log_string)
-    steps = zip_steps([], job_process.process.steps, process_instance.step_instances)
-    process =
-      job_process.process
-      |> Map.put(:last_process_instance, process_instance)
-      |> Map.put(:steps, steps)
-
-    Map.put(job_process, :process, process)
-  end
-
-  def delete_process_instance(%ProcessInstance{ step_instances: step_instances } = process_instance) do
-    Enum.each(step_instances,
-      fn(si) ->
-        { :ok, _ } = UserDocs.StepInstances.delete_step_instance(si)
+  def prepare_for_execution(%Job{ job_processes: job_processes, job_steps: job_steps } = job) do
+    IO.puts("First call")
+    job_processes = Enum.map(job_processes,
+      fn(jp) ->
+        prepare_for_execution(jp)
       end)
-    UserDocs.ProcessInstances.delete_process_instance(process_instance)
+    Map.put(job, :job_processes, job_processes)
+  end
+  def prepare_for_execution(%JobProcess{
+    process_instance: %ProcessInstance{ step_instances: step_instances } = process_instance,
+    process: %Process{ steps: steps } = process
+  } = job_process) when is_list(step_instances) and is_list(steps) do
+    _log_string = "Fixing to zip step instances {id, order, step_id}: #{inspect(Enum.map(step_instances, fn(si) -> { si.id, si.order, si.step_id } end))} and steps: #{inspect(Enum.map(steps, fn(s) -> { s.order, s.id } end))}"
+    IO.puts(_log_string)
+    steps = assign_instances(step_instances, steps)
+    process =
+      process
+      |> Map.put(:steps, steps)
+      |> Map.put(:last_process_instance, process_instance)
+
+    Map.put(job_process, :process, process)
   end
 
-  def zip_job_steps(result,
-  [ %JobStep{} = job_step | job_steps_tail ] = steps,
-  [ %StepInstance{} = step_instance | step_instances_tail ] = step_instances
+  def assign_instances(
+    [ %StepInstance{} = step_instance | si_tail ] = step_instances,
+    [ %Step{} = step | s_tail ] = steps
   ) do
-    case job_step.step.id == step_instance.step_id do
-      false ->
-        tail = zip_job_steps(result, job_steps_tail, step_instances)
-        job_step = Map.put(job_step, :step, Automation.put_blank_step_instance(job_step.step))
-        [ job_step | tail ]
-      true ->
-        tail = zip_job_steps(result, job_steps_tail, step_instances_tail)
-        job_step = Map.put(job_step, :step, match_step(job_step.step, step_instance))
-        [ job_step | tail ]
-    end
-  end
-  def zip_job_steps(result,
-    [ %JobStep{} = job_step ] = steps,
-    [ %StepInstance{} = step_instance ] = step_instances
-  ) do
-    case job_step.step.id == step_instance.step_id do
-      false -> raise("Steps don't match, failing")
-      true -> Map.put(job_step, :step, match_step(job_step.step, step_instance))
-    end
-  end
-  def zip_job_steps(result, [], [ %StepInstance{} = step_instance ]) do
-    { :ok, _ } = UserDocs.StepInstances.delete_step_instance(step_instance)
-    result
-  end
-  def zip_job_steps(result, [], []) do
-    result
-  end
+    step_instance_step_ids = Enum.map(step_instances, fn(si) -> si.step_id end)
+    if step.id in step_instance_step_ids do
+      step_instance =
+        step_instances
+        |> Enum.filter(fn(si) -> si.step_id == step.id end)
+        |> Enum.at(0)
 
-  def zip_steps(result, steps, step_instances, process_instance_id \\ nil)
-  def zip_steps(result,
-    [ %Step{} = step | steps_tail ] = steps,
-    [ %StepInstance{} = step_instance | step_instances_tail ] = step_instances,
-    process_instance_id
-  ) do
-    case step.id == step_instance.step_id do
-      false ->
-        Logger.warn("We failed to match step/step_instances. Id's: #{step.id}/#{step_instance.step_id}, orders: #{step.order}/#{step_instance.order}")
-        tail = zip_steps(result, steps_tail, step_instances)
-        [ Automation.put_blank_step_instance(step, process_instance_id) | tail ]
-      true ->
-        tail = zip_steps(result, steps_tail, step_instances_tail, process_instance_id)
-        [ match_step(step, step_instance) | tail ]
+      [ Map.put(step, :last_step_instance, step_instance) | assign_instances(step_instances, s_tail) ]
+    else
+      [ step | assign_instances(step_instances, s_tail) ]
     end
   end
-  def zip_steps(result,
-    [ %Step{} = step ] = steps,
-    [ %StepInstance{} = step_instance ] = step_instances,
-    process_instance_id
-  ) do
-    case step.id == step_instance.step_id do
-      false -> raise("Steps don't match, failing")
-      true -> match_step(step, step_instance)
-    end
-  end
-  def zip_steps(result,
-    [ %Step{} = step | steps_tail ],
-    [] = step_instances,
-    process_instance_id
-  ) do
-    #IO.inspect("zip_steps extra steps")
-    tail = zip_steps(result, steps_tail, step_instances, process_instance_id)
-    step = Automation.put_blank_step_instance(step, process_instance_id)
-    [ step | tail ]
-  end
-  def zip_steps(result, [ %Step{} = step ], [] = step_instances, process_instance_id) do
-    #IO.inspect("zip_steps last extra step")
-    [ Automation.put_blank_step_instance(step, process_instance_id) | result ]
-  end
-  def zip_steps(result, [], [], process_instance_id) do
-    result
-  end
+  def assign_instances(step_instances, []), do: []
+  def assign_instances([], steps), do: steps
 
-  def match_step(%Step{} = step, step_instance) do
-    Map.put(step, :last_step_instance, step_instance)
-  end
-
+  alias UserDocs.Jobs.JobProcess
   def get_executable_items(nil), do: []
   def get_executable_items(%Job{ job_steps: %Ecto.Association.NotLoaded{}} = job) do
     get_job!(job.id, %{ preloads: %{ processes: true, steps: true }})
