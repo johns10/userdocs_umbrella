@@ -376,6 +376,11 @@ defmodule UserDocs.Automation do
     |> Repo.update()
   end
 
+  def runner_update_step(%Step{} = step, attrs) do
+    Step.runner_changeset(step, attrs)
+    |> Repo.update()
+  end
+
   def update_nested_step(%Step{} = step, last_step, attrs, socket, action) do
     Step.nested_changeset(step, last_step, attrs, socket, action)
     |> Repo.update()
