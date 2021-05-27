@@ -568,4 +568,46 @@ Deprecated
     |> Map.get(:order)
   end
 """
+"""
+  #TODO: Revise
+  def update_job_step(
+    %Job{ process_instances: process_instances } = job,
+    %{ "process_instance_id" => process_instance_id, "id" => step_instance_id } = step_instance_attrs
+  ) do
+    updated_process_instances =
+      Enum.map(process_instances, fn(process_instance) ->
+        case process_instance.id == process_instance_id do
+          true ->
+            updated_step_instances = update_this_step_instance(process_instance.step_instances, step_instance_id, step_instance_attrs)
+            Map.put(process_instance, :step_instances, updated_step_instances)
+          false -> process_instance
+        end
+      end)
+
+    { :ok, Map.put(job, :process_instances, updated_process_instances)}
+  end
+
+  #TODO: Revise
+  def update_job_step_instance(
+    %Job{ step_instances: step_instances } = job,
+    %{ "id" => id } = step_instance_attrs
+  ) do
+    updated_step_instances = update_this_step_instance(step_instances, id, step_instance_attrs)
+    { :ok, Map.put(job, :step_instances, updated_step_instances)}
+  end
+
+  #TODO: Revise
+  def update_this_step_instance(step_instances, id, attrs) do
+    Enum.map(step_instances, fn(step_instance) ->
+      case step_instance.id == id do
+        true ->
+          { :ok, updated_step_instance } =
+            StepInstances.update_step_instance(step_instance, attrs)
+
+          Map.put(updated_step_instance, :step, step_instance.step) # TODO: Go get the step?
+        false -> step_instance
+      end
+    end)
+  end
+"""
 end
