@@ -222,7 +222,6 @@ defmodule UserDocs.Jobs do
     process: %Process{ steps: steps } = process
   } = job_process) when is_list(step_instances) and is_list(steps) do
     _log_string = "Fixing to zip step instances {id, order, step_id}: #{inspect(Enum.map(step_instances, fn(si) -> { si.id, si.order, si.step_id } end))} and steps: #{inspect(Enum.map(steps, fn(s) -> { s.order, s.id } end))}"
-    IO.puts(_log_string)
     steps = assign_instances(step_instances, steps)
     process =
       process
