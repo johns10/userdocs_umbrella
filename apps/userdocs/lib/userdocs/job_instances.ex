@@ -61,32 +61,6 @@ defmodule UserDocs.JobInstances do
     Map.put(job_instance, :process_instances, process_instances)
   end
 
-  def update_job_instance_step_instance(
-    %JobInstance{ process_instances: process_instances } = job_instance,
-    %StepInstance{ process_instance_id: process_instance_id} = step_instance
-  ) do
-    IO.puts("UJISI")
-    process_instances =
-      Enum.map(process_instances,
-        fn(process_instance) ->
-          if process_instance.id == process_instance_id do
-            step_instances =
-              Enum.map(process_instance.step_instances,
-                fn(inner_step_instance) ->
-                  if inner_step_instance == step_instance.id do
-                    Map.put(inner_step_instance, :status, step_instance.status)
-                  end
-                end)
-
-            Map.put(process_instance, :step_instances, step_instances)
-          else
-            process_instance
-          end
-        end)
-
-    Map.put(job_instance, :process_instances, process_instances)
-  end
-
   alias UserDocs.Jobs.JobStep
   alias UserDocs.Jobs.JobProcess
   alias UserDocs.Automation.Process
