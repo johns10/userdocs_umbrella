@@ -9,14 +9,14 @@ interface AnnotationHandler { [ key: string ]: Function }
 export const annotationHandlers: AnnotationHandler = {
   "Badge": (step: Step, elementToAnnotate: HTMLElement, style: { [key: string]: string }) => {
     // Get vars for these elements
-    const xOrientation = step.annotation.x_orientation;
-    const yOrientation = step.annotation.y_orientation;
+    const xOrientation = step.annotation.xOrientation;
+    const yOrientation = step.annotation.yOrientation;
     const size = step.annotation.size;
     const labelText = step.annotation.label;
     const color = step.annotation.color;
-    const xOffset = step.annotation.x_offset;
-    const yOffset = step.annotation.y_offset;
-    const fontSize = step.annotation.font_size;
+    const xOffset = step.annotation.xOffset;
+    const yOffset = step.annotation.yOffset;
+    const fontSize = step.annotation.fontSize;
     const annotationId = step.annotation.id;
   
     var badgeElement = document.createElement('span');
@@ -47,12 +47,12 @@ export const annotationHandlers: AnnotationHandler = {
       } else {
         window.active_annotations = [ wrapperElement ]
       }
+      return step
     } catch(error) {
       throw(error)
     }
   },
   "Outline": (step: Step, elementToAnnotate: HTMLElement, style: { [key: string]: string }) => {
-    console.log("outlining")
     const annotationId = step.annotation.id;
     const color = step.annotation.color;
     const thickness = step.annotation.thickness;
@@ -70,20 +70,21 @@ export const annotationHandlers: AnnotationHandler = {
       } else {
         window.active_annotations = [ outlineElement ]
       }
+      return step
     } catch(error) {
       throw(error)
     }
   },
   "Badge Outline": (step: Step, elementToAnnotate: HTMLElement, style: { [key: string]: string }) => {
     const thickness = step.annotation.thickness;
-    const xOrientation = step.annotation.x_orientation
-    const yOrientation = step.annotation.y_orientation
+    const xOrientation = step.annotation.xOrientation
+    const yOrientation = step.annotation.yOrientation
     const size = step.annotation.size
     const labelText = step.annotation.label
     const color = step.annotation.color
-    const xOffset = step.annotation.x_offset
-    const yOffset = step.annotation.y_offset
-    const fontSize = step.annotation.font_size;
+    const xOffset = step.annotation.xOffset
+    const yOffset = step.annotation.yOffset
+    const fontSize = step.annotation.fontSize;
     const annotationId = step.annotation.id;
   
     var badgeElement = document.createElement('span');
@@ -112,8 +113,6 @@ export const annotationHandlers: AnnotationHandler = {
     outlineElement = styleOutline(outlineElement, color, thickness)
   
     try {
-      console.log(wrapperElement)
-      console.log(outlineElement)
       document.body.appendChild(wrapperElement);
       document.body.appendChild(outlineElement)
       wrapperElement.appendChild(badgeElement); 
@@ -124,6 +123,7 @@ export const annotationHandlers: AnnotationHandler = {
       } else {
         window.active_annotations = [ outlineElement, wrapperElement ]
       }
+      return step
     } catch(error) {
       throw(error)
     }
@@ -131,5 +131,7 @@ export const annotationHandlers: AnnotationHandler = {
   "Blur": (step: Step, element: HTMLElement, style: { [key: string]: string }) => {
     element.style.textShadow = "0 0 5px rgba(0,0,0,0.5)";
     element.style.color = "transparent";
-  }
+    return step
+  },
+  "Throw": () => { throw new Error("Expected Failure") }
 }
