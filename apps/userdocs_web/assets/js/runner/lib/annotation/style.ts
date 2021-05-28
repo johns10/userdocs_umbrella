@@ -6,6 +6,9 @@ export const StyleFunctionsText: any  = {
 }
 
 function badge(element: HTMLSpanElement, size: number, fontSize: number, color: string) {
+  if(!size) throw new Error('Badge size not entered')
+  if(!fontSize) throw new Error('Font size not entered')
+  if(!color) throw new Error('Badge Color not entered')
   element.style.position = 'relative';
   element.style.display = 'inline-table';
   element.style.width = (2 * size).toString() + 'px';
@@ -33,10 +36,6 @@ function wrapper(element: HTMLDivElement, rect: DOMRect, size: number, xOffset: 
   const x = x_calcs[xOrientation]
   const y = y_calcs[yOrientation]
   const z_index = 999999
-
-  console.log(rect)
-  console.log(x)
-  console.log(y)
 
   element.style.display = 'static';
   element.style.justifyContent = 'center';
