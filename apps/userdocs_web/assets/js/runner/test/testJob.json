@@ -101,22 +101,22 @@
                         "status": "not_started",
                         "step": {
                             "annotation": {
-                                "annotation_type": {
+                                "annotationType": {
                                     "id": "3",
                                     "name": "Badge"
                                 },
                                 "color": "green",
                                 "font_color": null,
-                                "font_size": 24,
+                                "fontSize": 24,
                                 "id": "3",
                                 "label": "1",
                                 "name": "Label",
                                 "size": 16,
                                 "thickness": null,
-                                "x_offset": 0,
-                                "x_orientation": "R",
-                                "y_offset": 0,
-                                "y_orientation": "T"
+                                "xOffset": 0,
+                                "xOrientation": "R",
+                                "yOffset": 0,
+                                "yOrientation": "T"
                             },
                             "element": {
                                 "id": "4",
@@ -163,22 +163,22 @@
                         "status": "not_started",
                         "step": {
                             "annotation": {
-                                "annotation_type": {
+                                "annotationType": {
                                     "id": "3",
                                     "name": "Badge"
                                 },
                                 "color": "green",
                                 "font_color": null,
-                                "font_size": 24,
+                                "fontSize": 24,
                                 "id": "4",
                                 "label": "2",
                                 "name": "Label",
                                 "size": 16,
                                 "thickness": null,
-                                "x_offset": 0,
-                                "x_orientation": "R",
-                                "y_offset": 0,
-                                "y_orientation": "T"
+                                "xOffset": 0,
+                                "xOrientation": "R",
+                                "yOffset": 0,
+                                "yOrientation": "T"
                             },
                             "element": {
                                 "id": "5",
@@ -225,22 +225,22 @@
                         "status": "not_started",
                         "step": {
                             "annotation": {
-                                "annotation_type": {
+                                "annotationType": {
                                     "id": "1",
                                     "name": "Outline"
                                 },
                                 "color": "green",
                                 "font_color": null,
-                                "font_size": null,
+                                "fontSize": null,
                                 "id": "5",
                                 "label": null,
                                 "name": "Outline Login Button",
                                 "size": null,
                                 "thickness": 4,
-                                "x_offset": null,
-                                "x_orientation": null,
-                                "y_offset": null,
-                                "y_orientation": null
+                                "xOffset": null,
+                                "xOrientation": null,
+                                "yOffset": null,
+                                "yOrientation": null
                             },
                             "element": {
                                 "id": "3",
@@ -541,22 +541,22 @@
                         "status": "not_started",
                         "step": {
                             "annotation": {
-                                "annotation_type": {
+                                "annotationType": {
                                     "id": "5",
                                     "name": "Badge Outline"
                                 },
                                 "color": "green",
                                 "font_color": null,
-                                "font_size": 24,
+                                "fontSize": 24,
                                 "id": "6",
                                 "label": "1",
                                 "name": "Badge Outline Login",
                                 "size": 16,
                                 "thickness": 4,
-                                "x_offset": 0,
-                                "x_orientation": "R",
-                                "y_offset": 0,
-                                "y_orientation": "T"
+                                "xOffset": 0,
+                                "xOrientation": "R",
+                                "yOffset": 0,
+                                "yOrientation": "T"
                             },
                             "element": {
                                 "id": "6",
@@ -610,22 +610,22 @@
                 "status": "not_started",
                 "step": {
                     "annotation": {
-                        "annotation_type": {
+                        "annotationType": {
                             "id": "3",
                             "name": "Badge"
                         },
                         "color": "green",
                         "font_color": null,
-                        "font_size": 24,
+                        "fontSize": 24,
                         "id": "3",
                         "label": "1",
                         "name": "Label",
                         "size": 16,
                         "thickness": null,
-                        "x_offset": 0,
-                        "x_orientation": "R",
-                        "y_offset": 0,
-                        "y_orientation": "T"
+                        "xOffset": 0,
+                        "xOrientation": "R",
+                        "yOffset": 0,
+                        "yOrientation": "T"
                     },
                     "element": {
                         "id": "4",
