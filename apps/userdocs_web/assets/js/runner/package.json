@@ -27,7 +27,8 @@
     "fs": "^0.0.1-security",
     "graphql": "^15.5.0",
     "graphql-request": "^3.4.0",
-    "puppeteer": "^9.1.1"
+    "puppeteer": "^9.1.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.10.4",
