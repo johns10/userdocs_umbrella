@@ -1,18 +1,18 @@
 
-import { AnnotationType } from './annotation_type'
+import { AnnotationType } from './annotationType'
 
 export interface Annotation {
   id: string,
   name: string,
   label: string,
-  x_orientation: string,
-  y_orientation: string,
+  xOrientation: string,
+  yOrientation: string,
   size: number,
   color: string,
   thickness: number,
-  x_offset: number,
-  y_offset: number,
-  font_size: number,
+  xOffset: number,
+  yOffset: number,
+  fontSize: number,
   font_color: string,
-  annotation_type: AnnotationType
+  annotationType: AnnotationType
 }
