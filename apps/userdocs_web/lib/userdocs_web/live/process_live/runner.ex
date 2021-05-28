@@ -7,9 +7,9 @@ defmodule UserDocsWeb.ProcessLive.Runner do
   def render(assigns) do
     ~L"""
     <a id="<%= @id %>"
-      phx-click="execute_process"
-      phx-value-process-id="<%= @process.id %>"
-      phx-target="<%= @myself.cid %>"
+      phx-click="execute-process"
+      phx-value-id="<%= @process.id %>"
+      phx-target="#automation-manager"
       phx-hook="executeProcess"
       status="<%= @status %>"
     >
@@ -23,12 +23,6 @@ defmodule UserDocsWeb.ProcessLive.Runner do
       </span>
     </a>
     """
-  end
-
-  @impl true
-  def handle_event("execute_process", %{"process-id" => process_id}, socket) do
-    send self(), {:execute_process, %{ process_id: String.to_integer(process_id) }}
-    { :noreply, socket }
   end
 
   def handle_event("update_process", %{ "status" => status } = payload, socket) do
