@@ -1,3 +1,5 @@
+const { errors } = require("puppeteer");
+
 function browserClosed(payload) {
   const element = document.querySelector('#automated-browser-controls');
   const event = new CustomEvent("browser-closed", {
@@ -8,6 +10,7 @@ function browserClosed(payload) {
 }
 
 function browserOpened(payload) {
+  console.log("Browser Opened")
   const element = document.querySelector('#automated-browser-controls');
   const event = new CustomEvent("browser-opened", {
       bubbles: false,
@@ -16,71 +19,35 @@ function browserOpened(payload) {
   element.dispatchEvent(event)
 }
 
-function handleStepStatusUpdate(stepInstance, config) {
-  //console.log("handleStepStatusUpdate")
-  if (stepInstance.step_id) {
-    config.window.send('stepStatusUpdated', stepInstance)
-  }
-}
-
-function stepStatusUpdated(stepInstance) {
-  /*
-  if (stepInstance.step_id) {
-    if (stepInstance.attrs.screenshot != null) {
-      if (stepInstance.attrs.screenshot.base_64 != null) {
-        try {
-          document
-          .getElementById("screenshot-handler-component")
-          .dispatchEvent(new CustomEvent("screenshot", {
-            bubbles: false,
-            detail: stepInstance
-          }))
-        } catch(e) {
-          //console.log("Failed to update screenshot for step " + stepInstance.step_id)
-        }
-      }
-    }
-    try {
-      document  
-        .getElementById("step-" + stepInstance.step_id + "-status")
-        .dispatchEvent(new CustomEvent("update-step", {
-          bubbles: false,
-          detail: stepInstance 
-        }))
-    } catch (e) {
-      //console.log("Failed to send update to step-" + stepInstance.step_id + "-status")
-    }
-  }
-  */
+function stepUpdated(step) {
   try {
-    //console.log("trying to update automation manager")
+    console.log("trying to update automation manager")
     document
       .getElementById("automation-manager-hook")
-      .dispatchEvent(new CustomEvent("update-step-instance", {
+      .dispatchEvent(new CustomEvent("update-step", {
         bubbles: false,
-        detail: stepInstance
+        detail: step
       }))
   } catch (e) {
-    console.log("Failed to send update to step-instance: " + stepInstance.step_id)
+    console.error(`Failed to send update to step-instance: ${step.id } because ${e}`)
   }
 }
 
-function processStatusUpdated(stepInstance) {
-  console.log("Updating process " + stepInstance.attrs.step.process.id  + " status")
+function processUpdated(process) {
+  console.log("Updating process " + process.id  + " status")
   try {
     document  
-      .getElementById("process-" + stepInstance.attrs.step.process.id + "-runner")
+      .getElementById("automation-manager-hook")
       .dispatchEvent(new CustomEvent("update-process", {
         bubbles: false,
-        detail: stepInstance 
+        detail: process 
       }))
   } catch (e) {
-    console.log("Failed to send update to process-" + stepInstance.attrs.step.process.id + "-runner")
+    console.log("Failed to send update to process-" + process.id + "-runner")
   }
 }
 
 module.exports.browserOpened = browserOpened
 module.exports.browserClosed = browserClosed
-module.exports.stepStatusUpdated = stepStatusUpdated
-module.exports.processStatusUpdated = processStatusUpdated
-module.exports.handleStepStatusUpdate = handleStepStatusUpdate
+module.exports.stepUpdated = stepUpdated
+module.exports.processUpdated = processUpdated
