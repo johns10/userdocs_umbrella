@@ -263,12 +263,14 @@ defmodule UserDocsWeb.StepLive.Index do
         [ element: :strategy ],
       ]
 
-    order = [ steps: %{ field: :order, order: :asc } ]
+    order = [ %{ field: :order, order: :asc }, step_instances: %{ field: :id, order: :desc} ]
+    limit = [ step_instances: 5 ]
 
     opts =
       socket.assigns.state_opts
       |> Keyword.put(:preloads, preloads)
       |> Keyword.put(:order, order)
+      |> Keyword.put(:limit, limit)
 
     step = Automation.get_step!(id, socket, opts)
 
@@ -296,7 +298,8 @@ defmodule UserDocsWeb.StepLive.Index do
     opts =
       socket.assigns.state_opts
       |> Keyword.put(:preloads, preloads)
-      |> Keyword.put(:order, [ %{ field: :order, order: :asc } ])
+      |> Keyword.put(:order, [ %{ field: :order, order: :asc }, step_instances: %{ field: :id, order: :desc} ])
+      |> Keyword.put(:limit,  [ step_instances: 5 ])
       |> Keyword.put(:filter, { :process_id, process_id })
 
     assign(socket, :steps, Automation.list_steps(socket, opts))
