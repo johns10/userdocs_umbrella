@@ -46,10 +46,10 @@ Hooks.fileTransfer = {
   }
 };
 
+/*
 Hooks.stepStatus = {
   mounted() {
     this.el.addEventListener("update-step", e => {
-      //console.log("Got a step update")
       this.pushEventTo('#step-' + e.detail.step_id + '-status', "update_step", e.detail)
     })
   }
@@ -58,7 +58,8 @@ Hooks.stepStatus = {
 Hooks.executeProcess = {
   mounted() {
     this.handleEvent("execute-process", (message) => {
-      //console.log("Hook triggered for execute process")
+      console.log("Hook triggered for execute process")
+      console.log(message)
       window.userdocs.executeProcess(message)
     })
     this.el.addEventListener("update-process", e => {
@@ -67,18 +68,18 @@ Hooks.executeProcess = {
     })
   }
 };
-
+*/
 Hooks.automationManager = {
   mounted() {
-    this.handleEvent("put-job", (message) => {
-      window.userdocs.putJob(message)
-    })
-    this.handleEvent("start-running", (message) => {
-      window.userdocs.start(message)
-    })
+    this.handleEvent("start-running", (message) => { window.userdocs.start(message) })
     this.handleEvent("execute", (message) => { window.userdocs.execute(message.step) })
-    this.el.addEventListener("update-step-instance", (message) => {
-      this.pushEventTo("#automation-manager", "update-step-instance", message.detail)
+    this.handleEvent("executeProcess", (message) => { window.userdocs.executeProcess(message.process) })
+    this.handleEvent("executeJob", (message) => { window.userdocs.executeJob(message.job) })
+    this.el.addEventListener("update-step", (message) => {
+      this.pushEventTo("#automation-manager", "update-step", { step: message.detail })
+    })
+    this.el.addEventListener("update-process", (message) => {
+      this.pushEventTo('#automation-manager', "update-process", { process: message.detail })
     })
   }
 }
