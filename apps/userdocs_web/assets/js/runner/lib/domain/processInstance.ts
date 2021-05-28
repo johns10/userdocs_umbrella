@@ -4,6 +4,7 @@ import { Configuration } from '../automation/automation'
 import { gql } from 'graphql-request'
 
 export interface ProcessInstance {
+  uuid: string,
   id?: string,
   order: number,
   status: string,
