@@ -1,4 +1,4 @@
-const { stepInstanceHandlers } = require('../lib/automation/puppeteer/stepInstanceHandlers')
+const { stepHandlers } = require('../lib/automation/puppeteer/stepHandlers')
 const { Puppet } = require('../lib/automation/puppet')
 
 var browser
@@ -12,66 +12,66 @@ beforeAll( async () => {
   await page.goto(url);
 })
 
-//afterAll( async () => { await Puppet.closeBrowser(browser, {}); });
+afterAll( async () => { await Puppet.closeBrowser(browser, {}); });
 
 afterEach( async () => {
-  const handler = stepInstanceHandlers["Clear Annotations"]
+  const handler = stepHandlers["Clear Annotations"]
   await handler(browser, {})
 });
 
 test('Apply Badge Annotation', async () => {
-  const stepInstance = { step: { 
+  const step = { 
     element: { selector: selector, strategy: { name: 'xpath' }}, 
     stepType: { name: 'Apply Annotation' },
-    annotation: { id: annotationId, annotation_type: { name: 'Badge' }, size: 16, font_size: 24, color: 'green', x_offset: 0, y_offset: 0, x_orientation: 'M', y_orientation: 'B', label: '1' }
-  } } 
+    annotation: { id: annotationId, annotationType: { name: 'Badge' }, size: 16, fontSize: 24, color: 'green', xOffset: 0, yOffset: 0, xOrientation: 'M', yOrientation: 'B', label: '1' }
+  }
 
   const page = (await browser.pages())[0];
-  const handler = stepInstanceHandlers["Apply Annotation"]
-  await handler(browser, stepInstance)
+  const handler = stepHandlers["Apply Annotation"]
+  await handler(browser, step)
   const wrapperHandle = await page.$(`#userdocs-annotation-${annotationId}-wrapper`)
   expect(wrapperHandle).toHaveProperty('_remoteObject')
 })
 
 test('Apply Outline Annotation', async () => {
-  const stepInstance = { step: { 
+  const step = { 
     element: { selector: selector, strategy: { name: 'xpath' }}, 
     stepType: { name: 'Apply Annotation' },
-    annotation: { id: annotationId, annotation_type: { name: 'Outline' }, thickness: 6, color: 'green' }
-  } } 
+    annotation: { id: annotationId, annotationType: { name: 'Outline' }, thickness: 6, color: 'green' }
+  }
 
   const page = (await browser.pages())[0];
-  const handler = stepInstanceHandlers["Apply Annotation"]
-  await handler(browser, stepInstance)
+  const handler = stepHandlers["Apply Annotation"]
+  await handler(browser, step)
   const wrapperHandle = await page.$(`#userdocs-annotation-${annotationId}-outline`)
+  
   expect(wrapperHandle).toHaveProperty('_remoteObject')
 })
-
 test('Apply Blur Annotation', async () => {
-  const stepInstance = { step: { 
+  const step = { 
     element: { selector: selector, strategy: { name: 'xpath' }}, 
     stepType: { name: 'Apply Annotation' },
-    annotation: { id: annotationId, annotation_type: { name: 'Blur' } }
-  } } 
+    annotation: { id: annotationId, annotationType: { name: 'Blur' } }
+  } 
 
   const page = (await browser.pages())[0];
-  const handler = stepInstanceHandlers["Apply Annotation"]
-  await handler(browser, stepInstance)
+  const handler = stepHandlers["Apply Annotation"]
+  await handler(browser, step)
   const handle = (await page.$x('//button'))[0]
   expect(handle).toHaveProperty('_remoteObject')
 })
 
 
 test('Apply Badge Outline Annotation', async () => {
-  const stepInstance = { step: { 
+  const step = { 
     element: { selector: selector, strategy: { name: 'xpath' }}, 
     stepType: { name: 'Apply Annotation' },
-    annotation: { id: annotationId, annotation_type: { name: 'Badge Outline' }, thickness: 6, size: 16, font_size: 24, color: 'green', x_offset: 0, y_offset: 0, x_orientation: 'R', y_orientation: 'T', label: '1' }
-  } } 
+    annotation: { id: annotationId, annotationType: { name: 'Badge Outline' }, thickness: 6, size: 16, fontSize: 24, color: 'green', xOffset: 0, yOffset: 0, xOrientation: 'R', yOrientation: 'T', label: '1' }
+  }
 
   const page = (await browser.pages())[0];
-  const handler = stepInstanceHandlers["Apply Annotation"]
-  await handler(browser, stepInstance)
+  const handler = stepHandlers["Apply Annotation"]
+  await handler(browser, step)
   const wrapperHandle = await page.$(`#userdocs-annotation-${annotationId}-outline`)
   const badgeHandle = await page.$(`#userdocs-annotation-${annotationId}-badge`)
   expect(wrapperHandle).toHaveProperty('_remoteObject')
@@ -79,19 +79,30 @@ test('Apply Badge Outline Annotation', async () => {
 })
 
 test('Clear Annotations clears annotations', async () => {
-  const stepInstance = { step: { 
+  const step = { 
     element: { selector: selector, strategy: { name: 'xpath' }}, 
     stepType: { name: 'Apply Annotation' },
-    annotation: { id: annotationId, annotation_type: { name: 'Outline' }, thickness: 6, color: 'green' }
-  } } 
+    annotation: { id: annotationId, annotationType: { name: 'Outline' }, thickness: 6, color: 'green' }
+  }
 
   const page = (await browser.pages())[0];
-  const annotationHandler = stepInstanceHandlers["Apply Annotation"]
-  await annotationHandler(browser, stepInstance)
+  const annotationHandler = stepHandlers["Apply Annotation"]
+  await annotationHandler(browser, step)
   const wrapperHandle = await page.$(`#userdocs-annotation-${annotationId}-outline`)
   expect(wrapperHandle).toHaveProperty('_remoteObject')
-  const clearHandler = stepInstanceHandlers["Clear Annotations"]
-  await clearHandler(browser, stepInstance)
+  const clearHandler = stepHandlers["Clear Annotations"]
+  await clearHandler(browser, step)
   const nullHandle = await page.$(`#userdocs-annotation-${annotationId}-outline`)
   expect(nullHandle).toBeNull()
+})
+
+test('Annotations that throw result in thrown errors', async () => {
+  const step = { 
+    element: { selector: selector, strategy: { name: 'xpath' }}, 
+    stepType: { name: 'Apply Annotation' },
+    annotation: { annotationType: { name: 'Throw' } }
+  }
+  const page = (await browser.pages())[0];
+  const handler = stepHandlers["Apply Annotation"]
+  // await handler(browser, step) # It throws, set up assertion
 })
