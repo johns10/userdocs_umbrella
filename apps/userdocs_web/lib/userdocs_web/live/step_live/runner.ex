@@ -17,7 +17,7 @@ defmodule UserDocsWeb.StepLive.Runner do
     ~L"""
     <a class="navbar-item has-tooltip-left"
       id="<%= @id %>-runner"
-      phx-click="execute_step"
+      phx-click="execute-step"
       phx-value-id="<%= @step.id %>"
       phx-target="#automation-manager"
     >
