@@ -1,64 +1,94 @@
-import { Configuration, RunnerCallbacks } from '../runner/runner'
+import { v4 as uuidv4 } from 'uuid';
+
 import * as ProcessInstance from './processInstance'
 import * as Step from './step'
+import { Runner } from '../runner/runner'
 export interface Process {
   id: string,
   order: number,
   name: string,
-  processInstance: ProcessInstance.ProcessInstance,
+  type: string,
+  lastProcessInstance: ProcessInstance.ProcessInstance,
   steps: Array<Step.Step>
 }
 
-export async function execute(process: Process, browser: any, configuration: Configuration, callbacks: RunnerCallbacks, fetchStepHandler: Function) {
-  if(!callbacks) throw (`Callbacks not passed properly.  An object of the shape { calbbacks: { step: { ... }}} is required.  Got ${callbacks}`)
-  for(const callback of callbacks.process.preExecutionCallbacks) { 
-    if(typeof callback != 'function') throw (`Received ${callback}.  Expected function. The callbacks object is probably wrong ${callbacks}`)
-    process = await callback(process, browser, configuration) 
+export async function execute(process: Process, runner: Runner) {
+  console.group(`Starting execution of process ${process.id}, ${process.name}. It has process instance ${process.lastProcessInstance.id}.`)
+  console.time("Process Timer")
+  if(!runner.callbacks) throw new Error(`Callbacks not passed properly.  An object of the shape { calbacks: { process: { ... }}} is required.  Got ${runner.callbacks}`)
+  for(const callback of runner.callbacks.process.preExecutionCallbacks) { 
+    if(typeof callback != 'function') throw new Error(`Received ${callback}.  Expected function. The callbacks object is probably wrong ${runner.callbacks}`)
+    process = await callback(process, runner) 
   }
   try {
-    process = await callbacks.process.executionCallback(process, browser, configuration, callbacks, fetchStepHandler)
-    for(const callback of callbacks.process.successCallbacks) { 
-      process = await callback(process, browser, configuration) 
+    process = await runner.callbacks.process.executionCallback(process, runner)
+    for(const callback of runner.callbacks.process.successCallbacks) { 
+      process = await callback(process, runner) 
     }
+    console.debug(`Execution of process ${process.id}, ${process.name} completed successfully`)
   } catch(error) {
-    for(const callback of callbacks.process.failureCallbacks) { 
-      process = await callback(process, browser, configuration, error) 
+    for(const callback of runner.callbacks.process.failureCallbacks) { 
+      process = await callback(process, runner, error) 
     }
+    console.debug(`Execution of process ${process.id}, ${process.name} failed because ${error}`)
+    console.debug(error.stack)
+    throw(error)
   }
+  console.timeEnd("Process Timer")
+  console.groupEnd();
   return process
 }
 
 export const handlers = {
   embedNewProcessInstance: async(process: Process) => {
     const processInstance: ProcessInstance.ProcessInstance = {
+      uuid: uuidv4(),
       order: process.order,
-      status: "not_started",
+      status: "started", //TODO: Implement additional execution callbacks
       name: process.name,
       type: "stepInstance",
       processId: process.id,
       startedAt: new Date()
     }
-    process.processInstance = processInstance
+    if (process.lastProcessInstance) console.warn("Last Process Instance already exists, will not replace it.")
+    else process.lastProcessInstance = processInstance
     return process
   },
-  run: async(process: Process, browser: any, configuration: Configuration, callbacks: RunnerCallbacks, fetchStepHandler: Function) => {
+  startLastProcessInstance: async(process: Process, runner: Runner) => {
+    process.lastProcessInstance.status = 'started'
+    return process
+  },
+  run: async(process: Process, runner: Runner) => {  
     for(var step of process.steps) {
-      step = await Step.execute(step, browser, configuration, callbacks, fetchStepHandler)
-      if (step.stepInstance.status == 'failed') throw `Step ${step.id}, ${step.name} failed to execute`
+      step = await Step.execute(step, runner)
+      if (step.lastStepInstance.status == 'failed') throw new Error(`Step ${step.id}, ${step.name} failed to execute`)
+      if (process.lastProcessInstance.id) step.lastStepInstance.processInstanceId = process.lastProcessInstance.id
     }
     return process
   },
-  completeProcessInstance: async(process: Process) => {
-    process.processInstance.status = 'complete'
-    process.processInstance.finishedAt = new Date()
+  completeLastProcessInstance: async(process: Process) => {
+    process.lastProcessInstance.status = 'complete'
+    process.lastProcessInstance.finishedAt = new Date()
     return process
   },
-  failProcessInstance: async (process: Process, browser: any, configuration: Configuration, error: Error) => {
-    process.processInstance.status = 'failed'
-    if (Array.isArray(process.processInstance.errors) == true) process.processInstance.errors.push(error)
-    else process.processInstance.errors = [ error ]
+  failProcessInstance: async (process: Process, runner: Runner, error: Error) => {
+    process.lastProcessInstance.status = 'failed'
+    if (Array.isArray(process.lastProcessInstance.errors) == true) process.lastProcessInstance.errors.push(error)
+    else process.lastProcessInstance.errors = [ error ]
     return process
   },
   nothing: async (process: Process) => { return process },
-  fail: async (process: Process) => { throw "This process is expected to fail for test purposes" }
+  fail: async (process: Process) => { throw new Error("This process is expected to fail for test purposes") }
+}
+
+export function allowedFields(process: Process) {
+  var steps = []
+  for(const step of process.steps ? process.steps : []) {
+    steps.push(Step.allowedFields(step))
+  } 
+  var fields: any = {
+    id: process.id,
+    steps: steps
+  }
+  return fields
 }
