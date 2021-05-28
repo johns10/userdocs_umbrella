@@ -4,6 +4,7 @@ import { Configuration } from '../automation/automation'
 import { gql } from 'graphql-request'
 
 export interface StepInstance {
+  uuid: string,
   id?: string,
   order: number,
   status: string,
@@ -14,7 +15,9 @@ export interface StepInstance {
   errors?: Array<Error>,
   warnings?: Array<Error>,
   startedAt?: Date,
-  finishedAt?: Date
+  finishedAt?: Date,
+  processInstanceUuid?: string,
+  processInstanceId?: string
 }
 
 export function allowedFields(stepInstance: StepInstance) {
