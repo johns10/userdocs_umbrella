@@ -296,22 +296,6 @@ defmodule UserDocsWeb.Root do
     { :noreply, socket }
   end
 
-  def handle_info({ :execute_step, %{ step_id: step_id } = payload }, socket) do
-    IO.inspect("root got execute_step")
-    {
-      :noreply,
-      socket
-      |> UserDocsWeb.AutomationManagerLive.execute_step(payload)
-    }
-  end
-  def handle_info({ :execute_process, %{ process_id: process_id } = payload }, socket) do
-    IO.inspect("root got execute_step")
-    {
-      :noreply,
-      socket
-      |> UserDocsWeb.AutomationManagerLive.execute_process_instance(payload, 0)
-    }
-  end
   def handle_info({ :queue_process_instance, payload }, socket) do
     IO.inspect("root got add_process")
     {
