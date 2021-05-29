@@ -130,11 +130,11 @@ defmodule StateHandlers.Preload do
         limit_opts
     end
   end
-  def handle_limit_option(limit_opts, {association, [ _ ] = limit_opt}, _associations, _preload) do
+  def handle_limit_option(limit_opts, {_association, [ _ ] = limit_opt}, _associations, _preload) do
     #IO.puts("Handling Limit Option for a deeply nested limit call: #{association}, #{inspect(limit_opt)}.  The current opts are #{inspect(limit_opts)}.")
     limit_opts ++ limit_opt
   end
-  def handle_limit_option(limit_opts, {association, limit_opt}, _associations, _preload) do
+  def handle_limit_option(limit_opts, {_association, limit_opt}, _associations, _preload) do
     #IO.puts("Handling Limit Option for a nested limit call: #{association}: #{inspect(limit_opt)}")
     [ limit_opt | limit_opts ]
   end
