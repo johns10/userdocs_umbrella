@@ -80,8 +80,9 @@ defmodule UserDocsWeb.DocumentVersionDownloadController do
     )
     File.cd!(old_path)
 
+
+    conn = send_download(conn, { :file, base_path <> tmp_folder_name <> ".zip" }, filename: tmp_folder_name <> ".zip")
     conn
-    |> send_download({ :file, base_path <> tmp_folder_name <> ".zip" }, filename: tmp_folder_name <> ".zip")
   end
 
 end
