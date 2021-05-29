@@ -226,7 +226,6 @@ defmodule UserDocsWeb.Root do
     { :noreply, ModalMenus.edit_user(socket, params) }
   end
   def handle_event("select-version", %{"version-id" => version_id, "project-id" => project_id, "team-id" => team_id } = _payload, socket) do
-    IO.puts("Changing current version to #{version_id}")
     opts = Map.get(socket.assigns, :state_opts, state_opts())
 
     changes = %{
@@ -271,7 +270,7 @@ defmodule UserDocsWeb.Root do
 
 
     case Keyword.get(socket.assigns.state_opts, :types) do
-      nil -> raise(RuntimeError, "Types not populated in calling subscribed view")
+      nil -> raise(RuntimeError, "Types not populated in calling subscribed view #{socket.view}")
       _ -> ""
     end
 
