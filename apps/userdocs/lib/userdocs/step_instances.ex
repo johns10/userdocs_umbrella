@@ -91,7 +91,7 @@ defmodule UserDocs.StepInstances do
     create_step_instance(attrs)
   end
 
-  def base_step_instance_attrs(step, order, process_instance_id) do
+  def base_step_instance_attrs(step, order, process_instance_id  \\ nil) do
     %{
       order: order || step.order,
       step_id: step.id,
