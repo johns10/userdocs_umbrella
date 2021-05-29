@@ -1,7 +1,6 @@
 defmodule UserDocsWeb.UserLive.Show do
   use UserDocsWeb, :live_view
   use UserdocsWeb.LiveViewPowHelper
-  alias UserDocsWeb.Defaults
   alias UserDocsWeb.Root
 
   alias UserDocs.Users
@@ -50,6 +49,10 @@ defmodule UserDocsWeb.UserLive.Show do
 
   @impl true
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
+
+  @impl true
+  def handle_info(n, s), do: Root.handle_info(n, s)
+
 
   defp page_title(:show), do: "Show User"
   defp page_title(:edit), do: "Edit User"
