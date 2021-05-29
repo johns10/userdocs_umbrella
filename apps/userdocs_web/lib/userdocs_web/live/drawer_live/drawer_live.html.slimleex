@@ -33,7 +33,7 @@ input id="collapsible" class="toggle" type="checkbox" checked=@closed
 div#sidebar.is-flex.is-flex-direction-column
   .box.is-flex.is-flex-direction-row.is-justify-content-space-between.py-3.px-4.has-background-primary.has-text-primary-light.is-shadowless.mb-0
     h2.text Automation Manager
-    span phx-click="toggle-sidebar" phx-target="<%= @myself.cid %>"
+    span#sidebar-toggle phx-click="toggle-sidebar" phx-target="<%= @myself.cid %>"
       = if not @closed do
         i.fa.fa-minus-square.py-1
       - else 
