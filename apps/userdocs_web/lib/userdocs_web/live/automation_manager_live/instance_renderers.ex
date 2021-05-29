@@ -7,7 +7,7 @@ defmodule UserDocsWeb.AutomationManagerLive.Renderers do
   use Phoenix.HTML
 
   def job_item(object_instance, interactive \\ true)
-  def job_item(%JobStep{} = job_step, interactive) do
+  def job_item(%JobStep{} = job_step, _interactive) do
     ~L"""
     li
       div.is-flex.is-flex-direction-row.is-flex-grow-0
@@ -23,7 +23,7 @@ defmodule UserDocsWeb.AutomationManagerLive.Renderers do
           | )
     """
   end
-  def job_item(%JobProcess{} = job_process, interactive) do
+  def job_item(%JobProcess{} = job_process, _interactive) do
     ~L"""
     li
       input id="expand-job-process-<%= job_process.id %>" class="job-process-toggle" type="checkbox" hidden="true" checked=job_process.collapsed
