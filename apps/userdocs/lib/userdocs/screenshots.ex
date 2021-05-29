@@ -192,7 +192,7 @@ defmodule UserDocs.Screenshots do
     screenshot
   end
 
-  def create_aws_screenshot(%{ data: data, changes: %{ base64: base64 } } = changeset) do
+  def create_aws_screenshot(%{ data: _data, changes: %{ base64: base64 } } = changeset) do
     case Ecto.Changeset.get_field(changeset, :step_id) do
       nil -> throw("Screenshot has no step id")
       step_id ->
