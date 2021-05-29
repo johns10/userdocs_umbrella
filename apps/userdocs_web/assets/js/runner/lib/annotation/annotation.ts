@@ -61,7 +61,7 @@ export const annotationHandlers: AnnotationHandler = {
     outlineElement.id = `userdocs-annotation-${annotationId}-outline`
     outlineElement.classList.add("userdocs-outline")
     const styleOutline = new Function(`return ${style.styleOutline}`)()
-    outlineElement = styleOutline(outlineElement, color, thickness)
+    outlineElement = styleOutline(elementToAnnotate, outlineElement, color, thickness)
   
     try {
       document.body.appendChild(outlineElement)
@@ -110,7 +110,7 @@ export const annotationHandlers: AnnotationHandler = {
     outlineElement.id = `userdocs-annotation-${annotationId}-outline`
     outlineElement.classList.add("userdocs-outline")
     const styleOutline = new Function(`return ${style.styleOutline}`)()
-    outlineElement = styleOutline(outlineElement, color, thickness)
+    outlineElement = styleOutline(elementToAnnotate, outlineElement, color, thickness)
   
     try {
       document.body.appendChild(wrapperElement);

@@ -58,8 +58,8 @@ function label(element: HTMLSpanElement, size: number, fontSize: number, labelTe
   return element;
 }
 
-function outline(element: HTMLSpanElement, color: string, thickness: number) {
-  const rect = element.getBoundingClientRect();
+function outline(elementToOutline: HTMLSpanElement, element: HTMLSpanElement, color: string, thickness: number) {
+  const rect = elementToOutline.getBoundingClientRect();
   const zIndex = 999998
   
   element.style.position = 'fixed';
