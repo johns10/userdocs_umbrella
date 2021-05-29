@@ -71,7 +71,6 @@ defmodule UserDocsWeb.StepLiveTest do
 
   defp setup_session(%{ conn: conn, user: user  }) do
     opts = Pow.Plug.Session.init(@default_opts)
-    IO.inspect(opts)
     conn =
       conn
       |> Plug.Test.init_test_session(%{ current_user: user })
@@ -119,7 +118,6 @@ defmodule UserDocsWeb.StepLiveTest do
     ]
 
     test "lists all steps", %{authed_conn: conn, process: process} do
-      IO.puts("Running test")
       {:ok, _index_live, html} = live(conn, Routes.step_index_path(conn, :index, process.id))
 
       assert html =~ "Steps"
@@ -227,6 +225,7 @@ defmodule UserDocsWeb.StepLiveTest do
         AutomationFixtures.step_attrs(:valid, page.id, process.id, element.id, annotation.id, aa_step_type.id)
         |> Map.delete(:annotation_id)
         |> Map.delete(:element_id)
+        |> Map.delete(:name)
 
       changes = %{ "step_type_id" => aa_step_type.id |> to_string() }
 

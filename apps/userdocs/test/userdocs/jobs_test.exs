@@ -65,7 +65,7 @@ defmodule UserDocs.JobsTest do
       :create_screenshot,
       :query_step
     ]
-"""
+
     test "list_job/0 returns all job instances", %{ team: team } do
       job = JobsFixtures.job(team.id)
       [ result_job ] = Jobs.list_jobs() # BULLSHIT, remove
@@ -82,8 +82,8 @@ defmodule UserDocs.JobsTest do
       process_instance_one = JobsFixtures.process_instance(process.id)
       process_instance_two = JobsFixtures.process_instance(process.id)
 
-      { :ok, job_process_one } = Jobs.create_job_process(job, process.id, process_instance_one.id)
-      { :ok, job_process_two } = Jobs.create_job_process(job, process.id, process_instance_two.id)
+      { :ok, _job_process_one } = Jobs.create_job_process(job, process.id, process_instance_one.id)
+      { :ok, _job_process_two } = Jobs.create_job_process(job, process.id, process_instance_two.id)
 
       job = Jobs.get_job!(job.id, %{ preloads: [ steps: true, processes: true, last_job_instance: true ]})
 
@@ -223,14 +223,14 @@ defmodule UserDocs.JobsTest do
         process_two
         |> UserDocs.ProcessInstances.create_process_instance_from_process(Jobs.max_order(job) + 1)
 
-      { :ok, job_process } = Jobs.create_job_process(job, process.id, process_instance_one.id)
-      { :ok, job_process } = Jobs.create_job_process(job, process_two.id, process_instance_two.id)
+      { :ok, _job_process } = Jobs.create_job_process(job, process.id, process_instance_one.id)
+      { :ok, _job_process } = Jobs.create_job_process(job, process_two.id, process_instance_two.id)
 
 
-      { :ok, job_step } = Jobs.create_job_step(job, step.id)
-      { :ok, job_step } = Jobs.create_job_step(job, step.id)
-      { :ok, job_step } = Jobs.create_job_step(job, step_five.id)
-      { :ok, job_step } = Jobs.create_job_step(job, step_six.id)
+      { :ok, _job_step } = Jobs.create_job_step(job, step.id)
+      { :ok, _job_step } = Jobs.create_job_step(job, step.id)
+      { :ok, _job_step } = Jobs.create_job_step(job, step_five.id)
+      { :ok, _job_step } = Jobs.create_job_step(job, step_six.id)
 
       job = Jobs.get_job!(job.id, %{ preloads: [ processes: true, steps: true ] })
       { :ok, job_instance } = UserDocs.JobInstances.create_job_instance(job)
@@ -282,16 +282,16 @@ defmodule UserDocs.JobsTest do
 
 
     end
-"""
-    test "update_job_step_instance/2 updates the job", %{ team: team, step: step, process: process } do
+
+    test "update_job_step_instance/2 updates the job", %{ team: team, process: process } do
       job = JobsFixtures.job(team.id)
       process = UserDocs.AutomationManager.get_process!(process.id)
       job = Jobs.get_job!(job.id, %{ preloads: [ steps: true, processes: true, last_job_instance: true ]})
-      job_instance = UserDocs.JobInstances.create_job_instance(job)
+      _job_instance = UserDocs.JobInstances.create_job_instance(job)
       { :ok, process_instance } =
         UserDocs.ProcessInstances.create_process_instance_from_process(process, Jobs.max_order(job) + 1)
 
-      { :ok, job_process } = Jobs.create_job_process(job, process.id, process_instance.id)
+      { :ok, _job_process } = Jobs.create_job_process(job, process.id, process_instance.id)
 
       job =
         Jobs.get_job!(job.id, %{ preloads: [ steps: true, processes: true, last_job_instance: true ]})
