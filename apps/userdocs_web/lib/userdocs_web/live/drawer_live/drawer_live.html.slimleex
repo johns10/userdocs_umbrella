@@ -30,13 +30,14 @@ css:
   }
 
 input id="collapsible" class="toggle" type="checkbox" checked=@closed
-div#sidebar.is-flex.is-flex-direction-column phx-click="toggle-sidebar" phx-target="<%= @myself.cid %>"
+div#sidebar.is-flex.is-flex-direction-column
   .box.is-flex.is-flex-direction-row.is-justify-content-space-between.py-3.px-4.has-background-primary.has-text-primary-light.is-shadowless.mb-0
     h2.text Automation Manager
-    = if not @closed do
-      i.fa.fa-minus-square.py-1
-    - else 
-      i.fa.fa-plus-square.py-1
+    span phx-click="toggle-sidebar" phx-target="<%= @myself.cid %>"
+      = if not @closed do
+        i.fa.fa-minus-square.py-1
+      - else 
+        i.fa.fa-plus-square.py-1
   .box.pl-4.pt-4.pr-0.sidebar-content
     = live_component @socket,
       UserDocsWeb.AutomationBrowserHandlerLive, 
