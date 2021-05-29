@@ -29,7 +29,6 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
   end
 
   def load_processes(%{ assigns: %{ current_version: current_version }} = socket, opts) do
-    IO.puts("loading processes")
     opts =
       opts
       |> Keyword.put(:filters, %{version_id: current_version.id})

@@ -24,7 +24,6 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   end
 
   def processes(socket, opts) do
-    IO.puts("Loading processes")
     opts =
       opts
       |> Keyword.put(:filters, %{team_id: socket.assigns.current_team.id})
