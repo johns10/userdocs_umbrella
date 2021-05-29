@@ -145,8 +145,7 @@ export async function executeProcess(process: Process.Process, runner: Runner) {
   return completedProcess
 }
 
-export async function executeJob(job: Job.Job, runner: Runner, configuration: Configuration) {
-  console.log(job)
+export async function executeJob(job: Job.Job, runner: Runner) {
   const completedJob = await Job.execute(job, runner)
   return completedJob
 }
