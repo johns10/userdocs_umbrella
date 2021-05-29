@@ -32,6 +32,9 @@ npm-debug.log
 /assets/js/electron/node_modules/
 /assets/js/electron/default/
 /assets/js/userdocs_desktop/node_modules/
+/assets/js/userdocs_cicd/dist/
+/assets/js/userdocs_cicd/binary-dist/
+/assets/js/userdocs_cicd/node_modules/
 
 # Since we are building assets from assets/,
 # we ignore priv/static. You may want to comment
