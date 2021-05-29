@@ -1,5 +1,3 @@
-import {handle_message} from "../commands/commands.js"
-
 let Hooks = {}
 
 Hooks.testSelector = {
@@ -46,29 +44,6 @@ Hooks.fileTransfer = {
   }
 };
 
-/*
-Hooks.stepStatus = {
-  mounted() {
-    this.el.addEventListener("update-step", e => {
-      this.pushEventTo('#step-' + e.detail.step_id + '-status', "update_step", e.detail)
-    })
-  }
-};
-
-Hooks.executeProcess = {
-  mounted() {
-    this.handleEvent("execute-process", (message) => {
-      console.log("Hook triggered for execute process")
-      console.log(message)
-      window.userdocs.executeProcess(message)
-    })
-    this.el.addEventListener("update-process", e => {
-      //console.log("executeProcess hook got an update for process " + e.detail.attrs.step.process.id + " to " + e.detail.status)
-      this.pushEventTo('#process-' + e.detail.attrs.step.process.id + '-runner', "update_process", e.detail)
-    })
-  }
-};
-*/
 Hooks.automationManager = {
   mounted() {
     this.handleEvent("start-running", (message) => { window.userdocs.start(message) })
@@ -92,14 +67,6 @@ Hooks.configuration = {
   }
 }
 
-// TODO: THIS IS FOR THE EXTENSION AND SHOULD BE REMOVED 
-Hooks.configure = {
-  mounted() {
-    this.handleEvent("configure", (message) => {
-      handle_message(message, { environment: 'extension' })
-    })
-  }
-};
 
 
 
