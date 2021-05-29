@@ -3,7 +3,6 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
 
   alias UserDocs.Documents
   alias UserDocs.Automation
-  alias UserDocs.Media
   alias UserDocs.Web
 
   alias UserDocsWeb.Loaders
