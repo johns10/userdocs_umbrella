@@ -307,19 +307,17 @@ defmodule UserDocs.Jobs do
     %Job{ job_processes: job_processes } = job,
     %StepInstance{ id: id, process_instance_id: process_instance_id} = step_instance
   ) do
-    IO.puts("updating job step instance #{step_instance.id} inside process instance with id #{process_instance_id}")
+    _log_string = "updating job step instance #{step_instance.id} inside process instance with id #{process_instance_id}"
     job_processes =
       Enum.map(job_processes,
         fn(job_process) ->
           if job_process.process_instance_id == process_instance_id do
             _log_string = "Matched Process Instance #{job_process.process_instance_id}"
-            IO.puts(_log_string)
             steps =
               Enum.map(job_process.process.steps,
                 fn(inner_step) ->
                   if inner_step.last_step_instance.id == id do
                     _log_string = "Matched Step Instance #{inner_step.last_step_instance.id}.  Updating it's status to #{step_instance.status}"
-                    IO.puts(_log_string)
                     step_instance = Map.put(inner_step.last_step_instance, :status, step_instance.status)
                     Map.put(inner_step, :last_step_instance, step_instance)
                   else
