@@ -46,6 +46,7 @@ defmodule UserDocs.Automation.Step do
     fields_changeset(step, attrs)
     |> assoc_changeset()
     |> names_changeset()
+    |> cast_assoc(:last_step_instance)
     |> validate_required([:order])
   end
 
