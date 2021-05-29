@@ -61,16 +61,14 @@ defmodule UserDocsWeb.ProcessLiveTest do
       {:ok, index_live, _html} = live(conn, Routes.process_index_path(conn, :index))
 
       index_live
-      |> element("#sidebar")
+      |> element("#sidebar-toggle")
       |> render_click()
 
-      index_live
+      assert index_live
       |> element("#process-" <> to_string(process.id) <> "-queuer")
-      |> render_click()
-
-
+      |> render_click() =~ process.name
     end
-"""
+
     test "saves new process", %{authed_conn: conn, version: version} do
       {:ok, index_live, _html} = live(conn, Routes.process_index_path(conn, :index))
 
@@ -127,6 +125,13 @@ defmodule UserDocsWeb.ProcessLiveTest do
       assert index_live |> element("#delete-process-" <> to_string(process.id)) |> render_click()
       refute has_element?(index_live, "#process-" <> to_string(process.id))
     end
-    """
+
+    test "index handles standard events", %{authed_conn: conn, version: version } do
+      {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
+      send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
+      assert live
+             |> element("#version-picker-#{version.id}")
+             |> render_click() =~ version.name
+    end
   end
 end
