@@ -1204,20 +1204,6 @@ defmodule UserDocs.TestDataset do
     {:ok, %DocumentVersion{id: _document_version_id}} =
       Documents.create_document_version(document_version)
 
-    test_job_attrs = %{
-      order: 1,
-      status: "not_started",
-      name: "Test Job",
-      team_id: userdocs_team_id
-    }
-
-    { :ok, %Job{ id: _test_job_id } = test_job } =
-      Jobs.create_job(test_job_attrs)
-
-
-    test_everything_process = Automation.get_process!(test_everything_process_id, %{ preloads: "*"})
-    { :ok, process_instance } = ProcessInstances.create_process_instance_from_job_and_process(test_everything_process, test_job)
-
   end
 
 end
