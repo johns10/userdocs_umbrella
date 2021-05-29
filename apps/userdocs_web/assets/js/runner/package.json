@@ -21,12 +21,8 @@
   },
   "homepage": "https://github.com/johns10/userdocs_umbrella#readme",
   "dependencies": {
-    "axios": "^0.21.1",
     "bufferutil": "^4.0.3",
-    "electron-is-dev": "^2.0.0",
     "fs": "^0.0.1-security",
-    "graphql": "^15.5.0",
-    "graphql-request": "^3.4.0",
     "puppeteer": "^9.1.1",
     "uuid": "^8.3.2"
   },
