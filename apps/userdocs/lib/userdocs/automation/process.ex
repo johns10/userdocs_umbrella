@@ -26,6 +26,8 @@ defmodule UserDocs.Automation.Process do
     process
     |> cast(attrs, [:order, :name, :version_id])
     |> foreign_key_constraint(:version_id)
+    |> cast_assoc(:last_process_instance)
+    |> cast_assoc(:steps)
     |> validate_required([:name])
   end
 
