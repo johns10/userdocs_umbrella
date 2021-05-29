@@ -121,7 +121,7 @@ defmodule UserDocs.Screenshot do
 
     test "get_screenshot_url/1 with a screenshot a presigned url", %{ step: step, team: team } do
       screenshot = MediaFixtures.screenshot(step.id)
-      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base_64, single_white_pixel())
+      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base64, single_white_pixel())
       { :ok, screenshot } = Screenshots.update_screenshot(screenshot, attrs, team)
       { status, url } = Screenshots.get_screenshot_url(screenshot, team)
       assert status == :ok
@@ -176,7 +176,7 @@ defmodule UserDocs.Screenshot do
       { :ok, screenshot } = %Screenshot{} |> Screenshot.changeset(attrs) |> UserDocs.Repo.insert()
       attrs = MediaFixtures.screenshot_attrs(:nameless, step.id, single_white_pixel())
       { :ok, screenshot } = screenshot |> Screenshots.update_screenshot(attrs)
-      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base_64, single_white_pixel())
+      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base64, single_white_pixel())
       { :ok, screenshot } = screenshot |> Screenshots.update_screenshot(attrs)
       file_name = Screenshots.unpath(screenshot.aws_screenshot)
       score = score_uploaded_single_white_screenshot("screenshots/" <> to_string(screenshot.name) <> ".png", team)
@@ -194,7 +194,7 @@ defmodule UserDocs.Screenshot do
 
     test "update_screenshot/2 with no aws_screenshot creates a file on aws", %{ step: step, team: team } do
       screenshot = MediaFixtures.screenshot(step.id)
-      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base_64, single_white_pixel())
+      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base64, single_white_pixel())
       { :ok, screenshot } = Screenshots.update_screenshot(screenshot, attrs, team)
       score = score_uploaded_single_white_screenshot(screenshot.aws_screenshot, team)
       assert score == "inf"
@@ -224,10 +224,10 @@ defmodule UserDocs.Screenshot do
 
     test "update_screenshot/2 with a different file creates a provisional and diff screenshot", %{ step: step, team: team } do
       screenshot = MediaFixtures.screenshot(step.id)
-      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base_64, single_white_pixel())
+      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base64, single_white_pixel())
       { :ok, updated_screenshot } = Screenshots.update_screenshot(screenshot, attrs, team)
-      updated_screenshot = updated_screenshot |> Map.put(:base_64, nil)
-      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base_64, single_black_pixel())
+      updated_screenshot = updated_screenshot |> Map.put(:base64, nil)
+      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base64, single_black_pixel())
       { :ok, final_screenshot } = Screenshots.update_screenshot(updated_screenshot, attrs, team)
 
       provisional_score = score_uploaded_single_black_screenshot(final_screenshot.aws_provisional_screenshot, team)
@@ -241,9 +241,9 @@ defmodule UserDocs.Screenshot do
 
     test "update_screenshot/2 with the same file doesn't create a provisional or a diff", %{ step: step, team: team } do
       screenshot = MediaFixtures.screenshot(step.id)
-      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base_64, single_white_pixel())
+      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base64, single_white_pixel())
       { :ok, _updated_screenshot } = Screenshots.update_screenshot(screenshot, attrs, team)
-      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base_64, single_white_pixel())
+      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base64, single_white_pixel())
       { :ok, final_screenshot } = Screenshots.update_screenshot(screenshot, attrs, team)
       assert final_screenshot.aws_provisional_screenshot == nil
       assert final_screenshot.aws_diff_screenshot == nil
@@ -251,10 +251,10 @@ defmodule UserDocs.Screenshot do
 
     test "apply_provisional_screenshot/1 moves the provisional to the main, and removes the provisional and the diff", %{ step: step, team: team } do
       screenshot = MediaFixtures.screenshot(step.id)
-      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base_64, single_white_pixel())
+      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base64, single_white_pixel())
       { :ok, screenshot } = Screenshots.update_screenshot(screenshot, attrs, team)
-      screenshot = screenshot |> Map.put(:base_64, nil)
-      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base_64, single_black_pixel())
+      screenshot = screenshot |> Map.put(:base64, nil)
+      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base64, single_black_pixel())
       { :ok, screenshot } = Screenshots.update_screenshot(screenshot, attrs, team)
       final_screenshot = Screenshots.apply_provisional_screenshot(screenshot, team)
       aws_key = "screenshots/" <> to_string(screenshot.id) <> ".png"

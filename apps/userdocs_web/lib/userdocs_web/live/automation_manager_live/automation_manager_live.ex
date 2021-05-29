@@ -326,12 +326,12 @@ defmodule UserDocsWeb.AutomationManagerLive do
     assign(socket, :job, job)
   end
 
-  def maybe_update_screenshot(%{ "id" => id, "base_64" => _ } = attrs, team) do
+  def maybe_update_screenshot(%{ "id" => id, "base64" => _ } = attrs, team) do
     IO.inspect("updating sscreenshot")
     UserDocs.Screenshots.get_screenshot!(id)
     |> UserDocs.Screenshots.update_screenshot(attrs, team)
   end
-  def maybe_update_screenshot(%{ "base_64" => _ } = attrs, team) do
+  def maybe_update_screenshot(%{ "base64" => _ } = attrs, team) do
     IO.inspect("creating sscreenshot")
     { :ok, screenshot } = UserDocs.Screenshots.create_screenshot(attrs)
     UserDocs.Screenshots.update_screenshot(screenshot, attrs, team)
@@ -462,12 +462,12 @@ when status == "complete" do
   # { :ok, _step } = update_step_status(step_id, status)
   case attrs["screenshot"] do
     nil -> socket
-    %{ "id" => id, "base_64" => _ } = attrs ->
+    %{ "id" => id, "base64" => _ } = attrs ->
       { :ok, screenshot } = UserDocs.Screenshots.get_screenshot!(id)
       |> UserDocs.Screenshots.update_screenshot(attrs, socket.assigns.current_team)
       send(self(), { :broadcast, "update", screenshot })
       socket
-    %{ "base_64" => _ } = attrs ->
+    %{ "base64" => _ } = attrs ->
       { :ok, screenshot } = UserDocs.Screenshots.create_screenshot(%{ step_id: step_id })
       { :ok, screenshot } = UserDocs.Screenshots.update_screenshot(screenshot, attrs, socket.assigns.current_team)
       send(self(), { :broadcast, "update", screenshot })

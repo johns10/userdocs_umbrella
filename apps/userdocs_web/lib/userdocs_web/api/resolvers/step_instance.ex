@@ -36,17 +36,17 @@ defmodule UserDocsWeb.API.Resolvers.StepInstance do
 
   def update_step_instance(_parent, %{id: id} = args, resolution) do
     step_instance = StepInstances.get_step_instance!(args.id, %{ preloads: "*"})
-    StepInstances.update_step_instance(step_instance, map_base_64(args))
+    StepInstances.update_step_instance(step_instance, map_base64(args))
   end
 
 
-  def map_base_64(args) do
+  def map_base64(args) do
     try do
       screenshot =
         args
         |> Map.get(:step)
         |> Map.get(:screenshot)
-        |> Map.put(:base_64, args.step.screenshot.base64)
+        |> Map.put(:base64, args.step.screenshot.base64)
         |> Map.delete(:base64)
 
       Kernel.put_in(args, [ :step, :screenshot ], screenshot)

@@ -91,7 +91,7 @@ defmodule UserDocs.Screenshots do
   Creates a screenshot.
   """
   def create_screenshot(attrs \\ %{})
-  def create_screenshot(%{ step_id: step_id, base_64: _ } = attrs) do
+  def create_screenshot(%{ step_id: step_id, base64: _ } = attrs) do
     result = %Screenshot{}
     |> Screenshot.changeset(%{ step_id: step_id })
     |> Repo.insert()
@@ -124,7 +124,7 @@ defmodule UserDocs.Screenshots do
     |> Screenshot.changeset(attrs)
     |> Repo.update()
   end
-  def update_screenshot(%Screenshot{ base_64: _base_64 } = screenshot, attrs, %UserDocs.Users.Team{} = _team) do
+  def update_screenshot(%Screenshot{ base64: _base64 } = screenshot, attrs, %UserDocs.Users.Team{} = _team) do
     screenshot
     |> Screenshot.changeset(attrs)
     |> Repo.update()
@@ -192,18 +192,18 @@ defmodule UserDocs.Screenshots do
     screenshot
   end
 
-  def create_aws_screenshot(%{ data: data, changes: %{ base_64: base_64 } } = changeset) do
+  def create_aws_screenshot(%{ data: data, changes: %{ base64: base64 } } = changeset) do
     case Ecto.Changeset.get_field(changeset, :step_id) do
       nil -> throw("Screenshot has no step id")
       step_id ->
         team = UserDocs.Users.get_step_team!(step_id)
-        contents = Base.decode64!(base_64)
+        contents = Base.decode64!(base64)
         file_name = file_name(changeset, :production)
         aws_path = put_encoded_string_in_aws_object(contents, team, path(file_name))
         Ecto.Changeset.put_change(changeset, :aws_screenshot, aws_path)
     end
   end
-  def update_aws_screenshot(%{ data: %{ aws_screenshot: screenshot_path }, changes: %{ base_64: base_64 } } = changeset) do
+  def update_aws_screenshot(%{ data: %{ aws_screenshot: screenshot_path }, changes: %{ base64: base64 } } = changeset) do
     case Ecto.Changeset.get_field(changeset, :step_id) do
       nil -> throw("Screenshot has no step id")
       step_id ->
@@ -215,7 +215,7 @@ defmodule UserDocs.Screenshots do
           diff: "./tmp/" <> UUID.uuid4() <> ".png",
           opts: aws_opts(team),
           bucket: team.aws_bucket,
-          base_64: base_64,
+          base64: base64,
           team: team,
           score: nil
         }
@@ -229,11 +229,11 @@ defmodule UserDocs.Screenshots do
   end
 
   def prepare_aws_file(%{ aws: aws_path, original: local_path, updated: updated,
-    bucket: bucket, base_64: base_64, opts: opts } = state
+    bucket: bucket, base64: base64, opts: opts } = state
   ) do
     case ExAws.S3.download_file(bucket, aws_path, local_path) |> ExAws.request(opts) do
       { :ok, :done } ->
-        File.write(updated, Base.decode64!(base_64))
+        File.write(updated, Base.decode64!(base64))
         state
       { :error, reason } -> raise("#{__MODULE__}.prepare_aws_file failed because: #{reason}")
       _ -> raise("#{__MODULE__}.prepare_aws_file failed")

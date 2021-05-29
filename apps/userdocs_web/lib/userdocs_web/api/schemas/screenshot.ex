@@ -9,7 +9,7 @@ defmodule UserDocsWeb.API.Schema.Screenshot do
     field :aws_provisional_screenshot, :string
     field :aws_diff_screenshot, :string
     field :base64, :string do
-      resolve fn parent, _, _ -> {:ok, parent.base_64} end
+      resolve fn parent, _, _ -> {:ok, parent.base64} end
     end
   end
 
@@ -18,7 +18,7 @@ defmodule UserDocsWeb.API.Schema.Screenshot do
     field :name, :string
     field :step_id, :id
     field :base64, :string do
-      resolve fn parent, _, _ -> {:ok, parent.base_64} end
+      resolve fn parent, _, _ -> {:ok, parent.base64} end
     end
   end
 end
