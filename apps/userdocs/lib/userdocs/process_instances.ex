@@ -104,13 +104,25 @@ defmodule UserDocs.ProcessInstances do
   alias UserDocs.Jobs.Job
   def create_process_instance_from_job_and_process(%Process{} = process, %Job{} = job, order \\ 0) do
     process_instance = Ecto.build_assoc(job, :process_instances)
-    attrs = base_process_instance_attrs(process, step_instance_attrs(process, process_instance.id), order)
+    attrs = base_process_instance_attrs(process, step_instance_attrs(process), order)
     create_process_instance(attrs, process_instance)
   end
 
   def create_process_instance_from_process(process, order) do
     base_process_instance_attrs(process, step_instance_attrs(process), order)
     |> create_process_instance()
+  end
+
+  def step_instance_attrs(process) do
+    { step_instance_attrs, _max_order } =
+      process.steps
+      |> Enum.sort(fn(x, y) -> x.order < y.order end)
+      |> Enum.reduce({ [], 1 },
+        fn(step, { acc, inner_order }) ->
+          { [ StepInstances.base_step_instance_attrs(step, inner_order) | acc ], inner_order + 1 }
+        end)
+
+    Enum.reverse(step_instance_attrs)
   end
 
   def base_process_instance_attrs(process, step_instance_attrs, order) do
@@ -140,17 +152,6 @@ defmodule UserDocs.ProcessInstances do
     process_instance
     |> ProcessInstance.changeset(attrs)
     |> Repo.update()
-  end
-  def step_instance_attrs(process, process_instance_id \\ nil) do
-    { step_instance_attrs, _max_order } =
-      process.steps
-      |> Enum.sort(fn(x, y) -> x.order < y.order end)
-      |> Enum.reduce({ [], 1 },
-        fn(step, { acc, inner_order }) ->
-          { [ StepInstances.base_step_instance_attrs(step, inner_order) | acc ], inner_order + 1 }
-        end)
-
-    Enum.reverse(step_instance_attrs)
   end
 
   def delete_process_instance(%ProcessInstance{} = process_instance) do
