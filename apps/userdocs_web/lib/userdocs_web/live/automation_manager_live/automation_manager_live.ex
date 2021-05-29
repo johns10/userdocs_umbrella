@@ -251,7 +251,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
   def handle_event("update-step", %{ "step" => %{ "id" => id } = step_attrs }, socket) do
     step_attrs = underscored_map_keys(step_attrs)
     if step_attrs["last_step_instance"]["step_id"] == nil do
-      IO.inspect(step_attrs)
       raise "Got a nil step id for some reason, not updating"
     end
     Logger.info("Handling update step #{id}.  It's step instance is #{step_attrs["last_step_instance"]["id"]}.  We'll set it's status to #{step_attrs["last_step_instance"]["status"]}")
@@ -259,13 +258,19 @@ defmodule UserDocsWeb.AutomationManagerLive do
     process_instance_id = step_attrs["last_step_instance"]["process_instance_id"]
     step_instance_id = step_attrs["last_step_instance"]["id"]
     step =
-      socket.assigns.job.job_processes
-      |> Enum.filter(fn(jp) -> jp.process_instance_id == process_instance_id end)
-      |> Enum.at(0)
-      |> Map.get(:process)
-      |> Map.get(:steps)
-      |> Enum.filter(fn(s) -> s.last_step_instance.id == step_instance_id end)
-      |> Enum.at(0)
+      try do
+        socket.assigns.job.job_processes
+        |> Enum.filter(fn(jp) -> jp.process_instance_id == process_instance_id end)
+        |> Enum.at(0)
+        |> Map.get(:process)
+        |> Map.get(:steps)
+        |> Enum.filter(fn(s) -> s.last_step_instance.id == step_instance_id end)
+        |> Enum.at(0)
+      rescue
+        e in BadMapError -> AutomationManager.get_step!(id)
+      end
+
+    IO.inspect(step_attrs)
 
     changeset = Step.runner_changeset(step, step_attrs)
     { :ok, updated_step } = UserDocs.Repo.update(changeset)
