@@ -23,10 +23,7 @@ export interface StepInstance {
 export function allowedFields(stepInstance: StepInstance) {
   return {
     id: stepInstance.id,
-    status: stepInstance.status,
-    order: stepInstance.order,
-    stepId: stepInstance.stepId,
-    step: Step.allowedFields(stepInstance.step)
+    status: stepInstance.status
   }
 }
 

@@ -144,12 +144,12 @@ export function allowedFields(step: Step) {
     order: step.order
   }
   if(step.screenshot) fields.screenshot = step.screenshot
+  if(step.lastStepInstance) { 
+    fields.lastStepInstance = StepInstance.allowedFields(step.lastStepInstance) 
+  }
   return fields
 }
 
-export const UPDATE_STEP_SCREENSHOT = gql `
-
-`
 
 export const STEP_SCREENSHOT = gql `
   fragment StepBase64 on Step {

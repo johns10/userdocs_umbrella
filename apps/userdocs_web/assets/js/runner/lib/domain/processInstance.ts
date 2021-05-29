@@ -70,14 +70,9 @@ export function stepFailedError(processInstance: ProcessInstance, stepInstance: 
 }
 
 export function allowedFields(processInstance: ProcessInstance) {
-  var stepInstances = []
-  for(const stepInstance of processInstance.stepInstances) {
-    stepInstances.push(StepInstance.allowedFields(stepInstance))
-  } 
   return {
     id: processInstance.id,
-    status: processInstance.status,
-    stepInstances:  stepInstances
+    status: processInstance.status
   }
 }
 

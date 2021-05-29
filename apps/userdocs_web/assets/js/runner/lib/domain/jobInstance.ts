@@ -13,3 +13,10 @@ export interface JobInstance {
   startedAt?: Date,
   finishedAt?: Date
 }
+
+export function allowedFields(jobInstance: JobInstance) {
+  return {
+    id: jobInstance.id,
+    status: jobInstance.status
+  }
+}

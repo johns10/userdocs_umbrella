@@ -100,9 +100,9 @@ export function allowedFields(job: Job) {
   } 
   return {
     id: job.id,
-    status: job.status,
     jobSteps:  jobSteps,
-    jobProcesses: jobProcesses
+    jobProcesses: jobProcesses,
+    lastJobInstance: JobInstance.allowedFields(job.lastJobInstance)
   }
 }
 
@@ -114,13 +114,3 @@ function getExecutableItems(job: Job) {
     .concat(job.jobProcesses, job.jobSteps)
     .sort(function(a, b) { return a.order - b.order })
 }
-
-
-export const UPDATE_JOB = gql `
-  mutation UpdateJob($id: ID!, $status: String!, $processInstances: [ ProcessInstanceInput ] $stepInstances: [ StepInstanceInput ] ) {
-    updateJob(id: $id, status: $status, processInstances: $processInstances, stepInstances: $stepInstances) {
-      id
-      status
-    }
-  }
-`

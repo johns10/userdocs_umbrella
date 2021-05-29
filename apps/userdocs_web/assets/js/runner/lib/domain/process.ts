@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid';
-
 import * as ProcessInstance from './processInstance'
 import * as Step from './step'
 import { Runner } from '../runner/runner'
@@ -89,6 +88,9 @@ export function allowedFields(process: Process) {
   var fields: any = {
     id: process.id,
     steps: steps
+  }
+  if (process.lastProcessInstance) {
+    fields.lastProcessInstance = ProcessInstance.allowedFields(process.lastProcessInstance)
   }
   return fields
 }
