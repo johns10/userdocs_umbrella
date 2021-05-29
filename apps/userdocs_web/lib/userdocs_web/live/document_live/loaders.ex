@@ -36,10 +36,6 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
     Automation.load_processes(socket, opts)
   end
 
-  def load_files(socket, opts) do
-    Media.load_files(socket, opts)
-  end
-
   def load_steps(socket, opts) do
     params = %{
       screenshot: true,
