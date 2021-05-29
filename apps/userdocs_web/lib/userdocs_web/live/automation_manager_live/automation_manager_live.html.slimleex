@@ -13,13 +13,11 @@ css:
 = content_tag(:div, [ id: @id ]) do 
   .field.has-addons   
     p.control 
-      button.button 
-        = link to: "#", phx_click: "execute-job", phx_target: @myself.cid do
-          = content_tag(:i, "", [class: "fa fa-play-circle", aria_hidden: "true"])
+      = link to: "#", phx_click: "execute-job", phx_target: @myself.cid, class: "button", type: "button" do
+        = content_tag(:i, "", [class: "fa fa-play-circle", aria_hidden: "true"])
     p.control 
-      button.button 
-        = link to: "#", phx_click: "reset-job",  phx_target: @myself.cid do
-          = content_tag(:i, "", [class: "fa fa-refresh", aria_hidden: "true"])
+      = link to: "#", phx_click: "reset-job",  phx_target: @myself.cid, class: "button", type: "button" do
+        = content_tag(:i, "", [class: "fa fa-refresh", aria_hidden: "true"])
 
   = if @job_id != nil do
     aside.menu
