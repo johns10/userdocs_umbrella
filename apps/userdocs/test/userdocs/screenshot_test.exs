@@ -257,7 +257,7 @@ defmodule UserDocs.Screenshot do
       attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base64, single_black_pixel())
       { :ok, screenshot } = Screenshots.update_screenshot(screenshot, attrs, team)
       final_screenshot = Screenshots.apply_provisional_screenshot(screenshot, team)
-      aws_key = "screenshots/" <> to_string(screenshot.id) <> ".png"
+      _aws_key = "screenshots/" <> to_string(screenshot.id) <> ".png"
       opts = Screenshots.aws_opts(team)
       { :ok, _ } = ExAws.S3.download_file(team.aws_bucket, final_screenshot.aws_screenshot, "test.png") |> ExAws.request(opts)
       assert File.read!("test.png") |> Base.encode64() == single_black_pixel()

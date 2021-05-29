@@ -96,14 +96,7 @@ defmodule UserDocs.StepInstancesTest do
       assert {:ok, %StepInstance{} = step_instance} = StepInstances.create_step_instance(attrs)
       assert step_instance.name == attrs.name
     end
-"""
-    deprecated
-    test "create_step_instance_from_job_and_step/2 with valid data creates a step instance with the job set", %{ step: step, team: team } do
-      _attrs = JobsFixtures.step_instance_attrs(:valid, step.id)
-      job = JobsFixtures.job(team.id)
-      assert {:ok, %StepInstance{}} = StepInstances.create_step_instance_from_job_and_step(step, job, 0)
-    end
-"""
+
     test "create_step_instance_from_step/2 with valid data creates a step instance with the step preloaded", %{ step: step } do
       {:ok, %StepInstance{}} = StepInstances.create_step_instance_from_step(step, 0)
     end
@@ -142,17 +135,7 @@ defmodule UserDocs.StepInstancesTest do
       step_instance = JobsFixtures.step_instance(step.id)
       assert %Ecto.Changeset{} = StepInstances.change_step_instance(step_instance)
     end
-"""
-    Deprecated
-    test "format_step_instance_for_export/1 returns a step instance with attrs", %{ step: step, team: team } do
-      job = JobsFixtures.job(team.id)
-      {:ok, %StepInstance{} = step_instance} = StepInstances.create_step_instance_from_job_and_step(step, job, 0)
-      step_instance =
-        Map.put(step_instance, :step, step) # TODO: Investigate. Should I have to put the step in the instance?
-        |> StepInstances.format_step_instance_for_export()
-      assert step_instance.attrs.id == step.id
-    end
-"""
+
     test "step_instances_status/1 returns" do
       failed = %StepInstance{ status: "failed" }
       complete = %StepInstance{ status: "complete" }
