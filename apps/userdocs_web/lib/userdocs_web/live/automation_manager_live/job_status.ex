@@ -4,6 +4,12 @@ defmodule UserDocsWeb.AutomationManager.JobStatus do
 
   alias UserDocs.ProcessInstances.ProcessInstance
 
+  @impl true
+  def render(assigns) do
+    ~L"""
+    """
+  end
+
   def status(nil) do
     instance = %{ status: "none", id: nil, step_id: nil }
     content_tag(:span, span_kwargs(instance)) do
