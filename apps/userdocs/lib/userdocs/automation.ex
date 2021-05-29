@@ -553,6 +553,7 @@ defmodule UserDocs.Automation do
       ** (Ecto.NoResultsError)
 
   """
+  def get_process!(id, params \\ %{})
   def get_process!(id, %{ preloads: "*"}) do
     Repo.one! from process in Process,
       where: process.id == ^id,
@@ -576,7 +577,6 @@ defmodule UserDocs.Automation do
         }
       ]
   end
-  def get_process!(id, params \\ %{})
   def get_process!(id, params) do
     base_process_query(id)
     |> maybe_preload_pages(params[:pages])
