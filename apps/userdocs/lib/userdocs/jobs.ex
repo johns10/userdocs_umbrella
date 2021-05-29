@@ -210,7 +210,6 @@ defmodule UserDocs.Jobs do
   alias UserDocs.Automation.Process
 
   def prepare_for_execution(%Job{ job_processes: job_processes, job_steps: job_steps } = job) do
-    IO.puts("First call")
     job_processes = Enum.map(job_processes,
       fn(jp) ->
         prepare_for_execution(jp)
