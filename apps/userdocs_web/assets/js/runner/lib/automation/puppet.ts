@@ -2,6 +2,9 @@ import { Step } from '../domain/step'
 import { stepHandlers } from './puppeteer/stepHandlers'
 import { Runner, Configuration } from '../runner/runner'
 import { Browser } from 'puppeteer'
+import * as path from 'path'
+import * as os from 'os'
+
 const puppeteer = require('puppeteer')
 
 export const Puppet = {
@@ -17,7 +20,7 @@ export const Puppet = {
     else throw new Error(`Handler not found for ${step.stepType.name}`)
   },
   openBrowser: async(runner: Runner) => {
-    var executablePath = puppeteer.executablePath().replace("app.asar", "app.asar.unpacked")
+    var executablePath = puppeteer.executablePath()
     var args
 
     if(runner.environment == 'development') {
@@ -29,13 +32,17 @@ export const Puppet = {
         .concat('--no-zygote')
         .concat('--no-sandbox')
     } else if(runner.environment == 'desktop') {
+      executablePath = puppeteer.executablePath().replace("app.asar", "app.asar.unpacked")
       args = puppeteer.defaultArgs()
         .filter(arg => String(arg).toLowerCase() !== '--disable-extensions')
-        .filter(arg => String(arg).toLowerCase() !== '--headless')
       if (runner.userDataDirPath) {
         args.push('--user-data-dir=' + runner.userDataDirPath);
       }
     } else if(runner.environment == 'cicd') {
+      const isPkg = typeof (process as any).pkg !== 'undefined';
+
+      executablePath = '/usr/bin/chromium-browser'
+
       args = puppeteer.defaultArgs()
         .concat('--single-process')
         .concat('--no-zygote')
