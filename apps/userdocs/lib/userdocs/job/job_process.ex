@@ -24,6 +24,7 @@ defmodule UserDocs.Jobs.JobProcess do
     |> foreign_key_constraint(:process_id)
     |> foreign_key_constraint(:job_id)
     |> foreign_key_constraint(:process_instance_id)
+    |> cast_assoc(:process)
     |> validate_required([ :order ])
   end
 end
