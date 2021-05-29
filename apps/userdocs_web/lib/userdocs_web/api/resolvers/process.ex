@@ -2,6 +2,7 @@ defmodule UserDocsWeb.API.Resolvers.Process do
 
   alias UserDocs.Automation.Process
   alias UserDocs.Automation.Step
+  alias UserDocs.Jobs.JobProcess
 
   def get_process!(%Step{ process: %Process{} = process }, _args, _resolution) do
     IO.puts("Get process call where the parent is step, and it has a preloaded process")
@@ -12,4 +13,8 @@ defmodule UserDocsWeb.API.Resolvers.Process do
     { :ok, nil }
   end
 
+  def get_process!(%JobProcess{ process: %Process{} = process }, _args, _resolution) do
+    IO.puts("Get process call where the parent is job process, and it has a preloaded process")
+    { :ok, process }
+  end
 end

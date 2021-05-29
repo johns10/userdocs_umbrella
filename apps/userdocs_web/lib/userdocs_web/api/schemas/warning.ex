@@ -6,4 +6,10 @@ defmodule UserDocsWeb.API.Schema.Warning do
     field :name, :string
     field :stack, :string
   end
+
+  input_object :warning_input do
+    field :message, :string
+    field :name, :string
+    field :stack, :string
+  end
 end

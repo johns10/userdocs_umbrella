@@ -19,11 +19,13 @@ defmodule UserDocsWeb.API.Schema.Step do
     field :element, :element, resolve: &Resolvers.Element.get_element!/3
     field :screenshot, :screenshot, resolve: &Resolvers.Screenshot.get_screenshot!/3
     field :process, :process, resolve: &Resolvers.Process.get_process!/3
+    field :last_step_instance, :step_instance, resolve: &Resolvers.StepInstance.get_step_instance!/3
   end
 
   input_object :step_input do
     field :id, :id
     field :order, :integer
     field :screenshot, :screenshot_input
+    field :last_step_instance, :step_instance_input
   end
 end

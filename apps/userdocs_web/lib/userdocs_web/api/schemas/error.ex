@@ -6,4 +6,10 @@ defmodule UserDocsWeb.API.Schema.Error do
     field :name, :string
     field :stack, :string
   end
+
+  input_object :error_input do
+    field :message, :string
+    field :name, :string
+    field :stack, :string
+  end
 end

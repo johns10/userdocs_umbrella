@@ -1,6 +1,5 @@
 defmodule UserDocsWeb.API.Schema do
   use Absinthe.Schema
-  import_types UserDocsWeb.API.Schema.StepInstances
   import_types UserDocsWeb.API.Schema.Step
   import_types UserDocsWeb.API.Schema.Annotation
   import_types UserDocsWeb.API.Schema.Page
@@ -11,7 +10,11 @@ defmodule UserDocsWeb.API.Schema do
   import_types UserDocsWeb.API.Schema.Strategy
   import_types UserDocsWeb.API.Schema.AnnotationType
   import_types UserDocsWeb.API.Schema.Job
+  import_types UserDocsWeb.API.Schema.StepInstances
   import_types UserDocsWeb.API.Schema.ProcessInstance
+  import_types UserDocsWeb.API.Schema.JobInstance
+  import_types UserDocsWeb.API.Schema.JobProcess
+  import_types UserDocsWeb.API.Schema.JobStep
   import_types UserDocsWeb.API.Schema.Error
   import_types UserDocsWeb.API.Schema.Warning
 
@@ -32,9 +35,8 @@ defmodule UserDocsWeb.API.Schema do
     @desc "Update a Job"
     field :update_job, type: :job do
       arg :id, non_null(:id)
-      arg :status, non_null(:string)
-      arg :process_instances, list_of(:process_instance_input)
-      arg :step_instances, list_of(:step_instance_input)
+      arg :last_job_instance, :job_instance_input
+      arg :job_processes, list_of(:job_process_input)
       resolve &Resolvers.Job.update_job/3
     end
 

@@ -17,9 +17,6 @@ defmodule UserDocsWeb.API.Schema.StepInstances do
 
   input_object :step_instance_input do
     field :id, :id
-    field :order, :integer
     field :status, non_null(:string)
-    field :step, :step_input
-    field :step_id, :id
   end
 end

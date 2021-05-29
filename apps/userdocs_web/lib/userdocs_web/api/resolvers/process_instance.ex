@@ -1,10 +1,16 @@
 defmodule UserDocsWeb.API.Resolvers.ProcessInstance do
-  alias UserDocs.Jobs.Job
+  alias UserDocs.Jobs.JobProcess
   alias UserDocs.ProcessInstances
+  alias UserDocs.Automation.Process
 
-  def list_process_instances(%Job{ process_instances: process_instances }, _args, _resolution) when is_list(process_instances) do
+  def get_process_instance!(%JobProcess{ process_instance: process_instance }, _args, _resolution) do
     IO.puts("Got pi call")
-    { :ok, process_instances }
+    { :ok, process_instance }
+  end
+
+  def get_process_instance!(%Process{ last_process_instance: process_instance }, _args, _resolution) do
+    IO.puts("Got lpi call")
+    { :ok, process_instance }
   end
 
   def update_process_instance(_parent, %{id: id} = args, _resolution) do

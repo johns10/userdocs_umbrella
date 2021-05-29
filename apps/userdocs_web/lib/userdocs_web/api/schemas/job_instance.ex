@@ -1,8 +1,8 @@
-defmodule UserDocsWeb.API.Schema.ProcessInstance do
+defmodule UserDocsWeb.API.Schema.JobInstance do
   use Absinthe.Schema.Notation
   alias UserDocsWeb.API.Resolvers
 
-  object :process_instance do
+  object :job_instance do
     field :id, :id
     field :name, :string
     field :order, :integer
@@ -11,12 +11,15 @@ defmodule UserDocsWeb.API.Schema.ProcessInstance do
 
     field :warnings, list_of(:warning), resolve: &Resolvers.Warning.get_warning!/3
     field :errors, list_of(:error), resolve: &Resolvers.Error.get_error!/3
+
     field :step_instances, list_of(:step_instance), resolve: &Resolvers.StepInstance.list_step_instances/3
+    field :process_instances, list_of(:process_instance), resolve: &Resolvers.ProcessInstance.list_process_instance/3
   end
 
-  input_object :process_instance_input do
-    field :id, non_null(:id)
-    field :status, non_null(:string)
+  input_object :job_instance_input do
+    field :id, :id
+    field :status, :string
+    field :errors, list_of(:error_input)
+    field :warnings, list_of(:warning_input)
   end
-
 end
