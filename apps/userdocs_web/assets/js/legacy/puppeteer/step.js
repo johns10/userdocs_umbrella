@@ -55,14 +55,14 @@ async function elementScreenshot(browser, stepInstance) {
   let handle = await getElementHandle(browser, selector, strategy)
   if (!handle) raise("Element not found, couldn't take the screenshot.  Check the selector on the element for this step.")
 
-  let base_64 = await handle.screenshot({ path: filePath, encoding: "base64"});
+  let base64 = await handle.screenshot({ path: filePath, encoding: "base64"});
   if (stepInstance.attrs.screenshot === null) { 
-    stepInstance.attrs.screenshot = { base_64: base_64}
+    stepInstance.attrs.screenshot = { base64: base64}
   } else {
-    stepInstance.attrs.screenshot.base_64 = base_64
+    stepInstance.attrs.screenshot.base64 = base64
   }
   try {
-    writeFile(filePath, base_64, 'base64', function(err) {
+    writeFile(filePath, base64, 'base64', function(err) {
       console.log(err);
     });
   } catch(error) {
@@ -78,15 +78,15 @@ async function fullScreenScreenshot(browser, stepInstance) {
 
   await new Promise(resolve => setTimeout(resolve, 500));   
 
-  let base_64 = await page.screenshot({ encoding: "base64" });  
+  let base64 = await page.screenshot({ encoding: "base64" });  
 
   if (stepInstance.attrs.screenshot === null) { 
-    stepInstance.attrs.screenshot = { base_64: base_64}
+    stepInstance.attrs.screenshot = { base64: base64}
   } else {
-    stepInstance.attrs.screenshot.base_64 = base_64
+    stepInstance.attrs.screenshot.base64 = base64
   }
   try {
-    writeFile(filePath, base_64, 'base64', function(err) {
+    writeFile(filePath, base64, 'base64', function(err) {
       console.log(err);
     });
   } catch(error) {
