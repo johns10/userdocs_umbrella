@@ -39,7 +39,7 @@ export interface Configuration {
     process: CallbackConfiguration,
     job: CallbackConfiguration
   },
-  lib: { [ key: string ]: Function }
+  lib?: { [ key: string ]: Function } // need?
 }
 
 export interface CallbackConfiguration {
