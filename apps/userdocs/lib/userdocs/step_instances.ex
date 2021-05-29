@@ -86,15 +86,16 @@ defmodule UserDocs.StepInstances do
 
 
   alias UserDocs.Automation.Step
-  def create_step_instance_from_step(%Step{} = step, order \\ nil) do
-    attrs = base_step_instance_attrs(step, order)
+  def create_step_instance_from_step(%Step{} = step, order \\ nil, process_instance_id \\ nil) do
+    attrs = base_step_instance_attrs(step, order, process_instance_id)
     create_step_instance(attrs)
   end
 
-  def base_step_instance_attrs(step, order) do
+  def base_step_instance_attrs(step, order, process_instance_id) do
     %{
       order: order || step.order,
       step_id: step.id,
+      process_instance_id: process_instance_id,
       name: step.name,
       status: "not_started",
       errors: [],
