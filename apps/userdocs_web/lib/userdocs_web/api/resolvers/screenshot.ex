@@ -3,7 +3,6 @@ defmodule UserDocsWeb.API.Resolvers.Screenshot do
   alias UserDocs.Media.Screenshot
   alias UserDocs.Screenshots
   alias UserDocs.Automation.Step
-  alias UserDocs.Users
   alias UserDocs.Authorization
 
   def get_screenshot!(%Step{ screenshot: %Screenshot{} = screenshot }, _args, _resolution) do
