@@ -201,7 +201,7 @@ defmodule UserDocs.Automation do
     |> maybe_filter_by_process(filters[:process_id])
     |> maybe_filter_steps_by_version(filters[:version_id])
     |> maybe_filter_by_team(filters[:team_id])
-    |> maybe_preload_process(params[:processes])
+    |> maybe_preload_step_process(params[:processes])
     |> maybe_preload_annotation(params[:annotation])
     |> maybe_preload_annotation_type(params[:annotation_type])
     |> maybe_preload_screenshot(params[:screenshot])
@@ -275,8 +275,8 @@ defmodule UserDocs.Automation do
   defp maybe_preload_screenshot(query, nil), do: query
   defp maybe_preload_screenshot(query, _), do: from(steps in query, preload: [:screenshot])
 
-  defp maybe_preload_process(query, nil), do: query
-  defp maybe_preload_process(query, _), do: from(steps in query, preload: [:process])
+  defp maybe_preload_step_process(query, nil), do: query
+  defp maybe_preload_step_process(query, _), do: from(steps in query, preload: [:process])
 
   defp maybe_preload_element(query, nil), do: query
   defp maybe_preload_element(query, _), do: from(steps in query, preload: [:element])
@@ -590,12 +590,6 @@ defmodule UserDocs.Automation do
 
   defp base_process_query(id) do
     from(process in Process, where: process.id == ^id)
-  end
-
-  defp maybe_preload_process(processes, nil, _, _), do: processes
-  defp maybe_preload_process(processes, _preloads, state, opts) do
-    opts = Keyword.delete(opts, :filter)
-    StateHandlers.preload(state, processes, opts)
   end
 
 #TODO Remove
