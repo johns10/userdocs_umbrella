@@ -222,7 +222,7 @@ defmodule UserDocs.Jobs do
     process: %Process{ steps: steps } = process
   } = job_process) when is_list(step_instances) and is_list(steps) do
     _log_string = "Fixing to zip step instances {id, order, step_id}: #{inspect(Enum.map(step_instances, fn(si) -> { si.id, si.order, si.step_id } end))} and steps: #{inspect(Enum.map(steps, fn(s) -> { s.order, s.id } end))}"
-    steps = assign_instances(step_instances, steps)
+    steps = assign_instances(step_instances, steps, process_instance.id)
     process =
       process
       |> Map.put(:steps, steps)
@@ -233,7 +233,8 @@ defmodule UserDocs.Jobs do
 
   def assign_instances(
     [ %StepInstance{} = step_instance | si_tail ] = step_instances,
-    [ %Step{} = step | s_tail ] = steps
+    [ %Step{} = step | s_tail ] = steps,
+    process_instance_id
   ) do
     step_instance_step_ids = Enum.map(step_instances, fn(si) -> si.step_id end)
     if step.id in step_instance_step_ids do
@@ -242,13 +243,14 @@ defmodule UserDocs.Jobs do
         |> Enum.filter(fn(si) -> si.step_id == step.id end)
         |> Enum.at(0)
 
-      [ Map.put(step, :last_step_instance, step_instance) | assign_instances(step_instances, s_tail) ]
+      [ Map.put(step, :last_step_instance, step_instance) | assign_instances(step_instances, s_tail, process_instance_id) ]
     else
-      [ step | assign_instances(step_instances, s_tail) ]
+      { :ok, step_instance } = StepInstances.create_step_instance_from_step(step, nil, process_instance_id)
+      [ Map.put(step, :last_step_instance, step_instance) | assign_instances(step_instances, s_tail, process_instance_id) ]
     end
   end
-  def assign_instances(step_instances, []), do: []
-  def assign_instances([], steps), do: steps
+  def assign_instances(step_instances, [], _), do: []
+  def assign_instances([], steps, _), do: steps
 
   alias UserDocs.Jobs.JobProcess
   def get_executable_items(nil), do: []
