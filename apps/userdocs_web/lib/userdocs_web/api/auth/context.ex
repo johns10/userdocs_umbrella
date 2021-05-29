@@ -1,11 +1,6 @@
 defmodule UserDocsWeb.API.Auth.Context do
   @behaviour Plug
 
-  import Plug.Conn
-  import Ecto.Query, only: [where: 2]
-
-  alias UserDocs.{ Repo, Repo }
-
   def init(opts), do: opts
 
   def call(conn, _) do
