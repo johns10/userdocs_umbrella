@@ -1,14 +1,9 @@
 const { app, ipcMain } = require('electron');
 const { 
-  stepInstanceHandler, 
-  succeed, fail, start, 
-  COMPLETE, FAILED, STARTED } = require('../step/step_instance.js');
-const { 
   mainWindow, 
   navigateToLoginPage, 
   authenticateJohnDavenport, 
   createMainWindow } = require('./main_window/navigation.js')
-const puppeteer = require('./puppeteer/puppeteer.js')
 const path = require('path')
 const isDev = require('electron-is-dev');
 const Runner = require('../runner/dist/runner')
