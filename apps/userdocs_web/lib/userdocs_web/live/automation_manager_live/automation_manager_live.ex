@@ -178,8 +178,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
       AutomationManager.get_process!(process_id)
       |> ProcessInstances.create_process_instance_from_process(Jobs.max_order(job) + 1)
 
-    IO.inspect(process_instance)
-
     case Jobs.create_job_process(job, String.to_integer(process_id), process_instance.id) do
       { :ok, job_process } -> { :noreply, job |> assign_job(socket) }
       { :error, changeset } ->
@@ -270,8 +268,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
         e in BadMapError -> AutomationManager.get_step!(id)
       end
 
-    IO.inspect(step_attrs)
-
     changeset = Step.runner_changeset(step, step_attrs)
     { :ok, updated_step } = UserDocs.Repo.update(changeset)
     UserDocs.Subscription.broadcast_children(updated_step, changeset, opts)
@@ -327,12 +323,10 @@ defmodule UserDocsWeb.AutomationManagerLive do
   end
 
   def maybe_update_screenshot(%{ "id" => id, "base64" => _ } = attrs, team) do
-    IO.inspect("updating sscreenshot")
     UserDocs.Screenshots.get_screenshot!(id)
     |> UserDocs.Screenshots.update_screenshot(attrs, team)
   end
   def maybe_update_screenshot(%{ "base64" => _ } = attrs, team) do
-    IO.inspect("creating sscreenshot")
     { :ok, screenshot } = UserDocs.Screenshots.create_screenshot(attrs)
     UserDocs.Screenshots.update_screenshot(screenshot, attrs, team)
   end
