@@ -57,8 +57,8 @@ defmodule UserDocsWeb.ProcessLiveTest do
       assert html =~ process.name
     end
 
-    test "add process to job", %{authed_conn: conn, process: process, job: job} do
-      {:ok, index_live, html} = live(conn, Routes.process_index_path(conn, :index))
+    test "add process to job", %{authed_conn: conn, process: process } do
+      {:ok, index_live, _html} = live(conn, Routes.process_index_path(conn, :index))
 
       index_live
       |> element("#sidebar")
@@ -67,8 +67,8 @@ defmodule UserDocsWeb.ProcessLiveTest do
       index_live
       |> element("#process-" <> to_string(process.id) <> "-queuer")
       |> render_click()
-      
-      
+
+
     end
 """
     test "saves new process", %{authed_conn: conn, version: version} do
