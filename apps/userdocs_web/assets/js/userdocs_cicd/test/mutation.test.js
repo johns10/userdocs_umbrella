@@ -1,11 +1,11 @@
-const { authenticate } = require('../auth.ts')
-const Job = require('../lib/domain/job')
-const ProcessInstance = require('../lib/domain/processInstance')
-const StepInstance = require('../lib/domain/stepInstance')
-const { CREATE_SCREENSHOT, UPDATE_SCREENSHOT, DELETE_SCREENSHOT } = require('../lib/domain/screenshot')
-const { query } = require('../query.ts')
-const stepInstanceData = require('./testFullScreenScreenshotStep.json')
-const jobData = require('./testJob.json')
+const { authenticate } = require('../lib/auth')
+const Job = require('../../runner/lib/domain/job')
+const ProcessInstance = require('../../runner/lib/domain/processInstance')
+const StepInstance = require('../../runner/lib/domain/stepInstance')
+const { CREATE_SCREENSHOT, UPDATE_SCREENSHOT, DELETE_SCREENSHOT } = require('../../runner/lib/domain/screenshot')
+const { query } = require('../lib/query')
+const stepInstanceData = require('../../runner/test/testFullScreenScreenshotStep.json')
+const jobData = require('../../runner/test/testJob.json')
 require('dotenv').config()
 
 const auth_url = 'https://' + process.env.DEV_HOST + ':' + process.env.DEV_PORT  + '/api/session'
@@ -34,13 +34,8 @@ const expectProcessInstance = expect.objectContaining({
     [ expectStepInstance ] ) })
 
 const expectJob = expect.objectContaining({
-  id: expect.any(String),
-  status: expect.any(String),
-  stepInstances: expect.arrayContaining(
-    [ expectStepInstance ] ),
-  processInstances: expect.arrayContaining(
-    [ expectProcessInstance ] ) })
-/*
+  id: expect.any(String) })
+
 test('it properly filters the fields from a stepInstance', async () => {
   filteredStepInstance = StepInstance.allowedFields(stepInstanceData)
   expect(filteredStepInstance).toStrictEqual(
@@ -93,7 +88,7 @@ test('it deletes a screenshot', async () => {
       DeleteScreenshot: expect.objectContaining({ 
         id: expect.stringMatching(screenshotId) }) }) )
 })
-
+/*
 test('it updates a step instance with no screenshot', async () => {
   const variables = { id: 9, status: "complete", step: { id: 17, order: 50, screenshot: { stepId: 17, base64: singleBlackPixel } } }
   response = await query.execute(api_url, tokens, StepInstance.UPDATE_STEP_INSTANCE, variables);
