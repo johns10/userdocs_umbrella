@@ -295,15 +295,6 @@ defmodule UserDocsWeb.Root do
     { :noreply, socket }
   end
 
-  def handle_info({ :queue_process_instance, payload }, socket) do
-    IO.inspect("root got add_process")
-    {
-      :noreply,
-      socket
-      |> UserDocsWeb.AutomationManagerLive.queue_process(payload)
-    }
-  end
-
   def handle_info({ :update_session, params }, socket) do
     socket =
       Enum.reduce(params, socket,
