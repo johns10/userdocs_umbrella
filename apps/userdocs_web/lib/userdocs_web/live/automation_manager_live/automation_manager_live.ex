@@ -294,25 +294,25 @@ defmodule UserDocsWeb.AutomationManagerLive do
     opts = UserDocsWeb.Defaults.opts(socket, types())
 
     updated_job_processes =
-          Enum.map(socket.assigns.job.job_processes,
-            fn(jp) ->
-              if jp.process_instance_id == process_instance_attrs["id"] do
+      Enum.map(socket.assigns.job.job_processes,
+        fn(jp) ->
+          if jp.process_instance_id == process_instance_attrs["id"] do
 
-                { :ok, updated_process_instance } =
-                  UserDocs.ProcessInstances.update_process_instance(jp.process_instance, process_instance_attrs)
+            { :ok, updated_process_instance } =
+              UserDocs.ProcessInstances.update_process_instance(jp.process_instance, process_instance_attrs)
 
-                Logger.info("Updated process instance #{updated_process_instance.id} to status #{updated_process_instance.status}")
+            Logger.info("Updated process instance #{updated_process_instance.id} to status #{updated_process_instance.status}")
 
-                send(self(), { :broadcast, "update", updated_process_instance })
+            send(self(), { :broadcast, "update", updated_process_instance })
 
-                jp
-                |> Map.put(:process_instance, updated_process_instance)
-              else
+            jp
+            |> Map.put(:process_instance, updated_process_instance)
+          else
             IO.puts("Not on job process")
-                jp
-              end
-            end
-          )
+            jp
+          end
+        end
+      )
 
     process_instance =
       Enum.reduce(socket.assigns.job.job_processes, nil,
@@ -339,7 +339,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
           else
             jp
           end
-      end
+        end
       )
 
     updated_job =
