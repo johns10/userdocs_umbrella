@@ -332,6 +332,7 @@ defmodule UserDocsWeb.Root do
   end
 
   def live_session_status(socket) do
+    IO.inspect(socket.connected?)
     socket
     |> Map.get(:assigns)
     |> Map.get(:__live_session_id__, "Failed to fetch session status")
