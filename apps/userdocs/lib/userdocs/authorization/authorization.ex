@@ -25,6 +25,11 @@ defmodule UserDocs.Authorization do
     |> Enum.map(fn(tu) -> tu.user_id end)
     |> Enum.member?(user_id)
   end
+  def allowed?(%UserDocs.Jobs.Job{ id: id }, user_id) do
+    list_job_team_users(id)
+    |> Enum.map(fn(tu) -> tu.user_id end)
+    |> Enum.member?(user_id)
+  end
   def allowed?(step_instance_id, user_id) do
     list_step_instance_team_users(step_instance_id)
     |> Enum.map(fn(tu) -> tu.user_id end)
@@ -63,6 +68,14 @@ defmodule UserDocs.Authorization do
     |> join(:left, [processes: p], s in assoc(p, :steps), as: :steps)
     |> join(:left, [steps: s], si in assoc(s, :screenshot), as: :screenshot)
     |> where([screenshot: s], s.id == ^id)
+    |> Repo.all()
+  end
+
+  def list_job_team_users(id) do
+    from(t in TeamUser, as: :team_users)
+    |> join(:left, [team_users: tu], t in assoc(tu, :team), as: :teams)
+    |> join(:left, [teams: t], p in assoc(t, :jobs), as: :job)
+    |> where([job: j], j.id == ^id)
     |> Repo.all()
   end
 end
