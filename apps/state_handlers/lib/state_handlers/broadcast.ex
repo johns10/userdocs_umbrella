@@ -28,8 +28,8 @@ defmodule StateHandlers.Broadcast do
     channel = opts[:channel]
     action =
       case opts[:action] do
-        "create" -> "upsert"
-        "update" -> "upsert"
+        "create" -> "create"
+        "update" -> "update"
         "insert" -> "create" # Do not like, but this all has to go soon anyways
         action -> action
       end
