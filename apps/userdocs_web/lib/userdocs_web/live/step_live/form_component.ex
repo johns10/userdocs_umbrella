@@ -137,7 +137,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
         { :ok, step } ->
           assign(socket, :last_step, step)
         { :error, changeset } ->
-          Logger.error("Last Step Changeset #{changeset.data.id} failed to update")
+          Logger.error("Last Step Changeset #{changeset.data.id} failed to update because #{inspect(changeset.errors)}")
           socket
       end
 
