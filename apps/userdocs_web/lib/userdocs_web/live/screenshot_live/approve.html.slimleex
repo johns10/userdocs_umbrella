@@ -3,15 +3,37 @@ css:
     object-fit: scale-down;
     height: auto;
   }
-
+  .review-modal {
+    display: block;
+    width: 90%;
+    height: 90%;
+    max-width: 100%;
+    max-height: 100%;
+    position: fixed;
+    z-index: 100;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    box-shadow: 0 0 60px 10px rgba(0, 0, 0, 0.9);
+    overflow: initial;
+  }
+  .review-modal-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: scroll;
+  }
 .modal.is-active
   .modal-background 
     .section
-      .card
-        .card-header  
-          p.card-header-title Approve or Reject Image Update 
-        .card-content 
-          .columns
+      .card.review-modal 
+        .card-content.review-modal-content.p-0
+          .card-header.m-0
+            p.card-header-title Approve or Reject Image Update 
+          .columns.my-2.mx-1
             .column
               h2 Original Image
               = if @screenshot.aws_screenshot do 
@@ -20,15 +42,15 @@ css:
               h2 New Image
               = if @screenshot.aws_provisional_screenshot do 
                 = img_tag @aws_provisional_screenshot, class: "image review-image"
-          .columns
+          .columns.my-2.mx-1
             .column
               h2 Image Diff
               = if @screenshot.aws_diff_screenshot do 
                 = img_tag @aws_diff_screenshot
-        .card-footer
-          = link "Approve", to: "#", phx_target: @myself.cid, phx_click: "approve-provisional", class: "card-footer-item is-success"
-          = link "Reject", to: "#", phx_target: @myself.cid, phx_click: "reject-provisional", class: "card-footer-item is-danger"
-          = link "Cancel", to: "#", phx_target: @myself.cid, phx_click: "cancel-review", class: "card-footer-item is-danger"
+          .card-footer
+            = link "Approve", to: "#", phx_target: @myself.cid, phx_click: "approve-provisional", class: "card-footer-item is-success"
+            = link "Reject", to: "#", phx_target: @myself.cid, phx_click: "reject-provisional", class: "card-footer-item is-danger"
+            = link "Cancel", to: "#", phx_target: @myself.cid, phx_click: "cancel-review", class: "card-footer-item is-danger"
 
 
   
