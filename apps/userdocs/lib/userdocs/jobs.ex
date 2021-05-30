@@ -210,13 +210,16 @@ defmodule UserDocs.Jobs do
   alias UserDocs.Automation.Process
 
   def prepare_for_execution(%Job{ job_processes: job_processes, job_steps: job_steps } = job) do
-    job_processes = Enum.map(job_processes,
-      fn(jp) ->
-        prepare_for_execution(jp)
-      end)
-    Map.put(job, :job_processes, job_processes)
+    job_processes = Enum.map(job_processes, &prepare_job_process_for_execution/1)
+
+    job_steps = Enum.map(job_steps, &prepare_job_step_for_execution/1)
+
+    job
+    |> Map.put(:job_processes, job_processes)
+    |> Map.put(:job_steps, job_steps)
   end
-  def prepare_for_execution(%JobProcess{
+
+  def prepare_job_process_for_execution(%JobProcess{
     process_instance: %ProcessInstance{ step_instances: step_instances } = process_instance,
     process: %Process{ steps: steps } = process
   } = job_process) when is_list(step_instances) and is_list(steps) do
@@ -228,6 +231,14 @@ defmodule UserDocs.Jobs do
       |> Map.put(:last_process_instance, process_instance)
 
     Map.put(job_process, :process, process)
+  end
+
+  defp prepare_job_step_for_execution(%JobStep{
+    step_instance: %StepInstance{} = step_instance,
+    step: %Step{} = step
+  } = job_step) do
+    step = Map.put(step, :last_step_instance, step_instance)
+    Map.put(job_step, :step, step)
   end
 
   def assign_instances(
