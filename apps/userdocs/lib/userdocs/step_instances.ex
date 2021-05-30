@@ -10,11 +10,35 @@ defmodule UserDocs.StepInstances do
     StateHandlers.load(state, list_step_instances(opts[:params]), StepInstance, opts)
   end
 
+  def load_version_step_instances(state, opts) do
+    version_id = opts[:filters].version_id
+    StateHandlers.load(state, list_version_step_instances(version_id), StepInstance, opts)
+  end
+
   def list_step_instances(params \\ %{}) do
     filters = Map.get(params, :filters, [])
     base_step_instances_query()
     |> maybe_filter_step_instances_by_version_id(filters[:process_id])
     |> Repo.all()
+  end
+
+
+  alias UserDocs.Projects.Version
+  def list_version_step_instances(version_id) do
+    from(p in Version, as: :version)
+    |> join(:left, [ version: v ], p in assoc(v, :processes), as: :processes)
+    |> join(:left, [ processes: p ], s in assoc(p, :steps), as: :steps)
+    |> join(:inner_lateral, [ steps: s ], si in subquery(five_step_instances_subquery()), as: :step_instances)
+    |> where([version: v], v.id == ^version_id)
+    |> select([step_instances: si], %StepInstance{
+        id: si.id, order: si.order, status: si.status, name: si.name, type: si.type,
+        errors: si.errors, warnings: si.warnings, step_id: si.step_id, process_instance_id: si.process_instance_id
+      })
+    |> Repo.all()
+  end
+
+  def five_step_instances_subquery() do
+    from si in StepInstance, where: parent_as(:steps).id == si.step_id, limit: 5, order_by: [ desc: si.id ]
   end
 
   def maybe_filter_step_instances_by_version_id(query, nil), do: query
