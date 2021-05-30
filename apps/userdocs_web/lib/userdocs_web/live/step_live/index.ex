@@ -154,6 +154,11 @@ defmodule UserDocsWeb.StepLive.Index do
     { :noreply, socket } = Root.handle_info(sub_data, socket)
     { :noreply, prepare_steps(socket) }
   end
+  def handle_info(%{topic: _, event: _, payload: %UserDocs.StepInstances.StepInstance{}} = sub_data, socket) do
+    Logger.debug("#{__MODULE__} Received a step Instance broadcast")
+    { :noreply, socket } = Root.handle_info(sub_data, socket)
+    { :noreply, prepare_steps(socket) }
+  end
   def handle_info(%{topic: _, event: _, payload: %Screenshot{}} = sub_data, socket) do
     Logger.debug("#{__MODULE__} Received a screenshot broadcast")
     { :noreply, socket } = Root.handle_info(sub_data, socket)
