@@ -1,8 +1,6 @@
 defmodule UserDocsWeb.ProcessLive.Runner do
   use UserDocsWeb, :live_component
 
-  alias UserDocs.Automation.Runner
-
   @impl true
   def render(assigns) do
     ~L"""
@@ -12,6 +10,7 @@ defmodule UserDocsWeb.ProcessLive.Runner do
       phx-target="#automation-manager"
       phx-hook="executeProcess"
       status="<%= @status %>"
+      class="<%= @class %>"
     >
       <span class="icon">
         <%= case @status do
@@ -25,6 +24,7 @@ defmodule UserDocsWeb.ProcessLive.Runner do
     """
   end
 
+  @impl true
   def handle_event("update_process", %{ "status" => status } = payload, socket) do
     {
       :noreply,
@@ -40,6 +40,7 @@ defmodule UserDocsWeb.ProcessLive.Runner do
       socket
       |> assign(:status, :ok)
       |> assign(:error, "")
+      |> assign(:class, "")
 
     {:ok, socket}
   end
