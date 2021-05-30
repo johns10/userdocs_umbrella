@@ -28,6 +28,7 @@ defmodule UserDocsWeb.Root do
     socket
     |> authorize(session)
     |> PhoenixLiveSession.maybe_subscribe(session)
+    |> IO.inspect()
     |> assign(:browser_opened, Map.get(session, "browser_opened", false))
     |> assign(:user_opened_browser, Map.get(session, "user_opened_browser", false))
     |> assign(:navigation_drawer_closed, Map.get(session, "navigation_drawer_closed", true))
@@ -291,6 +292,8 @@ defmodule UserDocsWeb.Root do
     { :noreply, socket }
   end
   def handle_info({ :update_session, params }, socket) do
+    IO.puts("Attempting to update session")
+    IO.inspect(params)
     socket =
       Enum.reduce(params, socket,
         fn({ k, v }, inner_socket) ->
@@ -300,6 +303,7 @@ defmodule UserDocsWeb.Root do
     { :noreply, socket }
   end
   def handle_info({ :live_session_updated, params }, socket) do
+  IO.puts("Handling info for a live session update")
   {
     :noreply,
     socket
@@ -325,5 +329,14 @@ defmodule UserDocsWeb.Root do
   defp maybe_update_navigation_drawer_closed(socket, nil), do: socket
   defp maybe_update_navigation_drawer_closed(socket, navigation_drawer_closed) do
     assign(socket, :navigation_drawer_closed, navigation_drawer_closed)
+  end
+
+  def live_session_status(socket) do
+    try do
+      socket.assigns.__live_session_id__
+    rescue
+      e in KeyError -> "No Live Session"
+    end
+    |> IO.inspect()
   end
 end
