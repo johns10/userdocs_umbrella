@@ -300,8 +300,13 @@ defmodule UserDocs.Jobs do
     |> Repo.one!()
   end
 
-  def create_job_step(%Job{} = job, step_id) when is_integer(step_id) do
-    attrs = %{ job_id: job.id, step_id: step_id, order: max_order(job) + 1 }
+  def create_job_step(%Job{} = job, step_id, step_instance_id \\ nil) when is_integer(step_id) do
+    attrs = %{
+      job_id: job.id,
+      step_id: step_id,
+      order: max_order(job) + 1,
+      step_instance_id: step_instance_id
+    }
     %JobStep{}
     |> JobStep.changeset(attrs)
     |> Repo.insert()
