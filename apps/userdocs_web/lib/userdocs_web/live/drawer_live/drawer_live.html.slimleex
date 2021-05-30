@@ -50,4 +50,4 @@ div#sidebar.is-flex.is-flex-direction-column
         UserDocsWeb.AutomationManagerLive,
         [ id: "automation-manager", 
         current_team: @current_team,
-        job_id: ( ( @current_team |> Map.get(:job) ) || %{ id: nil } ) |> Map.get(:id) ]
+        job_id: ( ( @current_team |> Map.get(:job) |> Enum.at(0) ) || %{ id: nil } ) |> Map.get(:id) ]
