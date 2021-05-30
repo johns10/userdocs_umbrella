@@ -158,7 +158,12 @@ defmodule UserDocsWeb.AutomationManagerLive do
   end
   def handle_event("create-job-step", %{ "step-id" => step_id }, socket) do
     job = socket.assigns.job
-    case Jobs.create_job_step(job, String.to_integer(step_id)) do
+
+    { :ok, step_instance } =
+      AutomationManager.get_step!(step_id)
+      |> StepInstances.create_step_instance_from_step(Jobs.max_order(job) + 1)
+
+    case Jobs.create_job_step(job, String.to_integer(step_id), step_instance.id) do
       { :ok, job_step } -> { :noreply, job |> assign_job(socket) }
       { :error, changeset } ->
         formatted_errors = format_changeset_errors(changeset)
