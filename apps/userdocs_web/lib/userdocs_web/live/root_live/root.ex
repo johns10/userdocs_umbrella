@@ -26,6 +26,7 @@ defmodule UserDocsWeb.Root do
 
   def apply(socket, session, types) do
     socket
+    |> assign(:connected?, Phoenix.LiveView.connected?(socket))
     |> authorize(session)
     |> PhoenixLiveSession.maybe_subscribe(session)
     |> live_session_status()
@@ -332,7 +333,10 @@ defmodule UserDocsWeb.Root do
   end
 
   def live_session_status(socket) do
-    IO.inspect(socket.connected?)
+    socket
+    |> Map.get(:connected?, "Failed to fetch connected?")
+    |> IO.inspect()
+
     socket
     |> Map.get(:assigns)
     |> Map.get(:__live_session_id__, "Failed to fetch session status")
