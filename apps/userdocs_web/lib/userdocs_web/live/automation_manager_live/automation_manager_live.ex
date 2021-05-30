@@ -78,6 +78,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
     ~L"""
     li
       div.is-flex.is-flex-direction-row.is-flex-grow-0
+        = UserDocsWeb.StepLive.Instance.status(job_step.step.last_step_instance)
         = link to: "#", phx_click: "delete-job-step", phx_value_id: job_step.id,phx_target: cid, class: "navbar-item py-0" do
           span.icon
             i.fa.fa-trash aria-hidden="true"
