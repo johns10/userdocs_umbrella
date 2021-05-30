@@ -289,15 +289,11 @@ defmodule UserDocsWeb.AutomationManagerLive do
 
     { :noreply, assign(socket, :job, job) }
   end
-  def handle_event("update-process", %{ "process" => %{ "id" => id } = process_attrs }, socket) do
+  def handle_event("update-process", %{ "process" => %{ "id" => id, "lastProcessInstance" => process_instance_attrs } = process_attrs }, socket) do
     Logger.info("Received update-process command for process #{id}")
     opts = UserDocsWeb.Defaults.opts(socket, types())
-    process_attrs = underscored_map_keys(process_attrs)
 
     updated_job_processes =
-      case process_attrs["last_process_instance"] do
-        nil -> socket.assigns.job.job_processes
-        process_instance_attrs ->
           Enum.map(socket.assigns.job.job_processes,
             fn(jp) ->
               if jp.process_instance_id == process_instance_attrs["id"] do
@@ -312,11 +308,39 @@ defmodule UserDocsWeb.AutomationManagerLive do
                 jp
                 |> Map.put(:process_instance, updated_process_instance)
               else
+            IO.puts("Not on job process")
                 jp
               end
             end
           )
+
+    process_instance =
+      Enum.reduce(socket.assigns.job.job_processes, nil,
+        fn(jp, acc) ->
+          if jp.process_instance_id == process_instance_attrs["id"] do
+            jp.process_instance
+          else
+            acc
+          end
+        end
+      )
+      || ProcessInstances.get_process_instance!(process_instance_attrs["id"])
+
+    { :ok, updated_process_instance } =
+      UserDocs.ProcessInstances.update_process_instance(process_instance, process_instance_attrs)
+
+    send(self(), { :broadcast, "update", updated_process_instance })
+
+    updated_job_processes =
+      Enum.map(socket.assigns.job.job_processes,
+        fn(jp) ->
+          if jp.process_instance_id == process_instance_attrs["id"] do
+            Map.put(jp, :process_instance, updated_process_instance)
+          else
+            jp
+          end
       end
+      )
 
     updated_job =
       socket.assigns.job
