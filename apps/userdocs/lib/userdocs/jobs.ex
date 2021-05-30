@@ -319,6 +319,27 @@ defmodule UserDocs.Jobs do
   end
 
   def update_job_step_instance(
+    %Job{ job_steps: job_steps } = job,
+    %StepInstance{ id: id } = step_instance
+  ) do
+    job_steps =
+      Enum.map(job_steps,
+        fn(job_step) ->
+          if job_step.step_instance_id == step_instance.id do
+            updated_step_instance = Map.put(job_step.step.last_step_instance, :status, step_instance.status)
+            step = Map.put(job_step.step, :last_step_instance, updated_step_instance)
+
+            job_step
+            |> Map.put(:step_instance, step_instance)
+            |> Map.put(:step, step)
+          else
+            job_step
+          end
+        end)
+
+    Map.put(job, :job_steps, job_steps)
+  end
+  def update_job_process_instance_step_instance(
     %Job{ job_processes: job_processes } = job,
     %StepInstance{ id: id, process_instance_id: process_instance_id} = step_instance
   ) do
