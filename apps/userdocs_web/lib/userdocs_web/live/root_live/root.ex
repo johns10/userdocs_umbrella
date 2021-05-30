@@ -28,7 +28,6 @@ defmodule UserDocsWeb.Root do
     socket
     |> authorize(session)
     |> PhoenixLiveSession.maybe_subscribe(session)
-    |> IO.inspect()
     |> assign(:browser_opened, Map.get(session, "browser_opened", false))
     |> assign(:user_opened_browser, Map.get(session, "user_opened_browser", false))
     |> assign(:navigation_drawer_closed, Map.get(session, "navigation_drawer_closed", true))
@@ -332,11 +331,9 @@ defmodule UserDocsWeb.Root do
   end
 
   def live_session_status(socket) do
-    try do
-      socket.assigns.__live_session_id__
-    rescue
-      e in KeyError -> "No Live Session"
-    end
+    socket
+    |> Map.get(:assigns)
+    |> Map.get(:__live_session_id__, "Failed")
     |> IO.inspect()
   end
 end
