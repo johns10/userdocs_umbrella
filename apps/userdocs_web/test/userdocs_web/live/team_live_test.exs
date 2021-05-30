@@ -107,6 +107,14 @@ defmodule UserDocsWeb.TeamLiveTest do
       assert index_live |> element("#delete-team-" <>  to_string(team.id)) |> render_click()
       refute has_element?(index_live, "#team-" <> to_string(team.id))
     end
+
+    test "index handles standard events", %{authed_conn: conn, version: version } do
+      {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
+      send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
+      assert live
+             |> element("#version-picker-#{version.id}")
+             |> render_click() =~ version.name
+    end
   end
 
   describe "Show" do
@@ -156,5 +164,13 @@ defmodule UserDocsWeb.TeamLiveTest do
       assert html =~ valid_attrs.name
     end
     """
+
+    test "show handles standard events", %{authed_conn: conn, version: version } do
+      {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
+      send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
+      assert live
+             |> element("#version-picker-#{version.id}")
+             |> render_click() =~ version.name
+    end
   end
 end

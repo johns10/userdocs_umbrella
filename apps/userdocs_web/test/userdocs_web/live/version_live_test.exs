@@ -110,6 +110,14 @@ defmodule UserDocsWeb.VersionLiveTest do
       assert index_live |> element("#delete-version-" <> to_string(version.id)) |> render_click()
       refute has_element?(index_live, "#delete-version-" <> to_string(version.id))
     end
+
+    test "index handles standard events", %{authed_conn: conn, version: version } do
+      {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
+      send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
+      assert live
+             |> element("#version-picker-#{version.id}")
+             |> render_click() =~ version.name
+    end
   end
 
   describe "Show" do
@@ -159,5 +167,13 @@ defmodule UserDocsWeb.VersionLiveTest do
       assert html =~ "some updated name"
     end
     """
+
+    test "show handles standard events", %{authed_conn: conn, version: version } do
+      {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
+      send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
+      assert live
+             |> element("#version-picker-#{version.id}")
+             |> render_click() =~ version.name
+    end
   end
 end
