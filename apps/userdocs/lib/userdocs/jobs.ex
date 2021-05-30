@@ -47,8 +47,8 @@ defmodule UserDocs.Jobs do
     |> preload([ job_steps: js, js_steps: s, js_step_type: st, js_element: e, js_strategy: strategy, js_annotation: a,
         js_annotation_type: at, js_page: page, js_process: process, js_screenshot: screenshot, js_step_instances: si ],
       [ job_steps: { js,
+          step_instance: si,
           step: { s, [
-            last_step_instance: si,
             step_type: st,
             element: { e, strategy: strategy },
             annotation: { a, annotation_type: at },
