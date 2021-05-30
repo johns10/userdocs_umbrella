@@ -18,7 +18,7 @@ defmodule UserDocs.Jobs.JobStep do
 
   def changeset(step_instance, attrs) do
     step_instance
-    |> cast(attrs, [ :order, :job_id, :step_id  ])
+    |> cast(attrs, [ :order, :job_id, :step_id, :step_instance_id  ])
     |> foreign_key_constraint(:step_id)
     |> foreign_key_constraint(:job_id)
     |> validate_required([ :order ])
