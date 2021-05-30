@@ -404,6 +404,32 @@ defmodule UserDocs.Jobs do
   def delete_job_process(%JobProcess{} = job_process) do
     Repo.delete(job_process)
   end
+
+  def fetch_step_from_job_processes(%Job{} = job, process_instance_id, step_instance_id) do
+    try do
+      job.job_processes
+      |> Enum.filter(fn(jp) -> jp.process_instance_id == process_instance_id end)
+      |> Enum.at(0)
+      |> Map.get(:process)
+      |> Map.get(:steps)
+      |> Enum.filter(fn(s) -> s.last_step_instance.id == step_instance_id end)
+      |> Enum.at(0)
+    rescue
+      e in BadMapError -> nil
+    end
+  end
+
+  def fetch_step_from_job_step(%Job{} = job, step_instance_id) do
+    try do
+      job.job_steps
+      |> Enum.filter(fn(js) -> js. step_instance_id == step_instance_id end)
+      |> Enum.at(0)
+      |> Map.get(:step)
+    rescue
+      e in BadMapError -> nil
+    end
+  end
+
   """
   Deprecated
   def get_job!(id, %{ preloads: "*" }) do
