@@ -97,7 +97,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
       input id="expand-job-process-<%= job_process.id %>" class="job-process-toggle" type="checkbox" hidden="true" checked=job_process.collapsed
       .is-flex-direction-column.py-0.job-process
         .is-flex.is-flex-direction-row.is-flex-grow-0.py-0
-          = job_process.process_instance.id
           = UserDocsWeb.ProcessLive.Instance.status(job_process.process_instance)
           = link to: "#", phx_click: "expand-job-process", phx_value_id: job_process.id, phx_target: cid, class: "navbar-item py-0" do
               span.icon
@@ -118,7 +117,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
     ~L"""
     li
       div.is-flex.is-flex-direction-row.is-flex-grow-0
-        = step.last_step_instance.id
         = UserDocsWeb.StepLive.Instance.status(step.last_step_instance)
         = if interactive do
           = link to: "#", phx_click: "remove-step-instance", phx_value_d: step.id,phx_target: cid, class: "navbar-item py-0" do
