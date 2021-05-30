@@ -19,7 +19,7 @@ defmodule UserDocs.Users.Team do
     has_many :projects, Project
     has_many :content, Content
     has_many :team_users, TeamUser
-    has_many :job, Job
+    has_one :job, Job
 
     field :aws_region, :string
     field :aws_bucket, :string
