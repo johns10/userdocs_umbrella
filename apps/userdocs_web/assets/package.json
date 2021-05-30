@@ -17,8 +17,6 @@
   "scripts": {
     "deploy": "webpack --mode production",
     "watch": "webpack --mode development --watch",
-    "watch_extension": "webpack js/chrome.js -o js/chrome_app.js --mode development --watch",
-    "watch_browser": "webpack js/browser.js -o js/browser_app.js --mode development --watch",
     "start_electron": "electron js/electron/main.js",
     "test": "jest",
     "pack": "electron-builder --dir",
