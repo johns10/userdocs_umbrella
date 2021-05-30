@@ -39,10 +39,12 @@ export const stepHandlers: StepHandler = {
     const selector = step.element.selector
     const strategy = step.element.strategy.name
     const text = step.text
+    const page: Page | undefined = await currentPage(browser) 
 
     let handle = await getElementHandle(browser, selector, strategy)
     if (!handle) { throw new ElementNotFound(strategy, selector) }
     await handle.type(text);
+    await page.evaluate(handle => { handle.blur() }, handle) 
     return step
   },
   "Set Size Explicit": async(browser: Browser, step: Step) => {
