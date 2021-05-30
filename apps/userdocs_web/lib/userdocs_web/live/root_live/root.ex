@@ -26,10 +26,10 @@ defmodule UserDocsWeb.Root do
 
   def apply(socket, session, types) do
     socket
-    |> assign(:connected?, Phoenix.LiveView.connected?(socket))
     |> authorize(session)
-    |> PhoenixLiveSession.maybe_subscribe(session)
+    |> assign(:connected?, Phoenix.LiveView.connected?(socket))
     |> live_session_status()
+    |> PhoenixLiveSession.maybe_subscribe(session)
     |> assign(:browser_opened, Map.get(session, "browser_opened", false))
     |> assign(:user_opened_browser, Map.get(session, "user_opened_browser", false))
     |> assign(:navigation_drawer_closed, Map.get(session, "navigation_drawer_closed", true))
