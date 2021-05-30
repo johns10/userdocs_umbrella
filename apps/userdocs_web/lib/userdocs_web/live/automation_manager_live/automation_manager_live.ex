@@ -261,34 +261,53 @@ defmodule UserDocsWeb.AutomationManagerLive do
       |> Phoenix.LiveView.push_event("executeJob", %{ job: safe_job })
     }
   end
-  def handle_event("update-step", %{ "step" => %{ "id" => id } = step_attrs }, socket) do
+  def handle_event("update-step", %{ "step" =>
+    %{ "id" => id, "lastStepInstance" =>
+      %{ "id" => step_instance_id, "processInstanceId" => nil }
+    } = step_attrs }, socket
+  ) do
+    underscored_step_attrs = underscored_map_keys(step_attrs)
+    opts = UserDocsWeb.Defaults.opts(socket, types())
+
+    step =
+      Jobs.fetch_step_from_job_step(socket.assigns.job, step_instance_id)
+      || AutomationManager.get_step!(id)
+
+    IO.inspect(step)
+
+    changeset = Step.runner_changeset(step, underscored_step_attrs)
+    { :ok, updated_step } = UserDocs.Repo.update(changeset)
+    UserDocs.Subscription.broadcast_children(updated_step, changeset, opts)
+    send(self(), { :broadcast, "update", updated_step })
+
+
+    job = UserDocs.Jobs.update_job_step_instance(
+      socket.assigns.job, updated_step.last_step_instance)
+
+    { :noreply, assign(socket, :job, job) }
+  end
+  def handle_event("update-step", %{ "step" =>
+    %{ "id" => id, "lastStepInstance" =>
+      %{ "id" => step_instance_id, "processInstanceId" => process_instance_id }
+    } = step_attrs }, socket
+  ) do
     step_attrs = underscored_map_keys(step_attrs)
     if step_attrs["last_step_instance"]["step_id"] == nil do
       raise "Got a nil step id for some reason, not updating"
     end
-    Logger.info("Handling update step #{id}.  It's step instance is #{step_attrs["last_step_instance"]["id"]}.  We'll set it's status to #{step_attrs["last_step_instance"]["status"]}")
+    Logger.info("Handling update step #{id} with process instance #{process_instance_id}.  It's step instance is #{step_attrs["last_step_instance"]["id"]}.  We'll set it's status to #{step_attrs["last_step_instance"]["status"]}")
     opts = UserDocsWeb.Defaults.opts(socket, types())
-    process_instance_id = step_attrs["last_step_instance"]["process_instance_id"]
-    step_instance_id = step_attrs["last_step_instance"]["id"]
+
     step =
-      try do
-        socket.assigns.job.job_processes
-        |> Enum.filter(fn(jp) -> jp.process_instance_id == process_instance_id end)
-        |> Enum.at(0)
-        |> Map.get(:process)
-        |> Map.get(:steps)
-        |> Enum.filter(fn(s) -> s.last_step_instance.id == step_instance_id end)
-        |> Enum.at(0)
-      rescue
-        e in BadMapError -> AutomationManager.get_step!(id)
-      end
+      Jobs.fetch_step_from_job_processes(socket.assigns.job, process_instance_id, step_instance_id)
+      || AutomationManager.get_step!(id)
 
     changeset = Step.runner_changeset(step, step_attrs)
     { :ok, updated_step } = UserDocs.Repo.update(changeset)
     UserDocs.Subscription.broadcast_children(updated_step, changeset, opts)
     send(self(), { :broadcast, "update", updated_step })
 
-    job = UserDocs.Jobs.update_job_step_instance(
+    job = UserDocs.Jobs.update_job_process_instance_step_instance(
       socket.assigns.job, updated_step.last_step_instance)
 
     { :noreply, assign(socket, :job, job) }
