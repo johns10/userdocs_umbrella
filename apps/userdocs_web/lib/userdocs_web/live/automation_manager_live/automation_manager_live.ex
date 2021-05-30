@@ -212,26 +212,37 @@ defmodule UserDocsWeb.AutomationManagerLive do
     step =
       AutomationManager.get_step!(step_id)
       |> Automation.put_blank_step_instance()
+
+    safe_step =
+      step
       |> UserDocs.Automation.Runner.parse()
       |> camel_cased_map_keys()
+
+    send(self(), { :broadcast, "create", step.last_step_instance })
 
     {
       :noreply,
       socket
-      |> Phoenix.LiveView.push_event("execute", %{ step: step })
+      |> Phoenix.LiveView.push_event("execute", %{ step: safe_step })
     }
   end
   def handle_event("execute-process", %{ "id" => process_id } = payload, socket) do
     process =
       AutomationManager.get_process!(process_id)
       |> Automation.put_blank_process_and_step_instances()
+
+    safe_process =
+      process
       |> UserDocs.Automation.Runner.parse()
       |> camel_cased_map_keys()
+
+    send(self(), { :broadcast, "create", process.last_process_instance })
+    Enum.each(process.steps, fn(step) -> send(self(), { :broadcast, "create", step.last_step_instance }) end)
 
     {
       :noreply,
       socket
-      |> Phoenix.LiveView.push_event("executeProcess", %{ process: process })
+      |> Phoenix.LiveView.push_event("executeProcess", %{ process: safe_process })
     }
   end
   def handle_event("execute-job", _payload, socket) do
