@@ -6,12 +6,10 @@ defmodule UserDocsWeb.Root do
 
   alias UserDocs.Users
   alias UserDocs.Users.User
-  alias UserDocs.Users.TeamUser
   alias UserDocs.Users.Team
   alias UserDocs.Projects
   alias UserDocs.Projects.Project
   alias UserDocs.Projects.Version
-  alias UserDocs.Projects.Select
 
   alias StateHandlers
   alias UserDocsWeb.Defaults
@@ -226,8 +224,6 @@ defmodule UserDocsWeb.Root do
     { :noreply, ModalMenus.edit_user(socket, params) }
   end
   def handle_event("select-version", %{"version-id" => version_id, "project-id" => project_id, "team-id" => team_id } = _payload, socket) do
-    opts = Map.get(socket.assigns, :state_opts, state_opts())
-
     changes = %{
       selected_team_id: String.to_integer(team_id),
       selected_project_id: String.to_integer(project_id),
@@ -294,7 +290,6 @@ defmodule UserDocsWeb.Root do
     StateHandlers.broadcast(socket, data, opts)
     { :noreply, socket }
   end
-
   def handle_info({ :update_session, params }, socket) do
     socket =
       Enum.reduce(params, socket,
@@ -304,7 +299,6 @@ defmodule UserDocsWeb.Root do
       )
     { :noreply, socket }
   end
-
   def handle_info({ :live_session_updated, params }, socket) do
   {
     :noreply,
@@ -313,6 +307,9 @@ defmodule UserDocsWeb.Root do
     |> maybe_update_browser_opened(params["browser_opened"])
     |> maybe_update_navigation_drawer_closed(params["navigation_drawer_closed"])
   }
+  end
+  def handle_info(name, _socket) do
+    raise(FunctionClauseError, message: "Subscription #{inspect(name)} not implemented by Root")
   end
 
   defp maybe_update_user_opened_browser(socket, nil), do: socket
@@ -328,9 +325,5 @@ defmodule UserDocsWeb.Root do
   defp maybe_update_navigation_drawer_closed(socket, nil), do: socket
   defp maybe_update_navigation_drawer_closed(socket, navigation_drawer_closed) do
     assign(socket, :navigation_drawer_closed, navigation_drawer_closed)
-  end
-
-  def handle_info(name, _socket) do
-    raise(FunctionClauseError, message: "Subscription #{inspect(name)} not implemented by Root")
   end
 end
