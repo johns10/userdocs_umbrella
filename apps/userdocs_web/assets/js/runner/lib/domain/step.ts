@@ -1,4 +1,3 @@
-import { gql } from 'graphql-request'
 import { v4 as uuidv4 } from 'uuid';
 
 import * as StepInstance from './stepInstance'
@@ -150,9 +149,10 @@ export function allowedFields(step: Step) {
   return fields
 }
 
-
+/*
 export const STEP_SCREENSHOT = gql `
   fragment StepBase64 on Step {
     base64
   }
 `
+*/

@@ -1,5 +1,3 @@
-import { gql } from 'graphql-request'
-
 export interface Screenshot {
   id?: string
   name?: string,
@@ -15,7 +13,7 @@ export function allowedFields(screenshot: Screenshot) {
     base64: screenshot.base64
   }
 }
-
+/*
 export const ALL_SCREENSHOT_FIELDS = gql`
   fragment AllScreenshotFields on Screenshot {
     id
@@ -51,3 +49,4 @@ export const DELETE_SCREENSHOT = gql `
     }
   }
 `
+*/

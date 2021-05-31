@@ -1,7 +1,6 @@
 import { Process } from './process'
 import * as StepInstance from './stepInstance'
 import { Configuration } from '../automation/automation'
-import { gql } from 'graphql-request'
 
 export interface ProcessInstance {
   uuid: string,
@@ -75,7 +74,7 @@ export function allowedFields(processInstance: ProcessInstance) {
     status: processInstance.status
   }
 }
-
+/*
 export const UPDATE_PROCESS_INSTANCE = gql `
   mutation UpdateProcessInstance($id: ID!, $status: String!, $stepInstances: [ StepInstanceInput ] ) {
     updateProcessInstance(id: $id, status: $status, stepInstances: $stepInstances) {
@@ -84,3 +83,4 @@ export const UPDATE_PROCESS_INSTANCE = gql `
     }
   }
 `
+*/

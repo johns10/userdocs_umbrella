@@ -1,7 +1,6 @@
 import * as Step from './step'
 import { fetchCallbacks } from './helpers'
 import { Configuration } from '../automation/automation'
-import { gql } from 'graphql-request'
 
 export interface StepInstance {
   uuid: string,
@@ -26,7 +25,7 @@ export function allowedFields(stepInstance: StepInstance) {
     status: stepInstance.status
   }
 }
-
+/*
 export const STEP_INSTANCE_STATUS = gql`
   fragment StepInstanceStatus on StepInstance {
     id
@@ -59,3 +58,4 @@ export const UPDATE_STEP_INSTANCE_STATUS = gql`
   }
 `
 
+*/
