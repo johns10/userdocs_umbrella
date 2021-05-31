@@ -12,6 +12,10 @@
       "target": "dmg",
       "icon": "build/icon.png",
       "category": "public.app-category.developer-tools"
+    },
+    "linux": {
+      "target": "snap",
+      "executableName": "userdocs"
     }
   },
   "scripts": {
