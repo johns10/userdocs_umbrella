@@ -1,5 +1,6 @@
 {
   "name": "@userdocs/desktop",
+  "productName": "UserDocs",
   "version": "0.0.2",
   "description": "Authors steps and processes for collection of screenshots",
   "main": "main.js",
@@ -19,6 +20,10 @@
       "target": "dmg",
       "icon": "build/icon.png",
       "category": "public.app-category.developer-tools"
+    },
+    "linux": {
+      "executableName": "user_docs",
+      "target": "snap"
     }
   },
   "scripts": {
