@@ -8,7 +8,6 @@ defmodule UserDocsWeb.ProcessLive.Runner do
       phx-click="execute-process"
       phx-value-id="<%= @process.id %>"
       phx-target="#automation-manager"
-      phx-hook="executeProcess"
       status="<%= @status %>"
       class="<%= @class %>"
     >
