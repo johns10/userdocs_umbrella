@@ -28,13 +28,15 @@ export const Puppet = {
       args = puppeteer.defaultArgs()
         .filter(arg => String(arg).toLowerCase() !== '--disable-extensions')
         .filter(arg => String(arg).toLowerCase() !== '--headless')
-        .concat('--single-process')
-        .concat('--no-zygote')
-        .concat('--no-sandbox')
+        .concat("--proxy-server='direct://'")
+        .concat('--proxy-bypass-list=*')
     } else if(runner.environment == 'desktop') {
       executablePath = puppeteer.executablePath().replace("app.asar", "app.asar.unpacked")
       args = puppeteer.defaultArgs()
         .filter(arg => String(arg).toLowerCase() !== '--disable-extensions')
+        .filter(arg => String(arg).toLowerCase() !== '--headless')
+        .concat("--proxy-server='direct://'")
+        .concat('--proxy-bypass-list=*')
       if (runner.userDataDirPath) {
         args.push('--user-data-dir=' + runner.userDataDirPath);
       }
@@ -48,6 +50,8 @@ export const Puppet = {
         .concat('--no-zygote')
         .concat('--no-sandbox')
     } else args = puppeteer.defaultArgs()
+
+    console.log(args)
 
     const browser = await puppeteer.launch({ 
       executablePath: executablePath,
