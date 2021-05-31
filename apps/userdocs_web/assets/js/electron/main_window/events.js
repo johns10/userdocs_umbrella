@@ -1,5 +1,3 @@
-const { errors } = require("puppeteer");
-
 function browserClosed(payload) {
   const element = document.querySelector('#automated-browser-controls');
   const event = new CustomEvent("browser-closed", {
