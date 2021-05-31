@@ -18,12 +18,13 @@
     "appId": "johns10@gmail.com",
     "mac": {
       "target": "dmg",
-      "icon": "build/icon.png",
+      "icon": "build/icon.icns",
       "category": "public.app-category.developer-tools"
     },
     "linux": {
       "executableName": "user_docs",
-      "target": "snap"
+      "icon": "build/icon.icns",
+      "target": "tar.gz"
     }
   },
   "scripts": {
