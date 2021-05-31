@@ -75,29 +75,22 @@ function main() {
 }
 
 ipcMain.on('openBrowser', async (event) => { 
-  userdocs.runner = await openBrowser()
+  if(!userdocs.runner.automationFramework.browser) userdocs.runner = await openBrowser()
   return true
-})
+ })
 
 async function openBrowser() {
   if(!userdocs.runner) throw ("No RUnner")
-  runner = userdocs.runner
-  configuration = userdocs.configuration
-  runner = await Runner.openBrowser(runner, configuration)
-  browser = runner.automationFramework.browser
-  browser.on('disconnected', () => browserClosed())
-  mainWindow().webContents.send('browserOpened', { sessionId: browser.process().pid.toString() })
-  console.log(`Browser opened, runner: ${runner}`)  
-  return runner
+  userdocs.runner = await Runner.openBrowser(userdocs.runner, userdocs.configuration)
+  userdocs.runner.automationFramework.browser.on('disconnected', () => browserClosed())
+  mainWindow().webContents.send('browserOpened', { sessionId: 'id' })
+  return userdocs.runner
 }
 
 ipcMain.on('closeBrowser', async (event) => { 
   if(!userdocs.runner) throw ("No RUnner")
-  runner = userdocs.runner
-  configuration = userdocs.configuration
-  id = runner.automationFramework.browser.process().pid.toString()
-  await Runner.closeBrowser(runner, configuration)
-  browserClosed(id)
+  userdocs.runner = await Runner.closeBrowser(userdocs.runner, userdocs.configuration)
+  browserClosed('id')
   return true
 })
 
@@ -113,7 +106,7 @@ ipcMain.on('execute', async (event, step) => {
 })
 
 ipcMain.on('executeProcess', async (event, process) => {
-  if(!userdocs.runner.automationFramework.browser) userdocs.runner = await openBrowser()
+  if(!userdocs.runner.automationFramework.browser) await openBrowser()
   console.log(`bout to run runner process ${userdocs.runner}`)
   await Runner.executeProcess(process, userdocs.runner)
 })
