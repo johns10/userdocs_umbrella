@@ -6,7 +6,7 @@ const {
   createMainWindow } = require('./main_window/navigation.js')
 const path = require('path')
 const isDev = require('electron-is-dev');
-const Runner = require('../runner/dist/runner')
+const Runner = require('@userdocs/runner')
 
 if (isDev) {
   require('electron-reload')(__dirname, {
