@@ -141,6 +141,16 @@ defmodule UserDocs.AutomationTest do
       assert updated_step.order == attrs.order
     end
 
+    test "runner_update_step/2 with valid data updates the step" do
+      step = AutomationFixtures.step()
+      step_instance_attrs = %{ status: "not_started", step_id: step.id }
+      { :ok, step_instance } = UserDocs.StepInstances.create_step_instance(step_instance_attrs)
+      step = Map.put(step, :last_step_instance, step_instance)
+      step_attrs = %{ last_step_instance: %{ id: step_instance.id, status: "complete" }}
+      { :ok, step } = Automation.runner_update_step(step, step_attrs)
+      assert step.last_step_instance.status == "complete"
+    end
+
     test "update_step/2 with invalid data returns error changeset" do
       step = AutomationFixtures.step()
       attrs = AutomationFixtures.step_attrs(:invalid)
@@ -159,6 +169,7 @@ defmodule UserDocs.AutomationTest do
       step = AutomationFixtures.step()
       assert %Ecto.Changeset{} = Automation.change_step(step)
     end
+
   end
 
   describe "processes" do
@@ -218,4 +229,5 @@ defmodule UserDocs.AutomationTest do
       assert %Ecto.Changeset{} = Automation.change_process(process)
     end
   end
+
 end

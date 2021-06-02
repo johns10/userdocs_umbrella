@@ -36,7 +36,7 @@ defmodule UserDocs.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix_pubsub, "~> 2.0"},
+      {:phoenix_pubsub, "~> 2.0.0"},
       {:ecto_sql, "~> 3.5"},
       {:postgrex, ">= 0.0.0"},
       {:jason, "~> 1.0"},
@@ -52,7 +52,9 @@ defmodule UserDocs.MixProject do
       {:ex_aws, "~> 2.2.1"},
       {:ex_aws_s3, "~> 2.1.0"},
       {:hackney, "~> 1.9"},
-      {:sweet_xml, "~> 0.6"}
+      {:sweet_xml, "~> 0.6"},
+      {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
+      {:inflex, "~> 2.0.0"}
     ]
   end
 

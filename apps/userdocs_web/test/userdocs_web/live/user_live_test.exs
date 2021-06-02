@@ -100,6 +100,14 @@ defmodule UserDocsWeb.UserLiveTest do
       assert index_live |> element("#delete-user-" <> to_string(user.id), "Delete") |> render_click()
       refute has_element?(index_live, "#user-" <> to_string(user.id))
     end
+
+    test "index handles standard events", %{authed_conn: conn, team: team, user: user, version: version } do
+      {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
+      send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
+      assert live
+             |> element("#version-picker-#{version.id}")
+             |> render_click() =~ version.name
+    end
   end
 
   describe "Show" do
@@ -116,7 +124,7 @@ defmodule UserDocsWeb.UserLiveTest do
     ]
 
     test "displays user", %{authed_conn: conn, user: user} do
-      {:ok, _show_live, html} = live(conn, Routes.user_show_path(conn, :show, user))
+      {:ok, show_live, html} = live(conn, Routes.user_show_path(conn, :show, user))
 
       assert html =~ "Show User"
       assert html =~ user.email
@@ -140,5 +148,14 @@ defmodule UserDocsWeb.UserLiveTest do
       assert html =~ "User updated successfully"
       assert html =~ valid_attrs.email
     end
+
+    test "show handles standard events", %{authed_conn: conn, team: team, user: user, version: version } do
+      {:ok, show_live, html} = live(conn, Routes.user_show_path(conn, :show, user))
+      send(show_live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
+      assert show_live
+             |> element("#version-picker-#{version.id}")
+             |> render_click() =~ version.name
+    end
+
   end
 end

@@ -13,53 +13,20 @@
 # Ignore .fetch files in case you like to edit your project deps locally.
 /.fetch     
 
-# Ignore the dist file (where we put the electron release)
-/apps/userdocs_web/assets/dist/
-
 # If the VM crashes, it generates a dump, let's ignore it too.
 erl_crash.dump
 
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
 
+# Dev Certs
+/certs/
+
 # ignore the mnesia files
 /Mnesia.nonode@nohost/
-/apps/userdocs_web/Mnesia.nonode@nohost/
-*.LOG
-*.DCD
-*.DAT
-MnesiaCore.nonode*
-MnesiaCore.nonode@nohost_1593_274043_19000
-MnesiaCore.nonode@nohost_1593_274060_188000
-MnesiaCore.nonode@nohost_1593_293020_175000
-MnesiaCore.nonode@nohost_1593_291161_165000
-Mnesia.nonode@nohost/DECISION_TAB.LOG
-Mnesia.nonode@nohost/LATEST.LOG
 
-# Ignore the images
-*.jpeg
-*.png
-*.jpg
-*.zip
-
-# Ignore the builds
-apps/userdocs_web/assets/js/bundle.js
-apps/userdocs_web/assets/js/chrome_app.js
-apps/userdocs_web/assets/js/chrome_app.js.map
-apps/userdocs_web/assets/js/browser_app.js
-apps/userdocs_web/assets/js/browser_app.js.map
-apps/userdocs_web/assets/css/app.css
-apps/userdocs_web/assets/css/app.css.map
 # Ignore the files in tmp
-tmp/*
-apps/userdocs/tmp/*
+/tmp/
 
 # Ignore any lockfiles
-apps/userdocs_web/assets/package-lock.json
-apps/userdocs_web/assets/yarn.lock
 mix.lock
-
-
-# Ignore certs
-apps/userdocs_web/assets/js.crx
-apps/userdocs_web/assets/js.pem

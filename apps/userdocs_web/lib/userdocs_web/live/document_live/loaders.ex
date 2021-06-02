@@ -3,7 +3,6 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
 
   alias UserDocs.Documents
   alias UserDocs.Automation
-  alias UserDocs.Media
   alias UserDocs.Web
 
   alias UserDocsWeb.Loaders
@@ -29,16 +28,11 @@ defmodule UserDocsWeb.DocumentLive.Loaders do
   end
 
   def load_processes(%{ assigns: %{ current_version: current_version }} = socket, opts) do
-    IO.puts("loading processes")
     opts =
       opts
       |> Keyword.put(:filters, %{version_id: current_version.id})
 
     Automation.load_processes(socket, opts)
-  end
-
-  def load_files(socket, opts) do
-    Media.load_files(socket, opts)
   end
 
   def load_steps(socket, opts) do

@@ -70,23 +70,31 @@ defmodule UserDocs.StepInstancesTest do
       assert StepInstances.get_step_instance!(step_instance.id) == step_instance
     end
 
-    #TODO: Potentially move to teams test
-    test "get_step_instance_team!/1 returns the step instance with the breadcrumb to the team preloaded", %{ team: team, step: step } do
+    test "get_step_instance_by_uuid!/1 returns a step instance", %{ step: step } do
       step_instance = JobsFixtures.step_instance(step.id)
-      step_instance_team = UserDocs.Users.get_step_instance_team!(step_instance.id)
-      assert step_instance_team.id == team.id
+      assert StepInstances.get_step_instance_by_uuid(step_instance.uuid) == step_instance
     end
 
-    test "create_step_instance/1 with valid data creates a step instance", %{ team: team, step: step } do
+    test "get_step_instance!/2 with preload: * returns the step instance with the preloads", %{ step: step, element: element, annotation: annotation } do
+      step_instance = JobsFixtures.step_instance(step.id)
+      result = StepInstances.get_step_instance!(step_instance.id, %{ preloads: "*"})
+      assert result.step.id == step.id
+      assert result.step.element.id == element.id
+      assert result.step.annotation.id == annotation.id
+    end
+
+    #TODO: Potentially move to teams test
+    test "list_step_instance_team_users/1 returns the step instance with the breadcrumb to the team preloaded", %{ user: user, team: team, step: step } do
+      step_instance = JobsFixtures.step_instance(step.id)
+      step_instance_team_users = UserDocs.Authorization.list_step_instance_team_users(step_instance.id)
+      assert step_instance_team_users |> Enum.at(0) |> Map.get(:team_id) == team.id
+      assert step_instance_team_users |> Enum.at(0) |> Map.get(:user_id) == user.id
+    end
+
+    test "create_step_instance/1 with valid data creates a step instance", %{ step: step } do
       attrs = JobsFixtures.step_instance_attrs(:valid, step.id)
       assert {:ok, %StepInstance{} = step_instance} = StepInstances.create_step_instance(attrs)
       assert step_instance.name == attrs.name
-    end
-
-    test "create_step_instance_from_job_and_step/2 with valid data creates a step instance with the job set", %{ step: step, team: team } do
-      _attrs = JobsFixtures.step_instance_attrs(:valid, step.id)
-      job = JobsFixtures.job(team.id)
-      assert {:ok, %StepInstance{}} = StepInstances.create_step_instance_from_job_and_step(step, job, 0)
     end
 
     test "create_step_instance_from_step/2 with valid data creates a step instance with the step preloaded", %{ step: step } do
@@ -128,13 +136,22 @@ defmodule UserDocs.StepInstancesTest do
       assert %Ecto.Changeset{} = StepInstances.change_step_instance(step_instance)
     end
 
-    test "format_step_instance_for_export/1 returns a step instance with attrs", %{ step: step, team: team } do
-      job = JobsFixtures.job(team.id)
-      {:ok, %StepInstance{} = step_instance} = StepInstances.create_step_instance_from_job_and_step(step, job, 0)
-      step_instance =
-        Map.put(step_instance, :step, step) # TODO: Investigate. Should I have to put the step in the instance?
-        |> StepInstances.format_step_instance_for_export()
-      assert step_instance.attrs.id == step.id
+    test "step_instances_status/1 returns" do
+      failed = %StepInstance{ status: "failed" }
+      complete = %StepInstance{ status: "complete" }
+      started = %StepInstance{ status: "started" }
+      not_started = %StepInstance{ status: "not_started" }
+      warn = %StepInstance{ status: "warn" }
+      assert StepInstances.step_instances_status([ ]) == :none
+      assert StepInstances.step_instances_status([ failed ]) == :fail
+      assert StepInstances.step_instances_status([ started ]) == :started
+      assert StepInstances.step_instances_status([ not_started ]) == :warn
+      assert StepInstances.step_instances_status([ warn ]) == :warn
+      assert StepInstances.step_instances_status([ complete, failed ]) == :warn
+      assert StepInstances.step_instances_status([ complete, warn ]) == :warn
+      assert StepInstances.step_instances_status([ complete, not_started ]) == :ok
+      assert StepInstances.step_instances_status([ complete, started ]) == :ok
+      assert StepInstances.step_instances_status([ complete, complete, failed ]) == :warn
     end
   end
 end

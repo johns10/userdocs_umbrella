@@ -1,17 +1,15 @@
 defmodule UserDocsWeb.ProcessLive.Runner do
   use UserDocsWeb, :live_component
 
-  alias UserDocs.Automation.Runner
-
   @impl true
   def render(assigns) do
     ~L"""
     <a id="<%= @id %>"
-      phx-click="execute_process"
-      phx-value-process-id="<%= @process.id %>"
-      phx-target="<%= @myself.cid %>"
-      phx-hook="executeProcess"
+      phx-click="execute-process"
+      phx-value-id="<%= @process.id %>"
+      phx-target="#automation-manager"
       status="<%= @status %>"
+      class="<%= @class %>"
     >
       <span class="icon">
         <%= case @status do
@@ -26,11 +24,6 @@ defmodule UserDocsWeb.ProcessLive.Runner do
   end
 
   @impl true
-  def handle_event("execute_process", %{"process-id" => process_id}, socket) do
-    send self(), {:execute_process, %{ process_id: String.to_integer(process_id) }}
-    { :noreply, socket }
-  end
-
   def handle_event("update_process", %{ "status" => status } = payload, socket) do
     {
       :noreply,
@@ -46,6 +39,7 @@ defmodule UserDocsWeb.ProcessLive.Runner do
       socket
       |> assign(:status, :ok)
       |> assign(:error, "")
+      |> assign(:class, "")
 
     {:ok, socket}
   end

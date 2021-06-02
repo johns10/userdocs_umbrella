@@ -32,13 +32,13 @@ defmodule UserDocs.Subscription do
   def check_changes(changeset) do
     schema = changeset.data.__struct__
     associations = changeset.data.__struct__.__schema__(:associations)
-    Logger.debug("Checking changes on #{schema} with associations #{inspect(associations)}")
+    # Logger.debug("Checking changes on #{schema} with associations #{inspect(associations)}")
 
     Enum.reduce(associations, %{},
       fn(association, acc) ->
         association_field = schema.__schema__(:association, association).field
 
-        Logger.debug("  Checking changes on #{association_field}")
+        # Logger.debug("  Checking changes on #{association_field}")
         Ecto.Changeset.get_change(changeset, association_field)
         |> check_change(association_field, acc)
       end
@@ -46,13 +46,13 @@ defmodule UserDocs.Subscription do
   end
 
   def check_change(nil, field, acc) do
-    Logger.debug("    No change detected")
+    # Logger.debug("    No change detected")
     acc
   end
   def check_change(changeset, field, acc) do
     changes = check_changes(changeset)
     schema = changeset.data.__struct__
-    Logger.debug("    Change detected on #{schema}")
+    # Logger.debug("    Change detected on #{schema}")
 
     attrs = %{
       action: changeset.action,

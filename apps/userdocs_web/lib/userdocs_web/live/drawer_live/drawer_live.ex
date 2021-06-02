@@ -32,11 +32,13 @@ defmodule UserDocsWeb.DrawerLive do
     { :noreply, socket }
   end
 
-  def checkbox(boolean) do
-    if boolean do
-      content_tag(:input, id: "collapse-sidebar", class: "toggle", type: "checkbox", checked: true)
-    else
-      content_tag(:input, id: "collapse-sidebar", class: "toggle", type: "checkbox")
-    end
+  def checkbox(true) do
+    content_tag(:input, id: "collapse-sidebar", class: "toggle", type: "checkbox", checked: true)
+  end
+  def checkbox(false) do
+    content_tag(:input, id: "collapse-sidebar", class: "toggle", type: "checkbox")
+  end
+  def checkbox(nil) do
+    content_tag(:input, id: "collapse-sidebar", class: "toggle", type: "checkbox")
   end
 end

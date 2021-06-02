@@ -1,17 +1,18 @@
-div id=@id
+div.is-flex.is-flex-direction-row.is-flex-grow-0 id=@id
   = if Screenshots.get_screenshot_status(@step.screenshot) in [ :warn ]  do 
     = screenshot_status_element(@socket, @step.screenshot)
-  = if step_instances_status(@step.step_instances) in [ :warn ] do
+  .navbar-item
     = step_instances_status_element(@socket, @step.step_instances, @myself.cid)
   = if @display_errors_modal do 
     .modal.is-active
       .modal-background phx-click="toggle_errors_modal" phx-target=@myself.cid
       .section 
-        .card.m-4
-          .card-content
+        .card.m-4.errors-modal
+          .card-content.errors-modal-content
             = for step_instance <- @step.step_instances do 
               h2.title
                 => step_instance.name
+                => step_instance.id
               h2.subtitle
                 = step_instance.status
               p

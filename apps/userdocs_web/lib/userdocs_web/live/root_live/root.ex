@@ -6,12 +6,10 @@ defmodule UserDocsWeb.Root do
 
   alias UserDocs.Users
   alias UserDocs.Users.User
-  alias UserDocs.Users.TeamUser
   alias UserDocs.Users.Team
   alias UserDocs.Projects
   alias UserDocs.Projects.Project
   alias UserDocs.Projects.Version
-  alias UserDocs.Projects.Select
 
   alias StateHandlers
   alias UserDocsWeb.Defaults
@@ -29,6 +27,8 @@ defmodule UserDocsWeb.Root do
   def apply(socket, session, types) do
     socket
     |> authorize(session)
+    |> Map.put(:connected?, Phoenix.LiveView.connected?(socket))
+    |> live_session_status()
     |> PhoenixLiveSession.maybe_subscribe(session)
     |> assign(:browser_opened, Map.get(session, "browser_opened", false))
     |> assign(:user_opened_browser, Map.get(session, "user_opened_browser", false))
@@ -226,9 +226,6 @@ defmodule UserDocsWeb.Root do
     { :noreply, ModalMenus.edit_user(socket, params) }
   end
   def handle_event("select-version", %{"version-id" => version_id, "project-id" => project_id, "team-id" => team_id } = _payload, socket) do
-    IO.puts("Changing current version to #{version_id}")
-    opts = Map.get(socket.assigns, :state_opts, state_opts())
-
     changes = %{
       selected_team_id: String.to_integer(team_id),
       selected_project_id: String.to_integer(project_id),
@@ -271,7 +268,7 @@ defmodule UserDocsWeb.Root do
 
 
     case Keyword.get(socket.assigns.state_opts, :types) do
-      nil -> raise(RuntimeError, "Types not populated in calling subscribed view")
+      nil -> raise(RuntimeError, "Types not populated in calling subscribed view #{socket.view}")
       _ -> ""
     end
 
@@ -295,33 +292,9 @@ defmodule UserDocsWeb.Root do
     StateHandlers.broadcast(socket, data, opts)
     { :noreply, socket }
   end
-
-  def handle_info({ :execute_step, %{ step_id: step_id } = payload }, socket) do
-    IO.inspect("root got execute_step")
-    {
-      :noreply,
-      socket
-      |> UserDocsWeb.AutomationManagerLive.execute_step(payload)
-    }
-  end
-  def handle_info({ :execute_process, %{ process_id: process_id } = payload }, socket) do
-    IO.inspect("root got execute_step")
-    {
-      :noreply,
-      socket
-      |> UserDocsWeb.AutomationManagerLive.execute_process_instance(payload, 0)
-    }
-  end
-  def handle_info({ :queue_process_instance, payload }, socket) do
-    IO.inspect("root got add_process")
-    {
-      :noreply,
-      socket
-      |> UserDocsWeb.AutomationManagerLive.queue_process(payload)
-    }
-  end
-
   def handle_info({ :update_session, params }, socket) do
+    IO.puts("Attempting to update session")
+    IO.inspect(params)
     socket =
       Enum.reduce(params, socket,
         fn({ k, v }, inner_socket) ->
@@ -330,8 +303,8 @@ defmodule UserDocsWeb.Root do
       )
     { :noreply, socket }
   end
-
   def handle_info({ :live_session_updated, params }, socket) do
+  IO.puts("Handling info for a live session update")
   {
     :noreply,
     socket
@@ -339,6 +312,9 @@ defmodule UserDocsWeb.Root do
     |> maybe_update_browser_opened(params["browser_opened"])
     |> maybe_update_navigation_drawer_closed(params["navigation_drawer_closed"])
   }
+  end
+  def handle_info(name, _socket) do
+    raise(FunctionClauseError, message: "Subscription #{inspect(name)} not implemented by Root")
   end
 
   defp maybe_update_user_opened_browser(socket, nil), do: socket
@@ -356,7 +332,16 @@ defmodule UserDocsWeb.Root do
     assign(socket, :navigation_drawer_closed, navigation_drawer_closed)
   end
 
-  def handle_info(name, _socket) do
-    raise(FunctionClauseError, message: "Subscription #{inspect(name)} not implemented by Root")
+  def live_session_status(socket) do
+    socket
+    |> Map.get(:connected?, "Failed to fetch connected?")
+    |> IO.inspect()
+
+    socket
+    |> Map.get(:assigns)
+    |> Map.get(:__live_session_id__, "Failed to fetch session status")
+    |> IO.inspect()
+
+    socket
   end
 end

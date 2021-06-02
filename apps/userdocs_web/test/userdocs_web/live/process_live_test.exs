@@ -7,6 +7,7 @@ defmodule UserDocsWeb.ProcessLiveTest do
   alias UserDocs.WebFixtures
   alias UserDocs.ProjectsFixtures
   alias UserDocs.AutomationFixtures
+  alias UserDocs.JobsFixtures
 
   defp create_user(%{ password: password }), do: %{user: UsersFixtures.user(password)}
   defp create_team(_), do: %{team: UsersFixtures.team()}
@@ -15,6 +16,8 @@ defmodule UserDocsWeb.ProcessLiveTest do
   defp create_project(%{ team: team }), do: %{project: ProjectsFixtures.project(team.id)}
   defp create_version(%{ project: project, strategy: strategy }), do: %{version: ProjectsFixtures.version(project.id, strategy.id)}
   defp create_process(%{ version: version }), do: %{ process: AutomationFixtures.process(version.id)}
+  defp create_job(%{ team: team}), do: %{ job: JobsFixtures.job(team.id) }
+
 
   defp create_password(_), do: %{ password: UUID.uuid4()}
   defp grevious_workaround(%{ conn: conn, user: user, password: password }) do
@@ -42,6 +45,7 @@ defmodule UserDocsWeb.ProcessLiveTest do
       :create_project,
       :create_version,
       :create_process,
+      :create_job,
       :make_selections,
       :grevious_workaround
     ]
@@ -51,6 +55,18 @@ defmodule UserDocsWeb.ProcessLiveTest do
 
       assert html =~ "Listing Processes"
       assert html =~ process.name
+    end
+
+    test "add process to job", %{authed_conn: conn, process: process } do
+      {:ok, index_live, _html} = live(conn, Routes.process_index_path(conn, :index))
+
+      index_live
+      |> element("#sidebar-toggle")
+      |> render_click()
+
+      assert index_live
+      |> element("#process-" <> to_string(process.id) <> "-queuer")
+      |> render_click() =~ process.name
     end
 
     test "saves new process", %{authed_conn: conn, version: version} do
@@ -64,7 +80,7 @@ defmodule UserDocsWeb.ProcessLiveTest do
 
       assert index_live
       |> form("#process-form", process: AutomationFixtures.process_attrs(:invalid, version.id))
-      |> render_change() =~ "can&apos;t be blank"
+      |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = AutomationFixtures.process_attrs(:valid, version.id)
 
@@ -89,7 +105,7 @@ defmodule UserDocsWeb.ProcessLiveTest do
 
       assert index_live
       |> form("#process-form", process: AutomationFixtures.process_attrs(:invalid, version.id))
-      |> render_change() =~ "can&apos;t be blank"
+      |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = AutomationFixtures.process_attrs(:valid, version.id)
 
@@ -108,6 +124,14 @@ defmodule UserDocsWeb.ProcessLiveTest do
 
       assert index_live |> element("#delete-process-" <> to_string(process.id)) |> render_click()
       refute has_element?(index_live, "#process-" <> to_string(process.id))
+    end
+
+    test "index handles standard events", %{authed_conn: conn, version: version } do
+      {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
+      send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
+      assert live
+             |> element("#version-picker-#{version.id}")
+             |> render_click() =~ version.name
     end
   end
 end

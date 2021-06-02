@@ -65,7 +65,7 @@ defmodule UserDocsWeb.VersionLiveTest do
 
       assert index_live
       |> form("#version-form", version: ProjectFixtures.version_attrs(:invalid, project.id, strategy.id))
-      |> render_change() =~ "can&apos;t be blank"
+      |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = ProjectFixtures.version_attrs(:valid, project.id, strategy.id)
 
@@ -90,7 +90,7 @@ defmodule UserDocsWeb.VersionLiveTest do
 
       assert index_live
       |> form("#version-form", version: ProjectFixtures.version_attrs(:invalid, project.id, strategy.id))
-      |> render_change() =~ "can&apos;t be blank"
+      |> render_change() =~ "can&#39;t be blank"
 
       valid_attrs = ProjectFixtures.version_attrs(:valid, project.id, strategy.id)
 
@@ -109,6 +109,14 @@ defmodule UserDocsWeb.VersionLiveTest do
 
       assert index_live |> element("#delete-version-" <> to_string(version.id)) |> render_click()
       refute has_element?(index_live, "#delete-version-" <> to_string(version.id))
+    end
+
+    test "index handles standard events", %{authed_conn: conn, version: version } do
+      {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
+      send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
+      assert live
+             |> element("#version-picker-#{version.id}")
+             |> render_click() =~ version.name
     end
   end
 
@@ -145,7 +153,7 @@ defmodule UserDocsWeb.VersionLiveTest do
 
       assert show_live
              |> form("#version-form", version: @invalid_attrs)
-             |> render_change() =~ "can&apos;t be blank"
+             |> render_change() =~ "can&#39;t be blank"
 
       update_attrs = Map.put(@update_attrs, :project_id, first_project_id())
 
@@ -159,5 +167,13 @@ defmodule UserDocsWeb.VersionLiveTest do
       assert html =~ "some updated name"
     end
     """
+
+    test "show handles standard events", %{authed_conn: conn, version: version } do
+      {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
+      send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
+      assert live
+             |> element("#version-picker-#{version.id}")
+             |> render_click() =~ version.name
+    end
   end
 end

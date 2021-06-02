@@ -24,12 +24,18 @@ defmodule UserDocs.TestDataset do
   alias UserDocs.Web.Element
   alias UserDocs.Web.Strategy
 
+  alias UserDocs.Automation
   alias UserDocs.Automation.Step
   alias UserDocs.Automation.StepType
   alias UserDocs.Automation.Process
 
   alias UserDocs.Media.File
   alias UserDocs.Media.Screenshot
+
+  alias UserDocs.Jobs
+  alias UserDocs.Jobs.Job
+
+  alias UserDocs.ProcessInstances
 
   alias UserDocs.Repo
 
@@ -200,7 +206,7 @@ defmodule UserDocs.TestDataset do
     |> AnnotationType.changeset(blur)
     |> Repo.insert()
 
-  {:ok, %AnnotationType{id: _badge_id}} =
+  {:ok, %AnnotationType{id: badge_id}} =
     %AnnotationType{}
     |> AnnotationType.changeset(badge)
     |> Repo.insert()
@@ -210,7 +216,7 @@ defmodule UserDocs.TestDataset do
     |> AnnotationType.changeset(badge_blur)
     |> Repo.insert()
 
-  {:ok, %AnnotationType{id: _badge_outline_id}} =
+  {:ok, %AnnotationType{id: badge_outline_id}} =
     %AnnotationType{}
     |> AnnotationType.changeset(badge_outline)
     |> Repo.insert()
@@ -271,12 +277,12 @@ defmodule UserDocs.TestDataset do
     |> StepType.changeset(click)
     |> Repo.insert()
 
-  {:ok, %StepType{id: _fill_field_id}} =
+  {:ok, %StepType{id: fill_field_id}} =
     %StepType{}
     |> StepType.changeset(fill_field)
     |> Repo.insert()
 
-  {:ok, %StepType{id: _apply_annotation_id}} =
+  {:ok, %StepType{id: apply_annotation_id}} =
     %StepType{}
     |> StepType.changeset(apply_annotation)
     |> Repo.insert()
@@ -296,7 +302,7 @@ defmodule UserDocs.TestDataset do
     |> StepType.changeset(clear_annotations)
     |> Repo.insert()
 
-  {:ok, %StepType{id: _element_screenshot_id}} =
+  {:ok, %StepType{id: element_screenshot_id}} =
     %StepType{}
     |> StepType.changeset(element_screenshot)
     |> Repo.insert()
@@ -357,7 +363,11 @@ defmodule UserDocs.TestDataset do
 
     userdocs_team =
       %{
-        name: "UserDocs"
+        name: "UserDocs",
+        aws_bucket: "userdocs-test",
+        aws_access_key_id: "AKIAT5VKLWBUOAYXO656",
+        aws_secret_access_key: "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",
+        aws_region: "us-east-2"
       }
 
     loreline_team =
@@ -507,11 +517,25 @@ defmodule UserDocs.TestDataset do
       version_id: version_0_0_1_id
     }
 
+    login_page = %{
+      name: "Login Page",
+      order: 1,
+      url: "https://the-internet.herokuapp.com/login",
+      version_id: version_0_0_1_id
+    }
+
     processes_page = %{
       name: "Login",
       order: 2,
       url: "https://app.user-docs.com/processes",
       version_id: version_0_0_2_id
+    }
+
+    secure_page = %{
+      name: "Secure",
+      order: 3,
+      url: "https://the-internet.herokuapp.com/secure",
+      version_id: version_0_0_1_id
     }
 
     {:ok, %Page{id: add_remove_page_id}} =
@@ -524,17 +548,27 @@ defmodule UserDocs.TestDataset do
       |> Page.changeset(processes_page)
       |> Repo.insert()
 
+    {:ok, %Page{id: login_page_id}} =
+      %Page{}
+      |> Page.changeset(login_page)
+      |> Repo.insert()
+
+    {:ok, %Page{id: secure_page_id}} =
+      %Page{}
+      |> Page.changeset(secure_page)
+      |> Repo.insert()
+
     #
 
     _annotations = [
       add_outline = %{
         annotation_type_id: outline_id,
-        color: "#7FBE7F",
+        color: "green",
         content_id: nil,
         description: "Outline",
         font_color: nil,
         font_size: nil,
-        label: "1",
+        label: nil,
         name: "Outline",
         page_id: add_remove_page_id,
         size: nil,
@@ -550,12 +584,80 @@ defmodule UserDocs.TestDataset do
         content_id: nil,
         description: "Badge",
         font_color: nil,
-        font_size: nil,
+        font_size: 24,
         label: "2",
         name: "Label",
         page_id: add_remove_page_id,
         size: 12,
         thickness: nil,
+        x_offset: 0,
+        x_orientation: "R",
+        y_offset: 0,
+        y_orientation: "T"
+      },
+      badge_username_input = %{
+        annotation_type_id: badge_id,
+        color: "green",
+        content_id: nil,
+        description: "Badge",
+        font_color: "white",
+        font_size: 24,
+        label: "1",
+        name: "Label",
+        page_id: login_page_id,
+        size: 16,
+        thickness: nil,
+        x_offset: 0,
+        x_orientation: "R",
+        y_offset: 0,
+        y_orientation: "T"
+      },
+      badge_password_input = %{
+        annotation_type_id: badge_id,
+        color: "green",
+        content_id: nil,
+        description: "Badge",
+        font_color: nil,
+        font_size: 24,
+        label: "2",
+        name: "Label",
+        page_id: login_page_id,
+        size: 16,
+        thickness: nil,
+        x_offset: 0,
+        x_orientation: "R",
+        y_offset: 0,
+        y_orientation: "T"
+      },
+      outline_login_button = %{
+        annotation_type_id: outline_id,
+        color: "green",
+        content_id: nil,
+        description: "Outline Login",
+        font_color: nil,
+        font_size: nil,
+        label: nil,
+        name: "Outline Login Button",
+        page_id: login_page_id,
+        size: nil,
+        thickness: 4,
+        x_offset: nil,
+        x_orientation: nil,
+        y_offset: nil,
+        y_orientation: nil
+      },
+      badge_outline_secure_button = %{
+        annotation_type_id: badge_outline_id,
+        color: "green",
+        content_id: nil,
+        description: "Badge Outline Secure Button",
+        font_color: "white",
+        font_size: 24,
+        label: "1",
+        name: "Badge Outline Login",
+        page_id: secure_page_id,
+        size: 16,
+        thickness: 4,
         x_offset: 0,
         x_orientation: "R",
         y_offset: 0,
@@ -573,6 +675,26 @@ defmodule UserDocs.TestDataset do
       |> Annotation.changeset(badge_remove_button)
       |> Repo.insert()
 
+    {:ok, %Annotation{id: badge_username_input_id}} =
+      %Annotation{}
+      |> Annotation.changeset(badge_username_input)
+      |> Repo.insert()
+
+    {:ok, %Annotation{id: badge_password_input_id}} =
+      %Annotation{}
+      |> Annotation.changeset(badge_password_input)
+      |> Repo.insert()
+
+    {:ok, %Annotation{id: outline_login_button_id}} =
+      %Annotation{}
+      |> Annotation.changeset(outline_login_button)
+      |> Repo.insert()
+
+    {:ok, %Annotation{id: badge_outline_secure_button_id}} =
+      %Annotation{}
+      |> Annotation.changeset(badge_outline_secure_button)
+      |> Repo.insert()
+
     _elements = [
       add_element = %{
         name: "Add Element Button",
@@ -580,10 +702,40 @@ defmodule UserDocs.TestDataset do
         selector: "//button[.='Add Element']",
         strategy_id: xpath_strategy_id
       },
-      _delete_element = %{
+      delete_element = %{
         name: "Delete Button",
         page_id: add_remove_page_id,
         selector: "//button[.='Delete]",
+        strategy_id: xpath_strategy_id
+      },
+      login_button = %{
+        name: "Delete Button",
+        page_id: add_remove_page_id,
+        selector: "//button[@type='submit']",
+        strategy_id: xpath_strategy_id
+      },
+      login_form = %{
+        name: "Login Form",
+        page_id: login_page_id,
+        selector: "//div[@id='content']",
+        strategy_id: xpath_strategy_id
+      },
+      username_input = %{
+        name: "username input",
+        page_id: login_page_id,
+        selector: "//input[@id='username']",
+        strategy_id: xpath_strategy_id
+      },
+      password_input = %{
+        name: "password input",
+        page_id: login_page_id,
+        selector: "//input[@id='password']",
+        strategy_id: xpath_strategy_id
+      },
+      logout_button = %{
+        name: "Logout Button",
+        page_id: secure_page_id,
+        selector: "//a[@href='/logout']",
         strategy_id: xpath_strategy_id
       }
     ]
@@ -595,7 +747,32 @@ defmodule UserDocs.TestDataset do
 
     {:ok, %Element{id: _add_element_id}} =
       %Element{}
-      |> Element.changeset(add_element)
+      |> Element.changeset(delete_element)
+      |> Repo.insert()
+
+    {:ok, %Element{id: login_button_id}} =
+      %Element{}
+      |> Element.changeset(login_button)
+      |> Repo.insert()
+
+    {:ok, %Element{id: username_input_id}} =
+      %Element{}
+      |> Element.changeset(username_input)
+      |> Repo.insert()
+
+    {:ok, %Element{id: password_input_id}} =
+      %Element{}
+      |> Element.changeset(password_input)
+      |> Repo.insert()
+
+    {:ok, %Element{id: logout_button_id}} =
+      %Element{}
+      |> Element.changeset(logout_button)
+      |> Repo.insert()
+
+    {:ok, %Element{id: login_form_id}} =
+      %Element{}
+      |> Element.changeset(login_form)
       |> Repo.insert()
 
     _processes = [
@@ -608,6 +785,11 @@ defmodule UserDocs.TestDataset do
         name: "Add Process",
         order: 2,
         version_id: version_0_0_2_id
+      },
+      test_everything = %{
+        name: "Test Everything",
+        order: 3,
+        version_id: version_0_0_1_id
       }
     ]
 
@@ -619,6 +801,11 @@ defmodule UserDocs.TestDataset do
     {:ok, %Process{id: _add_process_id}} =
       %Process{}
       |> Process.changeset(add_process)
+      |> Repo.insert()
+
+    {:ok, %Process{id: test_everything_process_id} } =
+      %Process{}
+      |> Process.changeset(test_everything)
       |> Repo.insert()
 
     # Processes
@@ -734,7 +921,163 @@ defmodule UserDocs.TestDataset do
         text: nil,
         url: nil,
         width: nil
-      }
+      },
+      %{
+        annotation_id: nil,
+        element_id: nil,
+        height: nil,
+        name: "Navigate to Login Page",
+        order: 10,
+        page_id: login_page_id,
+        page_reference: "page",
+        process_id: test_everything_process_id,
+        step_type_id: navigate_id,
+        text: nil,
+        width: nil
+      },
+      %{
+        annotation_id: nil,
+        element_id: login_button_id,
+        name: "Set size to 1280 by 768",
+        order: 15,
+        page_id: login_page_id,
+        page_reference: "page",
+        process_id: test_everything_process_id,
+        step_type_id: set_size_explicit_id,
+        text: nil,
+        height: 768,
+        width: 1280
+      },
+      %{
+        annotation_id: badge_username_input_id,
+        element_id: username_input_id,
+        height: nil,
+        name: "Badge Username Input",
+        order: 20,
+        page_id: login_page_id,
+        page_reference: "page",
+        process_id: test_everything_process_id,
+        step_type_id: apply_annotation_id,
+        text: nil,
+        width: nil
+      },
+      %{
+        annotation_id: badge_password_input_id,
+        element_id: password_input_id,
+        height: nil,
+        name: "Badge Password Input",
+        order: 25,
+        page_id: login_page_id,
+        page_reference: "page",
+        process_id: test_everything_process_id,
+        step_type_id: apply_annotation_id,
+        text: nil,
+        width: nil
+      },
+      %{
+        annotation_id: outline_login_button_id,
+        element_id: login_button_id,
+        height: nil,
+        name: "Outline Login Button",
+        order: 30,
+        page_id: login_page_id,
+        page_reference: "page",
+        process_id: test_everything_process_id,
+        step_type_id: apply_annotation_id,
+        text: nil,
+        width: nil
+      },
+      %{
+        annotation_id: nil,
+        element_id: username_input_id,
+        height: nil,
+        name: "Enter tomsmith into username",
+        order: 35,
+        page_id: login_page_id,
+        page_reference: "page",
+        process_id: test_everything_process_id,
+        step_type_id: fill_field_id,
+        text: "tomsmith",
+        width: nil
+      },
+      %{
+        annotation_id: nil,
+        element_id: password_input_id,
+        height: nil,
+        name: "Enter SuperSecretPassword! into password",
+        order: 40,
+        page_id: login_page_id,
+        page_reference: "page",
+        process_id: test_everything_process_id,
+        step_type_id: fill_field_id,
+        text: "SuperSecretPassword!",
+        width: nil
+      },
+      %{
+        annotation_id: nil,
+        element_id: nil,
+        height: nil,
+        name: "Clear",
+        order: 45,
+        page_id: login_page_id,
+        page_reference: "page",
+        process_id: test_everything_process_id,
+        step_type_id: clear_annotations_id,
+        text: nil,
+        width: nil
+      },
+      %{
+        annotation_id: nil,
+        element_id: nil,
+        height: nil,
+        name: "Full Screen Screenshot",
+        order: 50,
+        page_id: login_page_id,
+        page_reference: "page",
+        process_id: test_everything_process_id,
+        step_type_id: full_screen_screenshot_id,
+        text: nil,
+        width: nil
+      },
+      %{
+        annotation_id: nil,
+        element_id: login_form_id,
+        height: nil,
+        name: "Screenshot Login Form",
+        order: 55,
+        page_id: login_page_id,
+        page_reference: "page",
+        process_id: test_everything_process_id,
+        step_type_id: element_screenshot_id,
+        text: nil,
+        width: nil
+      },
+      %{
+        annotation_id: nil,
+        element_id: login_button_id,
+        height: nil,
+        name: "Click Login",
+        order: 60,
+        page_id: login_page_id,
+        page_reference: "page",
+        process_id: test_everything_process_id,
+        step_type_id: click_id,
+        text: nil,
+        width: nil
+      },
+      %{
+        annotation_id: badge_outline_secure_button_id,
+        element_id: logout_button_id,
+        height: nil,
+        name: "Badge Outline Password Input",
+        order: 65,
+        page_id: secure_page_id,
+        page_reference: "page",
+        process_id: test_everything_process_id,
+        step_type_id: apply_annotation_id,
+        text: nil,
+        width: nil
+      },
     ]
 
     Enum.each(steps,

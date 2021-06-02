@@ -3,20 +3,22 @@ defmodule UserDocsWeb.ProcessLive.Index do
 
   use UserdocsWeb.LiveViewPowHelper
 
-  alias UserDocs.Web
+  require Logger
+
   alias UserDocs.Users
   alias UserDocs.Helpers
   alias UserDocs.Projects
   alias UserDocs.Automation
   alias UserDocs.Automation.Process
+  alias UserDocs.ProcessInstances.ProcessInstance
   alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.Defaults
   alias UserDocsWeb.Root
-  alias UserDocsWeb.ProcessLive.Runner
 
   def types() do
     [
       UserDocs.Automation.Process,
+      UserDocs.ProcessInstances.ProcessInstance,
       UserDocs.Projects.Version,
       UserDocs.Media.Screenshot,
     ]
@@ -39,6 +41,7 @@ defmodule UserDocsWeb.ProcessLive.Index do
     socket
     |> load_processes(opts)
     |> load_versions(opts)
+    |> load_process_instances(opts)
     |> assign(:state_opts, opts)
   end
   def initialize(socket), do: socket
@@ -110,6 +113,11 @@ defmodule UserDocsWeb.ProcessLive.Index do
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   @impl true
+  def handle_info(%{topic: _, event: _, payload: %ProcessInstance{}} = sub_data, socket) do
+    Logger.debug("#{__MODULE__} Received a ProcessInstance broadcast")
+    { :noreply, socket } = Root.handle_info(sub_data, socket)
+    { :noreply, prepare_processes(socket, socket.assigns.current_version.id) }
+  end
   def handle_info(p, s), do: Root.handle_info(p, s)
 
   def select_lists(socket) do
@@ -124,6 +132,8 @@ defmodule UserDocsWeb.ProcessLive.Index do
     opts =
       socket.assigns.state_opts
       |> Keyword.put(:filter, { :version_id, version_id })
+      |> Keyword.put(:preloads, [ :process_instances ])
+      |> Keyword.put(:limit,  [ process_instances: 5 ])
 
     socket
     |> assign(:processes, Automation.list_processes(socket, opts))
@@ -143,5 +153,13 @@ defmodule UserDocsWeb.ProcessLive.Index do
       |> Keyword.put(:filters, %{user_id: socket.assigns.current_user.id})
 
     Projects.load_versions(socket, opts)
+  end
+
+  def load_process_instances(socket, opts) do
+    opts =
+      opts
+      |> Keyword.put(:filters, %{user_id: socket.assigns.current_user.id})
+
+    UserDocs.ProcessInstances.load_user_process_instances(socket, opts)
   end
 end

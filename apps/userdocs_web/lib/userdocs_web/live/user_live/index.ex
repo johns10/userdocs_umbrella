@@ -67,8 +67,12 @@ defmodule UserDocsWeb.UserLive.Index do
 
     {:noreply, assign(socket, :users, list_users())}
   end
+  def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   defp list_users do
     Users.list_users()
   end
+
+  @impl true
+  def handle_info(n, s), do: Root.handle_info(n, s)
 end

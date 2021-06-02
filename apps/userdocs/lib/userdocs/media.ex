@@ -10,8 +10,6 @@ defmodule UserDocs.Media do
   alias UserDocs.Subscription
 
   alias UserDocs.Repo
-
-  alias UserDocs.Media.File
   alias UserDocs.Media.ScreenshotHelpers
 
 
@@ -29,7 +27,7 @@ defmodule UserDocs.Media do
       [%Screenshot{}, ...]
 
   """
-  def list_screenshots(params \\ %{}, filters \\ %{}) do
+  def list_screenshots(_params \\ %{}, filters \\ %{}) do
     base_screenshots_query()
     |> maybe_filter_screenshots_by_version(filters[:version_id])
     |> maybe_filter_by_step_id(filters[:step_id])
@@ -117,7 +115,7 @@ defmodule UserDocs.Media do
 
   def create_aws_file_and_screenshot(%{ "id" => step_id, "step_type" => %{ "name" => step_type_name },
     "element" => element, "screenshot" => %{ "aws_file" => raw_encoded_image }
-  } = payload) do
+  }) do
       IO.puts("create_file_and_screenshot for step #{step_id}")
     %{
       name: "Screenshot for step #{step_id}",

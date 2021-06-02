@@ -12,14 +12,17 @@
       "target": "dmg",
       "icon": "build/icon.png",
       "category": "public.app-category.developer-tools"
+    },
+    "linux": {
+      "target": "snap",
+      "executableName": "userdocs"
     }
   },
   "scripts": {
     "deploy": "webpack --mode production",
     "watch": "webpack --mode development --watch",
-    "watch_extension": "webpack js/chrome.js -o js/chrome_app.js --mode development --watch",
-    "watch_browser": "webpack js/browser.js -o js/browser_app.js --mode development --watch",
     "start_electron": "electron js/electron/main.js",
+    "test": "jest",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "dist-mac": "electron-builder -m",
@@ -30,25 +33,18 @@
     "bufferutil": "^4.0.3",
     "bulma": "^0.9.1",
     "bulma-switch": "^2.0.0",
-    "chrome-remote-interface": "^0.30.0",
-    "electron-is-dev": "^2.0.0",
     "nprogress": "^0.2.0",
     "phoenix": "^1.5.8",
     "phoenix_html": "^2.14.2",
-    "phoenix_live_view": "^0.15.5",
-    "puppeteer": "^8.0.0"
+    "phoenix_live_view": "^0.15.5"
   },
   "devDependencies": {
-    "electron-builder": "^22.10.5",
-    "electron-reload": "^1.5.0",
-    "@babel/core": "^7.10.5",
-    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/core": "^7.0.0",
     "@babel/preset-env": "^7.10.4",
     "@creativebulma/bulma-tooltip": "^1.2.0",
     "babel-loader": "^8.0.0",
     "copy-webpack-plugin": "^5.1.1",
     "css-loader": "^3.6.0",
-    "electron": "12.0.1",
     "mini-css-extract-plugin": "^0.9.0",
     "node-sass": "^4.13",
     "optimize-css-assets-webpack-plugin": "^5.0.1",

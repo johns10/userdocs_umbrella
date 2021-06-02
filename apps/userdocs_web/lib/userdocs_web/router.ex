@@ -43,15 +43,49 @@ defmodule UserDocsWeb.Router do
       error_handler: Pow.Plug.RequireNotAuthenticated
   end
 
+  pipeline :api do
+    plug :accepts, ["json"]
+    plug UserDocsWeb.API.Auth.Plug, otp_app: :userdocs_web
+  end
+
+  pipeline :api_protected do
+    plug Pow.Plug.RequireAuthenticated, error_handler: UserDocsWeb.API.Auth.ErrorHandler
+    plug UserDocsWeb.API.Auth.Context
+  end
+
+  scope "/api", UserDocsWeb.API, as: :api do
+    pipe_through :api
+
+
+    resources "/registration", RegistrationController, singleton: true, only: [:create]
+    resources "/session", SessionController, singleton: true, only: [:create, :delete]
+    post "/session/renew", SessionController, :renew
+  end
+
+  if Mix.env() in [:dev, :test] do
+    scope "/api", as: :api do
+      pipe_through :api
+
+      forward "/graphiql", Absinthe.Plug.GraphiQL,
+        schema: UserDocsWeb.API.Schema
+
+    end
+  end
+
+  scope "/api", as: :api do
+    #pipe_through :api
+    pipe_through [:api, :api_protected]
+
+    forward "/", Absinthe.Plug,
+      schema: UserDocsWeb.API.Schema
+
+  end
+
   scope "/", UserDocsWeb do
     pipe_through [:browser, :protected]
 
     live "/", PageLive, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-"""
-    live "/processpa", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/index.html", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "index.html", ProcessLive.SPA, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-"""
+
     live "/users/new", UserLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/users", UserLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/users/:id", UserLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}

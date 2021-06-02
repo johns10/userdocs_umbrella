@@ -71,7 +71,6 @@ defmodule UserDocsWeb.StepLiveTest do
 
   defp setup_session(%{ conn: conn, user: user  }) do
     opts = Pow.Plug.Session.init(@default_opts)
-    IO.inspect(opts)
     conn =
       conn
       |> Plug.Test.init_test_session(%{ current_user: user })
@@ -119,7 +118,6 @@ defmodule UserDocsWeb.StepLiveTest do
     ]
 
     test "lists all steps", %{authed_conn: conn, process: process} do
-      IO.puts("Running test")
       {:ok, _index_live, html} = live(conn, Routes.step_index_path(conn, :index, process.id))
 
       assert html =~ "Steps"
@@ -136,7 +134,7 @@ defmodule UserDocsWeb.StepLiveTest do
 
       assert index_live
       |> form("#step-form", step: invalid_attrs(process.id))
-      |> render_change() =~ "can&apos;t be blank"
+      |> render_change() =~ "can&#39;t be blank"
 
       step_attrs = valid_attrs(process.id, step_type.id)
 
@@ -160,7 +158,7 @@ defmodule UserDocsWeb.StepLiveTest do
 
       assert index_live
              |> form("#step-form", step: invalid_attrs(process.id))
-             |> render_change() =~ "can&apos;t be blank"
+             |> render_change() =~ "can&#39;t be blank"
 
       {:ok, _, html} =
         index_live
@@ -227,6 +225,7 @@ defmodule UserDocsWeb.StepLiveTest do
         AutomationFixtures.step_attrs(:valid, page.id, process.id, element.id, annotation.id, aa_step_type.id)
         |> Map.delete(:annotation_id)
         |> Map.delete(:element_id)
+        |> Map.delete(:name)
 
       changes = %{ "step_type_id" => aa_step_type.id |> to_string() }
 
@@ -329,6 +328,14 @@ defmodule UserDocsWeb.StepLiveTest do
       :timer.sleep(100) # Racy cause subscriptions
 
       refute has_element?(index_live, "#delete-step-"<> Integer.to_string(step.id))
+    end
+
+    test "index handles standard events", %{authed_conn: conn, version: version } do
+      {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
+      send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
+      assert live
+             |> element("#version-picker-#{version.id}")
+             |> render_click() =~ version.name
     end
   end
 end

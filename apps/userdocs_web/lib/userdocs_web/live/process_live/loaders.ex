@@ -24,7 +24,6 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   end
 
   def processes(socket, opts) do
-    IO.puts("Loading processes")
     opts =
       opts
       |> Keyword.put(:filters, %{team_id: socket.assigns.current_team.id})
@@ -76,8 +75,8 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   end
 
   def step_instances(socket, opts) do
-    opts = Keyword.put(opts, :params, %{ filters: %{version_id: socket.assigns.current_version.id } })
-    StepInstances.load_step_instances(socket, opts)
+    opts = Keyword.put(opts, :filters, %{version_id: socket.assigns.current_version.id })
+    StepInstances.load_version_step_instances(socket, opts)
   end
 
 end

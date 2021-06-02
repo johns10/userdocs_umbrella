@@ -1,0 +1,53 @@
+{
+  "name": "@userdocs/desktop",
+  "productName": "UserDocs",
+  "version": "0.0.2",
+  "description": "Authors steps and processes for collection of screenshots",
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johns10/userdocs_umbrella.git"
+  },
+  "author": "John Davenport",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/johns10/userdocs_umbrella/issues"
+  },
+  "homepage": "https://github.com/johns10/userdocs_umbrella#readme",
+  "build": {
+    "appId": "johns10@gmail.com",
+    "mac": {
+      "target": "dmg",
+      "icon": "build/icon.icns",
+      "category": "public.app-category.developer-tools"
+    },
+    "linux": {
+      "executableName": "user_docs",
+      "icon": "build/icon.icns",
+      "target": "tar.gz"
+    }
+  },
+  "scripts": {
+    "start_electron": "electron main.js",
+    "test": "jest",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist-mac": "electron-builder -m",
+    "dist-all": "electron-builder -wm"
+  },
+  "dependencies": {
+    "@userdocs/runner": "file:../runner",
+    "electron-is-dev": "^2.0.0"
+  },
+  "devDependencies": {
+    "electron": "12.0.9",
+    "electron-builder": "^22.10.5",
+    "electron-reload": "^1.5.0",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.5.5",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4",
+    "webpack": "4.41.5",
+    "webpack-cli": "^3.3.12"
+  }
+}

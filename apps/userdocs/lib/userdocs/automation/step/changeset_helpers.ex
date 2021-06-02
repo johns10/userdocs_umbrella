@@ -18,6 +18,14 @@ defmodule UserDocs.Automation.Step.Changeset do
   end
   def handle_page_id_change(changeset, _state), do: changeset
 
+  def maybe_replace_page_params(changeset, %{ changes: %{ page_id: nil }}, _state) do
+    params =
+      changeset.params
+      |> Map.put("page", nil)
+      |> Map.put("page_id", nil)
+
+    Map.put(changeset, :params, params)
+  end
   def maybe_replace_page_params(changeset, %{ changes: %{ page_id: page_id }}, state) do
     Logger.debug("Replacing Page #{page_id} Params")
     page = Web.get_page!(page_id, state, state.assigns.state_opts)
@@ -41,6 +49,14 @@ defmodule UserDocs.Automation.Step.Changeset do
   end
   def handle_annotation_id_change(changeset, _state), do: changeset
 
+  def maybe_replace_annotation_params(changeset, %{ changes: %{ annotation_id: nil }}, _state) do
+    params =
+      changeset.params
+      |> Map.put("annotation", nil)
+      |> Map.put("annotation_id", nil)
+
+    Map.put(changeset, :params, params)
+  end
   def maybe_replace_annotation_params(changeset, %{ changes: %{ annotation_id: annotation_id }}, state) do
     Logger.debug("Replacing Annotation #{annotation_id} Params")
     opts = Keyword.put(state.assigns.state_opts, :preloads, [ :content, :annotation_type ])
@@ -66,6 +82,14 @@ defmodule UserDocs.Automation.Step.Changeset do
     |> cast(changeset.params, [ :page_id, :element_id, :annotation_id])
   end
 
+  def maybe_replace_element_params(changeset, %{ changes: %{ element_id: nil }}, state) do
+    params =
+      changeset.params
+      |> Map.put("element", nil)
+      |> Map.put("element_id", nil)
+
+    Map.put(changeset, :params, params)
+  end
   def maybe_replace_element_params(changeset, %{ changes: %{ element_id: element_id }}, state) do
     Logger.debug("Replacing Element params")
     element = Web.get_element!(element_id, state, state.assigns.state_opts)

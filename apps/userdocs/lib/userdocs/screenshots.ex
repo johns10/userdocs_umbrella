@@ -90,7 +90,18 @@ defmodule UserDocs.Screenshots do
   @doc """
   Creates a screenshot.
   """
-  def create_screenshot(attrs \\ %{}) do
+  def create_screenshot(attrs \\ %{})
+  def create_screenshot(%{ step_id: step_id, base64: _ } = attrs) do
+    result = %Screenshot{}
+    |> Screenshot.changeset(%{ step_id: step_id })
+    |> Repo.insert()
+
+    case result do
+      { :ok, screenshot } -> update_screenshot(screenshot, attrs)
+      result -> result
+    end
+  end
+  def create_screenshot(attrs) do
     %Screenshot{}
     |> Screenshot.changeset(attrs)
     |> Repo.insert()
@@ -113,10 +124,9 @@ defmodule UserDocs.Screenshots do
     |> Screenshot.changeset(attrs)
     |> Repo.update()
   end
-  def update_screenshot(%Screenshot{ base_64: _base_64 } = screenshot, attrs, %UserDocs.Users.Team{} = team) do
+  def update_screenshot(%Screenshot{ base64: _base64 } = screenshot, attrs, %UserDocs.Users.Team{} = _team) do
     screenshot
     |> Screenshot.changeset(attrs)
-    |> diff_images(team)
     |> Repo.update()
   end
 
@@ -157,52 +167,13 @@ defmodule UserDocs.Screenshots do
   end
 
   def apply_provisional_screenshot(%Screenshot{ aws_screenshot: production } = screenshot, team) do
-    names = %{ aws_provisional_screenshot: UUID.uuid4() <> ".png" }
+    names = %{ aws_provisional_screenshot: "./tmp" <> UUID.uuid4() <> ".png" }
     prepare_files(screenshot, names, team.aws_bucket, aws_opts(team))
     put_encoded_string_in_aws_object(File.read!(names.aws_provisional_screenshot), team, production)
     attrs = %{ aws_diff_screenshot: nil, aws_provisional_screenshot: nil }
     { :ok, screenshot } = update_screenshot(screenshot, attrs)
+    Enum.each(names, fn({ _, file_name }) -> File.rm(file_name) end)
     screenshot
-  end
-
-  def reject_provisional_screenshot(%Screenshot{ } = screenshot) do
-    attrs = %{ aws_diff_screenshot: nil, aws_provisional_screenshot: nil }
-    { :ok, screenshot } = update_screenshot(screenshot, attrs)
-    screenshot
-  end
-
-  def diff_images(%{ data: %{ aws_screenshot: nil }} = changeset, team) do
-    case Ecto.Changeset.get_change(changeset, :base_64) do
-      nil -> changeset
-      base_64 ->
-        IO.inspect("Got a base 64 image")
-        contents = Base.decode64!(base_64)
-        file_name = file_name(changeset.data, :production)
-        aws_path = put_encoded_string_in_aws_object(contents, team, path(file_name))
-        Ecto.Changeset.put_change(changeset, :aws_screenshot, aws_path)
-    end
-  end
-  def diff_images(%{ data: %{ aws_screenshot: _aws_screenshot }} = changeset, team) do
-    case Ecto.Changeset.get_change(changeset, :base_64) do
-      nil -> changeset
-      base_64 ->
-        state = %{
-          aws: file_name(changeset.data, :production),
-          original: UUID.uuid4() <> ".png",
-          updated: UUID.uuid4() <> ".png",
-          diff: UUID.uuid4() <> ".png",
-          opts: aws_opts(team),
-          bucket: team.aws_bucket,
-          base_64: base_64,
-          team: team,
-          score: nil
-        }
-
-        prepare_aws_file(state)
-        |> score_files()
-        |> handle_changes(changeset)
-        |> delete_files(state)
-    end
   end
 
   def prepare_files(screenshot, names, bucket, opts) do
@@ -215,15 +186,57 @@ defmodule UserDocs.Screenshots do
     end)
   end
 
-  def prepare_aws_file(%{ aws: aws, original: original, updated: updated,
-    bucket: bucket, base_64: base_64, opts: opts } = state
+  def reject_provisional_screenshot(%Screenshot{ } = screenshot) do
+    attrs = %{ aws_diff_screenshot: nil, aws_provisional_screenshot: nil }
+    { :ok, screenshot } = update_screenshot(screenshot, attrs)
+    screenshot
+  end
+
+  def create_aws_screenshot(%{ data: _data, changes: %{ base64: base64 } } = changeset) do
+    case Ecto.Changeset.get_field(changeset, :step_id) do
+      nil -> throw("Screenshot has no step id")
+      step_id ->
+        team = UserDocs.Users.get_step_team!(step_id)
+        contents = Base.decode64!(base64)
+        file_name = file_name(changeset, :production)
+        aws_path = put_encoded_string_in_aws_object(contents, team, path(file_name))
+        Ecto.Changeset.put_change(changeset, :aws_screenshot, aws_path)
+    end
+  end
+  def update_aws_screenshot(%{ data: %{ aws_screenshot: screenshot_path }, changes: %{ base64: base64 } } = changeset) do
+    case Ecto.Changeset.get_field(changeset, :step_id) do
+      nil -> throw("Screenshot has no step id")
+      step_id ->
+        team = UserDocs.Users.get_step_team!(step_id)
+        state = %{
+          aws: screenshot_path,
+          original: "./tmp/" <> UUID.uuid4() <> ".png",
+          updated: "./tmp/" <> UUID.uuid4() <> ".png",
+          diff: "./tmp/" <> UUID.uuid4() <> ".png",
+          opts: aws_opts(team),
+          bucket: team.aws_bucket,
+          base64: base64,
+          team: team,
+          score: nil
+        }
+
+        prepare_aws_file(state)
+        |> score_files()
+        |> handle_changes(changeset)
+        |> delete_files(state)
+
+      end
+  end
+
+  def prepare_aws_file(%{ aws: aws_path, original: local_path, updated: updated,
+    bucket: bucket, base64: base64, opts: opts } = state
   ) do
-    path = "screenshots/" <> aws
-    case ExAws.S3.download_file(bucket, path, original) |> ExAws.request(opts) do
-      { :ok, :done} ->
-        File.write(updated, Base.decode64!(base_64))
+    case ExAws.S3.download_file(bucket, aws_path, local_path) |> ExAws.request(opts) do
+      { :ok, :done } ->
+        File.write(updated, Base.decode64!(base64))
         state
-      _ -> raise("#{__MODULE__}.diff_images failed")
+      { :error, reason } -> raise("#{__MODULE__}.prepare_aws_file failed because: #{reason}")
+      _ -> raise("#{__MODULE__}.prepare_aws_file failed")
     end
   end
 
@@ -240,10 +253,9 @@ defmodule UserDocs.Screenshots do
     case score do
       "inf" -> changeset
       _ ->
-        Logger.debug("The file is different, creating provisional and diff")
-        provisional_file_name = file_name(changeset.data, :provisional)
+        provisional_file_name = file_name(changeset, :provisional)
         put_encoded_string_in_aws_object(File.read!(updated), team, path(provisional_file_name))
-        diff_file_name = file_name(changeset.data, :diff)
+        diff_file_name = file_name(changeset, :diff)
         put_encoded_string_in_aws_object(File.read!(diff), team, path(diff_file_name))
         changeset
         |> Ecto.Changeset.put_change(:aws_provisional_screenshot, path(provisional_file_name))
@@ -268,6 +280,16 @@ defmodule UserDocs.Screenshots do
     end
   end
 
+  def rename_aws_object(src_path, dest_path, team) do
+    opts = aws_opts(team)
+    case ExAws.S3.put_object_copy(team.aws_bucket, dest_path, team.aws_bucket, src_path, opts) |> ExAws.request(opts) do
+      { :ok, _response } ->
+        ExAws.S3.delete_object(team.aws_bucket, src_path) |> ExAws.request(opts)
+        { :ok, dest_path }
+      e -> raise("#{__MODULE__}.rename_aws_object failed because #{inspect(e)}")
+    end
+  end
+
   def aws_opts(team) do
     [
       region: team.aws_region,
@@ -276,20 +298,29 @@ defmodule UserDocs.Screenshots do
     ]
   end
 
-  defp path(file_name) do
-    "screenshots/" <> file_name
+  @screenshots_directory "screenshots"
+  def path(file_name) do
+    @screenshots_directory <> "/" <> file_name
+  end
+  def unpath(path) do
+    @screenshots_directory <> "/" <> file_name = path
+    file_name
   end
 
-  defp file_name(screenshot, :diff) do
-    to_string(screenshot.id)
-    <> "-diff.png"
+  def file_name(screenshot, :diff), do: file_name(screenshot) <> "-diff.png"
+  def file_name(screenshot, :provisional), do: file_name(screenshot) <> "-provisional.png"
+  def file_name(screenshot, :production), do: file_name(screenshot) <> ".png"
+  defp file_name(%Ecto.Changeset{} = changeset) do
+    case Ecto.Changeset.get_field(changeset, :name, nil) do
+      nil -> case Ecto.Changeset.get_field(changeset, :id, nil) do
+        nil -> UUID.uuid4()
+        id -> Integer.to_string(id)
   end
-  defp file_name(screenshot, :provisional) do
-    to_string(screenshot.id)
-    <> "-provisional.png"
+      name -> name
   end
-  defp file_name(screenshot, :production) do
-    to_string(screenshot.id)
-    <> ".png"
   end
+  defp file_name(%Screenshot{ name: nil, id: nil }), do: UUID.uuid4()
+  defp file_name(%Screenshot{ name: nil, id: id }) when is_integer(id), do: Integer.to_string(id)
+  defp file_name(%Screenshot{ name: name }), do: name
+
 end

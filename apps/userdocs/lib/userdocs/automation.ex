@@ -7,10 +7,6 @@ defmodule UserDocs.Automation do
 
   import Ecto.Query, warn: false
   alias UserDocs.Repo
-  alias UserDocs.Subscription
-
-  alias UserDocs.Documents
-  alias UserDocs.Web
   alias UserDocs.Web.Page
   alias UserDocs.Web.Annotation
   alias UserDocs.Web.Element
@@ -205,7 +201,7 @@ defmodule UserDocs.Automation do
     |> maybe_filter_by_process(filters[:process_id])
     |> maybe_filter_steps_by_version(filters[:version_id])
     |> maybe_filter_by_team(filters[:team_id])
-    |> maybe_preload_process(params[:processes])
+    |> maybe_preload_step_process(params[:processes])
     |> maybe_preload_annotation(params[:annotation])
     |> maybe_preload_annotation_type(params[:annotation_type])
     |> maybe_preload_screenshot(params[:screenshot])
@@ -279,8 +275,8 @@ defmodule UserDocs.Automation do
   defp maybe_preload_screenshot(query, nil), do: query
   defp maybe_preload_screenshot(query, _), do: from(steps in query, preload: [:screenshot])
 
-  defp maybe_preload_process(query, nil), do: query
-  defp maybe_preload_process(query, _), do: from(steps in query, preload: [:process])
+  defp maybe_preload_step_process(query, nil), do: query
+  defp maybe_preload_step_process(query, _), do: from(steps in query, preload: [:process])
 
   defp maybe_preload_element(query, nil), do: query
   defp maybe_preload_element(query, _), do: from(steps in query, preload: [:element])
@@ -376,9 +372,24 @@ defmodule UserDocs.Automation do
     |> Repo.update()
   end
 
+  def runner_update_step(%Step{} = step, attrs) do
+    Step.runner_changeset(step, attrs)
+    |> Repo.update()
+  end
+
   def update_nested_step(%Step{} = step, last_step, attrs, socket, action) do
     Step.nested_changeset(step, last_step, attrs, socket, action)
     |> Repo.update()
+  end
+
+  def put_blank_step_instance(%Step{} = step, process_instance_id \\ nil) do
+    attrs = %{ status: "not_started", step_id: step.id, name: step.name, order: step.order, process_instance_id: process_instance_id }
+    { :ok, step_instance } = UserDocs.StepInstances.create_step_instance(attrs)
+    Map.put(step, :last_step_instance, step_instance)
+  end
+
+  def clear_last_step_instance(%Step{} = step) do
+    Map.put(step, :last_step_instance, nil)
   end
 
   def new_step_element(step, changeset) do
@@ -480,12 +491,21 @@ defmodule UserDocs.Automation do
   def list_processes(params \\ %{}, filters \\ %{})
   def list_processes(state, opts) when is_list(opts) do
     StateHandlers.list(state, Process, opts)
+    |> maybe_preload_process(opts[:preloads], state, opts)
   end
   def list_processes(params, filters) when is_map(params) and is_map(filters) do
     base_processes_query()
     |> maybe_filter_by_version(filters[:version_id])
     |> maybe_filter_processes_by_user_id(filters[:user_id])
+    |> maybe_filter_processes_by_team_id(filters[:team_id])
     |> Repo.all()
+  end
+
+
+  defp maybe_preload_process(process, nil, _, _), do: process
+  defp maybe_preload_process(process, _preloads, state, opts) do
+    opts = Keyword.delete(opts, :filter)
+    StateHandlers.preload(state, process, opts)
   end
 
   defp maybe_filter_by_version(query, nil), do: query
@@ -503,6 +523,16 @@ defmodule UserDocs.Automation do
       left_join: team in assoc(project, :team),
       left_join: user in assoc(team, :users),
       where: user.id == ^user_id
+    )
+  end
+
+  defp maybe_filter_processes_by_team_id(query, nil), do: query
+  defp maybe_filter_processes_by_team_id(query, team_id) do
+    from(process in query,
+      left_join: version in assoc(process, :version),
+      left_join: project in assoc(version, :project),
+      left_join: team in assoc(project, :team),
+      where: team.id == ^team_id
     )
   end
 
@@ -524,6 +554,29 @@ defmodule UserDocs.Automation do
 
   """
   def get_process!(id, params \\ %{})
+  def get_process!(id, %{ preloads: "*"}) do
+    Repo.one! from process in Process,
+      where: process.id == ^id,
+      left_join: step in assoc(process, :steps),
+      left_join: page in assoc(step, :page),
+      left_join: screenshot in assoc(step, :screenshot),
+      left_join: step_type in assoc(step, :step_type),
+      left_join: annotation in assoc(step, :annotation),
+      left_join: annotation_type in assoc(annotation, :annotation_type),
+      left_join: element in assoc(step, :element),
+      left_join: strategy in assoc(element, :strategy),
+      preload: [
+        steps: { step,
+          page: page,
+          annotation: annotation,
+          element: element,
+          step_type: step_type,
+          process: process,
+          screenshot: screenshot,
+          annotation: { annotation, annotation_type: annotation_type }
+        }
+      ]
+  end
   def get_process!(id, params) do
     base_process_query(id)
     |> maybe_preload_pages(params[:pages])
@@ -537,12 +590,6 @@ defmodule UserDocs.Automation do
 
   defp base_process_query(id) do
     from(process in Process, where: process.id == ^id)
-  end
-
-  defp maybe_preload_process(processes, nil, _, _), do: processes
-  defp maybe_preload_process(processes, _preloads, state, opts) do
-    opts = Keyword.delete(opts, :filter)
-    StateHandlers.preload(state, processes, opts)
   end
 
 #TODO Remove
@@ -587,6 +634,20 @@ defmodule UserDocs.Automation do
     process
     |> Process.changeset(attrs)
     |> Repo.update()
+  end
+
+  def put_blank_process_and_step_instances(%Process{} = process) do
+    attrs = %{ status: "not_started", process_id: process.id, name: process.name, order: process.order }
+    { :ok, process_instance } = UserDocs.ProcessInstances.create_process_instance(attrs)
+    steps = Enum.map(process.steps, fn(step) -> put_blank_step_instance(step, process_instance.id) end)
+
+    process
+    |> Map.put(:last_process_instance, process_instance)
+    |> Map.put(:steps, steps)
+  end
+
+  def clear_last_process_instance(%Process{} = process) do
+    Map.put(process, :last_process_instance, nil)
   end
 
   @doc """

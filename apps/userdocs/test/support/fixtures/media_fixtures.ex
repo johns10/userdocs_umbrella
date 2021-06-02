@@ -36,10 +36,17 @@ defmodule UserDocs.MediaFixtures do
       step_id: step_id
     }
   end
-  def screenshot_attrs(:invalid, step_id) do
+  def screenshot_attrs(:invalid, _step_id) do
     %{
       name: nil,
-      step_id: step_id
+      step_id: nil
+    }
+  end
+  def screenshot_attrs(:nameless, step_id, base64) do
+    %{
+      name: nil,
+      step_id: step_id,
+      base64: base64
     }
   end
 end

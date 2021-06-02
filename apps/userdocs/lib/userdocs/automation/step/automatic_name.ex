@@ -140,8 +140,6 @@ defmodule UserDocs.Automation.Step.Name do
 
   def generate("Fill Field", %Ecto.Changeset{} = step_changeset) do
     element = element_or_empty_element(step_changeset)
-    text = Ecto.Changeset.get_field(step_changeset, :text, "")
-
     element_name = element.name || ""
     guarded_text = Ecto.Changeset.get_field(step_changeset, :text, "") || ""
     order_name(step_changeset)

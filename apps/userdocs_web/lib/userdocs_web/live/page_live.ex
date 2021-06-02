@@ -4,6 +4,8 @@ defmodule UserDocsWeb.PageLive do
 
   alias UserDocsWeb.Root
 
+  @types []
+
   @impl true
   def mount(_params, session, socket) do
     {

@@ -5,7 +5,7 @@
   phx_change: "validate",
   phx_submit: "save"
 
-  h2.is-size-5 Edit Step
+  h2.is-size-4 Edit Step
 
   .field.is-horizontal
     .field-label.is-normal
@@ -65,11 +65,13 @@
           = error_tag(f, :page_id)
 
   = if "page_id" in @enabled_step_fields and page_reference(@changeset) == "page" do
-    = inputs_for f, :page, [id: @form_ids.page ], fn fp ->
-      div style="border-left: 5px solid LightGray;"
-        .pl-2
-          = PageLive.FormComponent.render_fields(Map.put(assigns, :field_ids, @field_ids.page),
-              fp, [ prefix: @form_ids.prefix ])
+    h3.is-size-5 Page
+    .field
+      = inputs_for f, :page, [id: @form_ids.page ], fn fp ->
+        div style="border-left: 5px solid LightGray;"
+          .pl-2
+            = PageLive.FormComponent.render_fields(Map.put(assigns, :field_ids, @field_ids.page),
+                fp, [ prefix: @form_ids.prefix ])
 
   = if "element_id" in @enabled_step_fields and @action not in [:new]  do
     .field.is-horizontal
@@ -83,18 +85,20 @@
             hidden: "element_id" not in @enabled_step_fields ], "control")
           = Layout.new_item_button("new-element", [ button_class: :a, phx_target: @myself.cid ], "control")
     = if !is_nil(@step.element) or @new_element do 
-      = inputs_for f, :element, [id: @form_ids.element], fn fe ->
-        div style="border-left: 5px solid LightGray;"
-          .pl-2
-            = hidden_input(fe, :page_id, value: f.data.page_id || @default_page_id)
-            = error_tag(fe, :page_id) 
-            = ElementLive.FormComponent.render_name_field(Map.put(assigns, :field_ids, @field_ids.element),
-                fe, @form_ids.prefix)
-            = ElementLive.FormComponent.render_selector_field(Map.put(assigns, :field_ids, @field_ids.element),
-                fe, @form_ids.prefix)
-            p 
-              = "Transferred Selector " <> (@transferred_strategy.name || "") <> ": "
-              = @transferred_selector || ""
+      h3.is-size-5 Element
+      .field
+        = inputs_for f, :element, [id: @form_ids.element], fn fe ->
+          div style="border-left: 5px solid LightGray;"
+            .pl-2
+              = hidden_input(fe, :page_id, value: f.data.page_id || @default_page_id)
+              = error_tag(fe, :page_id) 
+              = ElementLive.FormComponent.render_name_field(Map.put(assigns, :field_ids, @field_ids.element),
+                  fe, @form_ids.prefix)
+              = ElementLive.FormComponent.render_selector_field(Map.put(assigns, :field_ids, @field_ids.element),
+                  fe, @form_ids.prefix)
+              p 
+                = "Transferred Selector " <> (@transferred_strategy.name || "") <> ": "
+                = @transferred_selector || ""
 
   = if "annotation_id" in @enabled_step_fields and @action not in [:new] do
     .field.is-horizontal
@@ -108,10 +112,11 @@
             hidden: "annotation_id" not in @enabled_step_fields ], "control")
           = Layout.new_item_button("new-annotation", [ button_class: :a, phx_target: @myself.cid ], "control")
     = if !is_nil(@step.annotation) or @new_annotation do 
-      = inputs_for f, :annotation, [id: @form_ids.annotation ], fn fa ->
-        div style="border-left: 5px solid LightGray;"
-          .pl-2
-            = AnnotationLive.FormComponent.render_fields(assigns, fa, @form_ids.prefix)
+      .field
+        = inputs_for f, :annotation, [id: @form_ids.annotation ], fn fa ->
+          div style="border-left: 5px solid LightGray;"
+            .pl-2
+              = AnnotationLive.FormComponent.render_fields(assigns, fa, @form_ids.prefix)
 
   = Layout.text_input(f, [ field_name: :url, id: @field_ids.url,
         hidden: not(("url" in @enabled_step_fields) and (page_reference(@changeset) == "url"))])
@@ -128,12 +133,12 @@
   = if f.data.id do
     = if f.data.step_type.name in [ "Full Screen Screenshot", "Element Screenshot"] do
       = inputs_for f, :screenshot, [id: @form_ids.page ], fn fp ->
-        .field.is-horizontal
-          .field-label.is-normal
-            = label fp, :name, class: "label"
-          .field-body
-            .field.has-addons
-              = Layout.text_input(fp, [ field_name: :name, id: @field_ids.text, hidden: false, label: false  ])
+        h3.is-size-5 Screenshot
+        div style="border-left: 5px solid LightGray;"
+          .pl-2
+            = hidden_input(fp, :step_id, value: f.data.id)
+            .field
+              = Layout.text_input(fp, :name, [ id: @field_ids.text ], "control")
 
       .field
         = live_component @socket, UserDocsWeb.ScreenshotLive.Preview, 

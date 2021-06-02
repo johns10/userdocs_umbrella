@@ -35,7 +35,7 @@ defmodule UserDocsWeb.UserLive.FormComponent do
           </div>
         <% end %>
         <%= error_tag f, :team_users %>
-        <%= submit "Save", phx_disable_with: "Saving..." %>
+        <%= submit "Save", phx_disable_with: "Saving...", class: "button is-primary" %>
       </form>
     """
   end

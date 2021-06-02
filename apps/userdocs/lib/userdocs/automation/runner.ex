@@ -8,9 +8,16 @@ defmodule UserDocs.Automation.Runner do
   alias UserDocs.Web.Strategy
   alias UserDocs.Web.Page
   alias UserDocs.Media.Screenshot
+  alias UserDocs.Jobs.JobProcess
+  alias UserDocs.Jobs.JobStep
+  alias UserDocs.StepInstances.StepInstance
+  alias UserDocs.ProcessInstances.ProcessInstance
+  alias UserDocs.Jobs.JobInstance
 
   def parse(process = %UserDocs.Automation.Process{}) do
     handlers = %{
+      process_instance: &ProcessInstance.safe/2,
+      step_instance: &StepInstance.safe/2,
       step: &Step.safe/2,
       annotation: &Annotation.safe/2,
       element: &Element.safe/2,
@@ -18,6 +25,8 @@ defmodule UserDocs.Automation.Runner do
       strategy: &Strategy.safe/2,
       annotation_type: &AnnotationType.safe/2,
       page: &Page.safe/2,
+      process: &Process.safe/2,
+      screenshot: &Screenshot.safe/2
     }
 
     Process.safe(process, handlers)
@@ -25,6 +34,7 @@ defmodule UserDocs.Automation.Runner do
 
   def parse(step = %UserDocs.Automation.Step{}) do
     handlers = %{
+      step_instance: &StepInstance.safe/2,
       annotation: &Annotation.safe/2,
       element: &Element.safe/2,
       step_type: &StepType.safe/2,
@@ -36,5 +46,26 @@ defmodule UserDocs.Automation.Runner do
     }
 
     Step.safe(step, handlers)
+  end
+
+  def parse(job = %UserDocs.Jobs.Job{}) do
+    handlers = %{
+      process_instance: &ProcessInstance.safe/2,
+      step_instance: &StepInstance.safe/2,
+      job_instance: &JobInstance.safe/2,
+      step: &Step.safe/2,
+      annotation: &Annotation.safe/2,
+      element: &Element.safe/2,
+      step_type: &StepType.safe/2,
+      strategy: &Strategy.safe/2,
+      annotation_type: &AnnotationType.safe/2,
+      page: &Page.safe/2,
+      process: &Process.safe/2,
+      screenshot: &Screenshot.safe/2,
+      job_process: &JobProcess.Safe.apply/2,
+      job_step: &JobStep.Safe.apply/2
+    }
+
+    UserDocs.Jobs.Job.Safe.apply(job, handlers)
   end
 end

@@ -437,56 +437,8 @@ defmodule UserDocs.Users do
   def get_team!(id, %{ preloads: %{ job: %{ step_instances: true, process_instances: true }}}) do
     from(t in Team, as: :team)
     |> where([team: t], t.id == ^id)
-    |> join(:left, [team: t], job in assoc(t, :job), as: :j)
-    |> join(:left, [j: j], process_instances in assoc(j, :process_instances), as: :pi)
-    |> join(:left, [j: j], step_instances in assoc(j, :step_instances), as: :si)
-    |> join(:left, [si: si], steps in assoc(si, :step), as: :s)
-    |> join(:left, [s: s], st in assoc(s, :step_type), as: :st)
-    |> join(:left, [s: s], a in assoc(s, :annotation), as: :a)
-    |> join(:left, [s: s], p in assoc(s, :page), as: :page)
-    |> join(:left, [s: s], e in assoc(s, :element), as: :e)
-    |> join(:left, [s: s], s in assoc(s, :screenshot), as: :screenshot)
-    |> join(:left, [s: s], pr in assoc(s, :process), as: :process)
-    |> join(:left, [e: e], st in assoc(e, :strategy), as: :strategy)
-    |> join(:left, [a: a ], at in assoc(a, :annotation_type), as: :at)
-    |> join(:left, [pi: pi], process_instance_step_instances in assoc(pi, :step_instances), as: :pi_si)
-    |> join(:left, [pi_si: si], steps in assoc(si, :step), as: :pi_si_s)
-    |> order_by([pi_si: si], asc: si.order)
-    |> join(:left, [pi_si_s: s], st in assoc(s, :step_type), as: :pi_si_st)
-    |> join(:left, [pi_si_s: s], a in assoc(s, :annotation), as: :pi_si_a)
-    |> join(:left, [pi_si_s: s], p in assoc(s, :page), as: :pi_si_page)
-    |> join(:left, [pi_si_s: s], e in assoc(s, :element), as: :pi_si_e)
-    |> join(:left, [pi_si_s: s], s in assoc(s, :screenshot), as: :pi_si_screenshot)
-    |> join(:left, [pi_si_s: s], pr in assoc(s, :process), as: :pi_si_process)
-    |> join(:left, [pi_si_e: e], st in assoc(e, :strategy), as: :pi_si_strategy)
-    |> join(:left, [pi_si_a: a ], at in assoc(a, :annotation_type), as: :pi_si_at)
-    |> preload([ j: j, si: si, s: s, st: st, e: e, strategy: strategy, a: a, at: at, page: page, process: process, screenshot: screenshot ],
-      [ job: { j,
-        step_instances: { si,
-          step: { s, [
-            step_type: st,
-            element: { e, strategy: strategy },
-            annotation: { a, annotation_type: at },
-            page: page,
-            process: process,
-            screenshot: screenshot
-          ]}
-        }}])
-    |> preload([ j: j, pi: pi, pi_si: pi_si, pi_si_s: s, pi_si_st: st,
-      pi_si_e: e, pi_si_strategy: strategy, pi_si_a: a, pi_si_at: at,
-      pi_si_screenshot: screenshot, pi_si_page: page, pi_si_process: process ],
-      [ job: { j,
-        process_instances: { pi,
-          step_instances: { pi_si,
-            step: { s, [
-              step_type: st,
-              element: { e, strategy: strategy },
-              annotation: { a, annotation_type: at },
-              page: page,
-              process: process,
-              screenshot: screenshot
-            ]}
-        }}}])
+    |> join(:left, [team: t], job in assoc(t, :job), as: :job)
+    |> preload([ job: j  ], [ job: j ])
     |> Repo.one()
   end
   def get_team!(id, params \\ %{}) do
@@ -504,15 +456,25 @@ defmodule UserDocs.Users do
     |> maybe_preload(opts[:preloads], state, opts)
   end
 
-  def get_step_instance_team!(id) do
-    from(t in Team, as: :team)
-    |> join(:left, [team: t], p in assoc(t, :projects), as: :projects)
+  def get_screenshot_team!(id) do
+    from(t in Team, as: :teams)
+    |> join(:left, [teams: t], p in assoc(t, :projects), as: :projects)
     |> join(:left, [projects: p], v in assoc(p, :versions), as: :versions)
     |> join(:left, [versions: v], p in assoc(v, :processes), as: :processes)
     |> join(:left, [processes: p], s in assoc(p, :steps), as: :steps)
-    |> join(:left, [steps: s], si in assoc(s, :step_instances), as: :step_instance)
-    |> where([step_instance: si], si.id == ^id)
-    |> Repo.one()
+    |> join(:left, [steps: s], si in assoc(s, :screenshot), as: :screenshot)
+    |> where([screenshot: s], s.id == ^id)
+    |> Repo.one!()
+  end
+
+  def get_step_team!(id) do
+    from(t in Team, as: :teams)
+    |> join(:left, [teams: t], p in assoc(t, :projects), as: :projects)
+    |> join(:left, [projects: p], v in assoc(p, :versions), as: :versions)
+    |> join(:left, [versions: v], p in assoc(v, :processes), as: :processes)
+    |> join(:left, [processes: p], s in assoc(p, :steps), as: :step)
+    |> where([step: s], s.id == ^id)
+    |> Repo.one!()
   end
 
   defp maybe_preload(object, nil, _, _), do: object
@@ -556,16 +518,6 @@ defmodule UserDocs.Users do
       left_join: page in UserDocs.Web.Page, on: page.version_id == version.id,
       left_join: annotation in UserDocs.Web.Annotation, on: annotation.page_id == page.id,
       where: annotation.id == ^id
-  end
-
-  # TODO: Move this into base query
-  def get_step_team!(id) do
-    Repo.one from team in Team,
-      left_join: project in UserDocs.Projects.Project, on: project.team_id == team.id,
-      left_join: version in UserDocs.Projects.Version, on: version.project_id == project.id,
-      left_join: process in UserDocs.Automation.Process, on: process.version_id == version.id,
-      left_join: step in UserDocs.Automation.Step, on: step.process_id == process.id,
-      where: step.id == ^id
   end
 
   def team_default_project(nil), do: nil

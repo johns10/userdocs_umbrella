@@ -1,4 +1,4 @@
-const { BrowserWindow } = require('electron')
+const { app, BrowserWindow } = require('electron')
 const isDev = require('electron-is-dev');
 
 if (isDev) {
@@ -22,7 +22,7 @@ async function navigateToApplication (mainWindow) {
 async function authenticateJohnDavenport(mainWindow) {
   mainWindow = BrowserWindow.getAllWindows()[0]
   mainWindow.webContents.executeJavaScript("document.querySelector('#user_email').value = 'johns10davenport@gmail.com'")
-  mainWindow.webContents.executeJavaScript("document.querySelector('#user_password').value = 'A7B!2#x2y'")
+  mainWindow.webContents.executeJavaScript("document.querySelector('#user_password').value = 'userdocs'")
   mainWindow.webContents.executeJavaScript("document.querySelector('button').click()")
   return mainWindow
 }
@@ -37,14 +37,15 @@ async function createMainWindow () {
       enableRemoteModule: false
     }
   })
+  /*
   userdocs.mainWindow = win
   win.webContents.on('did-navigate', (event, input) => {
     console.log("Did Navigate")
-    /* console.log(event.sender)
+    console.log(event.sender)
     console.log(event.sender.getTitle())
     console.log(event.sender.getType())
     console.log(event.sender.debugger)
-    console.log(event.sender.inspectElement())*/
+    console.log(event.sender.inspectElement())
   })
   win.webContents.on('will-navigate', (event, input) => { console.log("Will Navigate") })
   win.webContents.on('will-redirect', (event, input) => { console.log("Will Redirect") })
@@ -58,6 +59,7 @@ async function createMainWindow () {
   win.webContents.on('devtools-reload-page', (event, input) => {
     console.log('devtools-reload-page')
   })
+  */
   return win
 }
 
