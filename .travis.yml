@@ -19,7 +19,7 @@ before_script:
   - yarn global add electron-builder
   
 script:
-  - yarn --cwd apps/userdocs_web/assets/ dist
+  - yarn --cwd apps/userdocs_web/assets/js/electron dist
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
 
