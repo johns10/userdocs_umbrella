@@ -23,8 +23,7 @@
     },
     "linux": {
       "executableName": "user_docs",
-      "icon": "build/icon.icns",
-      "target": "tar.gz"
+      "target": "snap"
     }
   },
   "scripts": {

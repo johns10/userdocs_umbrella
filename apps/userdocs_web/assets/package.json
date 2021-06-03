@@ -6,27 +6,9 @@
   "repository": {},
   "license": "MIT",
   "author": "John Davenport",
-  "build": {
-    "appId": "johns10@gmail.com",
-    "mac": {
-      "target": "dmg",
-      "icon": "build/icon.png",
-      "category": "public.app-category.developer-tools"
-    },
-    "linux": {
-      "target": "snap",
-      "executableName": "userdocs"
-    }
-  },
   "scripts": {
     "deploy": "webpack --mode production",
     "watch": "webpack --mode development --watch",
-    "start_electron": "electron js/electron/main.js",
-    "test": "jest",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder",
-    "dist-mac": "electron-builder -m",
-    "dist-all": "electron-builder -wm"
   },
   "dependencies": {
     "@medv/finder": "^2.0.0",
