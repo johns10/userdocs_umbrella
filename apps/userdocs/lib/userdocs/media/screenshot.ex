@@ -30,7 +30,6 @@ defmodule UserDocs.Media.Screenshot do
     |> foreign_key_constraint(:step_id)
     |> unique_constraint(:step_id)
     |> maybe_update_screenshots()
-    |> maybe_change_aws_filename()
     |> validate_required([:step_id])
   end
 
@@ -42,6 +41,7 @@ defmodule UserDocs.Media.Screenshot do
     if current_file_name != new_file_name do
       new_path = Screenshots.path(new_file_name)
       team = UserDocs.Users.get_screenshot_team!(id)
+      IO.inspect(changeset.action)
       { :ok, dest_path } = Screenshots.rename_aws_object(current_aws_path, new_path, team)
       put_change(changeset, :aws_screenshot, dest_path)
     else
