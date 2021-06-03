@@ -221,7 +221,6 @@ defmodule UserDocs.Screenshots do
         }
 
         prepare_aws_file(state)
-        |> IO.inspect
         |> score_files()
         |> handle_changes(changeset)
         |> delete_files(state)
