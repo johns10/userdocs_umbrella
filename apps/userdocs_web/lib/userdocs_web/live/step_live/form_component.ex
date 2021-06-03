@@ -258,9 +258,15 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   defp save_step(socket, :edit, step_params) do
     step = socket.assigns.step
     last_step = socket.assigns.last_step
+    changeset = Automation.change_step(step, step_params)
+    screenshot_changeset = Ecto.Changeset.get_change(changeset, :screenshot, nil)
     changeset =
-      Automation.change_step(step, step_params)
-      |> UserDocs.Screenshots.Screenshot.maybe_change_aws_filename()
+      if screenshot_changeset do
+        screenshot_changeset = UserDocs.Media.Screenshot.maybe_change_aws_filename(screenshot_changeset)
+        Ecto.Changeset.put_change(changeset, :screenshot, screenshot_changeset)
+      else
+        changeset
+      end
 
     case Automation.update_nested_step(step, last_step, step_params, socket, :update) do
       {:ok, step} ->
