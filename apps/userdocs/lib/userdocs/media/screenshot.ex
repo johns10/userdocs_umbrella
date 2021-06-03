@@ -30,6 +30,7 @@ defmodule UserDocs.Media.Screenshot do
     |> foreign_key_constraint(:step_id)
     |> unique_constraint(:step_id)
     |> maybe_update_screenshots()
+    # |> maybe_change_aws_filename()
     |> validate_required([:step_id])
   end
 
