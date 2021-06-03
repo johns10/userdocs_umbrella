@@ -16,6 +16,9 @@ if (isDev) {
   Runner = require('@userdocs/runner')
 }
 
+const { readFileSync } = require('fs');
+var configuration = JSON.parse(readFileSync('./config.json'));
+
 if (isDev) {
   require('electron-reload')(__dirname, {
     electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
@@ -68,6 +71,8 @@ userdocs = {
     }
   }
 }
+
+console.log(userdocs.configuration)
 
 function main() {
   if(isDev) {
