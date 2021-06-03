@@ -221,6 +221,7 @@ defmodule UserDocs.Screenshots do
         }
 
         prepare_aws_file(state)
+        |> IO.inspect
         |> score_files()
         |> handle_changes(changeset)
         |> delete_files(state)
@@ -235,7 +236,10 @@ defmodule UserDocs.Screenshots do
       { :ok, :done } ->
         File.write(updated, Base.decode64!(base64))
         state
-      { :error, reason } -> raise("#{__MODULE__}.prepare_aws_file failed because: #{reason}")
+      { :error, reason } ->
+        Logger.error("prepare_aws failed because: #{reason}")
+        #raise("#{__MODULE__}.prepare_aws_file failed because: #{reason}") #TODO: More permanent fix
+        state
       _ -> raise("#{__MODULE__}.prepare_aws_file failed")
     end
   end
@@ -245,7 +249,9 @@ defmodule UserDocs.Screenshots do
 
     case System.cmd("magick", args, [ stderr_to_stdout: true ]) do
       { score, 1 } -> Map.put(state, :score, score)
-      e -> raise("#{__MODULE__}.diff_images failed because #{e}")
+      e ->
+        Logger.error("#{__MODULE__}.diff_images failed because #{inspect(e)}")
+        Map.put(state, :score, "inf")
     end
   end
 
