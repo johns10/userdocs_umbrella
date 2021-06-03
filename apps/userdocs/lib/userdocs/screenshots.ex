@@ -248,9 +248,18 @@ defmodule UserDocs.Screenshots do
 
   def score_files(%{ original: original, updated: updated, diff: diff } = state) do
     args = ["compare", "-metric", "PSNR", original, updated, diff ]
-
+    """
     case System.cmd("magick", args, [ stderr_to_stdout: true ]) do
       { score, 1 } -> Map.put(state, :score, score)
+      e ->
+        Logger.error("{__MODULE__}.diff_images failed because {inspect(e)}")
+        Map.put(state, :score, "failed")
+    end
+    """
+    try do
+      { score, 1 } = System.cmd("magick", args, [ stderr_to_stdout: true ])
+      Map.put(state, :score, score)
+    rescue
       e ->
         Logger.error("#{__MODULE__}.diff_images failed because #{inspect(e)}")
         Map.put(state, :score, "failed")
