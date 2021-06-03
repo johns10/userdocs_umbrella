@@ -239,7 +239,10 @@ defmodule UserDocs.Screenshots do
         Logger.error("prepare_aws failed because: #{reason}")
         #raise("#{__MODULE__}.prepare_aws_file failed because: #{reason}") #TODO: More permanent fix
         state
-      _ -> raise("#{__MODULE__}.prepare_aws_file failed")
+      indeterminate ->
+        Logger.error("prepare_aws failed because indeterminate: #{indeterminate}")
+        # raise("#{__MODULE__}.prepare_aws_file failed")
+        state
     end
   end
 
