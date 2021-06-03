@@ -23,6 +23,10 @@ script:
 before_cache:
   - rm -rf $HOME/.cache/electron-builder/wine
 
+deploy:
+  provider: releases
+  github-token: $GITHUB_TOKEN
+
 branches:
   except:
     - "/^v\\d+\\.\\d+\\.\\d+$/"
