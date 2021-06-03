@@ -258,7 +258,9 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   defp save_step(socket, :edit, step_params) do
     step = socket.assigns.step
     last_step = socket.assigns.last_step
-    changeset = Automation.change_step(step, step_params)
+    changeset =
+      Automation.change_step(step, step_params)
+      |> UserDocs.Screenshots.Screenshot.maybe_change_aws_filename()
 
     case Automation.update_nested_step(step, last_step, step_params, socket, :update) do
       {:ok, step} ->
