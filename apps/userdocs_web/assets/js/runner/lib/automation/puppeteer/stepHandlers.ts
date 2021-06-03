@@ -76,7 +76,7 @@ export const stepHandlers: StepHandler = {
       ? step.screenshot.name 
       : step.process.name + " " + step.order + ".png"
 
-    if(configuration.imagePath) {
+    if(configuration.imagePath != '') {
       const filePath = path.join(configuration.imagePath, fileName)
       await writeFile(filePath, base64);
     }
@@ -89,18 +89,18 @@ export const stepHandlers: StepHandler = {
     return step
   },
   "Full Screen Screenshot": async(browser: Browser, step: Step, configuration: Configuration) => {
-    console.log(step)
     const processName = step.process ? step.process.name : ""
     const stepOrder = step.order
     await new Promise(resolve => setTimeout(resolve, 500));  
     const page: Page | undefined = await currentPage(browser) 
     if (!page) { throw new Error("Page not retreived from browser") }
     let base64: any = await page.screenshot({ encoding: "base64" });  
+
     var fileName = step.screenshot.name 
       ? step.screenshot.name 
       : step.process.name + " " + step.order + ".png"
 
-    if(configuration.imagePath) {
+    if(configuration.imagePath != '') {
       const filePath = path.join(configuration.imagePath, fileName)
       await writeFile(filePath, base64);
     }

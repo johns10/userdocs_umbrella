@@ -6,9 +6,12 @@ const {
   createMainWindow } = require('./main_window/navigation.js')
 const path = require('path')
 const isDev = require('electron-is-dev');
+const Store = require('electron-store');
+const schema = require('./configSchema')
+
 var Runner
 if (isDev) {
-  Runner = require('../runner/runner')
+  Runner = require('../runner/dist/runner')
 } else {
   Runner = require('@userdocs/runner')
 }
@@ -18,6 +21,8 @@ if (isDev) {
     electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
   });
 }
+
+const store = new Store({schema})
 
 stepUpdated = function(step) { 
   mainWindow().send('stepStatusUpdated', step); 
@@ -36,11 +41,11 @@ userdocs = {
   runState: 'stopped',
   runner: null,
   configuration: {
-    automationFrameworkName: 'puppeteer',
-    maxRetries: 3,
-    environment: 'desktop',
-    imagePath: null,
-    userDataDirPath: 'default',
+    automationFrameworkName: store.get('automationFrameworkName'),
+    maxRetries: store.get('maxRetries'),
+    environment: store.get('environment'),
+    imagePath: store.get('imagePath'),
+    userDataDirPath: store.get('userDataDirPath'),
     callbacks: {
       step: {
         preExecutionCallbacks: [ 'startLastStepInstance', stepUpdated ],
