@@ -251,13 +251,14 @@ defmodule UserDocs.Screenshots do
       { score, 1 } -> Map.put(state, :score, score)
       e ->
         Logger.error("#{__MODULE__}.diff_images failed because #{inspect(e)}")
-        Map.put(state, :score, "inf")
+        Map.put(state, :score, "failed")
     end
   end
 
   def handle_changes(%{ score: score, diff: diff, updated: updated, team: team }, changeset) do
     case score do
       "inf" -> changeset
+      "failed" -> create_aws_screenshot(changeset)
       _ ->
         provisional_file_name = file_name(changeset, :provisional)
         put_encoded_string_in_aws_object(File.read!(updated), team, path(provisional_file_name))
@@ -292,7 +293,9 @@ defmodule UserDocs.Screenshots do
       { :ok, _response } ->
         ExAws.S3.delete_object(team.aws_bucket, src_path) |> ExAws.request(opts)
         { :ok, dest_path }
-      e -> raise("#{__MODULE__}.rename_aws_object failed because #{inspect(e)}")
+      e ->
+        Logger.error("#{__MODULE__}.rename_aws_object failed because #{inspect(e)}")
+        { :ok, dest_path }
     end
   end
 
