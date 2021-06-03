@@ -24,10 +24,17 @@
     "linux": {
       "executableName": "user_docs",
       "target": "snap"
-    }
+    },
+    "extraResources": [
+      {
+        "filter": [
+          "./config.json"
+        ]
+      }
+    ]
   },
   "scripts": {
-    "start_electron": "electron main.js",
+    "start": "electron main.js",
     "test": "jest",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
@@ -36,7 +43,8 @@
   },
   "dependencies": {
     "@userdocs/runner": "file:../runner",
-    "electron-is-dev": "^2.0.0"
+    "electron-is-dev": "^2.0.0",
+    "electron-store": "^8.0.0"
   },
   "devDependencies": {
     "electron": "12.0.9",
