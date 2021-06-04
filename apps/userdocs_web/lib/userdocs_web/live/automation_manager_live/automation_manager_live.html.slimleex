@@ -22,6 +22,8 @@ css:
   = if @job_id != nil do
     aside.menu
       ul.menu-list
+        p 
+          = "Job ID: " <> to_string(@job_id)
         = for item <- Jobs.get_executable_items(@job) do 
           = render_job_item(item, @myself.cid)
 
