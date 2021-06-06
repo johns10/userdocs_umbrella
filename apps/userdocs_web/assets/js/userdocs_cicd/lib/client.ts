@@ -8,6 +8,9 @@ interface Credentials {
 }
 
 export async function authenticate(url, credentials : Credentials) {
+
+  console.log(url)
+  console.log(credentials)
 	const params = {
     'user[email]': credentials.email,
     'user[password]': credentials.password

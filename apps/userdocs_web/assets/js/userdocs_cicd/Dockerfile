@@ -1,8 +1,6 @@
 FROM alpine
 RUN apk add chromium
-ADD binary-dist/main-alpine .
+RUN wget https://github.com/johns10/userdocs/releases/download/0.0.2/userdocs-cicd-alpine
 ADD .env .
 RUN ls	
-RUN chmod +x main-alpine
-ADD ca.crt .
-RUN export NODE_EXTRA_CA_CERTS=ca.crt
+RUN chmod +x userdocs-cicd-alpine

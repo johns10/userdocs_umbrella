@@ -28,13 +28,15 @@ async function authenticateJohnDavenport(mainWindow) {
 }
 
 async function createMainWindow () {  
+  app.commandLine.appendSwitch('ignore-certificate-errors');
   var win = await new BrowserWindow({
     width: 1600,
     height: 800,
     webPreferences: {
       preload: require('path').join(__dirname, './preload.js'),
       devTools: true,
-      enableRemoteModule: false
+      enableRemoteModule: false,
+      webSecurity: false
     }
   })
   /*

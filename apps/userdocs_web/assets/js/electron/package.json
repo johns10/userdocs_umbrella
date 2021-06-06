@@ -23,7 +23,7 @@
     },
     "linux": {
       "executableName": "user_docs",
-      "target": "snap"
+      "target": "AppImage"
     },
     "extraResources": [
       {
@@ -33,11 +33,22 @@
       }
     ]
   },
+  "publish": {
+    "token": "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",
+    "provider": "github",
+    "repo": "userdocs",
+    "owner": "johns10",
+    "host": "github.com",
+    "protocol": "https",
+    "releaseType": "draft",
+    "private": true
+  },
   "scripts": {
     "start": "electron main.js",
     "test": "jest",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
+    "release": "electron-builder -p always",
     "dist-mac": "electron-builder -m",
     "dist-all": "electron-builder -wm"
   },
