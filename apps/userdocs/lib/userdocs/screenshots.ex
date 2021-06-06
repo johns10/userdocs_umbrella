@@ -122,6 +122,7 @@ defmodule UserDocs.Screenshots do
   def update_screenshot(%Screenshot{} = screenshot, attrs) do
     screenshot
     |> Screenshot.changeset(attrs)
+    |> maybe_change_aws_filename()
     |> Repo.update()
   end
   def update_screenshot(%Screenshot{ base64: _base64 } = screenshot, attrs, %UserDocs.Users.Team{} = _team) do
@@ -136,6 +137,20 @@ defmodule UserDocs.Screenshots do
     |> Repo.insert(on_conflict: :nothing)
   end
 
+  def maybe_change_aws_filename(%{ data: %{ aws_screenshot: nil }} = changeset), do: changeset
+  def maybe_change_aws_filename(%{ data: %{ aws_screenshot: current_aws_path, id: id }} = changeset) when is_integer(id) do
+    current_file_name = unpath(current_aws_path)
+    { :ok, screenshot } = Ecto.Changeset.apply_action(changeset, :update)
+    new_file_name = file_name(screenshot, :production)
+    if current_file_name != new_file_name do
+      new_path = path(new_file_name)
+      team = UserDocs.Users.get_screenshot_team!(id)
+      { :ok, dest_path } = rename_aws_object(current_aws_path, new_path, team)
+      Ecto.Changeset.put_change(changeset, :aws_screenshot, dest_path)
+    else
+      changeset
+    end
+  end
 
   @doc """
   Deletes a screenshot.
@@ -237,11 +252,11 @@ defmodule UserDocs.Screenshots do
         state
       { :error, reason } ->
         Logger.error("prepare_aws failed because: #{reason}")
-        #raise("#{__MODULE__}.prepare_aws_file failed because: #{reason}") #TODO: More permanent fix
+        raise("#{__MODULE__}.prepare_aws_file failed because: #{reason}") #TODO: More permanent fix
         state
       indeterminate ->
         Logger.error("prepare_aws failed because indeterminate: #{indeterminate}")
-        # raise("#{__MODULE__}.prepare_aws_file failed")
+        raise("#{__MODULE__}.prepare_aws_file failed")
         state
     end
   end
@@ -249,17 +264,17 @@ defmodule UserDocs.Screenshots do
   def score_files(%{ original: original, updated: updated, diff: diff } = state) do
     args = ["compare", "-metric", "PSNR", original, updated, diff ]
     """
-    case System.cmd("magick", args, [ stderr_to_stdout: true ]) do
-      { score, 1 } -> Map.put(state, :score, score)
+    try do
+      { score, 1 } = System.cmd("magick", args, [ stderr_to_stdout: true ])
+      Map.put(state, :score, score)
+    rescue
       e ->
         Logger.error("{__MODULE__}.diff_images failed because {inspect(e)}")
         Map.put(state, :score, "failed")
     end
     """
-    try do
-      { score, 1 } = System.cmd("magick", args, [ stderr_to_stdout: true ])
-      Map.put(state, :score, score)
-    rescue
+    case System.cmd("magick", args, [ stderr_to_stdout: true ]) do
+      { score, 1 } -> Map.put(state, :score, score)
       e ->
         Logger.error("#{__MODULE__}.diff_images failed because #{inspect(e)}")
         Map.put(state, :score, "failed")
