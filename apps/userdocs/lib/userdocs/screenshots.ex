@@ -247,6 +247,7 @@ defmodule UserDocs.Screenshots do
     bucket: bucket, base64: base64, opts: opts } = state
   ) do
     IO.inspect(local_path)
+    IO.inspect(aws_path)
     case ExAws.S3.download_file(bucket, aws_path, local_path) |> ExAws.request(opts) do
       { :ok, :done } ->
         File.write(updated, Base.decode64!(base64))
