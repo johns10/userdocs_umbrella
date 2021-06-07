@@ -278,6 +278,7 @@ defmodule UserDocs.Screenshots do
       { score, 1 } -> Map.put(state, :score, score)
       { score, 0 } -> Map.put(state, :score, score)
       :enoent -> raise("It's very likely you're not calling magick correctly, or your files aren't created correctly.")
+      "compare: image widths or heights differ" <> _ -> raise("Image widths or heights are different, write a fake diff and compare")
       e ->
         raise("#{__MODULE__}.diff_images failed because #{inspect(e)}")
     end
