@@ -246,11 +246,6 @@ defmodule UserDocs.Screenshots do
   def prepare_aws_file(%{ aws: aws_path, original: local_path, updated: updated,
     bucket: bucket, base64: base64, opts: opts } = state
   ) do
-    IO.inspect("Preparing aws files 2")
-    IO.inspect(aws_path)
-    IO.inspect(local_path)
-    IO.inspect(updated)
-    IO.inspect(File.cwd!)
     case ExAws.S3.download_file(bucket, aws_path, local_path) |> ExAws.request(opts) do
       { :ok, :done } ->
         File.write(updated, Base.decode64!(base64))
@@ -279,15 +274,9 @@ defmodule UserDocs.Screenshots do
         Map.put(state, :score, "failed")
     end
     """
-    IO.inspect("scoring files")
-    IO.inspect("Original: " <> Path.absname(original))
-    IO.inspect("Updated: " <> Path.absname(updated))
-    IO.inspect("Diff: " <> Path.absname(diff))
-    IO.inspect(Path.wildcard(File.cwd! <> "/tmp/*"))
-    File.write(diff, "")
-    IO.inspect("seriously, update")
     case System.cmd("compare", args, [ stderr_to_stdout: true ]) do
       { score, 1 } -> Map.put(state, :score, score)
+      :enoent -> raise("It's very likely you're not calling magick correctly, or your files aren't created correctly.")
       e ->
         raise("#{__MODULE__}.diff_images failed because #{inspect(e)}")
     end
