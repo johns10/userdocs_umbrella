@@ -246,6 +246,7 @@ defmodule UserDocs.Screenshots do
   def prepare_aws_file(%{ aws: aws_path, original: local_path, updated: updated,
     bucket: bucket, base64: base64, opts: opts } = state
   ) do
+    IO.inspect(local_path)
     case ExAws.S3.download_file(bucket, aws_path, local_path) |> ExAws.request(opts) do
       { :ok, :done } ->
         File.write(updated, Base.decode64!(base64))
@@ -253,10 +254,6 @@ defmodule UserDocs.Screenshots do
       { :error, reason } ->
         Logger.error("prepare_aws failed because: #{reason}")
         raise("#{__MODULE__}.prepare_aws_file failed because: #{reason}") #TODO: More permanent fix
-        state
-      indeterminate ->
-        Logger.error("prepare_aws failed because indeterminate: #{indeterminate}")
-        raise("#{__MODULE__}.prepare_aws_file failed")
         state
     end
   end
