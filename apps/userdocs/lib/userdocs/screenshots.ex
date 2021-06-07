@@ -246,11 +246,11 @@ defmodule UserDocs.Screenshots do
   def prepare_aws_file(%{ aws: aws_path, original: local_path, updated: updated,
     bucket: bucket, base64: base64, opts: opts } = state
   ) do
+    IO.inspect("Preparing aws files")
     IO.inspect(aws_path)
     IO.inspect(local_path)
     IO.inspect(updated)
     IO.inspect(File.cwd!)
-    IO.inspect(Path.wildcard(File.cwd! <> "/*"))
     case ExAws.S3.download_file(bucket, aws_path, local_path) |> ExAws.request(opts) do
       { :ok, :done } ->
         File.write(updated, Base.decode64!(base64))
@@ -280,11 +280,11 @@ defmodule UserDocs.Screenshots do
     end
     """
     IO.inspect("scoring files")
-    IO.inspect(original)
     IO.inspect(Path.absname(original))
-    IO.inspect(updated)
-    IO.inspect(diff)
+    IO.inspect(Path.absname(updated))
+    IO.inspect(Path.absname(diff))
     IO.inspect(Path.wildcard(File.cwd! <> "/tmp/*"))
+    File.write(diff, "")
     case System.cmd("magick", args, [ stderr_to_stdout: true ]) do
       { score, 1 } -> Map.put(state, :score, score)
       e ->
