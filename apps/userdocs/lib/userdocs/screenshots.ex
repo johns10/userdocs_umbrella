@@ -246,7 +246,7 @@ defmodule UserDocs.Screenshots do
   def prepare_aws_file(%{ aws: aws_path, original: local_path, updated: updated,
     bucket: bucket, base64: base64, opts: opts } = state
   ) do
-    IO.inspect("Preparing aws files")
+    IO.inspect("Preparing aws files 2")
     IO.inspect(aws_path)
     IO.inspect(local_path)
     IO.inspect(updated)
