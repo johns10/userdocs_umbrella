@@ -26,7 +26,6 @@ erl_crash.dump
 /Mnesia.nonode@nohost/
 
 # Ignore the files in tmp
-/tmp/
 
 # Ignore any lockfiles
 mix.lock
