@@ -246,8 +246,11 @@ defmodule UserDocs.Screenshots do
   def prepare_aws_file(%{ aws: aws_path, original: local_path, updated: updated,
     bucket: bucket, base64: base64, opts: opts } = state
   ) do
-    IO.inspect(local_path)
     IO.inspect(aws_path)
+    IO.inspect(local_path)
+    IO.inspect(updated)
+    IO.inspect(File.cwd!)
+    IO.inspect(Path.wildcard(File.cwd! <> "/*"))
     case ExAws.S3.download_file(bucket, aws_path, local_path) |> ExAws.request(opts) do
       { :ok, :done } ->
         File.write(updated, Base.decode64!(base64))
