@@ -274,6 +274,7 @@ defmodule UserDocs.Screenshots do
         Map.put(state, :score, "failed")
     end
     """
+    IO.inspect(Path.wildcard(File.cwd! <> "/tmp/*"))
     case System.cmd("magick", args, [ stderr_to_stdout: true ]) do
       { score, 1 } -> Map.put(state, :score, score)
       e ->
