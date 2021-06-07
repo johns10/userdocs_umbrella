@@ -288,7 +288,8 @@ defmodule UserDocs.Screenshots do
     case score do
       "inf" -> changeset
       "failed" -> create_aws_screenshot(changeset)
-      _ ->
+      score ->
+        Logger.info("Image Comparison score is " <> to_string(score))
         provisional_file_name = file_name(changeset, :provisional)
         put_encoded_string_in_aws_object(File.read!(updated), team, path(provisional_file_name))
         diff_file_name = file_name(changeset, :diff)
