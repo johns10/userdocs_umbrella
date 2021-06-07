@@ -64,14 +64,15 @@
             [ button_class: :a, phx_target: @myself.cid ], "control")
           = error_tag(f, :page_id)
 
-  = if "page_id" in @enabled_step_fields and page_reference(@changeset) == "page" do
-    h3.is-size-5 Page
-    .field
-      = inputs_for f, :page, [id: @form_ids.page ], fn fp ->
-        div style="border-left: 5px solid LightGray;"
-          .pl-2
-            = PageLive.FormComponent.render_fields(Map.put(assigns, :field_ids, @field_ids.page),
-                fp, [ prefix: @form_ids.prefix ])
+  = if "page_id" in @enabled_step_fields do
+    = if !is_nil(@step.page) or @new_page do
+      h3.is-size-5 Page
+      .field
+        = inputs_for f, :page, [id: @form_ids.page ], fn fp ->
+          div style="border-left: 5px solid LightGray;"
+            .pl-2
+              = PageLive.FormComponent.render_fields(Map.put(assigns, :field_ids, @field_ids.page),
+                  fp, [ prefix: @form_ids.prefix ])
 
   = if "element_id" in @enabled_step_fields and @action not in [:new]  do
     .field.is-horizontal

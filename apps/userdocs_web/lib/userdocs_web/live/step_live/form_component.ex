@@ -198,6 +198,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       socket
       |> assign(:changeset, changeset)
       |> assign(:step, changeset.data)
+      |> assign(:new_page, true)
     }
   end
 
