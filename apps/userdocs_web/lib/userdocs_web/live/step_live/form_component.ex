@@ -125,8 +125,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
         changeset <- Ecto.Changeset.validate_required(changeset, [:order])
       do
         changeset
-      else
-        _ -> raise("Fail")
       end
 
     enabled_step_fields = Helpers.enabled_step_fields(socket, changeset)
@@ -262,7 +260,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     screenshot_changeset = Ecto.Changeset.get_change(changeset, :screenshot, nil)
     changeset =
       if screenshot_changeset do
-        screenshot_changeset = UserDocs.Media.Screenshot.maybe_change_aws_filename(screenshot_changeset)
         Ecto.Changeset.put_change(changeset, :screenshot, screenshot_changeset)
       else
         changeset
