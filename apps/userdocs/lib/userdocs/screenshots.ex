@@ -264,7 +264,7 @@ defmodule UserDocs.Screenshots do
 
   def score_files(%{ original: original, updated: updated, diff: diff } = state) do
     args = [
-      "compare", "-metric", "PSNR",
+      "-metric", "PSNR",
       Path.absname(original),
       Path.absname(updated),
       Path.absname(diff)
@@ -280,13 +280,13 @@ defmodule UserDocs.Screenshots do
     end
     """
     IO.inspect("scoring files")
-    IO.inspect(Path.absname(original))
-    IO.inspect(Path.absname(updated))
-    IO.inspect(Path.absname(diff))
+    IO.inspect("Original: " <> Path.absname(original))
+    IO.inspect("Updated: " <> Path.absname(updated))
+    IO.inspect("Diff: " <> Path.absname(diff))
     IO.inspect(Path.wildcard(File.cwd! <> "/tmp/*"))
     File.write(diff, "")
     IO.inspect("seriously, update")
-    case System.cmd("magick", args, [ stderr_to_stdout: true ]) do
+    case System.cmd("compare", args, [ stderr_to_stdout: true ]) do
       { score, 1 } -> Map.put(state, :score, score)
       e ->
         raise("#{__MODULE__}.diff_images failed because #{inspect(e)}")
