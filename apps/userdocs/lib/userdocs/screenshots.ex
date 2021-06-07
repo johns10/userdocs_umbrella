@@ -285,6 +285,7 @@ defmodule UserDocs.Screenshots do
     IO.inspect(Path.absname(diff))
     IO.inspect(Path.wildcard(File.cwd! <> "/tmp/*"))
     File.write(diff, "")
+    IO.inspect("seriously, update")
     case System.cmd("magick", args, [ stderr_to_stdout: true ]) do
       { score, 1 } -> Map.put(state, :score, score)
       e ->
