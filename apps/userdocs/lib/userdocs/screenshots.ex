@@ -287,6 +287,8 @@ defmodule UserDocs.Screenshots do
   def handle_changes(%{ score: score, diff: diff, updated: updated, team: team }, changeset) do
     case score do
       "inf" -> changeset
+      0 -> changeset
+      "0" -> changeset
       "failed" -> create_aws_screenshot(changeset)
       score ->
         Logger.info("Image Comparison score is " <> to_string(score))
