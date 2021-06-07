@@ -294,7 +294,6 @@ defmodule UserDocsWeb.Root do
   end
   def handle_info({ :update_session, params }, socket) do
     IO.puts("Attempting to update session")
-    IO.inspect(params)
     socket =
       Enum.reduce(params, socket,
         fn({ k, v }, inner_socket) ->
@@ -335,12 +334,10 @@ defmodule UserDocsWeb.Root do
   def live_session_status(socket) do
     socket
     |> Map.get(:connected?, "Failed to fetch connected?")
-    |> IO.inspect()
 
     socket
     |> Map.get(:assigns)
     |> Map.get(:__live_session_id__, "Failed to fetch session status")
-    |> IO.inspect()
 
     socket
   end

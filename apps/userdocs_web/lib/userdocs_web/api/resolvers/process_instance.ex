@@ -20,10 +20,8 @@ defmodule UserDocsWeb.API.Resolvers.ProcessInstance do
 
   def update_process_instance(_parent, %{id: id} = args, _resolution) do
     IO.puts("Updating Process Instances")
-    IO.inspect(args)
     process_instance = ProcessInstances.get_process_instance!(id, %{ preloads: "*"})
     ProcessInstances.update_process_instance(process_instance, args)
-    |> IO.inspect()
   end
 
 end

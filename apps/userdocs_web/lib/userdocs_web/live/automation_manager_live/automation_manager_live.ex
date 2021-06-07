@@ -273,8 +273,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
       Jobs.fetch_step_from_job_step(socket.assigns.job, step_instance_id)
       || AutomationManager.get_step!(id)
 
-    IO.inspect(step)
-
     changeset = Step.runner_changeset(step, underscored_step_attrs)
     { :ok, updated_step } = UserDocs.Repo.update(changeset)
     UserDocs.Subscription.broadcast_children(updated_step, changeset, opts)
