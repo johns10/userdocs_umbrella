@@ -278,7 +278,7 @@ defmodule UserDocs.Screenshots do
       { score, 1 } -> Map.put(state, :score, score)
       { score, 0 } -> Map.put(state, :score, score)
       { "compare: image widths or heights differ" <> _, 2 } ->
-        raise("Image widths or heights are different, write a fake diff and compare")
+        Map.put(state, :score, "size_difference")
       :enoent -> raise("It's very likely you're not calling magick correctly, or your files aren't created correctly.")
       e ->
         raise("#{__MODULE__}.diff_images failed because #{inspect(e)}")
@@ -300,6 +300,12 @@ defmodule UserDocs.Screenshots do
         changeset
         |> Ecto.Changeset.put_change(:aws_provisional_screenshot, path(provisional_file_name))
         |> Ecto.Changeset.put_change(:aws_diff_screenshot, path(diff_file_name))
+        put_encoded_string_in_aws_object(File.read!(updated), team, path(provisional_file_name))
+      "size_difference" ->
+        Logger.info("There was a size difference")
+        provisional_file_name = file_name(changeset, :provisional)
+        changeset
+        |> Ecto.Changeset.put_change(:aws_provisional_screenshot, path(provisional_file_name))
     end
   end
 

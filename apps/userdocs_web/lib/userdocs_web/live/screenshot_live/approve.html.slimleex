@@ -47,6 +47,8 @@ css:
               h2 Image Diff
               = if @screenshot.aws_diff_screenshot do 
                 = img_tag @aws_diff_screenshot
+              - else 
+                p Screenshot size is different, couldn't diff
           .card-footer
             = link "Approve", to: "#", phx_target: @myself.cid, phx_click: "approve-provisional", class: "card-footer-item is-success"
             = link "Reject", to: "#", phx_target: @myself.cid, phx_click: "reject-provisional", class: "card-footer-item is-danger"

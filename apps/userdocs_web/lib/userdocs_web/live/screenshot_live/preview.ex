@@ -34,6 +34,7 @@ defmodule UserDocsWeb.ScreenshotLive.Preview do
   end
 
   def status(%Screenshot{ aws_screenshot: _, aws_provisional_screenshot: nil, aws_diff_screenshot: nil }), do: :ok
+  def status(%Screenshot{ aws_screenshot: _, aws_provisional_screenshot: _, aws_diff_screenshot: nil }), do: :warn
   def status(%Screenshot{ aws_screenshot: _, aws_provisional_screenshot: _, aws_diff_screenshot: _ }), do: :warn
   def status(%Screenshot{}), do: nil
 end
