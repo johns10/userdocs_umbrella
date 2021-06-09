@@ -277,8 +277,9 @@ defmodule UserDocs.Screenshots do
     case System.cmd("compare", args, [ stderr_to_stdout: true ]) do
       { score, 1 } -> Map.put(state, :score, score)
       { score, 0 } -> Map.put(state, :score, score)
+      { "compare: image widths or heights differ" <> _, 2 } ->
+        raise("Image widths or heights are different, write a fake diff and compare")
       :enoent -> raise("It's very likely you're not calling magick correctly, or your files aren't created correctly.")
-      "compare: image widths or heights differ" <> _ -> raise("Image widths or heights are different, write a fake diff and compare")
       e ->
         raise("#{__MODULE__}.diff_images failed because #{inspect(e)}")
     end
