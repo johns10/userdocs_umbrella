@@ -11,14 +11,12 @@
     "watch": "webpack --mode development --watch"
   },
   "dependencies": {
-    "@medv/finder": "^2.0.0",
-    "bufferutil": "^4.0.3",
     "bulma": "^0.9.1",
     "bulma-switch": "^2.0.0",
     "nprogress": "^0.2.0",
-    "phoenix": "^1.5.8",
-    "phoenix_html": "^2.14.2",
-    "phoenix_live_view": "^0.15.5"
+    "phoenix": "file:../deps/phoenix",
+    "phoenix_html": "file:../deps/phoenix_html",
+    "phoenix_live_view": "file:../deps/phoenix_live_view"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
