@@ -291,21 +291,21 @@ defmodule UserDocs.Screenshots do
       0 -> changeset
       "0" -> changeset
       "failed" -> create_aws_screenshot(changeset)
+      "size_difference" ->
+        Logger.info("There was a size difference")
+        provisional_file_name = file_name(changeset, :provisional)
+        changeset
+        |> Ecto.Changeset.put_change(:aws_provisional_screenshot, path(provisional_file_name))
       score ->
         Logger.info("Image Comparison score is " <> to_string(score))
         provisional_file_name = file_name(changeset, :provisional)
         put_encoded_string_in_aws_object(File.read!(updated), team, path(provisional_file_name))
         diff_file_name = file_name(changeset, :diff)
         put_encoded_string_in_aws_object(File.read!(diff), team, path(diff_file_name))
+
         changeset
         |> Ecto.Changeset.put_change(:aws_provisional_screenshot, path(provisional_file_name))
         |> Ecto.Changeset.put_change(:aws_diff_screenshot, path(diff_file_name))
-        put_encoded_string_in_aws_object(File.read!(updated), team, path(provisional_file_name))
-      "size_difference" ->
-        Logger.info("There was a size difference")
-        provisional_file_name = file_name(changeset, :provisional)
-        changeset
-        |> Ecto.Changeset.put_change(:aws_provisional_screenshot, path(provisional_file_name))
     end
   end
 
