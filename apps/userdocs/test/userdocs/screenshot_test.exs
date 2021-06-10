@@ -44,7 +44,7 @@ defmodule UserDocs.Screenshot do
 
   defp single_white_pixel(), do: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAAAMSURBVBhXY/j//z8ABf4C/qc1gYQAAAAASUVORK5CYII="
   defp single_black_pixel(), do: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAAANSURBVBhXY8jPz/8PAATrAk3xWKD8AAAAAElFTkSuQmCC"
-
+  defp two_white_pixels(), do: "iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAIAAAB7QOjdAAABhWlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TtSoVhXYQUchQnSyIijhqFYpQIdQKrTqYXPohNGlIUlwcBdeCgx+LVQcXZ10dXAVB8APEzc1J0UVK/F9SaBHrwXE/3t173L0DhGqRaVbbGKDptpmMx8R0ZkUMvKIDXQihD0Mys4xZSUqg5fi6h4+vd1Ge1frcn6NHzVoM8InEM8wwbeJ14qlN2+C8TxxmBVklPiceNemCxI9cVzx+45x3WeCZYTOVnCMOE4v5JlaamBVMjXiSOKJqOuULaY9VzluctWKZ1e/JXxjM6stLXKc5iDgWsAgJIhSUsYEibERp1UmxkKT9WAv/gOuXyKWQawOMHPMoQYPs+sH/4He3Vm5i3EsKxoD2F8f5GAYCu0Ct4jjfx45TOwH8z8CV3vCXqsD0J+mVhhY5Anq3gYvrhqbsAZc7QP+TIZuyK/lpCrkc8H5G35QBQrdA96rXW30fpw9AirpK3AAHh8BInrLXWry7s7m3f8/U+/sBMgtyjVZNXqEAAAAJcEhZcwAALiMAAC4jAXilP3YAAAAHdElNRQflBgkTEgFphsfXAAAAGXRFWHRDb21tZW50AENyZWF0ZWQgd2l0aCBHSU1QV4EOFwAAAA9JREFUCNdj/P//PwMDAwAO/wL/sBiIKQAAAABJRU5ErkJggg=="
   def aws_opts(team) do
     [
       region: team.aws_region,
@@ -71,7 +71,7 @@ defmodule UserDocs.Screenshot do
       :create_step_types,
       :create_step
     ]
-
+"""
     def score_uploaded_single_white_screenshot(aws_path, team) do
       downloaded = "./test/support/downloads/downloaded_single_white_pixel.png"
       original = "./test/support/fixtures/single_white_pixel.png"
@@ -282,6 +282,18 @@ defmodule UserDocs.Screenshot do
     test "change_screenshot/1 returns a screenshot changeset", %{ step: step } do
       screenshot = MediaFixtures.screenshot(step.id)
       assert %Ecto.Changeset{} = Screenshots.change_screenshot(screenshot)
+    end
+    """
+    test "updating a screenshot with a differently sized image creates a provisional, but not diff", %{ team: team, step: step } do
+      screenshot = MediaFixtures.screenshot(step.id)
+      attrs = MediaFixtures.screenshot_attrs(:valid, step.id) |> Map.put(:base64, single_white_pixel()) |> Map.put(:name, "Test")
+      { :ok, screenshot } = Screenshots.update_screenshot(screenshot, attrs, team)
+      IO.inspect(screenshot)
+      attrs_two = %{ base64: two_white_pixels() }
+      { :ok, screenshot } = Screenshots.update_screenshot(screenshot, attrs_two, team)
+      assert screenshot.aws_diff_screenshot == nil
+      assert screenshot.aws_provisional_screenshot == "screenshots/Test-provisional.png"
+      assert screenshot.aws_screenshot == "screenshots/Test.png"
     end
   end
 end
