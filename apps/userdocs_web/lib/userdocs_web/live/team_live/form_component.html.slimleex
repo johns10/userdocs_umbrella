@@ -43,6 +43,11 @@ h2.title = @title
   = link to: "#", phx_click: "add-user", phx_target: @myself.cid do
     p New User
 
+  div.field
+    = label form, :css, class: "label"
+    div.control
+      = textarea(form, :css, class: "textarea")
+
   .field 
     .control
       = submit "Save", phx_disable_with: "Saving...", class: "button is-link"

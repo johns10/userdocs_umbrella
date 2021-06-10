@@ -21,6 +21,7 @@ defmodule UserDocs.Users.Team do
     has_many :team_users, TeamUser
     has_one :job, Job
 
+    field :css, :string
     field :aws_region, :string
     field :aws_bucket, :string
     field :aws_access_key_id, UserDocs.Encrypted.Binary
@@ -39,7 +40,7 @@ defmodule UserDocs.Users.Team do
   @doc false
   def changeset(team, attrs) do
     team
-    |> cast(attrs, [ :name, :default_language_code_id, :aws_bucket, :aws_region, :aws_access_key_id, :aws_secret_access_key ])
+    |> cast(attrs, [ :name, :default_language_code_id, :aws_bucket, :aws_region, :aws_access_key_id, :aws_secret_access_key, :css ])
     |> cast_assoc(:team_users)
     |> cast_assoc(:projects)
     |> foreign_key_constraint(:default_language_code_id)
