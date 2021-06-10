@@ -111,7 +111,7 @@ defmodule UserDocs.TestDataset do
       },
       %{
         args: ["element_id"],
-        name: "Wait"
+        name: "Wait for Element"
       },
       %{
         args: ["element_id"],
