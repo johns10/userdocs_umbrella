@@ -28,11 +28,14 @@ aside.menu
                 app_name: @app_name,
                 process: process ])
             = live_redirect to: Routes.process_show_path(@socket, :show, process.id) do
-              i.fa.fa-search
+              span
+                i.fa.fa-search
             = live_patch to: Routes.process_index_path(@socket, :edit,process.id), id: "edit-process-#{process.id}" do
-              i.fa.fa-edit
+              span
+                i.fa.fa-edit
             = link to: "#", phx_click: "delete", phx_value_id: process.id, id: "delete-process-#{process.id}", data: [confirm: "Are you sure?"] do
-              i.fa.fa-trash
+              span 
+                i.fa.fa-trash
 
 = if @app_name == "web" do 
   = live_patch to: Routes.process_index_path(@socket, :new) do
