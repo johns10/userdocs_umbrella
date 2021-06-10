@@ -67,25 +67,26 @@ css:
   div phx-hook="automatedBrowserCommands" id="automated-browser-commands"
   div phx-hook="testSelector" id="selector-tester"
 
-  main.container role="main"
-    p.alert.alert-info role="alert" phx-click="lv:clear-flash" phx-value-key="info"
-      = live_flash(@flash, :info)
+  section.section
+    main.container role="main"
+      p.alert.alert-info role="alert" phx-click="lv:clear-flash" phx-value-key="info"
+        = live_flash(@flash, :info)
 
-    p class="alert alert-danger" role="alert" phx-click="lv:clear-flash" phx-value-key="error"
-      = live_flash(@flash, :error)
-      
-    div.with-sidebar
-      div 
+      p class="alert alert-danger" role="alert" phx-click="lv:clear-flash" phx-value-key="error"
+        = live_flash(@flash, :error)
+        
+      div.with-sidebar
         div 
-          = @inner_content
-        = if is_struct(@current_user, UserDocs.Users.User) and is_struct(@current_team, UserDocs.Users.Team) do
-          = live_component(@socket, UserDocsWeb.DrawerLive, 
-            [ id: "navigation-drawer", 
-            current_user: @current_user, 
-            current_team: @current_team,
-            browser_opened: @browser_opened,
-            user_opened_browser: @user_opened_browser,
-            closed: @navigation_drawer_closed  ])
+          div 
+            = @inner_content
+          = if is_struct(@current_user, UserDocs.Users.User) and is_struct(@current_team, UserDocs.Users.Team) do
+            = live_component(@socket, UserDocsWeb.DrawerLive, 
+              [ id: "navigation-drawer", 
+              current_user: @current_user, 
+              current_team: @current_team,
+              browser_opened: @browser_opened,
+              user_opened_browser: @user_opened_browser,
+              closed: @navigation_drawer_closed  ])
 
-    <!--<%= UserDocsWeb.LiveHelpers.live_modal_menus(@socket, [ id: "modal-menus", form_data: @form_data ]) %>-->
+      <!--<%= UserDocsWeb.LiveHelpers.live_modal_menus(@socket, [ id: "modal-menus", form_data: @form_data ]) %>-->
 
