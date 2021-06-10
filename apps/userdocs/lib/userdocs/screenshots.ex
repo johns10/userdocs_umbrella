@@ -305,6 +305,7 @@ defmodule UserDocs.Screenshots do
       "size_difference" ->
         Logger.info("There was a size difference")
         provisional_file_name = file_name(changeset, :provisional)
+        put_encoded_string_in_aws_object(File.read!(updated), team, path(provisional_file_name))
         changeset
         |> Ecto.Changeset.put_change(:aws_provisional_screenshot, path(provisional_file_name))
       score ->
