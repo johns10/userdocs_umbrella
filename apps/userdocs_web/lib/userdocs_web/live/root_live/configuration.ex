@@ -14,7 +14,8 @@ defmodule UserDocsWeb.Configuration do
     configuration = %{
       image_path: assigns.image_path || "/images/",
       strategy: assigns.strategy || "xpath",
-      user_data_dir_path: assigns.user_data_dir_path || nil
+      user_data_dir_path: assigns.user_data_dir_path || nil,
+      css: assigns.css || ""
     }
     {
       :ok,
