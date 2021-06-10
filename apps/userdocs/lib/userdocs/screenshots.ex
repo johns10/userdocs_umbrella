@@ -182,7 +182,7 @@ defmodule UserDocs.Screenshots do
   end
 
   def apply_provisional_screenshot(%Screenshot{ aws_screenshot: production } = screenshot, team) do
-    names = %{ aws_provisional_screenshot: "./tmp" <> UUID.uuid4() <> ".png" }
+    names = %{ aws_provisional_screenshot: "./tmp/" <> UUID.uuid4() <> ".png" }
     prepare_files(screenshot, names, team.aws_bucket, aws_opts(team))
     put_encoded_string_in_aws_object(File.read!(names.aws_provisional_screenshot), team, production)
     attrs = %{ aws_diff_screenshot: nil, aws_provisional_screenshot: nil }
