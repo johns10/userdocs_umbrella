@@ -236,6 +236,7 @@ defmodule UserDocs.Screenshots do
         }
 
         prepare_aws_file(state)
+        |> ping_files()
         |> score_files()
         |> handle_changes(changeset)
         |> delete_files(state)
@@ -255,6 +256,16 @@ defmodule UserDocs.Screenshots do
         raise("#{__MODULE__}.prepare_aws_file failed because: #{reason}") #TODO: More permanent fix
         state
     end
+  end
+
+  def ping_files(%{ original: original, updated: updated, diff: diff } = state) do
+    System.cmd("identify", ["-ping", "-format", "%w %h", Path.absname(original)], [ stderr_to_stdout: true ])
+    |> IO.inspect()
+
+    System.cmd("identify", ["-ping", "-format", "%w %h", Path.absname(updated)], [ stderr_to_stdout: true ])
+    |> IO.inspect()
+
+    state
   end
 
   def score_files(%{ original: original, updated: updated, diff: diff } = state) do
