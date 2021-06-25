@@ -37,22 +37,6 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
     IO.inspect("Item Selected Event")
     %{ element: %{ selector: selector } }
   end
-  def params(%{ payload: %{ "action" => "CREATE_ANNOTATION" }}) do
-    IO.inspect("Annotation Event")
-  end
-
-  def form_tweaks(socket, %{ payload: %{ "action" => "Click" }}) do
-    IO.puts("Adding new element")
-    socket
-  end
-  def form_tweaks(socket, %{ payload: %{ "action" => "Navigate" }} = state) do
-    IO.puts("Navigate")
-    socket
-  end
-  def form_tweaks(socket, %{ payload: %{ "action" => "ITEM_SELECTED" }} = state) do
-    IO.puts("Item Selected")
-    socket
-  end
 
   def handle_action(%Phoenix.LiveView.Socket{ assigns: %{ live_action: :index }} = socket, %{} = params) do
     route = UserDocsWeb.Router.Helpers.step_index_path(socket, :new, socket.assigns.process, %{ step_params: params })

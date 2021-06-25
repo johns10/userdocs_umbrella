@@ -151,7 +151,6 @@ defmodule UserDocsWeb.StepLive.Index do
     step_type = BrowserEvents.step_type(payload)
     state = %{ step_type: step_type, payload: payload, page_id: recent_navigated_page_id }
     step_params = UserDocsWeb.StepLive.BrowserEvents.params(state)
-    socket = BrowserEvents.form_tweaks(socket, state)
     socket = BrowserEvents.handle_action(socket, step_params)
 
     { :noreply, socket }
