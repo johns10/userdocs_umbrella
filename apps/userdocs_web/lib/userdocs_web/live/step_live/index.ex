@@ -21,7 +21,6 @@ defmodule UserDocsWeb.StepLive.Index do
   alias UserDocsWeb.StepLive.Queuer
   alias UserDocsWeb.StepLive.Runner
   alias UserDocsWeb.StepLive.Status
-  alias UserDocs.Automation.Process.RecentPage
 
   def types() do
     [
@@ -57,8 +56,7 @@ defmodule UserDocsWeb.StepLive.Index do
     opts = socket.assigns.state_opts
     socket
     |> assign(:modal_action, :show)
-    |> assign(:transferred_selector, "")
-    |> assign(:transferred_strategy, %{ name: "", id: ""})
+    |> assign(:step_params, nil)
     |> UserDocsWeb.Loaders.screenshots(opts)
     |> Web.load_annotation_types(opts)
     |> Web.load_strategies(opts)
@@ -83,7 +81,8 @@ defmodule UserDocsWeb.StepLive.Index do
 
   @impl true
   def handle_params(_, _, %{ assigns: %{ auth_state: :not_logged_in }} = socket), do: { :noreply, socket }
-  def handle_params(%{ "process_id" => process_id } = params, _, socket) do
+  def handle_params(%{ "process_id" => process_id, "step_params" => step_params } = params, _, socket) do
+    IO.puts("Handle Params with embedded step params")
     process = Automation.get_process!(process_id)
     {
       :noreply,
@@ -94,8 +93,29 @@ defmodule UserDocsWeb.StepLive.Index do
       |> apply_action(socket.assigns.live_action, params)
     }
   end
-
+  def handle_params(%{ "process_id" => process_id } = params, _, socket) do
+    IO.puts("HPPI")
+    process = Automation.get_process!(process_id)
+    {
+      :noreply,
+      socket
+      |> assign(:process, process)
+      |> prepare_steps(String.to_integer(process_id))
+      |> assign(:select_lists, %{})
+      |> apply_action(socket.assigns.live_action, params)
+    }
+  end
+  def handle_params(%{ "id" => id, "step_params" => step_params } = params, _, socket) do
+    IO.puts("Handle Edit with embedded step params")
+    {
+      :noreply,
+      socket
+      |> prepare_step(String.to_integer(id))
+      |> apply_action(socket.assigns.live_action, params)
+    }
+  end
   def handle_params(%{ "id" => id } = params, _, socket) do
+    IO.puts("HPI")
     {
       :noreply,
       socket
@@ -112,27 +132,77 @@ defmodule UserDocsWeb.StepLive.Index do
     {:noreply, socket}
   end
 
-  @impl true
+  alias UserDocsWeb.StepLive.BrowserEvents
+
+  def handle_event("browser-event", payload, socket) do
+    IO.inspect("Received Browser Event")
+    IO.inspect(payload)
+
+    recent_navigated_page_id =
+      try do
+        socket.assigns.steps
+        |> Enum.filter(fn(s) -> s.step_type.name == "Navigate" end)
+        |> Enum.max_by(fn(s) -> s.order end)
+        |> Map.get(:page_id)
+      rescue
+        _ -> nil
+      end
+
+    step_type = BrowserEvents.step_type(payload)
+    state = %{ step_type: step_type, payload: payload, page_id: recent_navigated_page_id }
+    step_params = UserDocsWeb.StepLive.BrowserEvents.params(state)
+    socket = BrowserEvents.form_tweaks(socket, state)
+    socket = BrowserEvents.handle_action(socket, step_params)
+
+    { :noreply, socket }
+  end
+
+
+  defp apply_action(socket, :edit, %{ "id" => id, "step_params" => step_params }) when map_size(step_params) > 0 do
+    IO.puts("Edit apply action with step params")
+    IO.inspect(socket.assigns.changeset.params)
+
+    updated_params = Map.merge(step_params, socket.assigns.changeset.params)
+    changeset = Map.put(socket.assigns.changeset, :params, updated_params)
+
+    socket
+    |> assign(:page_title, "Edit Process")
+    |> prepare_step(String.to_integer(id))
+    |> assign(:changeset, changeset)
+    |> assign_select_lists()
+  end
   defp apply_action(socket, :edit, %{"id" => id}) do
+    IO.puts("Edit apply action")
     socket
     |> assign(:page_title, "Edit Process")
     |> prepare_step(String.to_integer(id))
     |> assign_select_lists()
   end
+  defp apply_action(socket, :new, %{ "step_params" => step_params }) do
+    IO.puts("New Step, with params")
+    step_form =
+      %UserDocs.Automation.StepForm{}
+      |> Automation.change_step_form(step_params)
+      |> Ecto.Changeset.apply_changes()
 
+    socket
+    |> assign(:page_title, "New Step")
+    |> assign(:step, %UserDocs.Automation.Step{})
+    |> assign(:step_form, step_form)
+    |> assign(:select_lists, select_lists(socket))
+  end
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Step")
-    |> assign(:step, %Step{})
+    |> assign(:step, %UserDocs.Automation.Step{})
+    |> assign(:step_form, %UserDocs.Automation.StepForm{})
     |> assign(:select_lists, select_lists(socket))
   end
-
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Listing Steps")
     |> assign(:step, nil)
   end
-
   defp apply_action(socket, :screenshot_workflow, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Process")
@@ -209,7 +279,7 @@ defmodule UserDocsWeb.StepLive.Index do
 
   def step_types_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
     Automation.list_step_types(socket, state_opts)
-    |> Helpers.select_list(:name, :false)
+    |> Helpers.select_list(:name, :true)
   end
   def step_types_select(_), do: []
 
@@ -279,7 +349,26 @@ defmodule UserDocsWeb.StepLive.Index do
 
     step = Automation.get_step!(id, socket, opts)
 
+    step_form = %Automation.StepForm{
+      order: step.order,
+      name: step.name,
+      url: step.url,
+      url: step.text,
+      url: step.width,
+      url: step.height,
+      page_id: step.page_id,
+      page: step.page,
+      element_id: step.element_id,
+      element: step.element,
+      annotation_id: step.annotation_id,
+      annotation: step.annotation,
+      screenshot: step.screenshot,
+      step_type_id: step.step_type_id,
+      process_id: step.process_id
+    }
+
     socket
+    |> assign(:step_form, step_form)
     |> assign(:step, step)
     |> assign(:process, step.process)
     |> prepare_steps(step.process_id) # This has to go
