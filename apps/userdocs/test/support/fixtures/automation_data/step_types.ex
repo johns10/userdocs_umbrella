@@ -2,23 +2,23 @@ defmodule UserDocs.AutomationFixtures.StepTypes do
   def data() do
     [
       %{
-        args: ["url", "page_id", "page_reference"],
+        args: ["page_form"],
         name: "Navigate"
       },
       %{
-        args: ["element_id"],
-        name: "Wait"
+        args: ["element_id", "element_form"],
+        name: "Wait for Element"
       },
       %{
-        args: ["element_id"],
+        args: ["element_id", "element_form"],
         name: "Click"
       },
       %{
-        args: ["element_id", "text"],
+        args: ["element_id", "element_form", "text"],
         name: "Fill Field"
       },
       %{
-        args: ["annotation_id", "element_id"],
+        args: ["annotation_id", "annotation_form", "element_id", "element_form"],
         name: "Apply Annotation"
       },
       %{
@@ -34,9 +34,15 @@ defmodule UserDocs.AutomationFixtures.StepTypes do
         name: "Clear Annotations"
       },
       %{
-        args: ["element_id"],
+        args: ["element_id", "element_form"],
         name: "Element Screenshot"
-      }
+      },
+      %{ args: ["element_id", "element_form"], name: "Scroll to Element" },
+      %{ args: ["element_id", "element_form"], name: "Send Enter Key" },
+      %{
+        args: ["element_id", "element_form"],
+        name: "Submit Form"
+      },
     ]
   end
 end
