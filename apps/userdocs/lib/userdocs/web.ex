@@ -611,6 +611,12 @@ defmodule UserDocs.Web do
     Repo.all(Strategy)
   end
 
+  def css_strategy do
+    list_strategies()
+    |> Enum.filter(fn(s) -> s.name == "css" end)
+    |> Enum.at(0)
+  end
+
   def get_strategy!(id, state, opts) do
     StateHandlers.get(state, id, Strategy, opts)
   end
