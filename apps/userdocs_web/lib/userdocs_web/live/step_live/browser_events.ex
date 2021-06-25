@@ -13,7 +13,25 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
     |> Enum.at(0)
   end
 
-  def params(%{ payload: %{ "action" => "Navigate", "href" => href }, step_type: step_type }) do
+  def annotation_type_id(payload) do
+    annotation_type(payload)
+    |> Map.get(:id, nil)
+  end
+  def annotation_type(payload) do
+    IO.inspect("annotation_type")
+    IO.inspect(payload)
+    IO.inspect(payload["annotation_type"])
+    Web.list_annotation_types()
+    |> IO.inspect()
+    |> Enum.filter(fn(at) ->
+      IO.inspect(at)
+      at.name == payload["annotation_type"]
+    end)
+    |> IO.inspect()
+    |> Enum.at(0)
+  end
+
+  def params(%{ payload: %{ "action" => "Navigate", "href" => href } = payload }) do
     IO.inspect("Navigate Event")
     %{
       step_type_id: step_type_id(payload),
@@ -24,9 +42,8 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
       }
     }
   end
-  def params(%{ payload: %{ "action" => "Click", "selector" => selector }, step_type: step_type, page_id: page_id }) do
+  def params(%{ payload: %{ "action" => "Click", "selector" => selector } = payload, page_id: page_id }) do
     IO.inspect("Click Event")
-      step_type_id: step_type_id(payload),
     %{
       step_type_id: step_type_id(payload),
       page_id: page_id,
@@ -34,6 +51,22 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
         page_id: page_id,
         strategy_id: Web.css_strategy() |> Map.get(:id),
         selector: selector
+      }
+    }
+  end
+  def params(%{ payload: %{ "action" => "Apply Annotation", "selector" => selector } = payload, page_id: page_id }) do
+    IO.inspect("Apply Annotation Event")
+    %{
+      step_type_id: step_type_id(payload),
+      page_id: page_id,
+      element: %{
+        page_id: page_id,
+        strategy_id: Web.css_strategy() |> Map.get(:id),
+        selector: selector
+      },
+      annotation: %{
+        page_id: page_id,
+        annotation_type_id: annotation_type_id(payload)
       }
     }
   end
