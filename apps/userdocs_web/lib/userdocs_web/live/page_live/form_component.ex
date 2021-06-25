@@ -26,23 +26,16 @@ defmodule UserDocsWeb.PageLive.FormComponent do
     """
   end
 
-  def render_fields(assigns, form, _opts \\ []) do
+  def render_fields(assigns, form, opts \\ []) do
     ~L"""
       <div class="field is-grouped">
         <%= Layout.select_input(form, :version_id, @select_lists.versions, [
           # TODO: Still a little funky
           selected: @current_version.id || "",
-          id: "page_id" # @field_ids.version_id || ""
+          id: opts[:prefix] <> "page-id"
         ], "control") %>
 
-        <%= Layout.number_input(form, :order, [
-          id: "page_order" # @field_ids.order || ""
-        ], "control") %>
-
-        <%= Layout.text_input(form, [
-          field_name: :name,
-          id: "page_name" # @field_ids.name
-        ], "control is-expanded") %>
+        <%= Layout.text_input(form, [ field_name: :name ], "control is-expanded") %>
 
       </div>
 
