@@ -29,7 +29,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
     ~L"""
 
       <%= hidden_input(form, :name, [
-        id: @field_ids.annotation.name,
+        id: prefix <> "name-input",
         value: Ecto.Changeset.get_field(@changeset, :name, "")
       ]) %>
 
@@ -37,7 +37,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
 
         <%= Layout.select_input(form, :page_id, @select_lists.pages_select, [
           selected: form.data.page_id || @default_page_id || "",
-          id: @field_ids.annotation.page_id,
+          id: prefix <> "page-select",
         ], "control") %>
 
         <%= Layout.select_input(form, :annotation_type_id, @select_lists.annotation_types, [
@@ -54,7 +54,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
             <%= text_input form, :label,
               class: "input",
               type: "text",
-              id: @field_ids.annotation.label %>
+              id: prefix <> "label-input" %>
           </div>
         <% end %>
 
@@ -64,7 +64,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
             <%= number_input form, :size,
               class: "input",
               type: "text",
-              id: @field_ids.annotation.size %>
+              id: prefix <> "size-input" %>
           </div>
         <% end %>
 
@@ -74,7 +74,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
             <%= number_input form, :x_offset,
               class: "input",
               type: "text",
-              id: @field_ids.annotation.x_offset %>
+              id: prefix <> "x-offset-input" %>
           </div>
         <% end %>
 
@@ -84,7 +84,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
             <%= number_input form, :y_offset,
               class: "input",
               type: "text",
-              id: @field_ids.annotation.y_offset %>
+              id: prefix <> "y-offset-input" %>
           </div>
         <% end %>
 
@@ -94,7 +94,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
             <%= text_input form, :font_size,
               class: "input",
               type: "text",
-              id: @field_ids.annotation.font_size %>
+              id: prefix <> "font-size-input" %>
           </div>
         <% end %>
 
@@ -102,7 +102,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
           Layout.select_input(form, :x_orientation,
             [{"None", ""}, { "Right", "R" }, {"Middle", "M"}, { "Left", "L" }], [
               placeholder: form.data.x_orientation || "",
-              id: @field_ids.annotation.x_orientation,
+              id: prefix <> "x-orientation-input",
               hidden: "x_orientation" not in @enabled_annotation_fields
             ], "control")
         %>
@@ -111,13 +111,13 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
           Layout.select_input(form, :y_orientation,
             [{"None", ""}, { "Top", "T" }, {"Middle", "M"}, { "Bottom", "B" }], [
               placeholder: form.data.y_orientation || "",
-              id: @field_ids.annotation.y_orientation,
+              id: prefix <> "y-orientation-input",
               hidden: not("y_orientation" in @enabled_annotation_fields),
             ], "control")
         %>
 
         <%= Layout.text_input(form, :color, [
-          id: @field_ids.annotation.color,
+          id: prefix <> "color-input",
           hidden: not("color" in @enabled_annotation_fields)
         ], "control") %>
 
@@ -127,7 +127,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
             <%= text_input form, :thickness,
               class: "input",
               type: "text",
-              id: @field_ids.annotation.thickness %>
+              id: prefix <> "thickness-input" %>
           </div>
         <% end %>
       </div>
@@ -153,7 +153,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
             <%= Layout.select_input(form, :content_id, @select_lists.content,
               [
                 value: form.data.content_id,
-                id: @field_ids.annotation.content_id,
+                id: prefix <> "content-select",
                 label: false
               ]) %>
 
