@@ -106,23 +106,23 @@ defmodule UserDocs.TestDataset do
 
     step_types = [
       %{
-        args: ["url", "page_id", "page_reference"],
+        args: ["page_form"],
         name: "Navigate"
       },
       %{
-        args: ["element_id"],
+        args: ["element_id", "element_form"],
         name: "Wait for Element"
       },
       %{
-        args: ["element_id"],
+        args: ["element_id", "element_form"],
         name: "Click"
       },
       %{
-        args: ["element_id", "text"],
+        args: ["element_id", "element_form", "text"],
         name: "Fill Field"
       },
       %{
-        args: ["annotation_id", "element_id"],
+        args: ["annotation_id", "annotation_form", "element_id", "element_form"],
         name: "Apply Annotation"
       },
       %{
@@ -138,11 +138,15 @@ defmodule UserDocs.TestDataset do
         name: "Clear Annotations"
       },
       %{
-        args: ["element_id"],
+        args: ["element_id", "element_form"],
         name: "Element Screenshot"
       },
-      %{ args: ["element_id"], name: "Scroll to Element" },
-      %{ args: ["element_id"], name: "Send Enter Key" }
+      %{ args: ["element_id", "element_form"], name: "Scroll to Element" },
+      %{ args: ["element_id", "element_form"], name: "Send Enter Key" },
+      %{
+        args: ["element_id", "element_form"],
+        name: "Submit Form"
+      },
     ]
 
     Enum.each(step_types, fn(step_type) -> UserDocs.Automation.create_step_type(step_type) end)
@@ -222,26 +226,25 @@ defmodule UserDocs.TestDataset do
     |> Repo.insert()
 
   # Step Types
-
   _step_types = [
     navigate = %{
-      args: ["url", "page_id", "page_reference"],
+      args: ["page_form"],
       name: "Navigate"
     },
     wait = %{
-      args: ["element_id"],
-      name: "Wait"
+      args: ["element_id", "element_form"],
+      name: "Wait for Element"
     },
     click = %{
-      args: ["element_id"],
+      args: ["element_id", "element_form"],
       name: "Click"
     },
     fill_field = %{
-      args: ["element_id", "text"],
+      args: ["element_id", "element_form", "text"],
       name: "Fill Field"
     },
     apply_annotation = %{
-      args: ["annotation_id", "element_id"],
+      args: ["annotation_id", "annotation_form", "element_id", "element_form"],
       name: "Apply Annotation"
     },
     set_size_explicit = %{
@@ -257,9 +260,15 @@ defmodule UserDocs.TestDataset do
       name: "Clear Annotations"
     },
     element_screenshot = %{
-      args: ["element_id"],
+      args: ["element_id", "element_form"],
       name: "Element Screenshot"
-    }
+    },
+    scroll_to_element = %{ args: ["element_id", "element_form"], name: "Scroll to Element" },
+    send_enter = %{ args: ["element_id", "element_form"], name: "Send Enter Key" },
+    submit_form = %{
+      args: ["element_id", "element_form"],
+      name: "Submit Form"
+    },
   ]
 
   {:ok, %StepType{id: navigate_id}} =
@@ -305,6 +314,21 @@ defmodule UserDocs.TestDataset do
   {:ok, %StepType{id: element_screenshot_id}} =
     %StepType{}
     |> StepType.changeset(element_screenshot)
+    |> Repo.insert()
+
+  {:ok, %StepType{id: _scroll_to_element_id}} =
+    %StepType{}
+    |> StepType.changeset(scroll_to_element)
+    |> Repo.insert()
+
+  {:ok, %StepType{id: _send_enter_id}} =
+    %StepType{}
+    |> StepType.changeset(send_enter)
+    |> Repo.insert()
+
+  {:ok, %StepType{id: _submit_form_id}} =
+    %StepType{}
+    |> StepType.changeset(submit_form)
     |> Repo.insert()
 
     # User Data
