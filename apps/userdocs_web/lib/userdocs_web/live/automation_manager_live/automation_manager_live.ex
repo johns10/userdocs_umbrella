@@ -220,7 +220,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
     safe_step =
       step
       |> UserDocs.Automation.Runner.parse()
-      |> camel_cased_map_keys()
+      |> UserDocsWeb.LiveHelpers.camel_cased_map_keys()
 
     send(self(), { :broadcast, "create", step.last_step_instance })
 
@@ -238,7 +238,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
     safe_process =
       process
       |> UserDocs.Automation.Runner.parse()
-      |> camel_cased_map_keys()
+      |> UserDocsWeb.LiveHelpers.camel_cased_map_keys()
 
     send(self(), { :broadcast, "create", process.last_process_instance })
     Enum.each(process.steps, fn(step) -> send(self(), { :broadcast, "create", step.last_step_instance }) end)
@@ -253,7 +253,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
     safe_job =
       socket.assigns.job
       |> UserDocs.Automation.Runner.parse()
-      |> camel_cased_map_keys()
+      |> UserDocsWeb.LiveHelpers.camel_cased_map_keys()
 
     {
       :noreply,
@@ -266,7 +266,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
       %{ "id" => step_instance_id, "processInstanceId" => nil }
     } = step_attrs }, socket
   ) do
-    underscored_step_attrs = underscored_map_keys(step_attrs)
+    underscored_step_attrs = UserDocsWeb.LiveHelpers.underscored_map_keys(step_attrs)
     opts = UserDocsWeb.Defaults.opts(socket, types())
 
     step =
@@ -289,7 +289,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
       %{ "id" => step_instance_id, "processInstanceId" => process_instance_id }
     } = step_attrs }, socket
   ) do
-    step_attrs = underscored_map_keys(step_attrs)
+    step_attrs = UserDocsWeb.LiveHelpers.underscored_map_keys(step_attrs)
     if step_attrs["last_step_instance"]["step_id"] == nil do
       raise "Got a nil step id for some reason, not updating"
     end
@@ -387,33 +387,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
     UserDocs.Screenshots.update_screenshot(screenshot, attrs, team)
   end
   def maybe_update_screenshot(attrs, _team), do: { :ok, attrs }
-
-
-  defp underscored_map_keys(%Date{} = val), do: val
-  defp underscored_map_keys(%DateTime{} = val), do: val
-  defp underscored_map_keys(%NaiveDateTime{} = val), do: val
-
-  defp underscored_map_keys(map) when is_map(map) do
-    for {key, val} <- map, into: %{} do
-      {Inflex.underscore(key), underscored_map_keys(val)}
-    end
-  end
-
-  defp underscored_map_keys(val), do: val
-
-  defp camel_cased_map_keys(%Date{} = val), do: val
-  defp camel_cased_map_keys(%DateTime{} = val), do: val
-  defp camel_cased_map_keys(%NaiveDateTime{} = val), do: val
-  defp camel_cased_map_keys(items) when is_list(items), do: Enum.map(items, &camel_cased_map_keys/1)
-
-  defp camel_cased_map_keys(map) when is_map(map) do
-    for {key, val} <- map, into: %{} do
-      {Inflex.camelize(key, :lower), camel_cased_map_keys(val)}
-    end
-  end
-
-  defp camel_cased_map_keys(val), do: val
-
 
   def format_changeset_errors(changeset) do
     errors = Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->

@@ -6,6 +6,27 @@ defmodule UserDocsWeb.LiveHelpers do
   alias Phoenix.LiveView
   alias UserDocsWeb.ModalMenus
 
+  def underscored_map_keys(%Date{} = val), do: val
+  def underscored_map_keys(%DateTime{} = val), do: val
+  def underscored_map_keys(%NaiveDateTime{} = val), do: val
+  def underscored_map_keys(map) when is_map(map) do
+    for {key, val} <- map, into: %{} do
+      {Inflex.underscore(key), underscored_map_keys(val)}
+    end
+  end
+  def underscored_map_keys(val), do: val
+
+  def camel_cased_map_keys(%Date{} = val), do: val
+  def camel_cased_map_keys(%DateTime{} = val), do: val
+  def camel_cased_map_keys(%NaiveDateTime{} = val), do: val
+  def camel_cased_map_keys(items) when is_list(items), do: Enum.map(items, &camel_cased_map_keys/1)
+  def camel_cased_map_keys(map) when is_map(map) do
+    for {key, val} <- map, into: %{} do
+      {Inflex.camelize(key, :lower), camel_cased_map_keys(val)}
+    end
+  end
+  def camel_cased_map_keys(val), do: val
+
   def which_app(conn) do
     %{ "app_name" => Atom.to_string(conn.assigns.app_name) }
   end
