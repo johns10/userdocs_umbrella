@@ -41,7 +41,7 @@ defmodule UserDocsWeb.PageLive.FormComponent do
 
       <%= Layout.text_input(form, [
         field_name: :url,
-        id: @field_ids.url
+        id: opts[:prefix] <> "url-input"
       ], "control is-expanded") %>
     """
   end
