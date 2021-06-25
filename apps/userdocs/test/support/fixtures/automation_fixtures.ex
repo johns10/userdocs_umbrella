@@ -92,6 +92,14 @@ defmodule UserDocs.AutomationFixtures do
       |> Automation.create_step()
       step
   end
+  def step_form(page_id \\ nil, process_id \\ nil,
+    element_id \\ nil, annotation_id \\ nil, step_type_id \\ nil) do
+    {:ok, step } =
+      step_attrs(:valid, page_id, process_id, element_id,
+        annotation_id, step_type_id)
+      |> Automation.create_step_form()
+      step
+  end
 
   def step_attrs(attr_types, page_id \\ nil, process_id \\ nil, element_id \\ nil, annotation_id \\ nil, step_type_id \\ nil)
   def step_attrs(:valid, page_id, process_id, element_id, annotation_id, step_type_id) do
