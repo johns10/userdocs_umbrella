@@ -35,6 +35,16 @@ Hooks.automatedBrowserEvents = {
   }
 };
 
+Hooks.browserEventHandler = {
+  mounted() {
+    this.el.addEventListener("browser-event", (message) => {
+      console.log("browser event received by hook")
+      console.log(message)
+      this.pushEventTo("#browser-event-handler", "browser-event", message.detail)
+    })
+  }
+}
+
 Hooks.fileTransfer = {
   mounted() {
     this.el.addEventListener("screenshot", e => {
