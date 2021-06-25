@@ -118,15 +118,17 @@ defmodule UserDocs.Automation do
   def get_step_type!(id), do: Repo.get!(StepType, id)
   def get_step_type!(%{ step_types: step_types }, id), do: get_step_type!(step_types, id)
   def get_step_type!(step_types, id) when is_list(step_types) do
-    step_types
-    |> Enum.filter(fn(st) -> st.id == id end)
-    |> Enum.at(0)
+    base_step_type_query(id)
+    |> Repo.one!()
+  end
+  def get_step_type!(id, state, opts) when is_list(opts) do
+    StateHandlers.get(state, id, StepType, opts)
   end
 
-  @spec create_step_type(
-          :invalid
-          | %{optional(:__struct__) => none, optional(atom | binary) => any}
-        ) :: any
+  def base_step_type_query(id) do
+    from(step_type in StepType, where: step_type.id == ^id)
+  end
+
   @doc """
   Creates a step_type.
 
