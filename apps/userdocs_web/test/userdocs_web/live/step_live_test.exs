@@ -133,14 +133,14 @@ defmodule UserDocsWeb.StepLiveTest do
       assert_patch(index_live, Routes.step_index_path(conn, :new, process.id))
 
       assert index_live
-      |> form("#step-form", step: invalid_attrs(process.id))
+      |> form("#step-form", step_form: invalid_attrs(process.id))
       |> render_change() =~ "can&#39;t be blank"
 
       step_attrs = valid_attrs(process.id, step_type.id)
 
       {:ok, _, html} =
         index_live
-        |> form("#step-form", step: step_attrs)
+        |> form("#step-form", step_form: step_attrs)
         |> render_submit()
         |> follow_redirect(conn, Routes.step_index_path(conn, :index, process.id))
 
@@ -157,12 +157,12 @@ defmodule UserDocsWeb.StepLiveTest do
       assert_patch(index_live, Routes.step_index_path(conn, :edit, step))
 
       assert index_live
-             |> form("#step-form", step: invalid_attrs(process.id))
+             |> form("#step-form", step_form: invalid_attrs(process.id))
              |> render_change() =~ "can&#39;t be blank"
 
       {:ok, _, html} =
         index_live
-        |> form("#step-form", step: valid_attrs(step.process_id, step_type.id))
+        |> form("#step-form", step_form: valid_attrs(step.process_id, step_type.id))
         |> render_submit()
         |> follow_redirect(conn, Routes.step_index_path(conn, :index, process.id))
 
@@ -178,42 +178,42 @@ defmodule UserDocsWeb.StepLiveTest do
 
       # put it in page mode
       index_live
-      |> form("#step-form", step: attrs)
-      |> render_change(%{ "step" => %{"page_reference" => "page"} } )
+      |> form("#step-form", step_form: attrs)
+      |> render_change()
 
       assert index_live
-             |> element("#step-" <> (step.id |> to_string) <> "-page_id")
+             |> element("#step-form_page_id")
              |> has_element?()
 
       assert index_live
-             |> element("#page_name")
+             |> element("#page-subform_name")
              |> render() =~ first_page().name
 
       # change the page
       index_live
-      |> form("#step-form", step: attrs)
-      |> render_change(%{ "step" => %{ "page_id" => second_page().id |> to_string() } } )
+      |> form("#step-form", step_form: attrs)
+      |> render_change(%{ "step_form" => %{ "page_id" => second_page().id |> to_string() } } )
 
       assert index_live
-             |> element("#page_name")
+             |> element("#page-subform_name")
              |> render() =~ second_page().name
 
       # change it back to the first page
       index_live
-      |> form("#step-form", step: attrs)
-      |> render_change(%{ "step" => %{ "page_id" => first_page().id |> to_string() } } )
+      |> form("#step-form", step_form: attrs)
+      |> render_change(%{ "step_form" => %{ "page_id" => first_page().id |> to_string() } } )
 
       assert index_live
-             |> element("#page_name")
+             |> element("#page-subform_name")
              |> render() =~ first_page().name
 
       # put some new text on the page
       index_live
-      |> form("#step-form", step: attrs)
-      |> render_change(%{ "step" => %{ "name" => "value" } } )
+      |> form("#step-form", step_form: attrs)
+      |> render_change(%{ "step_form" => %{ "name" => "value" } } )
 
       assert index_live
-             |> form("#step-form", step: attrs)
+             |> form("#step-form", step_form: attrs)
              |> render_submit()
              |> follow_redirect(conn, Routes.step_index_path(conn, :index, process.id))
     end
@@ -230,15 +230,16 @@ defmodule UserDocsWeb.StepLiveTest do
       changes = %{ "step_type_id" => aa_step_type.id |> to_string() }
 
       index_live
-      |> form("#step-form", step: attrs)
-      |> render_change(%{ "step" => changes })
+      |> form("#step-form", step_form: attrs)
+      |> render_change(%{ "step_form" => changes })
 
       changes = %{"annotation_id" => second_annotation().id |> to_string()}
 
       # change the annotation_id
       index_live
-      |> form("#step-form", step: attrs)
-      |> render_change(%{ "step" => changes })
+      |> form("#step-form", step_form: attrs)
+      |> render_change(%{ "step_form" => changes })
+
 
       # Annotation form changes
       assert index_live |> render() =~ second_annotation().label
@@ -247,24 +248,24 @@ defmodule UserDocsWeb.StepLiveTest do
 
       # change it back
       index_live
-      |> form("#step-form", step: attrs)
-      |> render_change(%{ "step" => second_changes })
+      |> form("#step-form", step_form: attrs)
+      |> render_change(%{ "step_form" => second_changes })
 
       # Annotation form changes
       assert index_live |> render() =~ first_annotation().label
 
       # Element picker doesn't
       assert index_live
-             |> element("#step-" <> (step.id |> to_string) <> "-element_id")
+             |> element("#step-form_element_id")
              |> render() =~ "selected=\"selected\">" <> second_element().name
 
       # put some new text on the page, save it
       index_live
-      |> form("#step-form", step: attrs)
-      |> render_change(%{ "step" => %{ "annotation" => %{ "name" => "updated name" } } } )
+      |> form("#step-form", step_form: attrs)
+      |> render_change(%{ "step_form" => %{ "annotation" => %{ "name" => "updated name" } } } )
 
       assert index_live
-             |> form("#step-form", step: attrs)
+             |> form("#step-form", step_form: attrs)
              |> render_submit()
              |> follow_redirect(conn, Routes.step_index_path(conn, :index, process.id))
     end
@@ -282,38 +283,38 @@ defmodule UserDocsWeb.StepLiveTest do
 
       # change the element_id
       index_live
-      |> form("#step-form", step: attrs)
-      |> render_change(%{ "step" => changes })
+      |> form("#step-form", step_form: attrs)
+      |> render_change(%{ "step_form" => changes })
 
       assert index_live
-             |> element("#step-" <> (step.id |> to_string) <> "-element-" <> (second_element().id |> to_string) <> "-name")
+             |> element("#element-form_name")
              |> render() =~ second_element().name
 
       # change it back
       index_live
-      |> form("#step-form", step: attrs)
-      |> render_change(%{ "step" => %{
+      |> form("#step-form", step_form: attrs)
+      |> render_change(%{ "step_form" => %{
           "step_type_id" => step_type.id |> to_string(),
           "element_id" => first_element().id |> to_string()
         }})
 
       # Element Form Changes
       assert index_live
-             |> element("#step-" <> (step.id |> to_string) <> "-element-" <> (second_element().id |> to_string) <> "-name")
+             |> element("#element-form_name")
              |> render() =~ first_element().name
 
       # Annotation picker doesn't
       assert index_live
-            |> element("#step-" <> (step.id |> to_string) <> "-annotation_id")
+            |> element("#step-form_annotation_id")
             |> render() =~ "selected=\"selected\">" <> second_annotation().name
 
       # put some new text on the page, save it
       index_live
-      |> form("#step-form", step: attrs)
-      |> render_change(%{ "step" => %{ "element" => %{ "name" => "updated name" } } } )
+      |> form("#step-form", step_form: attrs)
+      |> render_change(%{ "step_form" => %{ "element" => %{ "name" => "updated name" } } } )
 
       assert index_live
-            |> form("#step-form", step: attrs)
+            |> form("#step-form", step_form: attrs)
             |> render_submit()
             |> follow_redirect(conn, Routes.step_index_path(conn, :index, process.id))
     end
@@ -330,11 +331,164 @@ defmodule UserDocsWeb.StepLiveTest do
       refute has_element?(index_live, "#delete-step-"<> Integer.to_string(step.id))
     end
 
+    test "click event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step: step, step_types: step_types } do
+      step_type = step_type_from_name(step_types, "Click")
+      {:ok, index_live, html} = live(conn, Routes.step_index_path(conn, :index, process.id))
+      attrs =
+        valid_attrs(step.process_id, step_type.id)
+        |> Map.put(:page_id, first_page().id)
+        |> Map.delete(:step_type_id)
+
+      event = %{ action: "Click", selector: "test_selector" }
+
+      # Pass the click browser event
+      html = index_live |> render_hook(:"browser-event", event)
+      assert html =~ "Click"
+      assert html =~ event.selector
+
+      # Create and put the changes required to make the form valid (page will be passed in production)
+      changes = %{
+        "step_form" => %{
+          "order" => attrs.order |> to_string(),
+          "page_id" => attrs.page_id |> to_string(),
+          "element" => %{
+            "name" => "test_element_name",
+            "page_id" => attrs.page_id |> to_string()
+          }
+        }}
+
+      index_live
+      |> form("#step-form", step_form: attrs)
+      |> render_change(changes)
+
+      # Save the form
+      {:ok, _, html} =
+        index_live
+        |> form("#step-form", step_form: attrs)
+        |> render_submit()
+        |> follow_redirect(conn, Routes.step_index_path(conn, :index, process.id))
+
+      assert html =~ "Step created successfully"
+    end
+
+    test "navigate event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step: step, step_types: step_types } do
+      step_type = step_type_from_name(step_types, "Navigate")
+      {:ok, index_live, html} = live(conn, Routes.step_index_path(conn, :index, process.id))
+      attrs =
+        valid_attrs(step.process_id, step_type.id)
+        |> Map.delete(:step_type_id)
+
+      event = %{ action: "Navigate", href: "https://www.google.com" }
+
+      # Pass the navigate browser event
+      html = index_live |> render_hook(:"browser-event", event)
+      assert html =~ "Navigate"
+      assert html =~ event.href
+
+      # Create and put the changes required to make the form valid
+      changes = %{
+        "step_form" => %{
+          "order" => attrs.order |> to_string(),
+          "page" => %{
+            "name" => "test_page_name"
+          }
+        }
+      }
+
+      index_live
+      |> form("#step-form", step_form: attrs)
+      |> render_change(changes)
+
+      # Save the form
+      {:ok, _, html} =
+        index_live
+        |> form("#step-form", step_form: attrs)
+        |> render_submit()
+        |> follow_redirect(conn, Routes.step_index_path(conn, :index, process.id))
+
+      assert html =~ "Step created successfully"
+    end
+
+    test "Click, then navigate does the expected thing", %{authed_conn: conn, process: process, step: step, step_types: step_types } do
+      step_type = step_type_from_name(step_types, "Click")
+      {:ok, index_live, html} = live(conn, Routes.step_index_path(conn, :index, process.id))
+      attrs =
+        valid_attrs(step.process_id, step_type.id)
+        |> Map.put(:page_id, first_page().id)
+        |> Map.delete(:step_type_id)
+
+      event = %{ action: "Click", selector: "test_selector" }
+
+      # Pass the click browser event
+      html = index_live |> render_hook(:"browser-event", event)
+      assert html =~ "Click"
+      assert html =~ event.selector
+
+      event = %{ action: "Navigate", href: "https://www.google.com" }
+
+      # Pass the navigate browser event
+      html = index_live |> render_hook(:"browser-event", event)
+      assert html =~ "Navigate"
+      assert html =~ event.href
+
+      # Create and put the changes required to make the form valid
+      changes = %{
+        "step_form" => %{
+          "order" => attrs.order |> to_string(),
+          "page" => %{
+            "name" => "test_page_name"
+          }
+        }
+      }
+
+      # This could spell trouble, add the additional fields and save
+      attrs = Map.delete(attrs, :page_id)
+      index_live
+      |> form("#step-form", step_form: attrs)
+      |> render_change(changes)
+
+      # Save the form
+      {:ok, _, html} =
+        index_live
+        |> form("#step-form", step_form: attrs)
+        |> render_submit()
+        |> follow_redirect(conn, Routes.step_index_path(conn, :index, process.id))
+
+      assert html =~ "Step created successfully"
+    end
+
+    test "browser events update the Edit form", %{authed_conn: conn, step: step, step_types: step_types, process: process, element: element, annotation: annotation, page: page } do
+      aa_step_type = step_type_from_name(step_types, "Apply Annotation")
+      {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :edit, step))
+      attrs =
+        AutomationFixtures.step_attrs(:valid, page.id, process.id, element.id, annotation.id, aa_step_type.id)
+        |> Map.delete(:annotation_id)
+        |> Map.delete(:element_id)
+        |> Map.delete(:name)
+
+      changes = %{ "step_type_id" => aa_step_type.id |> to_string() }
+
+      index_live
+      |> form("#step-form", step_form: attrs)
+      |> render_change(%{ "step" => changes })
+
+      event = %{ action: "Click", selector: "test_selector" }
+
+      # Pass the click browser event
+      html = index_live |> render_hook(:"browser-event", event)
+
+      index_live
+      |> open_browser()
+
+      assert html =~ "selected=\"selected\">Click"
+      assert html =~ event.selector
+    end
+
     test "index handles standard events", %{authed_conn: conn, version: version } do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert live
-             |> element("#version-picker-#{version.id}")
+             |> element("#version-picker-" <> to_string(version.id))
              |> render_click() =~ version.name
     end
   end
