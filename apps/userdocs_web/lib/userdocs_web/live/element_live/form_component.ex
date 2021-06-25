@@ -64,41 +64,6 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
           <%= Layout.text_input(form, :selector, [ label: false, id: prefix <> "selector-input"
             ], "control is-expanded") %>
 
-          <div class="control">
-            <button
-              class="button"
-              type="button"
-              id="<%= ID.strategy_field(form.data.page_id, form.data.id) %>"
-              selector="<%= prefix <> @field_ids.selector %>"
-              strategy="<%= prefix <> @field_ids.strategy_id %>"
-              phx-hook="CopySelector"
-            >
-              <span class="icon" >
-                <i
-                  class="fa fa-arrow-left"
-                  aria-hidden="true"
-                ></i>
-              </span>
-            </span>
-          </div>
-          <!-- TODO validate that @changeset.data.selector works here -->
-          <p class="control">
-            <button
-              type="button"
-              class="button"
-              phx-target="<%= @myself.cid %>"
-              phx-value-element-id="<%= form.data.id %>"
-              phx-value-selector="test"
-              phx-value-strategy="css"
-              phx-click="test_selector"
-            >
-              <span class="icon" >
-                <i class="fa fa-cloud-upload"
-                  aria-hidden="true"
-                ></i>
-              </span>
-            </span>
-          </p>
         </div>
         <%= error_tag form, :selector %>
       </p>
