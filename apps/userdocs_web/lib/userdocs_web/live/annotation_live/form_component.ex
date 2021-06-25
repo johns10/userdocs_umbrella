@@ -4,7 +4,6 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
   require Logger
 
   alias UserDocsWeb.Layout
-  alias UserDocsWeb.ID
 
   alias UserDocs.Web
 
@@ -42,7 +41,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
 
         <%= Layout.select_input(form, :annotation_type_id, @select_lists.annotation_types, [
             placeholder: form.data.annotation_type_id || "",
-            id: ID.form_field(form.data, :annotation_type_id, prefix),
+            id: prefix <> "annotation-type-select",
           ], "control") %>
 
       </div>
