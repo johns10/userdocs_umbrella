@@ -498,6 +498,14 @@ defmodule UserDocs.Automation do
   def change_step(%Step{} = step, attrs \\ %{}) do
     Step.changeset(step, attrs)
   end
+  def change_fields(%Step{} = step, attrs \\ %{}) do
+    Step.fields_changeset(step, attrs)
+  end
+  def change_assocs(%Step{} = step, attrs \\ %{}) do
+    step
+    |> Ecto.Changeset.cast(attrs, [])
+    |> Step.assoc_changeset()
+  end
 
   def change_nested_step(%Step{} = step, %Step{} = last_step, attrs \\ %{}, state, validate) do
     Step.nested_changeset(step, last_step, attrs, state, validate)
