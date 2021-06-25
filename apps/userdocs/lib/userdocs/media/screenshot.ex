@@ -33,6 +33,12 @@ defmodule UserDocs.Media.Screenshot do
     |> validate_required([:step_id])
   end
 
+  def fields_changeset(screenshot, attrs) do
+    screenshot
+    |> cast(attrs, [:name, :step_id, :base64, :aws_screenshot, :aws_provisional_screenshot, :aws_diff_screenshot])
+    |> validate_required([:step_id])
+  end
+
   def maybe_update_screenshots(changeset) do
     case Ecto.Changeset.get_change(changeset, :base64) do
       nil -> changeset
