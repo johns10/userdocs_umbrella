@@ -716,4 +716,16 @@ defmodule UserDocs.Automation do
   def change_process(%Process{} = process, attrs \\ %{}) do
     Process.changeset(process, attrs)
   end
+
+  alias UserDocs.Automation.StepForm
+
+  def create_step_form(attrs \\ %{}) do
+    %StepForm{}
+    |> StepForm.changeset(attrs)
+    |> Ecto.Changeset.apply_action(:insert)
+  end
+
+  def change_step_form(%StepForm{} = step, attrs \\ %{}) do
+    StepForm.changeset(step, attrs)
+  end
 end
