@@ -24,7 +24,7 @@ defmodule UserDocs.Automation.Process do
   @doc false
   def changeset(process, attrs) do
     process
-    |> cast(attrs, [:order, :name, :version_id])
+    |> cast(attrs, [:name, :version_id])
     |> foreign_key_constraint(:version_id)
     |> cast_assoc(:last_process_instance)
     |> cast_assoc(:steps)
