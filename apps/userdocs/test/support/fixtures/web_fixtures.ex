@@ -81,6 +81,16 @@ defmodule UserDocs.WebFixtures do
     annotation
   end
 
+  def all_valid_annotation_types() do
+    UserDocs.WebFixtures.AnnotationTypes.data()
+    |> Enum.map(
+      fn(st) ->
+        { :ok, annotation_type } = Web.create_annotation_type(st)
+        annotation_type
+      end
+    )
+  end
+
   def page_attrs(:valid, version_id \\ nil) do
     %{
       url: "some url",
