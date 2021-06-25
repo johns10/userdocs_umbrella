@@ -28,6 +28,12 @@ defmodule UserDocs.Web.Page do
     |> validate_required([:url])
   end
 
+  def fields_changeset(page, attrs) do
+    page
+    |> cast(attrs, [:name, :url, :version_id])
+    |> validate_required([:url])
+  end
+
   def safe(page, handlers \\ %{})
   def safe(page = %UserDocs.Web.Page{}, _handlers) do
     base_safe(page)
