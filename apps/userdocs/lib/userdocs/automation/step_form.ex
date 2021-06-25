@@ -75,8 +75,16 @@ defmodule UserDocs.Automation.StepForm do
       field :content_version_id, :integer
     end
 
+    field :screenshot_form_enabled, :boolean
     embeds_one :screenshot, Screenshot do
       field :name, :string
+      field :base64, :string
+
+      field :aws_screenshot, :string
+      field :aws_provisional_screenshot, :string
+      field :aws_diff_screenshot, :string
+
+      field :step_id, :integer
     end
   end
 
@@ -88,7 +96,7 @@ defmodule UserDocs.Automation.StepForm do
     |> cast_embed(:element, with: &Element.fields_changeset/2)
     |> cast_embed(:annotation, with: &Annotation.fields_changeset/2)
     |> cast_embed(:page, with: &Page.fields_changeset/2)
-    |> cast_embed(:screenshot)
+    |> cast_embed(:screenshot, with: &Screenshot.fields_changeset/2)
     |> validate_required([:order])
   end
 end
