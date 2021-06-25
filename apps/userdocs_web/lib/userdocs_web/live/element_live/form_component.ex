@@ -46,9 +46,7 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
 
   def render_name_field(assigns, form, prefix) do
     ~L"""
-    <%= Layout.text_input(form, :name, [
-      id: prefix <> @field_ids.name
-    ], "control") %>
+    <%= Layout.text_input(form, :name, [], "control") %>
     """
   end
 
@@ -60,12 +58,10 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
         <div class="field has-addons">
 
           <%= Layout.select_input(form, :strategy_id, @select_lists.strategies, [
-              id: prefix <> @field_ids.strategy_id, label: false
+              id: prefix <> "strategy-select", label: false
             ], "control") %>
 
-          <%= Layout.text_input(form, :selector, [
-              label: false,
-              id: prefix <> @field_ids.selector
+          <%= Layout.text_input(form, :selector, [ label: false, id: prefix <> "selector-input"
             ], "control is-expanded") %>
 
           <div class="control">
