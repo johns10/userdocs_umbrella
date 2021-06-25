@@ -85,8 +85,20 @@ defmodule UserDocs.Automation do
   def list_step_types(state, opts) when is_list(opts) do
     StateHandlers.list(state, StepType, opts)
   end
-  def list_step_types do
-    Repo.all(StepType)
+  def list_step_types(params \\ %{}) do
+    filters = Map.get(params, :filters, [])
+    base_step_types_query()
+    |> maybe_filter_by_name(filters[:name])
+    |> Repo.all()
+  end
+
+  defp base_step_types_query(), do: from(step_type in StepType)
+
+  defp maybe_filter_by_name(query, nil), do: query
+  defp maybe_filter_by_name(query, name) do
+    from(step_type in query,
+      where: step_type.name == ^name
+    )
   end
 
   @doc """
