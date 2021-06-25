@@ -440,7 +440,8 @@ defmodule UserDocs.Automation do
     |> Ecto.Changeset.put_change(foreign_key, nil)
   end
 
-  def clear_association(step, foreign_key, key) do
+  def clear_association(%Step{ id: nil } = step, _, _), do: step
+  def clear_association(%Step{} = step, foreign_key, key) do
     { :ok, new_step } =
       step
       |> Step.changeset(%{ foreign_key => nil })
