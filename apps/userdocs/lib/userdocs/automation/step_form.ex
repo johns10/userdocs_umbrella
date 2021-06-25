@@ -69,6 +69,10 @@ defmodule UserDocs.Automation.StepForm do
       field :font_size, :integer
       field :font_color, :string
       field :page_id, :integer
+
+      field :annotation_type_id, :integer
+      field :content_id, :integer
+      field :content_version_id, :integer
     end
 
     embeds_one :screenshot, Screenshot do
@@ -82,7 +86,7 @@ defmodule UserDocs.Automation.StepForm do
     |> cast(attrs, [ :order, :name, :text, :width, :height ])
     |> cast(attrs, [ :process_id, :page_id, :element_id, :annotation_id, :step_type_id ])
     |> cast_embed(:element, with: &Element.fields_changeset/2)
-    |> cast_embed(:annotation, with: &Annotation.changeset/2)
+    |> cast_embed(:annotation, with: &Annotation.fields_changeset/2)
     |> cast_embed(:page, with: &Page.fields_changeset/2)
     |> cast_embed(:screenshot)
     |> validate_required([:order])
