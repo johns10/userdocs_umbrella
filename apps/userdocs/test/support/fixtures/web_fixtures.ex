@@ -109,7 +109,7 @@ defmodule UserDocs.WebFixtures do
 
   def strategy_attrs(:valid) do
     %{
-      name: "strategy"
+      name: "css"
     }
   end
 
