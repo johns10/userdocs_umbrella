@@ -136,7 +136,7 @@ defmodule UserDocsWeb.StepLive.Index do
 
   def handle_event("browser-event", payload, socket) do
     IO.inspect("Received Browser Event")
-    IO.inspect(payload)
+    payload = UserDocsWeb.LiveHelpers.underscored_map_keys(payload)
 
     recent_navigated_page_id =
       try do
