@@ -1,5 +1,5 @@
 
-defmodule UserDocs.Repo.Migrations.AlterTeamAddCss do
+defmodule UserDocs.Repo.Migrations.AlterTeamModifyCss do
   use Ecto.Migration
 
   def up do
