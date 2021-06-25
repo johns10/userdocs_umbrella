@@ -23,7 +23,7 @@ defmodule UserDocs.Web.Page do
   @doc false
   def changeset(page, attrs) do
     page
-    |> cast(attrs, [:order, :name, :url, :version_id])
+    |> cast(attrs, [:name, :url, :version_id])
     |> foreign_key_constraint(:version_id)
     |> validate_required([:url])
   end
