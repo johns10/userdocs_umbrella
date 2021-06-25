@@ -25,6 +25,13 @@ defmodule UserDocs.Web.Element do
     |> ignore_missing()
   end
 
+  def fields_changeset(element, attrs) do
+    element
+    |> cast(attrs, [:name, :strategy_id, :selector, :page_id])
+    |> validate_required([:strategy_id, :selector, :page_id])
+    |> ignore_missing()
+  end
+
   def ignore_missing(changeset) do
     case changeset do
       %{valid?: false, changes: changes} = changeset when changes == %{ } ->
