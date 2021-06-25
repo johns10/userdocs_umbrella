@@ -57,6 +57,7 @@ defmodule UserDocs.Automation.Step do
     |> cast_assoc(:last_step_instance, with: &UserDocs.StepInstances.StepInstance.changeset/2)
   end
 
+  """
   def nested_changeset(step, last_step, attrs, state, action) do
     last_change = changeset(last_step, attrs)
     step
@@ -94,6 +95,13 @@ defmodule UserDocs.Automation.Step do
     |> assoc_changeset()
     |> names_changeset()
     |> validate_required([:order])
+  end
+  """
+  def create_nested_changeset(step, attrs) do
+    IO.puts("create_nested_changeset")
+    step
+    |> cast(attrs, [ :page_id, :annotation_id, :element_id, :process_id, :step_type_id ])
+    |> IO.inspect()
   end
 
   def fields_changeset(step, attrs) do
