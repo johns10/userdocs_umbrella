@@ -5,7 +5,7 @@
   phx_change: "validate",
   phx_submit: "save"
 
-  h2.is-size-4 Edit Step
+  h2.is-size-4 Edit Step 
 
   .field.is-horizontal
     .field-label.is-normal
@@ -13,17 +13,8 @@
     .field-body
       .control
         .select
-          = select f, :process_id, @select_lists.processes_select, 
-            [ class: "input", selected: @parent_id || "", id: @field_ids.process_id || "" ]
+          = select f, :process_id, @select_lists.processes_select, [ class: "input", selected: @parent_id || "", id: "process-select" ]
           = error_tag(f, :process_id)
-
-  .field.is-horizontal
-    .field-label.is-normal
-      = label f, :order, class: "label"
-    .field-body
-      .control
-        = number_input f, :order, [ class: "input", type: "text", id: @field_ids.order || "" ]
-        = error_tag(f, :order)
 
   .field.is-horizontal
     .field-label.is-normal
@@ -32,49 +23,66 @@
       .control
         .select
           = select f,:step_type_id, @select_lists.step_types_select, 
-            [ class: "input", type: "text", id: @field_ids.step_type_id || "" ]
+            [ class: "input", type: "text", id: "step-type-select" ]
           = error_tag(f, :step_type_id)
 
-  = if "page_reference" in @enabled_step_fields and @action not in [:new] do
+  .field.is-horizontal
+    .field-label.is-normal
+      = label f, :page_id, class: "label"
+    .field-body
+      .field.has-addons
+        .control 
+          .select
+            = select(f, :page_id, @select_lists.pages_select, 
+              [ value: @changeset |> Ecto.Changeset.get_change(:page_id, nil) ])
+        = Layout.new_item_button("new-page", 
+          [ button_class: :a, phx_target: @myself.cid ], "control")
+        = error_tag(f, :page_id)
+
+  .field.is-horizontal
+    .field-label.is-normal
+      = label f, :order, class: "label"
+    .field-body
+      .control
+        = number_input f, :order, [ class: "input", type: "text" ]
+        = error_tag(f, :order)
+
+  = if @last_step_form.width_enabled do
     .field.is-horizontal
       .field-label.is-normal
-        = label(f, :page_reference, [ class: :label ])
+        = label f, :width, class: "label"
       .field-body
         .control
-          label.radio
-            = radio_button(f, :page_reference, "url", 
-              [ id: @field_ids.page_reference_url, label: "url" ])
-              span< Type
-          label.radio
-            = radio_button(f, :page_reference, "page", 
-              [ id: @field_ids.page_reference_page, label: "page" ])
-              span< Select
-          = error_tag(f, :page_reference)
+          = number_input f, :width, [ class: "input", type: "text", id: "width-input" ]
+          = error_tag(f, :width)
 
-  = if @action not in [:new] and (page_reference(@changeset) != "url") do
+  = if @last_step_form.width_enabled do
     .field.is-horizontal
       .field-label.is-normal
-        = label f, :page_id, class: "label"
+        = label f, :height, class: "label"
       .field-body
-        .field.has-addons
-          = Layout.select_input(f, :page_id, @select_lists.pages_select,
-            [ value: @changeset |> Ecto.Changeset.get_change(:page_id, nil) || f.data.page_id || @default_page_id ||  "",
-            id: @field_ids.page_id, label: false ], "control")
-          = Layout.new_item_button("new-page", 
-            [ button_class: :a, phx_target: @myself.cid ], "control")
-          = error_tag(f, :page_id)
+        .control
+          = number_input f, :height, [ class: "input", type: "text", id: "height-input" ]
+          = error_tag(f, :height)
 
-  = if "page_id" in @enabled_step_fields do
-    = if !is_nil(@step.page) or @new_page do
-      h3.is-size-5 Page
-      .field
-        = inputs_for f, :page, [id: @form_ids.page ], fn fp ->
-          div style="border-left: 5px solid LightGray;"
-            .pl-2
-              = PageLive.FormComponent.render_fields(Map.put(assigns, :field_ids, @field_ids.page),
-                  fp, [ prefix: @form_ids.prefix ])
+  = if @last_step_form.text_enabled do
+    .field.is-horizontal
+      .field-label.is-normal
+        = label f, :text, class: "label"
+      .field-body
+        .control
+          = text_input f, :height, [ class: "input", type: "text", id: "text-input" ]
+          = error_tag(f, :text)
 
-  = if "element_id" in @enabled_step_fields and @action not in [:new]  do
+  = if @last_step_form.page_form_enabled do
+    h3.is-size-5 Page
+    .field
+      = inputs_for f, :page, [id: "page-subform" ], fn fp ->
+        div style="border-left: 5px solid LightGray;"
+          .pl-2
+            = PageLive.FormComponent.render_fields(assigns, fp, [ prefix: "page-" ])
+
+  = if @last_step_form.element_id_enabled do
     .field.is-horizontal
       .field-label.is-normal
         = label f, :element_id, class: "label"
@@ -82,26 +90,22 @@
         .field.has-addons
           = Layout.select_input(f, :element_id, @select_lists.elements, 
             [ value: @changeset |> Ecto.Changeset.get_change(:element_id, nil) || f.data.element_id || "", 
-            id: @field_ids.element_id, label: false,
-            hidden: "element_id" not in @enabled_step_fields ], "control")
+            label: false ], "control")
           = Layout.new_item_button("new-element", [ button_class: :a, phx_target: @myself.cid ], "control")
-    = if !is_nil(@step.element) or @new_element do 
+
+    = if @last_step_form.element_form_enabled do
       h3.is-size-5 Element
       .field
-        = inputs_for f, :element, [id: @form_ids.element], fn fe ->
+        = inputs_for f, :element, [id: "element-form" ], fn fe ->
           div style="border-left: 5px solid LightGray;"
             .pl-2
-              = hidden_input(fe, :page_id, value: f.data.page_id || @default_page_id)
-              = error_tag(fe, :page_id) 
-              = ElementLive.FormComponent.render_name_field(Map.put(assigns, :field_ids, @field_ids.element),
-                  fe, @form_ids.prefix)
-              = ElementLive.FormComponent.render_selector_field(Map.put(assigns, :field_ids, @field_ids.element),
-                  fe, @form_ids.prefix)
-              p 
-                = "Transferred Selector " <> (@transferred_strategy.name || "") <> ": "
-                = @transferred_selector || ""
+              = Layout.select_input(fe, :page_id, @select_lists.pages_select,
+                [ value: @changeset |> Ecto.Changeset.get_change(:page_id, nil),
+                id: "page-select" ], "control")
+              = ElementLive.FormComponent.render_name_field(assigns, fe, "element-")
+              = ElementLive.FormComponent.render_selector_field(assigns, fe, "element-")
 
-  = if "annotation_id" in @enabled_step_fields and @action not in [:new] do
+  = if @last_step_form.annotation_id_enabled do
     .field.is-horizontal
       .field-label.is-normal
         = label f, :annotation_id, class: "label"
@@ -109,37 +113,45 @@
         .field.has-addons 
           = Layout.select_input(f, :annotation_id, @select_lists.annotations, 
             [ value: @changeset |> Ecto.Changeset.get_change(:annotation_id, nil) || f.data.annotation_id || "",
-            id: @field_ids.annotation_id, label: false,
-            hidden: "annotation_id" not in @enabled_step_fields ], "control")
+            label: false ], "control")
           = Layout.new_item_button("new-annotation", [ button_class: :a, phx_target: @myself.cid ], "control")
-    = if !is_nil(@step.annotation) or @new_annotation do 
-      .field
-        = inputs_for f, :annotation, [id: @form_ids.annotation ], fn fa ->
-          div style="border-left: 5px solid LightGray;"
-            .pl-2
-              = AnnotationLive.FormComponent.render_fields(assigns, fa, @form_ids.prefix)
+          
+  = if @last_step_form.annotation_form_enabled do
+    .field
+      = inputs_for f, :annotation, [id: "annotation-form" ], fn fa ->
+        div style="border-left: 5px solid LightGray;"
+          .pl-2
+            = AnnotationLive.FormComponent.render_fields(assigns, fa, "annotation-")
 
-  = Layout.text_input(f, [ field_name: :url, id: @field_ids.url,
-        hidden: not(("url" in @enabled_step_fields) and (page_reference(@changeset) == "url"))])
 
-  = Layout.text_input(f, [ field_name: :text, id: @field_ids.text,
-        hidden: not("text" in @enabled_step_fields)])
 
-  = Layout.text_input(f, [ field_name: :width, id: @field_ids.width,
-        hidden: not("width" in @enabled_step_fields)])
 
-  = Layout.text_input(f, [ field_name: :height, id: @field_ids.height,
-        hidden: not("height" in @enabled_step_fields)])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   = if f.data.id do
     = if f.data.step_type.name in [ "Full Screen Screenshot", "Element Screenshot"] do
-      = inputs_for f, :screenshot, [id: @form_ids.page ], fn fp ->
+      = inputs_for f, :screenshot, [id: "page-form" ], fn fp ->
         h3.is-size-5 Screenshot
         div style="border-left: 5px solid LightGray;"
           .pl-2
             = hidden_input(fp, :step_id, value: f.data.id)
             .field
-              = Layout.text_input(fp, :name, [ id: @field_ids.text ], "control")
+              = Layout.text_input(fp, :name, [ id: "screenshot-name-input" ], "control")
 
       .field
         = live_component @socket, UserDocsWeb.ScreenshotLive.Preview, 
