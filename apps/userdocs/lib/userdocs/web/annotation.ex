@@ -64,8 +64,6 @@ defmodule UserDocs.Web.Annotation do
         :size, :color, :thickness, :x_offset, :y_offset,
         :font_size, :page_id, :annotation_type_id,
         :content_id, :content_version_id ])
-    |> foreign_key_constraint(:page_id)
-    |> foreign_key_constraint(:annotation_type_id)
     |> validate_required([:page_id])
   end
 
