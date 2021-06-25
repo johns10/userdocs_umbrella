@@ -368,6 +368,21 @@ defmodule UserDocs.Automation do
     |> Repo.insert()
   end
 
+  def create_nested_step(attrs) do
+    { :ok, step } =
+      %Step{}
+      |> Step.fields_changeset(attrs)
+      |> Repo.insert()
+
+    step
+    |> Map.put(:element, nil)
+    |> Map.put(:annotation, nil)
+    |> Map.put(:page, nil)
+    |> Ecto.Changeset.cast(attrs, [])
+    |> Step.assoc_changeset()
+    |> Repo.update()
+  end
+
   @doc """
   Updates a step.
 
