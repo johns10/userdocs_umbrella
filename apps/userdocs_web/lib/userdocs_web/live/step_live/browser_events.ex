@@ -3,6 +3,10 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
   alias UserDocs.Automation
   alias UserDocs.Web
 
+  def step_type_id(payload) do
+    step_type(payload)
+    |> Map.get(:id, nil)
+  end
   def step_type(%{ "action" => "ITEM_SELECTED" }), do: nil
   def step_type(payload) do
     Automation.list_step_types(%{ filters: [ name: payload["action"] ]})
@@ -12,7 +16,7 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
   def params(%{ payload: %{ "action" => "Navigate", "href" => href }, step_type: step_type }) do
     IO.inspect("Navigate Event")
     %{
-      step_type_id: step_type.id,
+      step_type_id: step_type_id(payload),
       page_reference: "page",
       page_id: nil,
       page: %{
@@ -22,9 +26,9 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
   end
   def params(%{ payload: %{ "action" => "Click", "selector" => selector }, step_type: step_type, page_id: page_id }) do
     IO.inspect("Click Event")
-    IO.inspect(step_type)
+      step_type_id: step_type_id(payload),
     %{
-      step_type_id: step_type.id,
+      step_type_id: step_type_id(payload),
       page_id: page_id,
       element: %{
         page_id: page_id,
