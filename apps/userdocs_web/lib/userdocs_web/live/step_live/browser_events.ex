@@ -54,6 +54,18 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
       }
     }
   end
+  def params(%{ payload: %{ "action" => "Element Screenshot", "selector" => selector } = payload, page_id: page_id }) do
+    IO.inspect("Click Event")
+    %{
+      step_type_id: step_type_id(payload),
+      page_id: page_id,
+      element: %{
+        page_id: page_id,
+        strategy_id: Web.css_strategy() |> Map.get(:id),
+        selector: selector
+      }
+    }
+  end
   def params(%{ payload: %{ "action" => "Apply Annotation", "selector" => selector } = payload, page_id: page_id }) do
     IO.inspect("Apply Annotation Event")
     %{
