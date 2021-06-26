@@ -262,7 +262,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :changeset, changeset)}
+        temp_changeset = Automation.StepForm.changeset(socket.assigns.step_form, step_form_params)
+        {:noreply, assign(socket, :changeset, temp_changeset)}
     end
   end
 
@@ -281,7 +282,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, changeset: changeset)}
+        temp_changeset = Automation.StepForm.changeset(socket.assigns.step_form, step_params)
+        {:noreply, assign(socket, :changeset, temp_changeset)}
     end
   end
 
