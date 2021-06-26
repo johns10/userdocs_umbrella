@@ -348,12 +348,13 @@ defmodule UserDocsWeb.StepLive.Index do
     step = Automation.get_step!(id, socket, opts)
 
     step_form = %Automation.StepForm{
+      id: step.id,
       order: step.order,
       name: step.name,
       url: step.url,
-      url: step.text,
-      url: step.width,
-      url: step.height,
+      text: step.text,
+      width: step.width,
+      height: step.height,
       page_id: step.page_id,
       page: step.page,
       element_id: step.element_id,
