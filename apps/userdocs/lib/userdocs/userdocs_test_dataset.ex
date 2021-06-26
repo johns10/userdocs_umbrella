@@ -197,6 +197,10 @@ defmodule UserDocs.TestDataset do
       args: ["x_orientation", "y_orientation", "size", "label", "color",
        "thickness", "x_offset", "y_offset", "font_size"],
       name: "Badge Outline"
+    },
+    none = %{
+      args: [],
+      name: "None"
     }
   ]
 
