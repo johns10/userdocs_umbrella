@@ -7,6 +7,7 @@ defmodule UserDocs.Automation.StepForm do
   alias UserDocs.Web.Element
   alias UserDocs.Web.Page
   alias UserDocs.Web.Annotation
+  alias UserDocs.Web.AnnotationForm
   alias UserDocs.Media.Screenshot
 
   schema "step_form" do
@@ -56,24 +57,7 @@ defmodule UserDocs.Automation.StepForm do
     field :annotation_id, :integer
 
     field :annotation_form_enabled, :boolean
-    embeds_one :annotation, Annotation, on_replace: :update do
-      field :name, :string
-      field :label, :string
-      field :x_orientation, :string
-      field :y_orientation, :string
-      field :size, :integer
-      field :color, :string
-      field :thickness, :integer
-      field :x_offset, :integer
-      field :y_offset, :integer
-      field :font_size, :integer
-      field :font_color, :string
-      field :page_id, :integer
-
-      field :annotation_type_id, :integer
-      field :content_id, :integer
-      field :content_version_id, :integer
-    end
+    embeds_one :annotation, AnnotationForm, on_replace: :update
 
     field :screenshot_form_enabled, :boolean
     embeds_one :screenshot, Screenshot, on_replace: :update do
@@ -94,7 +78,7 @@ defmodule UserDocs.Automation.StepForm do
     |> cast(attrs, [ :order, :name, :text, :width, :height ])
     |> cast(attrs, [ :process_id, :page_id, :element_id, :annotation_id, :step_type_id ])
     |> cast_embed(:element, with: &Element.fields_changeset/2)
-    |> cast_embed(:annotation, with: &Annotation.fields_changeset/2)
+    |> cast_embed(:annotation, with: &AnnotationForm.changeset/2)
     |> cast_embed(:page, with: &Page.fields_changeset/2)
     |> cast_embed(:screenshot, with: &Screenshot.fields_changeset/2)
     |> validate_required([:order])
