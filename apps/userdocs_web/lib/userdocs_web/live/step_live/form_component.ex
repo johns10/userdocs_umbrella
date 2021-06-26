@@ -7,6 +7,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   alias UserDocsWeb.ElementLive
   alias UserDocsWeb.PageLive
   alias UserDocsWeb.Layout
+  alias UserDocsWeb.StepLive.FormComponent.Helpers
 
   alias UserDocs.Automation
   alias UserDocs.Automation.StepForm
@@ -22,7 +23,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     last_change =
       last_step_form
       |> StepForm.changeset(step_params)
-      |> handle_enabled_fields(socket.assigns)
+      |> Helpers.handle_enabled_fields(socket.assigns)
 
     last_step_form = Ecto.Changeset.apply_changes(last_change)
 
@@ -60,9 +61,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
     step_form =
       step_form
-      |> enabled_step_fields(assigns)
-
-    # step_type_id = Ecto.Changeset.get_field(changeset, :step_type_id)
+      |> Helpers.enabled_step_fields(assigns)
+      |> Helpers.enabled_annotation_fields(assigns)
 
     # We do this for the new case
     annotation_type_id =
@@ -72,12 +72,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
         nil -> nil
         annotation -> Map.get(annotation, :annotation_type_id, nil)
       end
-
-    enabled_annotation_fields =
-      UserDocsWeb.LiveHelpers.enabled_fields(
-        assigns.data.annotation_types,
-        annotation_type_id
-      )
 
     select_lists =
       assigns.select_lists
@@ -89,7 +83,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       socket
       |> assign(assigns)
       |> assign(:changeset, changeset)
-      |> assign(:enabled_annotation_fields, enabled_annotation_fields)
       |> assign(:select_lists, select_lists)
       |> assign(:state_opts, assigns.state_opts)
       |> assign(:last_step_form, step_form)
@@ -104,7 +97,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     last_change =
       last_step_form
       |> StepForm.changeset(step_form_params)
-      |> handle_enabled_fields(socket.assigns)
+      |> Helpers.handle_enabled_fields(socket.assigns)
 
     last_step_form = Ecto.Changeset.apply_changes(last_change)
 
@@ -160,42 +153,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     }
   end
 
-  def handle_enabled_fields(%Ecto.Changeset{} = changeset, state) do
-    IO.puts("handle_enabled_fields")
-    changeset
-    |> maybe_update_enabled_step_fields(state)
-  end
-
-  def maybe_update_enabled_step_fields(%Ecto.Changeset{ changes: %{ step_type_id: step_type_id }} = changeset, state) do
-    enabled_step_fields(changeset, state)
-  end
-  def maybe_update_enabled_step_fields(%Ecto.Changeset{} = changeset, _), do: changeset
-
-  def enabled_step_fields(%Ecto.Changeset{} = changeset, state) do
-    step_type = UserDocs.Automation.get_step_type!(changeset.changes.step_type_id, state, state.state_opts)
-    Enum.reduce(@enablers, changeset,
-      fn(enabler, inner_changeset) ->
-        if String.replace(to_string(enabler), "_enabled", "") in step_type.args do
-          Ecto.Changeset.put_change(inner_changeset, enabler, true)
-        else
-          Ecto.Changeset.put_change(inner_changeset, enabler, false)
-        end
-      end
-    )
-  end
-  def enabled_step_fields(%StepForm{ step_type_id: nil} = step_form, _), do: step_form
-  def enabled_step_fields(%StepForm{ step_type_id: step_type_id} = step_form, state) do
-    step_type = UserDocs.Automation.get_step_type!(step_type_id, state, state.state_opts)
-    Enum.reduce(@enablers, step_form,
-      fn(enabler, inner_step_form) ->
-        if String.replace(to_string(enabler), "_enabled", "") in step_type.args do
-          Map.put(inner_step_form, enabler, true)
-        else
-          Map.put(inner_step_form, enabler, false)
-        end
-      end
-    )
-  end
 
   def handle_param_updates(params, %Ecto.Changeset{} = changeset, state) do
     params
