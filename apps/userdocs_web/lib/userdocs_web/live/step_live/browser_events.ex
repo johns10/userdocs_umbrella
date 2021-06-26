@@ -19,16 +19,8 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
     |> Map.get(:id, nil)
   end
   def annotation_type(payload) do
-    IO.inspect("annotation_type")
-    IO.inspect(payload)
-    IO.inspect(payload["annotation_type"])
     Web.list_annotation_types()
-    |> IO.inspect()
-    |> Enum.filter(fn(at) ->
-      IO.inspect(at)
-      at.name == payload["annotation_type"]
-    end)
-    |> IO.inspect()
+    |> Enum.filter(fn(at) -> at.name == payload["annotation_type"] end)
     |> Enum.at(0)
   end
 
