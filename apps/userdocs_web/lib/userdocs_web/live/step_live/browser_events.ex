@@ -94,26 +94,28 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
     }
   end
 
-  def handle_action(%Phoenix.LiveView.Socket{ assigns: %{ live_action: :index }} = socket, %{} = params) do
-    route = UserDocsWeb.Router.Helpers.step_index_path(socket, :new, socket.assigns.process, %{ step_params: params })
-    IO.puts("Its in index mode, pushing to #{route}")
-    socket
-    |> Phoenix.LiveView.push_patch(to: route)
+  def handle_action(%Socket{ assigns: %{ live_action: :index }} = socket, %{ "action" => "item_selected" }), do: socket
+  def handle_action(%Socket{ assigns: %{ live_action: action }} = socket, %{ "action" => "item_selected" } = params) when action in [ :new, :edit ] do
+    Phoenix.LiveView.assign(socket, :step_params, params)
   end
-  def handle_action(%Phoenix.LiveView.Socket{ assigns: %{ live_action: :new }} = socket, %{} = params) do
+  def handle_action(%Socket{ assigns: %{ live_action: :index }} = socket, %{} = params) do
     route = UserDocsWeb.Router.Helpers.step_index_path(socket, :new, socket.assigns.process, %{ step_params: params })
     socket
     |> Phoenix.LiveView.push_patch(to: route)
   end
-  def handle_action(%Phoenix.LiveView.Socket{ assigns: %{ live_action: :edit }} = socket, %{} = params) do
-    IO.puts("Its in edit mode")
+  def handle_action(%Socket{ assigns: %{ live_action: :new }} = socket, %{} = params) do
+    IO.puts("Handle action on a new form, adding in the params")
     socket
     |> Phoenix.LiveView.assign(:step_params, params)
   end
-  def handle_action(%Phoenix.LiveView.Socket{ assigns: %{ live_action: action }} = socket, %{} = params) do
+  def handle_action(%Socket{ assigns: %{ live_action: :edit }} = socket, %{} = params) do
+    socket
+    |> Phoenix.LiveView.assign(:step_params, params)
+  end
+  def handle_action(%Socket{ assigns: %{ live_action: action }}, _params) do
     throw("Action handler not implemented for #{action}")
   end
-  def handle_action(socket, %{} = params) do
+  def handle_action(socket, _params) do
     IO.inspect(socket)
     throw("Action Probably not on socket")
   end
