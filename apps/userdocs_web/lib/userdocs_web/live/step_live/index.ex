@@ -138,21 +138,22 @@ defmodule UserDocsWeb.StepLive.Index do
     IO.inspect("Received Browser Event")
     payload = UserDocsWeb.LiveHelpers.underscored_map_keys(payload)
 
-    recent_navigated_page_id =
-      try do
-        socket.assigns.steps
-        |> Enum.filter(fn(s) -> s.step_type.name == "Navigate" end)
-        |> Enum.max_by(fn(s) -> s.order end)
-        |> Map.get(:page_id)
-      rescue
-        _ -> nil
-      end
-
-    state = %{ payload: payload, page_id: recent_navigated_page_id }
+    state = %{ payload: payload, page_id: recent_navigated_page_id(socket) }
     step_params = UserDocsWeb.StepLive.BrowserEvents.params(state)
     socket = BrowserEvents.handle_action(socket, step_params)
 
     { :noreply, socket }
+  end
+
+  defp recent_navigated_page_id(socket) do
+    try do
+      socket.assigns.steps
+      |> Enum.filter(fn(s) -> s.step_type.name == "Navigate" end)
+      |> Enum.max_by(fn(s) -> s.order end)
+      |> Map.get(:page_id)
+    rescue
+      _ -> nil
+    end
   end
 
 
@@ -182,18 +183,25 @@ defmodule UserDocsWeb.StepLive.Index do
       %UserDocs.Automation.StepForm{}
       |> Automation.change_step_form(step_params)
       |> Ecto.Changeset.apply_changes()
+      |> Map.put(:page_id, recent_navigated_page_id(socket))
+      |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{})
 
     socket
     |> assign(:page_title, "New Step")
-    |> assign(:step_form, %UserDocs.Automation.StepForm{ annotation: %UserDocs.Web.AnnotationForm{} })
+    |> assign(:step, %UserDocs.Automation.Step{})
     |> assign(:step_form, step_form)
     |> assign(:select_lists, select_lists(socket))
   end
   defp apply_action(socket, :new, _params) do
+    step_form =
+      %UserDocs.Automation.StepForm{}
+      |> Map.put(:page_id, recent_navigated_page_id(socket))
+      |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{})
+
     socket
     |> assign(:page_title, "New Step")
     |> assign(:step, %UserDocs.Automation.Step{})
-    |> assign(:step_form, %UserDocs.Automation.StepForm{ annotation: %UserDocs.Web.AnnotationForm{} })
+    |> assign(:step_form, step_form)
     |> assign(:select_lists, select_lists(socket))
   end
   defp apply_action(socket, :index, _params) do
