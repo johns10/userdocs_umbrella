@@ -29,7 +29,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
     = hidden_input(form, :name, [ value: Ecto.Changeset.get_field(@changeset, :name, "") ])
     .field.is-grouped
       = Layout.select_input(form, :page_id, @select_lists.pages_select,
-        [ selected: form.data.page_id || @default_page_id || "" ], "control")
+        [ selected: form.data.page_id || "" ], "control")
       = Layout.select_input(form, :annotation_type_id, @select_lists.annotation_types,
         [ placeholder: form.data.annotation_type_id || "None" ], "control")
 
