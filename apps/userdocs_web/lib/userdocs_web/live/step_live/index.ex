@@ -179,12 +179,13 @@ defmodule UserDocsWeb.StepLive.Index do
   end
   defp apply_action(socket, :new, %{ "step_params" => step_params }) do
     IO.puts("New Step, with params")
+    page_id = recent_navigated_page_id(socket)
     step_form =
       %UserDocs.Automation.StepForm{}
       |> Automation.change_step_form(step_params)
       |> Ecto.Changeset.apply_changes()
-      |> Map.put(:page_id, recent_navigated_page_id(socket))
-      |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{})
+      |> Map.put(:page_id, page_id)
+      |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{ page_id: page_id })
 
     socket
     |> assign(:page_title, "New Step")
@@ -193,10 +194,11 @@ defmodule UserDocsWeb.StepLive.Index do
     |> assign(:select_lists, select_lists(socket))
   end
   defp apply_action(socket, :new, _params) do
+    page_id = recent_navigated_page_id(socket)
     step_form =
       %UserDocs.Automation.StepForm{}
-      |> Map.put(:page_id, recent_navigated_page_id(socket))
-      |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{})
+      |> Map.put(:page_id, page_id)
+      |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{ page_id: page_id })
 
     socket
     |> assign(:page_title, "New Step")
