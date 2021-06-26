@@ -53,15 +53,15 @@ defmodule UserDocsWeb.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:pow, "~> 1.0.23"},
       {:uuid, "~> 1.1"},
-      {:dialyxir, "~> 0.5.0", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:cors_plug, "~> 2.0"},
       {:pbkdf2_elixir, "~> 1.0"},
       {:phoenix_slime, "~> 0.13.1"},
-      {:userdocs, in_umbrella: true},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:absinthe, "~> 1.5", override: true},
-      {:absinthe_plug, "~> 1.5.8"}
+      {:absinthe_plug, "~> 1.5.8"},
+      {:userdocs, in_umbrella: true},
     ]
   end
 
