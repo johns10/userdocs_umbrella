@@ -77,7 +77,7 @@
   = if @last_step_form.page_form_enabled do
     h3.is-size-5 Page
     .field
-      = inputs_for f, :page, [id: "page-subform" ], fn fp ->
+      = inputs_for f, :page, [], fn fp ->
         div style="border-left: 5px solid LightGray;"
           .pl-2
             = PageLive.FormComponent.render_fields(assigns, fp, [ prefix: "page-" ])
@@ -96,7 +96,7 @@
     = if @last_step_form.element_form_enabled do
       h3.is-size-5 Element
       .field
-        = inputs_for f, :element, [id: "element-form" ], fn fe ->
+        = inputs_for f, :element, [], fn fe ->
           div style="border-left: 5px solid LightGray;"
             .pl-2
               = Layout.select_input(fe, :page_id, @select_lists.pages_select,
@@ -124,7 +124,7 @@
             = AnnotationLive.FormComponent.render_fields(assigns, fa, "annotation-")
 
   = if @last_step_form.screenshot_form_enabled do
-    = inputs_for f, :screenshot, [id: "page-form" ], fn fp ->
+    = inputs_for f, :screenshot, [], fn fp ->
       h3.is-size-5 Screenshot
       div style="border-left: 5px solid LightGray;"
         .pl-2
