@@ -99,4 +99,20 @@ defmodule UserDocs.Automation.StepForm do
     |> cast_embed(:screenshot, with: &Screenshot.fields_changeset/2)
     |> validate_required([:order])
   end
+
+  def enabler_fields do
+    [
+      :url_enabled,
+      :text_enabled,
+      :width_enabled,
+      :height_enabled,
+      :page_id_enabled,
+      :page_form_enabled,
+      :element_id_enabled,
+      :element_form_enabled,
+      :annotation_id_enabled,
+      :annotation_form_enabled,
+      :screenshot_form_enabled
+    ]
+  end
 end
