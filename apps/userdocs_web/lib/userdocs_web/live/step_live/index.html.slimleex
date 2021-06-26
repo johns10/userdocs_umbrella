@@ -13,7 +13,6 @@ div
         current_version: @current_version,
         current_team: @current_team,
         data: @data,
-        default_page_id: RecentPage.get_id(@steps, @step, @data.pages),
         id: "step-form",
         new_element: false,
         new_annotation: false,
