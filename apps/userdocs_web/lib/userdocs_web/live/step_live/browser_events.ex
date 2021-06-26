@@ -34,57 +34,64 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
   def params(%{ payload: %{ "action" => "Navigate", "href" => href } = payload }) do
     IO.inspect("Navigate Event")
     %{
-      step_type_id: step_type_id(payload),
-      page_reference: "page",
-      page_id: nil,
-      page: %{
-        url: href
+      "step_type_id" => step_type_id(payload),
+      "page_reference" => "page",
+      "page_id" => nil,
+      "page" => %{
+        "url" => href
       }
     }
   end
   def params(%{ payload: %{ "action" => "Click", "selector" => selector } = payload, page_id: page_id }) do
     IO.inspect("Click Event")
     %{
-      step_type_id: step_type_id(payload),
-      page_id: page_id,
-      element: %{
-        page_id: page_id,
-        strategy_id: Web.css_strategy() |> Map.get(:id),
-        selector: selector
+      "step_type_id" => step_type_id(payload),
+      "page_id" => page_id,
+      "element" => %{
+        "page_id" => page_id,
+        "strategy_id" => Web.css_strategy() |> Map.get(:id),
+        "selector" => selector
       }
     }
   end
   def params(%{ payload: %{ "action" => "Element Screenshot", "selector" => selector } = payload, page_id: page_id }) do
     IO.inspect("Click Event")
     %{
-      step_type_id: step_type_id(payload),
-      page_id: page_id,
-      element: %{
-        page_id: page_id,
-        strategy_id: Web.css_strategy() |> Map.get(:id),
-        selector: selector
+      "step_type_id" => step_type_id(payload),
+      "page_id" => page_id,
+      "element" => %{
+        "page_id" => page_id,
+        "strategy_id" => Web.css_strategy() |> Map.get(:id),
+        "selector" => selector
       }
     }
   end
   def params(%{ payload: %{ "action" => "Apply Annotation", "selector" => selector } = payload, page_id: page_id }) do
     IO.inspect("Apply Annotation Event")
     %{
-      step_type_id: step_type_id(payload),
-      page_id: page_id,
-      element: %{
-        page_id: page_id,
-        strategy_id: Web.css_strategy() |> Map.get(:id),
-        selector: selector
+      "step_type_id" => step_type_id(payload),
+      "page_id" => page_id,
+      "element" => %{
+        "page_id" => page_id,
+        "strategy_id" => Web.css_strategy() |> Map.get(:id),
+        "selector" => selector
       },
-      annotation: %{
-        page_id: page_id,
-        annotation_type_id: annotation_type_id(payload)
+      "annotation" => %{
+        "page_id" => page_id,
+        "annotation_type_id" => annotation_type_id(payload)
       }
     }
   end
-  def params(%{ payload: %{ "action" => "ITEM_SELECTED", "selector" => selector }}) do
+  def params(%{ payload: %{ "action" => "ITEM_SELECTED", "selector" => selector }, page_id: page_id }) do
     IO.inspect("Item Selected Event")
-    %{ element: %{ selector: selector } }
+    %{
+      "page_id" => page_id,
+      "action" => "item_selected",
+      "element" => %{
+        "page_id" => page_id,
+        "selector" => selector
+      }
+    }
   end
 
   def handle_action(%Phoenix.LiveView.Socket{ assigns: %{ live_action: :index }} = socket, %{} = params) do
