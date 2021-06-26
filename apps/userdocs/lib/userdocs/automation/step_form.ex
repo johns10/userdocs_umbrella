@@ -76,7 +76,7 @@ defmodule UserDocs.Automation.StepForm do
     end
 
     field :screenshot_form_enabled, :boolean
-    embeds_one :screenshot, Screenshot do
+    embeds_one :screenshot, Screenshot, on_replace: :update do
       field :name, :string
       field :base64, :string
 
