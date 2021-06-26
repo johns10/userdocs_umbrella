@@ -185,7 +185,7 @@ defmodule UserDocsWeb.StepLive.Index do
 
     socket
     |> assign(:page_title, "New Step")
-    |> assign(:step, %UserDocs.Automation.Step{})
+    |> assign(:step_form, %UserDocs.Automation.StepForm{ annotation: %UserDocs.Web.AnnotationForm{} })
     |> assign(:step_form, step_form)
     |> assign(:select_lists, select_lists(socket))
   end
@@ -193,7 +193,7 @@ defmodule UserDocsWeb.StepLive.Index do
     socket
     |> assign(:page_title, "New Step")
     |> assign(:step, %UserDocs.Automation.Step{})
-    |> assign(:step_form, %UserDocs.Automation.StepForm{})
+    |> assign(:step_form, %UserDocs.Automation.StepForm{ annotation: %UserDocs.Web.AnnotationForm{} })
     |> assign(:select_lists, select_lists(socket))
   end
   defp apply_action(socket, :index, _params) do
