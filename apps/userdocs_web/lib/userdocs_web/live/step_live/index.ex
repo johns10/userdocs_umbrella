@@ -347,6 +347,29 @@ defmodule UserDocsWeb.StepLive.Index do
 
     step = Automation.get_step!(id, socket, opts)
 
+    annotation_form =
+      if step.annotation do
+        a = step.annotation
+        %Web.AnnotationForm{
+          name: a.name,
+          label: a.label,
+          x_orientation: a.x_orientation,
+          y_orientation: a.y_orientation,
+          size: a.size,
+          color: a.color,
+          thickness: a.thickness,
+          x_offset: a.x_offset,
+          y_offset: a.y_offset,
+          font_size: a.font_size,
+          page_id: a.page_id,
+          annotation_type_id: a.annotation_type_id,
+          content_id: a.content_id,
+          content_version_id: a.content_version_id
+        }
+      else
+        %Web.AnnotationForm{}
+      end
+
     step_form = %Automation.StepForm{
       id: step.id,
       order: step.order,
@@ -360,7 +383,7 @@ defmodule UserDocsWeb.StepLive.Index do
       element_id: step.element_id,
       element: step.element,
       annotation_id: step.annotation_id,
-      annotation: step.annotation,
+      annotation: annotation_form,
       screenshot: step.screenshot,
       step_type_id: step.step_type_id,
       process_id: step.process_id
