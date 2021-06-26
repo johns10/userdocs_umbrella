@@ -28,7 +28,7 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
       <div class="field is-grouped">
 
         <%= Layout.select_input(form, :page_id, @select_lists.pages_select, [
-          selected: form.data.page_id || @default_page_id || "",
+          selected: form.data.page_id || "",
           id: prefix <> @field_ids.page_id,
         ], "control") %>
 

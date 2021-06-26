@@ -28,7 +28,6 @@ div.py-2
           type: Step,
           current_version_id: @version.id,
           state_opts: @state_opts,
-          default_page_id: RecentPage.get_id(@process, step, @process.steps),
           data: %{ step_types: @data.step_types,
             strategies: @data.strategies,
             annotations: @data.annotations,

@@ -75,8 +75,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
     select_lists =
       assigns.select_lists
-      |> Map.put(:elements, elements_select(assigns, step_form.page_id || assigns.default_page_id))
-      |> Map.put(:annotations, annotations_select(assigns, step_form.page_id || assigns.default_page_id))
+      |> Map.put(:elements, elements_select(assigns, step_form.page_id))
+      |> Map.put(:annotations, annotations_select(assigns, step_form.page_id))
 
     {
       :ok,
