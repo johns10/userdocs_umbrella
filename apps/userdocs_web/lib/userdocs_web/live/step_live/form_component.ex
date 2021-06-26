@@ -248,6 +248,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     changeset = Automation.change_fields(socket.assigns.step, step_form_params)
     { :ok, step } = UserDocs.Repo.update(changeset)
     changeset = Automation.change_assocs(step, step_form_params)
+    changeset = Automation.Step.names_changeset(changeset)
     case UserDocs.Repo.update(changeset) do
       {:ok, step} ->
         opts = socket.assigns.state_opts |> Keyword.put(:action, :update)
