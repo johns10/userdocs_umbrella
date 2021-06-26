@@ -1,5 +1,6 @@
 defmodule UserDocsWeb.StepLive.BrowserEvents do
   require Logger
+  alias Phoenix.LiveView.Socket
   alias UserDocs.Automation
   alias UserDocs.Web
 
