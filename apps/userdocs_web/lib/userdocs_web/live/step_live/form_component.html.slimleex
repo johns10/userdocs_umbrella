@@ -136,26 +136,6 @@
       = live_component @socket, UserDocsWeb.ScreenshotLive.Preview, 
       [ id: "screenshot-preview", screenshot: f.data.screenshot, team: @current_team ]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   .buttons
     = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
       = if @action == :edit do
