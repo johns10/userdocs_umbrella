@@ -154,7 +154,8 @@ defmodule UserDocsWeb.LiveHelpers do
   def maybe_object(:new, _, struct), do: struct
   def maybe_object(:edit, object, _), do: object
   def maybe_object(:show, object, _), do: object
-
+  ### MARKED FOR DELETION ###
+  """
   def enabled_fields(_, "Elixir.None"), do: []
   def enabled_fields(_, ""), do: []
   def enabled_fields(_, nil), do: []
@@ -166,8 +167,7 @@ defmodule UserDocsWeb.LiveHelpers do
     |> Enum.at(0)
     |> Map.get(:args)
   end
-
-  ### MARKED FOR DELETION ###
+  """
   def maybe_action(assigns) do
     try do
       Map.get(assigns, :action)
