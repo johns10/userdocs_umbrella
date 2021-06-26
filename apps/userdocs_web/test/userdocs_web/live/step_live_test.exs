@@ -37,6 +37,7 @@ defmodule UserDocsWeb.StepLiveTest do
   defp create_annotation(%{ page: page }), do: %{annotation: WebFixtures.annotation(page.id)}
   defp create_step_type(_), do: %{step_type: AutomationFixtures.step_type()}
   defp create_step_types(_), do: %{step_types: AutomationFixtures.all_valid_step_types()}
+  defp create_annotation_types(_), do: %{annotation_types: WebFixtures.all_valid_annotation_types()}
   defp create_step(%{ page: page, process: p, element: e, annotation: a, step_type: st }) do
     %{ step: AutomationFixtures.step(page.id, p.id, e.id, a.id, st.id)}
   end
@@ -112,6 +113,7 @@ defmodule UserDocsWeb.StepLiveTest do
       :create_annotation,
       :create_step_type,
       :create_step_types,
+      :create_annotation_types,
       :create_step,
       :grevious_workaround,
       :make_selections,
@@ -484,6 +486,27 @@ defmodule UserDocsWeb.StepLiveTest do
       assert html =~ event.selector
     end
 
+    test "Apply Annotation event opens form, filling additional fields and saving works", %{ authed_conn: conn, process: process, step: step, step_types: step_types, annotation: annotation, element: element, page: page } do
+      aa_step_type = step_type_from_name(step_types, "Apply Annotation")
+      {:ok, index_live, html} = live(conn, Routes.step_index_path(conn, :index, process.id))
+      attrs =
+        AutomationFixtures.step_attrs(:valid, page.id, process.id, element.id, annotation.id, aa_step_type.id)
+        |> Map.delete(:annotation_id)
+        |> Map.delete(:element_id)
+        |> Map.delete(:name)
+
+      event = %{ action: "Apply Annotation", selector: "test_selector", annotation_type: "Badge" }
+
+      # Pass the navigate browser event
+      html = index_live |> render_hook(:"browser-event", event)
+      assert html =~ "Apply Annotation"
+      assert html =~ event.selector
+
+      index_live
+      |> open_browser()
+
+    end
+
     test "index handles standard events", %{authed_conn: conn, version: version } do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
@@ -491,5 +514,6 @@ defmodule UserDocsWeb.StepLiveTest do
              |> element("#version-picker-" <> to_string(version.id))
              |> render_click() =~ version.name
     end
+
   end
 end
