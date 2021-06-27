@@ -202,9 +202,16 @@ defmodule UserDocsWeb.StepLive.Index do
   end
   defp apply_action(socket, :new, _params) do
     page_id = recent_navigated_page_id(socket)
+    page =
+      case page_id do
+        nil -> nil
+        page_id -> Web.get_page!(page_id, socket, socket.assigns.state_opts)
+      end
+
     step_form =
       %UserDocs.Automation.StepForm{}
       |> Map.put(:page_id, page_id)
+      |> Map.put(:page, page)
       |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{ page_id: page_id })
       |> Map.put(:screenshot, %UserDocs.Media.Screenshot{})
 
