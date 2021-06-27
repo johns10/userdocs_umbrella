@@ -229,6 +229,11 @@ defmodule UserDocs.TestDataset do
     |> AnnotationType.changeset(badge_outline)
     |> Repo.insert()
 
+  {:ok, %AnnotationType{id: _none_id}} =
+    %AnnotationType{}
+    |> AnnotationType.changeset(none)
+    |> Repo.insert()
+
   # Step Types
   _step_types = [
     navigate = %{
