@@ -76,7 +76,7 @@
 
   = if @last_step_form.page_form_enabled do
     h3.is-size-5 Page
-    .field
+    .field id="page-subform"
       = inputs_for f, :page, [], fn fp ->
         div style="border-left: 5px solid LightGray;"
           .pl-2
