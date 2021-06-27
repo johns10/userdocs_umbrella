@@ -75,8 +75,8 @@
           = error_tag(f, :text)
 
   = if @last_step_form.page_form_enabled do
-    h3.is-size-5 Page
     .field id="page-subform"
+      h3.is-size-5 Page
       = inputs_for f, :page, [], fn fp ->
         div style="border-left: 5px solid LightGray;"
           .pl-2
@@ -94,8 +94,8 @@
           = Layout.new_item_button("new-element", [ button_class: :a, phx_target: @myself.cid ], "control")
 
     = if @last_step_form.element_form_enabled do
-      h3.is-size-5 Element
       .field id="element-subform"
+        h3.is-size-5 Element
         = inputs_for f, :element, [], fn fe ->
           div style="border-left: 5px solid LightGray;"
             .pl-2
@@ -125,13 +125,14 @@
             = AnnotationLive.FormComponent.render_fields(assigns, fa, "annotation-")
 
   = if @last_step_form.screenshot_form_enabled do
-    = inputs_for f, :screenshot, [], fn fp ->
-      h3.is-size-5 Screenshot
-      div style="border-left: 5px solid LightGray;"
-        .pl-2
-          = hidden_input(fp, :step_id, value: f.data.id)
-          .field
-            = Layout.text_input(fp, :name, [ id: "screenshot-name-input" ], "control")
+    .field id="screenshot-subform"
+      = inputs_for f, :screenshot, [], fn fp ->
+        h3.is-size-5 Screenshot
+        div style="border-left: 5px solid LightGray;"
+          .pl-2
+            = hidden_input(fp, :step_id, value: f.data.id)
+            .field
+              = Layout.text_input(fp, :name, [ id: "screenshot-name-input" ], "control")
 
     .field
       = live_component @socket, UserDocsWeb.ScreenshotLive.Preview, 
