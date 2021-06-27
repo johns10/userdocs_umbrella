@@ -71,7 +71,7 @@
         = label f, :text, class: "label"
       .field-body
         .control
-          = text_input f, :height, [ class: "input", type: "text", id: "text-input" ]
+          = text_input f, :text, [ class: "input", type: "text", id: "text-input" ]
           = error_tag(f, :text)
 
   = if @last_step_form.page_form_enabled do
