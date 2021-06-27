@@ -7,7 +7,6 @@ defmodule UserDocsWeb.StepLive.FormComponent.Helpers do
 
   def handle_enabled_fields(%Ecto.Changeset{} = changeset, state) do
     IO.puts("handle_enabled_fields")
-    IO.inspect(changeset.data)
     changeset
     |> maybe_update_enabled_step_fields(state)
     |> maybe_update_enabled_annotation_fields(state)
