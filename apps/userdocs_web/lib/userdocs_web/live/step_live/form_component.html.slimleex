@@ -117,7 +117,7 @@
           = Layout.new_item_button("new-annotation", [ button_class: :a, phx_target: @myself.cid ], "control")
           
   = if @last_step_form.annotation_form_enabled do
-    .field
+    .field id="annotation-subform"
       = inputs_for f, :annotation, [id: "annotation-form" ], fn fa ->
         h3.is-size-5 Annotation
         div style="border-left: 5px solid LightGray;"
