@@ -192,6 +192,7 @@ defmodule UserDocsWeb.StepLive.Index do
       |> Ecto.Changeset.apply_changes()
       |> Map.put(:page_id, page_id)
       |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{ page_id: page_id, annotation_type_id: annotation_type_id })
+      |> Map.put(:screenshot, %UserDocs.Media.Screenshot{})
 
     socket
     |> assign(:page_title, "New Step")
@@ -205,6 +206,7 @@ defmodule UserDocsWeb.StepLive.Index do
       %UserDocs.Automation.StepForm{}
       |> Map.put(:page_id, page_id)
       |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{ page_id: page_id })
+      |> Map.put(:screenshot, %UserDocs.Media.Screenshot{})
 
     socket
     |> assign(:page_title, "New Step")
