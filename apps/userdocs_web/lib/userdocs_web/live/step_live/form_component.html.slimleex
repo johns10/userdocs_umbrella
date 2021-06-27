@@ -134,9 +134,9 @@
             .field
               = Layout.text_input(fp, :name, [ id: "screenshot-name-input" ], "control")
 
-    .field
-      = live_component @socket, UserDocsWeb.ScreenshotLive.Preview, 
-      [ id: "screenshot-preview", screenshot: f.data.screenshot, team: @current_team ]
+      .field
+        = live_component @socket, UserDocsWeb.ScreenshotLive.Preview, 
+        [ id: "screenshot-preview", screenshot: f.data.screenshot, team: @current_team ]
 
   .buttons
     = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
