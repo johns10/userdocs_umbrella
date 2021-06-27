@@ -194,9 +194,13 @@ defmodule UserDocsWeb.StepLive.Index do
       |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{ page_id: page_id, annotation_type_id: annotation_type_id })
       |> Map.put(:screenshot, %UserDocs.Media.Screenshot{})
 
+    step =
+      %UserDocs.Automation.Step{}
+      |> Map.put(:screenshot, %UserDocs.Media.Screenshot{})
+
     socket
     |> assign(:page_title, "New Step")
-    |> assign(:step, %UserDocs.Automation.Step{})
+    |> assign(:step, step)
     |> assign(:step_form, step_form)
     |> assign(:select_lists, select_lists(socket))
   end
@@ -213,11 +217,14 @@ defmodule UserDocsWeb.StepLive.Index do
       |> Map.put(:page_id, page_id)
       |> Map.put(:page, page)
       |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{ page_id: page_id })
+
+    step =
+      %UserDocs.Automation.Step{}
       |> Map.put(:screenshot, %UserDocs.Media.Screenshot{})
 
     socket
     |> assign(:page_title, "New Step")
-    |> assign(:step, %UserDocs.Automation.Step{})
+    |> assign(:step, step)
     |> assign(:step_form, step_form)
     |> assign(:select_lists, select_lists(socket))
   end
