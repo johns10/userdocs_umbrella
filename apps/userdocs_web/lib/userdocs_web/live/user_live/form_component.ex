@@ -7,7 +7,7 @@ defmodule UserDocsWeb.UserLive.FormComponent do
   @impl true
   def render(%{ action: :options } = assigns) do
     ~L"""
-      h2 <%= @title %>
+      <h2 class="title"><%= @title %></h2>
 
       <%= f = form_for @changeset, "#",
         id: "user-form",
@@ -41,7 +41,7 @@ defmodule UserDocsWeb.UserLive.FormComponent do
   end
   def render(%{ action: action } = assigns) when action in [ :new, :edit ] do
     ~L"""
-      <h2 class="title"><%= @title %>
+      <h2 class="title"><%= @title %></h2>
       <%= form_for @changeset, Routes.pow_registration_path(@socket, :update), [
         phx_target: @myself.cid, phx_change: "validate", phx_submit: "save", id: "user-form", as: :user
       ], fn f -> %>
