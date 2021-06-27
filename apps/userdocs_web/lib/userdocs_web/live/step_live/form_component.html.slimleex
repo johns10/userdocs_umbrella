@@ -95,7 +95,7 @@
 
     = if @last_step_form.element_form_enabled do
       h3.is-size-5 Element
-      .field
+      .field id="element-subform"
         = inputs_for f, :element, [], fn fe ->
           div style="border-left: 5px solid LightGray;"
             .pl-2
