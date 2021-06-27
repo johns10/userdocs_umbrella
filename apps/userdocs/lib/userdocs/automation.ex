@@ -374,12 +374,23 @@ defmodule UserDocs.Automation do
       |> Step.fields_changeset(attrs)
       |> Repo.insert()
 
+    page = case step do # TODO: Add for other objects
+      %Step{ page_id: nil } -> nil
+      %Step{ page_id: page_id } -> UserDocs.Web.get_page!(page_id)
+    end
+
+    element = case step do
+      %Step{ element_id: nil } -> nil
+      %Step{ element_id: element_id } -> UserDocs.Web.get_element!(element_id)
+    end
+
     step
-    |> Map.put(:element, nil)
+    |> Map.put(:element, element)
     |> Map.put(:annotation, nil)
-    |> Map.put(:page, nil)
+    |> Map.put(:page, page)
     |> Ecto.Changeset.cast(attrs, [])
     |> Step.assoc_changeset()
+    |> IO.inspect()
     |> Repo.update()
   end
 
