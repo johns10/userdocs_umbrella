@@ -15,8 +15,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   @impl true
   def update(%{ step_params: step_params }, socket) when step_params != nil do
-    IO.puts("Got step params")
-    IO.inspect(step_params)
     original_step_form = socket.assigns.step_form
     last_step_form = socket.assigns.last_step_form
 
@@ -30,14 +28,9 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     updated_params = handle_param_updates(step_params, last_change, socket.assigns)
     updated_params = Map.merge(step_params, updated_params)
 
-    IO.puts("updated params")
-    IO.inspect(updated_params)
-
     changeset =
       StepForm.changeset(original_step_form, updated_params)
       |> Map.put(:action, :validate)
-
-    IO.inspect(changeset)
 
     {
       :ok,
@@ -47,10 +40,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       |> assign(:step_params, nil)
     }
   end
-  def update(%{ step_form: step_form, step: step } = assigns, socket) do
-    IO.puts("Updating form")
-
-    # This is because on a new form we need to make the changeset, but I think the second clause here is wrong
+  def update(%{ step_form: step_form } = assigns, socket) do
+    # This is because on a new form we need to make the changeset, but I think the second clause here is wrong.  Not sure why we'd reuse the existing changes
     changeset =
       case Map.get(socket.assigns, :changeset, nil) do
         nil -> Automation.change_step_form(step_form)
