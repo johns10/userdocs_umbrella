@@ -258,16 +258,18 @@ defmodule UserDocs.Screenshots do
     end
   end
 
-  def ping_files(%{ original: original, updated: updated, diff: diff } = state) do
-    System.cmd("identify", ["-ping", "-format", "%w %h", Path.absname(original)], [ stderr_to_stdout: true ])
-    |> IO.inspect()
+  def ping_files(%{ original: original, updated: updated, diff: _diff } = state) do
+    r = System.cmd("identify", ["-ping", "-format", "%w %h", Path.absname(original)], [ stderr_to_stdout: true ])
 
-    System.cmd("identify", ["-ping", "-format", "%w %h", Path.absname(updated)], [ stderr_to_stdout: true ])
-    |> IO.inspect()
+    r2 = System.cmd("identify", ["-ping", "-format", "%w %h", Path.absname(updated)], [ stderr_to_stdout: true ])
 
-    state
+    case r == r2 do
+      false -> Map.put(state, :score, "size_difference")
+      true -> state
+    end
   end
 
+  def score_files(%{ score: "size_difference"} = state), do: state
   def score_files(%{ original: original, updated: updated, diff: diff } = state) do
     args = [
       "-metric", "PSNR",
@@ -275,16 +277,7 @@ defmodule UserDocs.Screenshots do
       Path.absname(updated),
       Path.absname(diff)
     ]
-    """
-    try do
-      { score, 1 } = System.cmd("magick", args, [ stderr_to_stdout: true ])
-      Map.put(state, :score, score)
-    rescue
-      e ->
-        Logger.error("{__MODULE__}.diff_images failed because {inspect(e)}")
-        Map.put(state, :score, "failed")
-    end
-    """
+
     case System.cmd("compare", args, [ stderr_to_stdout: true ]) do
       { score, 1 } -> Map.put(state, :score, score)
       { score, 0 } -> Map.put(state, :score, score)
