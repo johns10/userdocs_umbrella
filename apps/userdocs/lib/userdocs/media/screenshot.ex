@@ -30,13 +30,13 @@ defmodule UserDocs.Media.Screenshot do
     |> foreign_key_constraint(:step_id)
     |> unique_constraint(:step_id)
     |> maybe_update_screenshots()
-    |> validate_required([:step_id])
+    |> validate_required([])
   end
 
   def fields_changeset(screenshot, attrs) do
     screenshot
     |> cast(attrs, [:name, :step_id, :base64, :aws_screenshot, :aws_provisional_screenshot, :aws_diff_screenshot])
-    |> validate_required([:step_id])
+    |> validate_required([])
   end
 
   def maybe_update_screenshots(changeset) do
