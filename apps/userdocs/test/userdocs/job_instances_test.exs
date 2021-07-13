@@ -18,16 +18,17 @@ defmodule UserDocs.JobInstancesTest do
   defp fixture(:process, version_id), do: AutomationFixtures.process(version_id)
   defp fixture(:page, version_id), do: WebFixtures.page(version_id)
   defp fixture(:annotation, page_id), do: WebFixtures.annotation(page_id)
+  defp fixture(:job, team_id), do: JobFixtures.job(team_id)
 
   defp fixture(:team_user, user_id, team_id), do: UsersFixtures.team_user(user_id, team_id)
   defp fixture(:element, page_id, strategy_id), do: WebFixtures.element(page_id, strategy_id)
+
 
   defp fixture(:step, page_id, process_id, element_id, annotation_id, step_type_id) do
     step = AutomationFixtures.step(page_id, process_id, element_id, annotation_id, step_type_id)
     UserDocs.Automation.get_step!(step.id)
   end
 
-  defp fixture(:job, team_id), do: JobFixtures.job(team_id)
 
   defp create_user(_), do: %{user: fixture(:user)}
   defp create_team(_), do: %{team: fixture(:team)}
@@ -83,9 +84,9 @@ defmodule UserDocs.JobInstancesTest do
     end
 
     test "create_job_instance/1 with a job prototypes a job instance", %{ step: step, process: process, job: job } do
-      { :ok, job_process } = Jobs.create_job_process(job, process.id)
-      { :ok, job_step } = Jobs.create_job_step(job, step.id)
-      { :ok, job_step } = Jobs.create_job_step(job, step.id)
+      { :ok, _job_process } = Jobs.create_job_process(job, process.id)
+      { :ok, _job_step } = Jobs.create_job_step(job, step.id)
+      { :ok, _job_step } = Jobs.create_job_step(job, step.id)
       job = Jobs.get_job!(job.id, %{ preloads: [ processes: true, steps: true ] })
       { :ok, job_instance } = JobInstances.create_job_instance(job)
 
