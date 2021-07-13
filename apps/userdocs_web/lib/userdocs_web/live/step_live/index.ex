@@ -82,7 +82,6 @@ defmodule UserDocsWeb.StepLive.Index do
   @impl true
   def handle_params(_, _, %{ assigns: %{ auth_state: :not_logged_in }} = socket), do: { :noreply, socket }
   def handle_params(%{ "process_id" => process_id, "step_params" => step_params } = params, _, socket) do
-    IO.puts("Handle Params with embedded step params")
     process = Automation.get_process!(process_id)
     {
       :noreply,
@@ -94,7 +93,6 @@ defmodule UserDocsWeb.StepLive.Index do
     }
   end
   def handle_params(%{ "process_id" => process_id } = params, _, socket) do
-    IO.puts("HPPI")
     process = Automation.get_process!(process_id)
     {
       :noreply,
@@ -106,7 +104,6 @@ defmodule UserDocsWeb.StepLive.Index do
     }
   end
   def handle_params(%{ "id" => id, "step_params" => step_params } = params, _, socket) do
-    IO.puts("Handle Edit with embedded step params")
     {
       :noreply,
       socket
@@ -115,7 +112,6 @@ defmodule UserDocsWeb.StepLive.Index do
     }
   end
   def handle_params(%{ "id" => id } = params, _, socket) do
-    IO.puts("HPI")
     {
       :noreply,
       socket
@@ -135,7 +131,6 @@ defmodule UserDocsWeb.StepLive.Index do
   alias UserDocsWeb.StepLive.BrowserEvents
 
   def handle_event("browser-event", payload, socket) do
-    IO.inspect("Received Browser Event")
     payload = UserDocsWeb.LiveHelpers.underscored_map_keys(payload)
 
     state = %{ payload: payload, page_id: recent_navigated_page_id(socket) }
@@ -158,8 +153,6 @@ defmodule UserDocsWeb.StepLive.Index do
 
 
   defp apply_action(socket, :edit, %{ "id" => id, "step_params" => step_params }) when map_size(step_params) > 0 do
-    IO.puts("Edit apply action with step params")
-    IO.inspect(socket.assigns.changeset.params)
 
     updated_params = Map.merge(step_params, socket.assigns.changeset.params)
     changeset = Map.put(socket.assigns.changeset, :params, updated_params)
@@ -171,14 +164,12 @@ defmodule UserDocsWeb.StepLive.Index do
     |> assign_select_lists()
   end
   defp apply_action(socket, :edit, %{"id" => id}) do
-    IO.puts("Edit apply action")
     socket
     |> assign(:page_title, "Edit Process")
     |> prepare_step(String.to_integer(id))
     |> assign_select_lists()
   end
   defp apply_action(socket, :new, %{ "step_params" => step_params }) do
-    IO.puts("New Step, with params")
     page_id = recent_navigated_page_id(socket)
     annotation_type_id =
       case step_params do
