@@ -25,7 +25,6 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
   end
 
   def params(%{ payload: %{ "action" => "Navigate", "href" => href } = payload }) do
-    IO.inspect("Navigate Event")
     %{
       "step_type_id" => step_type_id(payload),
       "page_reference" => "page",
@@ -36,7 +35,6 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
     }
   end
   def params(%{ payload: %{ "action" => "Click", "selector" => selector } = payload, page_id: page_id }) do
-    IO.inspect("Click Event")
     %{
       "step_type_id" => step_type_id(payload),
       "page_id" => page_id,
@@ -48,7 +46,6 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
     }
   end
   def params(%{ payload: %{ "action" => "Element Screenshot", "selector" => selector } = payload, page_id: page_id }) do
-    IO.inspect("Click Event")
     %{
       "step_type_id" => step_type_id(payload),
       "page_id" => page_id,
@@ -60,7 +57,6 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
     }
   end
   def params(%{ payload: %{ "action" => "Apply Annotation", "selector" => selector } = payload, page_id: page_id }) do
-    IO.inspect("Apply Annotation Event")
     %{
       "step_type_id" => step_type_id(payload),
       "page_id" => page_id,
@@ -76,7 +72,6 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
     }
   end
   def params(%{ payload: %{ "action" => "ITEM_SELECTED", "selector" => selector }, page_id: page_id }) do
-    IO.inspect("Item Selected Event")
     %{
       "page_id" => page_id,
       "action" => "item_selected",
@@ -97,7 +92,6 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
     |> Phoenix.LiveView.push_patch(to: route)
   end
   def handle_action(%Socket{ assigns: %{ live_action: :new }} = socket, %{} = params) do
-    IO.puts("Handle action on a new form, adding in the params")
     socket
     |> Phoenix.LiveView.assign(:step_params, params)
   end
@@ -109,7 +103,6 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
     throw("Action handler not implemented for #{action}")
   end
   def handle_action(socket, _params) do
-    IO.inspect(socket)
     throw("Action Probably not on socket")
   end
 
