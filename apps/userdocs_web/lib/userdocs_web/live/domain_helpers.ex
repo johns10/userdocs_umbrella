@@ -73,7 +73,7 @@ defmodule UserDocsWeb.DomainHelpers do
       KeyError -> Map.get(changeset.data, field)
     end
   end
-
+  """
   def most_recent_navigated_to_page(assigns, pages) do
     page_id =
       case step = recent_navigation_step(assigns) do
@@ -106,4 +106,5 @@ defmodule UserDocsWeb.DomainHelpers do
       _ -> None
     end
   end
+  """
 end
