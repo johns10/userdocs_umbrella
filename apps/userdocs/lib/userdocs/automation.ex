@@ -388,9 +388,9 @@ defmodule UserDocs.Automation do
     |> Map.put(:element, element)
     |> Map.put(:annotation, nil)
     |> Map.put(:page, page)
+    |> Map.put(:screenshot, nil)
     |> Ecto.Changeset.cast(attrs, [])
     |> Step.assoc_changeset()
-    |> IO.inspect()
     |> Repo.update()
   end
 
