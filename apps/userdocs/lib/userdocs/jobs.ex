@@ -4,7 +4,6 @@ defmodule UserDocs.Jobs do
   import Ecto.Query, warn: false
   alias UserDocs.Repo
 
-  alias UserDocs.ProcessInstances
   alias UserDocs.ProcessInstances.ProcessInstance
 
   alias UserDocs.StepInstances
@@ -16,19 +15,13 @@ defmodule UserDocs.Jobs do
   alias UserDocs.Jobs.JobStep
 
   def list_jobs(params \\ %{}) do
-    preloads = Map.get(params, :preloads, [])
+    _preloads = Map.get(params, :preloads, [])
     base_jobs_query()
     #|> maybe_preload_step_instances(preloads[:step_instances])
     #|> maybe_preload_process_instances(preloads[:process_instances])
     |> Repo.all()
   end
-  """
-  defp maybe_preload_step_instances(query, nil), do: query
-  defp maybe_preload_step_instances(query, _), do: from(users in query, preload: [:step_instances])
 
-  defp maybe_preload_process_instances(query, nil), do: query
-  defp maybe_preload_process_instances(query, _), do: from(users in query, preload: [:process_instances])
-  """
   defp maybe_preload_steps(query, nil), do: query
   defp maybe_preload_steps(query, _) do
     from(jobs in query)
@@ -88,7 +81,7 @@ defmodule UserDocs.Jobs do
     |> limit(1)
     |> preload([
       step_instances: ^preload_step_instances_query(),
-      process_instances: ^preload_process_instances_query
+      process_instances: ^preload_process_instances_query()
     ])
   end
 
@@ -202,7 +195,6 @@ defmodule UserDocs.Jobs do
     UserDocs.Automation.Runner.parse(job)
   end
 
-  alias UserDocs.Jobs.JobInstance
   alias UserDocs.Jobs.JobProcess
   alias UserDocs.ProcessInstances.ProcessInstance
   alias UserDocs.StepInstances.StepInstance
@@ -242,8 +234,8 @@ defmodule UserDocs.Jobs do
   end
 
   def assign_instances(
-    [ %StepInstance{} = step_instance | si_tail ] = step_instances,
-    [ %Step{} = step | s_tail ] = steps,
+    [ %StepInstance{} | _si_tail ] = step_instances,
+    [ %Step{} = step | s_tail ] = _steps,
     process_instance_id
   ) do
     step_instance_step_ids = Enum.map(step_instances, fn(si) -> si.step_id end)
@@ -259,7 +251,7 @@ defmodule UserDocs.Jobs do
       [ Map.put(step, :last_step_instance, step_instance) | assign_instances(step_instances, s_tail, process_instance_id) ]
     end
   end
-  def assign_instances(step_instances, [], _), do: []
+  def assign_instances(_step_instances, [], _), do: []
   def assign_instances([], steps, _), do: steps
 
   alias UserDocs.Jobs.JobProcess
@@ -272,7 +264,7 @@ defmodule UserDocs.Jobs do
     get_job!(job.id, %{ preloads: %{ processes: true, steps: true }})
     |> get_executable_items()
   end
-  def get_executable_items(%Job{ job_steps: job_steps, job_processes: job_processes } = job) do
+  def get_executable_items(%Job{ job_steps: job_steps, job_processes: job_processes }) do
     job_steps
     ++ job_processes
     |> Enum.sort(fn(o1, o2) -> o1.order < o2.order end)
@@ -318,14 +310,22 @@ defmodule UserDocs.Jobs do
     |> Repo.update()
   end
 
-  def update_job_step_instance(
+  def update_job_step_instance(%Job{} = job, %StepInstance{ id: _id } = step_instance) do
+    job
+    |> update_job_direct_step_instance(step_instance)
+    |> update_job_process_instance_step_instance(step_instance)
+  end
+
+  def update_job_direct_step_instance( %Job{ job_steps: [] } = job, %StepInstance{}), do: job
+  def update_job_direct_step_instance(
     %Job{ job_steps: job_steps } = job,
-    %StepInstance{ id: id } = step_instance
+    %StepInstance{ id: _id } = step_instance
   ) do
     job_steps =
       Enum.map(job_steps,
         fn(job_step) ->
           if job_step.step_instance_id == step_instance.id do
+            IO.puts("Match")
             updated_step_instance = Map.put(job_step.step.last_step_instance, :status, step_instance.status)
             step = Map.put(job_step.step, :last_step_instance, updated_step_instance)
 
@@ -333,12 +333,15 @@ defmodule UserDocs.Jobs do
             |> Map.put(:step_instance, step_instance)
             |> Map.put(:step, step)
           else
+            IO.puts("noMatch")
             job_step
           end
         end)
 
     Map.put(job, :job_steps, job_steps)
   end
+
+  def update_job_process_instance_step_instance( %Job{ job_processes: [] } = job, %StepInstance{}), do: job
   def update_job_process_instance_step_instance(
     %Job{ job_processes: job_processes } = job,
     %StepInstance{ id: id, process_instance_id: process_instance_id} = step_instance
@@ -415,7 +418,7 @@ defmodule UserDocs.Jobs do
       |> Enum.filter(fn(s) -> s.last_step_instance.id == step_instance_id end)
       |> Enum.at(0)
     rescue
-      e in BadMapError -> nil
+      e in BadMapError -> Logger.error(e)
     end
   end
 
@@ -426,12 +429,18 @@ defmodule UserDocs.Jobs do
       |> Enum.at(0)
       |> Map.get(:step)
     rescue
-      e in BadMapError -> nil
+      e in BadMapError -> Logger.error(e)
     end
   end
 
-  """
-  Deprecated
+  _deprecated = """
+
+  defp maybe_preload_step_instances(query, nil), do: query
+  defp maybe_preload_step_instances(query, _), do: from(users in query, preload: [:step_instances])
+
+  defp maybe_preload_process_instances(query, nil), do: query
+  defp maybe_preload_process_instances(query, _), do: from(users in query, preload: [:process_instances])
+
   def get_job!(id, %{ preloads: "*" }) do
     from(j in Job, as: :job)
     |> where([job: j], j.id == ^id)
@@ -486,9 +495,6 @@ defmodule UserDocs.Jobs do
         }}])
     |> Repo.one()
   end
-  """
-  """
-  Deprecated
   def add_step_instance_to_job(%Job{} = job, step_id) when is_integer(step_id) do
     { :ok, step_instance } =
       UserDocs.Automation.get_step!(step_id)
@@ -553,9 +559,6 @@ defmodule UserDocs.Jobs do
       end
     )
   end
-  """
-  """
-  # Deprecated
   def reset_job_status(%Job{ process_instances: process_instances, step_instances: step_instances } = job) do
     process_instance_attrs = Enum.map(process_instances,
       fn(%{ step_instances: process_step_instances } = process_instance) ->
@@ -613,9 +616,6 @@ def get_executable_items(%Job{ } = job) do
   |> Enum.sort(fn(o1, o2) -> o1.order < o2.order end)
 end
 def get_executable_items(%Ecto.Association.NotLoaded{}), do: [] # TODO: Fix root cause, thiss is bs
-"""
-"""
-Deprecated
   def max_order(%Job{ } = job) do
     job.step_instances
     ++ job.process_instances
@@ -628,9 +628,6 @@ Deprecated
     |> Enum.max_by(fn(o) -> o.order end)
     |> Map.get(:order)
   end
-"""
-"""
-  #TODO: Revise
   def update_job_step(
     %Job{ process_instances: process_instances } = job,
     %{ "process_instance_id" => process_instance_id, "id" => step_instance_id } = step_instance_attrs
