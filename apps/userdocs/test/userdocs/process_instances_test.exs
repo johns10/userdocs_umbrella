@@ -62,8 +62,8 @@ defmodule UserDocs.ProcessInstancesTest do
 
     test "list_process_process_instances/1 returns only 5 process instances", %{ user: user, version: version, process: process } do
       process_two = fixture(:process, version.id)
-      Enum.each(1..7, fn(pi) -> JobsFixtures.process_instance(process.id) end)
-      Enum.each(1..7, fn(pi) -> JobsFixtures.process_instance(process_two.id) end)
+      Enum.each(1..7, fn(_pi) -> JobsFixtures.process_instance(process.id) end)
+      Enum.each(1..7, fn(_pi) -> JobsFixtures.process_instance(process_two.id) end)
       pis = ProcessInstances.list_user_process_instances(user.id)
       process_one_pis = Enum.filter(pis, fn(pi) -> pi.process_id == process.id end)
       process_two_pis = Enum.filter(pis, fn(pi) -> pi.process_id == process_two.id end)
