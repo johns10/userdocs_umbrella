@@ -44,8 +44,6 @@ defmodule UserDocs.MixProject do
       {:image64, "~> 0.0.1"},
       {:uuid, "~> 1.1"},
       {:mogrify, "~> 0.8.0"},
-      {:ex_doc, "~> 0.22", only: :dev, runtime: false},
-      {:state_handlers, in_umbrella: true},
       {:cloak_ecto, "~> 1.1.1"},
       {:waffle, "~> 1.1.4"},
       {:waffle_ecto, "~> 0.0.9"},
@@ -53,8 +51,11 @@ defmodule UserDocs.MixProject do
       {:ex_aws_s3, "~> 2.1.0"},
       {:hackney, "~> 1.9"},
       {:sweet_xml, "~> 0.6"},
+      {:inflex, "~> 2.0.0"},
+      {:state_handlers, in_umbrella: true},
+      {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
-      {:inflex, "~> 2.0.0"}
+      {:mix_test_watch, "~> 1.0", only: :dev, runtime: false}
     ]
   end
 
