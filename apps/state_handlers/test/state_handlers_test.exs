@@ -56,12 +56,15 @@ defmodule StateHandlersTest do
     alias UserDocs.Documents.Document
     alias UserDocs.Documents.DocumentVersion
 
-    def broadcaster(_channel, _action, data) do
+    def broadcaster(_channel, _action, _data) do
+      _inspect_stuff_code = """
       case data do
         %{objects: [ object | _ ]} -> IO.inspect(object.__meta__.schema)
         [ object | _ ] -> IO.inspect(object.__meta__.schema)
         object -> IO.inspect(object.__meta__.schema)
       end
+      """
+      ""
     end
 
     test "StateHandlers.Initialize" do
