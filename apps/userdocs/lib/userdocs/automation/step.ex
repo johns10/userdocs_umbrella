@@ -101,7 +101,6 @@ defmodule UserDocs.Automation.Step do
     IO.puts("create_nested_changeset")
     step
     |> cast(attrs, [ :page_id, :annotation_id, :element_id, :process_id, :step_type_id ])
-    |> IO.inspect()
   end
 
   def fields_changeset(step, attrs) do
