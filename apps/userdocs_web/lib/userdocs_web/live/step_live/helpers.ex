@@ -6,7 +6,6 @@ defmodule UserDocsWeb.StepLive.FormComponent.Helpers do
 
 
   def handle_enabled_fields(%Ecto.Changeset{} = changeset, state) do
-    IO.puts("handle_enabled_fields")
     changeset
     |> maybe_update_enabled_step_fields(state)
     |> maybe_update_enabled_annotation_fields(state)
@@ -33,29 +32,23 @@ defmodule UserDocsWeb.StepLive.FormComponent.Helpers do
   end
 
   def enabled_annotation_fields(%Ecto.Changeset{} = changeset, state) do
-    IO.inspect("enabled_annotation_fields, changeset version")
     annotation_type_id = changeset.changes.annotation.changes.annotation_type_id
     annotation_type = Web.get_annotation_type!(annotation_type_id, state, state.state_opts)
     annotation_form = enable_fields(changeset.changes.annotation, AnnotationForm.enabler_fields(), annotation_type.args)
-    IO.inspect(annotation_form)
     Ecto.Changeset.put_change(changeset, :annotation, annotation_form)
   end
   def enabled_annotation_fields(%StepForm{ annotation: nil } = step_form, _), do: step_form
   def enabled_annotation_fields(%StepForm{ annotation: %{ annotation_type_id: nil }} = step_form, _), do: step_form
   def enabled_annotation_fields(%StepForm{ annotation: %{ annotation_type_id: annotation_type_id } = annotation } = step_form, state) do
-    IO.inspect("enabled_annotation_fields")
     annotation_type = Web.get_annotation_type!(annotation_type_id, state, state.state_opts)
     annotation_form = enable_fields(annotation, AnnotationForm.enabler_fields(), annotation_type.args)
     Map.put(step_form, :annotation, annotation_form)
   end
 
   def enable_fields(%Ecto.Changeset{} = changeset, fields, fields_to_enable) do
-    IO.inspect(fields)
-    IO.inspect(fields_to_enable)
     Enum.reduce(fields, changeset,
       fn(enabler, inner_changeset) ->
         if String.replace(to_string(enabler), "_enabled", "") in fields_to_enable do
-          IO.inspect("Replacing a true for #{enabler}")
           Ecto.Changeset.put_change(inner_changeset, enabler, true)
         else
           Ecto.Changeset.put_change(inner_changeset, enabler, false)
