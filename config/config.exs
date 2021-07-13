@@ -35,19 +35,6 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-"""
-config :cors_plug,
-  origin: [
-    "chrome-extension://mkbbhaeofgjbbhopopbjnjjjfbbnaone",
-    "http://localhost",
-    "file:///D:/Users/johns10/Documents/GitHub/electro_test/",
-    "https://app.user-docs.com",
-    "https://electron.user-docs.com",
-  ],
-  max_age: 86400,
-  methods: ["GET", "PUT", "POST", "OPTIONS"]
-"""
-
 config :phoenix, :template_engines,
   slim: PhoenixSlime.Engine,
   slime: PhoenixSlime.Engine,
