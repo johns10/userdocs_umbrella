@@ -87,7 +87,7 @@ defmodule UserDocs.JobsTest do
 
       job = Jobs.get_job!(job.id, %{ preloads: [ steps: true, processes: true, last_job_instance: true ]})
 
-      job_instance = UserDocs.JobInstances.create_job_instance(job)
+      _job_instance = UserDocs.JobInstances.create_job_instance(job)
 
       job =
         Jobs.get_job!(job.id, %{ preloads: [ steps: true, processes: true, last_job_instance: true ]})
@@ -139,14 +139,14 @@ defmodule UserDocs.JobsTest do
 
     test "create_job_step/2 adds a step to the job", %{ team: team, step: step } do
       job = JobsFixtures.job(team.id)
-      { :ok, job_step } = Jobs.create_job_step(job, step.id)
+      { :ok, _job_step } = Jobs.create_job_step(job, step.id)
       job = Jobs.get_job!(job.id, %{ preloads: [ steps: true ] })
       assert job.job_steps |> Enum.at(0) |> Map.get(:step) |> Map.get(:id) == step.id
     end
 
     test "create_job_process/2 adds a process to the job", %{ team: team, process: process } do
       job = JobsFixtures.job(team.id)
-      { :ok, job_process } = Jobs.create_job_process(job, process.id)
+      { :ok, _job_process } = Jobs.create_job_process(job, process.id)
       job = Jobs.get_job!(job.id, %{ preloads: [ processes: true ] })
       assert job.job_processes |> Enum.at(0) |> Map.get(:process) |> Map.get(:id) == process.id
     end
@@ -171,7 +171,7 @@ defmodule UserDocs.JobsTest do
 
     test "expand_job_process/2 expands the instance", %{ team: team, process: process } do
       job = JobsFixtures.job(team.id)
-      { :ok, job_process } = Jobs.create_job_process(job, process.id)
+      { :ok, _job_process } = Jobs.create_job_process(job, process.id)
       job = Jobs.get_job!(job.id, %{ preloads: %{ processes: true }})
       { :ok, job } = Jobs.expand_job_process(job, process.id)
       assert job.job_processes |> Enum.at(0) |> Map.get(:collapsed) == true
@@ -197,7 +197,7 @@ defmodule UserDocs.JobsTest do
           %{ id: job_step5.id, order: 5 },
         ]
 
-      assert job_processes = [
+      assert job_processes == [
         %{ id: job_process2.id, order: 2 },
         %{ id: job_process3.id, order: 3 },
       ]
@@ -205,9 +205,9 @@ defmodule UserDocs.JobsTest do
 
     test "prepare_job_for_execution/2 attaches the instances correctly", %{ page: page, version: version, team: team, step: step, process: process } do
       process_two = AutomationFixtures.process(version.id)
-      step_two = AutomationFixtures.step(page.id, process.id)
-      step_three = AutomationFixtures.step(page.id, process_two.id)
-      step_four = AutomationFixtures.step(page.id, process_two.id)
+      _step_two = AutomationFixtures.step(page.id, process.id)
+      _step_three = AutomationFixtures.step(page.id, process_two.id)
+      _step_four = AutomationFixtures.step(page.id, process_two.id)
       step_five = AutomationFixtures.step()
       step_six = AutomationFixtures.step()
       job = JobsFixtures.job(team.id)
@@ -274,11 +274,11 @@ defmodule UserDocs.JobsTest do
         process_two
         |> UserDocs.ProcessInstances.create_process_instance_from_process(Jobs.max_order(job) + 1)
 
-      { :ok, job_process } = Jobs.create_job_process(job, process.id, process_instance_three.id)
-      { :ok, job_process } = Jobs.create_job_process(job, process_two.id, process_instance_four.id)
+      { :ok, _job_process } = Jobs.create_job_process(job, process.id, process_instance_three.id)
+      { :ok, _job_process } = Jobs.create_job_process(job, process_two.id, process_instance_four.id)
 
       job = Jobs.get_job!(job.id, %{ preloads: [ steps: true, processes: true, last_job_instance: true ]})
-      job = Jobs.prepare_for_execution(job)
+      _job = Jobs.prepare_for_execution(job)
 
 
     end
