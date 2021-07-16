@@ -9,7 +9,7 @@ defmodule UserDocs.UsersFixtures do
   def user_attrs(:valid, password) do
     guarded_password = password || UUID.uuid4()
     %{
-      email: UUID.uuid4() <> "@gmail.com",
+      email: UUID.uuid4() <> "@user-docs.com",
       password: guarded_password,
       password_confirmation: guarded_password
     }

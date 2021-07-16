@@ -27,6 +27,19 @@ config :userdocs_web, UserDocsWeb.Endpoint,
   pubsub_server: UserDocs.PubSub,
   live_view: [signing_salt: "EkPV4O8j"]
 
+
+config :userdocs_web, :pow,
+  web_module: UserDocsWeb,
+  web_mailer_module: UserDocsWeb,
+  user: UserDocs.Users.User,
+  repo: UserDocs.Repo,
+  cache_store_backend: Pow.Store.Backend.MnesiaCache,
+  backend: Pow.Store.Backend.MnesiaCache,
+  routes_backend: UserDocsWeb.Pow.Routes,
+  extensions: [PowResetPassword, PowEmailConfirmation],
+  controller_callbacks: Pow.Extension.Phoenix.ControllerCallbacks,
+  mailer_backend: UserDocsWeb.Pow.Mailer
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
@@ -39,14 +52,6 @@ config :phoenix, :template_engines,
   slim: PhoenixSlime.Engine,
   slime: PhoenixSlime.Engine,
   slimleex: PhoenixSlime.LiveViewEngine
-
-config :userdocs_web, :pow,
-  web_module: UserDocsWeb,
-  user: UserDocs.Users.User,
-  repo: UserDocs.Repo,
-  cache_store_backend: Pow.Store.Backend.MnesiaCache,
-  backend: Pow.Store.Backend.MnesiaCache,
-  routes_backend: UserDocsWeb.Pow.Routes
 
 config :userdocs, :userdocs_s3,
   uploads_dir: "uploads"
@@ -61,6 +66,10 @@ config :userdocs, :ex_aws,
   access_key_id: "AKIAT5VKLWBUIMRZM7ZU",
   secret_access_key: "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",
   region: "us-east-2"
+
+config :userdocs, UserDocs.Mailer,
+  adapter: Bamboo.SendGridAdapter,
+  api_key: "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"
 
 config :waffle,
   storage: Waffle.Storage.S3, # or Waffle.Storage.Local

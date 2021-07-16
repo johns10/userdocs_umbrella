@@ -89,4 +89,5 @@ css:
               closed: @navigation_drawer_closed  ])
 
       <!--<%= UserDocsWeb.LiveHelpers.live_modal_menus(@socket, [ id: "modal-menus", form_data: @form_data ]) %>-->
-
+- else
+  = @inner_content

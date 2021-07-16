@@ -1,7 +1,9 @@
 defmodule UserDocs.Users.User do
   use Ecto.Schema
-  use Pow.Ecto.Schema
   import Ecto.Changeset
+  use Pow.Ecto.Schema
+  use Pow.Extension.Ecto.Schema,
+    extensions: [PowResetPassword, PowEmailConfirmation]
 
   alias UserDocs.ChangesetHelpers
   alias UserDocs.Users.Team
@@ -45,7 +47,15 @@ defmodule UserDocs.Users.User do
   def changeset(user, attrs) do
     user
     |> pow_changeset(attrs)
+    |> pow_extension_changeset(attrs)
     |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id])
+  end
+
+  def signup_changeset(user, attrs) do
+    user
+    |> pow_user_id_field_changeset(attrs)
+    |> pow_password_changeset(attrs)
+    |> pow_extension_changeset(attrs)
   end
 
   def change_options(user, attrs) do

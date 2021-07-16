@@ -170,6 +170,14 @@ defmodule UserDocs.Users do
     |> Repo.insert()
   end
 
+  def validate_signup(attrs) do
+    changeset = User.signup_changeset(%User{}, attrs)
+    case Ecto.Changeset.apply_action(changeset, :insert) do
+      { :error, inner_changeset } -> { :error, inner_changeset }
+      { :ok, _user } -> { :ok, changeset }
+    end
+  end
+
   @doc """
   Updates a user.
 
@@ -237,6 +245,10 @@ defmodule UserDocs.Users do
 
   def change_user_options(%User{} = user, attrs \\ %{}) do
     User.change_options(user, attrs)
+  end
+
+  def change_user_signup(%User{} = user, attrs \\ %{}) do
+    User.signup_changeset(user, attrs)
   end
 
   alias UserDocs.Users.TeamUser

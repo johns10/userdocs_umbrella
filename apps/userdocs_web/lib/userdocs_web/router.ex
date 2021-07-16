@@ -1,7 +1,8 @@
 defmodule UserDocsWeb.Router do
   use UserDocsWeb, :router
-
   use Pow.Phoenix.Router
+  use Pow.Extension.Phoenix.Router,
+    extensions: [PowResetPassword, PowEmailConfirmation]
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -11,6 +12,7 @@ defmodule UserDocsWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
+
 
   def root_layout(conn, _opts) do
     case conn.host do
@@ -141,20 +143,33 @@ defmodule UserDocsWeb.Router do
     live "/content/:id/show/edit", ContentLive.Show, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
   end
 
+  scope "/", UserDocsWeb do
+    pipe_through [:browser, :not_authenticated, :put_user_agent_data]
+
+    live "/signup", SignupLive.Index, :new
+    live "/setup", SignupLive.Index, :setup
+  end
+
+  def put_user_agent_data(conn, _opts) do
+    ua = get_req_header(conn, "user-agent")
+    ua =
+      case ua do
+        [ ua | _ ] -> ua
+        [] -> "Mozilla/5.0 (Linux; Android 7.0; SM-G930VC Build/NRD90M; wv)"
+      end
+
+    conn
+    |> put_session(:os, UAInspector.parse(ua).os.name)
+  end
 
   scope "/" do
     pipe_through :browser
     pow_routes()
+    pow_extension_routes()
   end
 
 
   _commented_code = """
-  scope "/", UserDocsWeb do
-    pipe_through [:browser, :not_authenticated]
-
-    get "/session", SessionController, :new
-    post "/session", SessionController, :create
-  end
 
   scope "/", UserDocsWeb do
     pipe_through [:browser, :protected]
@@ -210,6 +225,8 @@ defmodule UserDocsWeb.Router do
   # as long as you are also using SSL (which you should anyway).
   if Mix.env() in [:dev, :test] do
     import Phoenix.LiveDashboard.Router
+
+    forward "/sent_emails", Bamboo.SentEmailViewerPlug
 
     scope "/" do
       pipe_through :browser
