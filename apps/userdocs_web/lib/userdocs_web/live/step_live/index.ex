@@ -20,35 +20,17 @@ defmodule UserDocsWeb.StepLive.Index do
   alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.ProcessLive.Loaders
   alias UserDocsWeb.Root
+  alias UserDocsWeb.ScreenshotLive.Approve
   alias UserDocsWeb.StepLive.BrowserEvents
-  alias UserDocsWeb.StepLive.Queuer
-  alias UserDocsWeb.StepLive.Runner
-  alias UserDocsWeb.StepLive.Status
-
-  def types() do
-    [
-      UserDocs.Web.AnnotationType,
-      UserDocs.Web.Strategy,
-      UserDocs.Projects.Version,
-      UserDocs.Documents.Content,
-      UserDocs.Documents.LanguageCode,
-      UserDocs.Automation.StepType,
-      UserDocs.Automation.Process,
-      UserDocs.Automation.Step,
-      UserDocs.Web.Annotation,
-      UserDocs.Web.Element,
-      UserDocs.Web.Page,
-      UserDocs.Media.Screenshot,
-      UserDocs.StepInstances.StepInstance
-   ]
-  end
+  alias UserDocsWeb.StepLive
+  alias UserDocsWeb.ProcessLive
 
   @impl true
   def mount(_params, session, socket) do
     {
       :ok,
       socket
-      |> Root.apply(session, types())
+      |> Root.apply(session, data_types())
       |> assign(:sidebar_open, false)
       |> initialize()
    }
@@ -137,8 +119,7 @@ defmodule UserDocsWeb.StepLive.Index do
     payload = UserDocsWeb.LiveHelpers.underscored_map_keys(payload)
 
     state = %{payload: payload, page_id: recent_navigated_page_id(socket)}
-    step_params = BrowserEvents.params(state)
-    socket = BrowserEvents.handle_action(socket, step_params)
+    socket = BrowserEvents.handle(socket, state)
 
     {:noreply, socket}
   end
@@ -265,6 +246,24 @@ defmodule UserDocsWeb.StepLive.Index do
     {:noreply, prepare_steps(socket)}
   end
   def handle_info(n, s), do: Root.handle_info(n, s)
+
+  def data_types do
+    [
+      UserDocs.Web.AnnotationType,
+      UserDocs.Web.Strategy,
+      UserDocs.Projects.Version,
+      UserDocs.Documents.Content,
+      UserDocs.Documents.LanguageCode,
+      UserDocs.Automation.StepType,
+      UserDocs.Automation.Process,
+      UserDocs.Automation.Step,
+      UserDocs.Web.Annotation,
+      UserDocs.Web.Element,
+      UserDocs.Web.Page,
+      UserDocs.Media.Screenshot,
+      UserDocs.StepInstances.StepInstance
+   ]
+  end
 
   def assign_select_lists(socket), do: assign(socket, :select_lists, select_lists(socket))
 
