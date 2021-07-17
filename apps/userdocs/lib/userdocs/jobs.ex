@@ -418,7 +418,9 @@ defmodule UserDocs.Jobs do
       |> Enum.filter(fn(s) -> s.last_step_instance.id == step_instance_id end)
       |> Enum.at(0)
     rescue
-      e in BadMapError -> Logger.error(e)
+      e in BadMapError ->
+        Logger.error(e)
+        nil
     end
   end
 
@@ -429,7 +431,9 @@ defmodule UserDocs.Jobs do
       |> Enum.at(0)
       |> Map.get(:step)
     rescue
-      e in BadMapError -> Logger.error(e)
+      e in BadMapError ->
+        Logger.error(e)
+        nil
     end
   end
 
