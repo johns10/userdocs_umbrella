@@ -52,6 +52,7 @@ defmodule UserDocs.MixProject do
       {:hackney, "~> 1.9"},
       {:sweet_xml, "~> 0.6"},
       {:inflex, "~> 2.0.0"},
+      {:bamboo, "~> 2.2.0"},
       {:state_handlers, in_umbrella: true},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
