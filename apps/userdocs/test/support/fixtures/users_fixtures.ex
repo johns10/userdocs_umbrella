@@ -11,7 +11,8 @@ defmodule UserDocs.UsersFixtures do
     %{
       email: UUID.uuid4() <> "@user-docs.com",
       password: guarded_password,
-      password_confirmation: guarded_password
+      password_confirmation: guarded_password,
+      email_confirmed_at: DateTime.utc_now()
     }
   end
   def user_attrs(:invalid, _password) do
@@ -25,7 +26,7 @@ defmodule UserDocs.UsersFixtures do
   def user(password \\ UUID.uuid4()) do
     { :ok, user } =
       user_attrs(:valid, password)
-      |> Users.create_user()
+      |> Users.create_test_user()
     user
   end
 

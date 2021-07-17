@@ -51,6 +51,13 @@ defmodule UserDocs.Users.User do
     |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id])
   end
 
+  def test_fixture_changeset(user, attrs) do
+    user
+    |> pow_changeset(attrs)
+    |> pow_extension_changeset(attrs)
+    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id, :email_confirmed_at])
+  end
+
   def signup_changeset(user, attrs) do
     user
     |> pow_user_id_field_changeset(attrs)

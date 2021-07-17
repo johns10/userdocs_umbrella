@@ -170,6 +170,12 @@ defmodule UserDocs.Users do
     |> Repo.insert()
   end
 
+  def create_test_user(attrs \\ %{}) do
+    %User{}
+    |> User.test_fixture_changeset(attrs)
+    |> Repo.insert()
+  end
+
   def validate_signup(attrs) do
     changeset = User.signup_changeset(%User{}, attrs)
     case Ecto.Changeset.apply_action(changeset, :insert) do
@@ -544,6 +550,14 @@ defmodule UserDocs.Users do
         nil
       e -> raise(e)
     end
+  end
+
+  def search_team_name(search_term) do
+    wildcard_search = "%#{search_term}%"
+
+    from(t in Team, as: :teams)
+    |> where([teams: t], ilike(t.name, ^wildcard_search))
+    |> Repo.all()
   end
 
   @doc """
