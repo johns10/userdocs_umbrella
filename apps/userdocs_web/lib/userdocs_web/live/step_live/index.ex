@@ -1,4 +1,7 @@
 defmodule UserDocsWeb.StepLive.Index do
+  @moduledoc """
+    Index file for the Step Datatype
+  """
   use UserDocsWeb, :live_view
 
   use UserdocsWeb.LiveViewPowHelper
@@ -7,17 +10,17 @@ defmodule UserDocsWeb.StepLive.Index do
 
   alias UserDocs.Automation
   alias UserDocs.Automation.Step
-  alias UserDocs.Web
-  alias UserDocs.Projects
   alias UserDocs.Documents
   alias UserDocs.Helpers
-  alias UserDocs.Web.Strategy
   alias UserDocs.Media.Screenshot
-  alias UserDocs.Automation.Process.RecentPage
+  alias UserDocs.Projects
+  alias UserDocs.Web
+  alias UserDocs.Web.Strategy
 
-  alias UserDocsWeb.Root
   alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.ProcessLive.Loaders
+  alias UserDocsWeb.Root
+  alias UserDocsWeb.StepLive.BrowserEvents
   alias UserDocsWeb.StepLive.Queuer
   alias UserDocsWeb.StepLive.Runner
   alias UserDocsWeb.StepLive.Status
@@ -37,7 +40,7 @@ defmodule UserDocsWeb.StepLive.Index do
       UserDocs.Web.Page,
       UserDocs.Media.Screenshot,
       UserDocs.StepInstances.StepInstance
-    ]
+   ]
   end
 
   @impl true
@@ -48,10 +51,10 @@ defmodule UserDocsWeb.StepLive.Index do
       |> Root.apply(session, types())
       |> assign(:sidebar_open, false)
       |> initialize()
-    }
+   }
   end
 
-  def initialize(%{ assigns: %{ auth_state: :not_logged_in }} = socket), do: socket
+  def initialize(%{assigns: %{auth_state: :not_logged_in}} = socket), do: socket
   def initialize(socket) do
     opts = socket.assigns.state_opts
     socket
@@ -80,8 +83,8 @@ defmodule UserDocsWeb.StepLive.Index do
   end
 
   @impl true
-  def handle_params(_, _, %{ assigns: %{ auth_state: :not_logged_in }} = socket), do: { :noreply, socket }
-  def handle_params(%{ "process_id" => process_id, "step_params" => step_params } = params, _, socket) do
+  def handle_params(_, _, %{assigns: %{auth_state: :not_logged_in}} = socket), do: {:noreply, socket}
+  def handle_params(%{"process_id" => process_id, "step_params" => _} = params, _, socket) do
     process = Automation.get_process!(process_id)
     {
       :noreply,
@@ -90,9 +93,9 @@ defmodule UserDocsWeb.StepLive.Index do
       |> prepare_steps(String.to_integer(process_id))
       |> assign(:select_lists, %{})
       |> apply_action(socket.assigns.live_action, params)
-    }
+   }
   end
-  def handle_params(%{ "process_id" => process_id } = params, _, socket) do
+  def handle_params(%{"process_id" => process_id} = params, _, socket) do
     process = Automation.get_process!(process_id)
     {
       :noreply,
@@ -101,58 +104,55 @@ defmodule UserDocsWeb.StepLive.Index do
       |> prepare_steps(String.to_integer(process_id))
       |> assign(:select_lists, %{})
       |> apply_action(socket.assigns.live_action, params)
-    }
+   }
   end
-  def handle_params(%{ "id" => id, "step_params" => step_params } = params, _, socket) do
+  def handle_params(%{"id" => id, "step_params" => _} = params, _, socket) do
     {
       :noreply,
       socket
       |> prepare_step(String.to_integer(id))
       |> apply_action(socket.assigns.live_action, params)
-    }
+   }
   end
-  def handle_params(%{ "id" => id } = params, _, socket) do
+  def handle_params(%{"id" => id} = params, _, socket) do
     {
       :noreply,
       socket
       |> prepare_step(String.to_integer(id))
       |> apply_action(socket.assigns.live_action, params)
-    }
+   }
   end
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     step = Automation.get_step!(String.to_integer(id))
-    {:ok, deleted_step } = Automation.delete_step(step)
-    send(self(), { :broadcast, "delete", deleted_step })
+    {:ok, deleted_step} = Automation.delete_step(step)
+    send(self(), {:broadcast, "delete", deleted_step})
     {:noreply, socket}
   end
 
-  alias UserDocsWeb.StepLive.BrowserEvents
+  alias BrowserEvents
 
   def handle_event("browser-event", payload, socket) do
     payload = UserDocsWeb.LiveHelpers.underscored_map_keys(payload)
 
-    state = %{ payload: payload, page_id: recent_navigated_page_id(socket) }
-    step_params = UserDocsWeb.StepLive.BrowserEvents.params(state)
+    state = %{payload: payload, page_id: recent_navigated_page_id(socket)}
+    step_params = BrowserEvents.params(state)
     socket = BrowserEvents.handle_action(socket, step_params)
 
-    { :noreply, socket }
+    {:noreply, socket}
   end
 
   defp recent_navigated_page_id(socket) do
-    try do
-      socket.assigns.steps
-      |> Enum.filter(fn(s) -> s.step_type.name == "Navigate" end)
-      |> Enum.max_by(fn(s) -> s.order end)
-      |> Map.get(:page_id)
-    rescue
-      _ -> nil
-    end
+    socket.assigns.steps
+    |> Enum.filter(fn(s) -> s.step_type.name == "Navigate" end)
+    |> Enum.max_by(fn(s) -> s.order end)
+    |> Map.get(:page_id)
+  rescue
+    _ -> nil
   end
 
-
-  defp apply_action(socket, :edit, %{ "id" => id, "step_params" => step_params }) when map_size(step_params) > 0 do
+  defp apply_action(socket, :edit, %{"id" => id, "step_params" => step_params}) when map_size(step_params) > 0 do
 
     updated_params = Map.merge(step_params, socket.assigns.changeset.params)
     changeset = Map.put(socket.assigns.changeset, :params, updated_params)
@@ -169,11 +169,11 @@ defmodule UserDocsWeb.StepLive.Index do
     |> prepare_step(String.to_integer(id))
     |> assign_select_lists()
   end
-  defp apply_action(socket, :new, %{ "step_params" => step_params }) do
+  defp apply_action(socket, :new, %{"step_params" => step_params}) do
     page_id = recent_navigated_page_id(socket)
     annotation_type_id =
       case step_params do
-        %{ "annotation" => %{ "annotation_type_id" => annotation_type_id }} -> annotation_type_id
+        %{"annotation" => %{"annotation_type_id" => annotation_type_id}} -> annotation_type_id
         _ -> nil
       end
 
@@ -182,7 +182,7 @@ defmodule UserDocsWeb.StepLive.Index do
       |> Automation.change_step_form(step_params)
       |> Ecto.Changeset.apply_changes()
       |> Map.put(:page_id, page_id)
-      |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{ page_id: page_id, annotation_type_id: annotation_type_id })
+      |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{page_id: page_id, annotation_type_id: annotation_type_id})
       |> Map.put(:screenshot, %UserDocs.Media.Screenshot{})
 
     step =
@@ -207,7 +207,7 @@ defmodule UserDocsWeb.StepLive.Index do
       %UserDocs.Automation.StepForm{}
       |> Map.put(:page_id, page_id)
       |> Map.put(:page, page)
-      |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{ page_id: page_id })
+      |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{page_id: page_id})
 
     step =
       %UserDocs.Automation.Step{}
@@ -233,36 +233,36 @@ defmodule UserDocsWeb.StepLive.Index do
 
   @impl true
   def handle_info(%{topic: _, event: _, payload: %UserDocs.Documents.Content{}} = sub_data, socket) do
-    { :noreply, socket } = Root.handle_info(sub_data, socket)
+    {:noreply, socket} = Root.handle_info(sub_data, socket)
     {
       :noreply,
       socket
       |> assign(:select_lists, select_lists(socket))
-    }
+   }
   end
   def handle_info(%{topic: _, event: _, payload: %Step{}} = sub_data, socket) do
     Logger.debug("#{__MODULE__} Received a step broadcast")
-    { :noreply, socket } = Root.handle_info(sub_data, socket)
-    { :noreply, prepare_steps(socket) }
+    {:noreply, socket} = Root.handle_info(sub_data, socket)
+    {:noreply, prepare_steps(socket)}
   end
   def handle_info(%{topic: _, event: _, payload: %UserDocs.StepInstances.StepInstance{}} = sub_data, socket) do
     Logger.debug("#{__MODULE__} Received a step Instance broadcast")
-    { :noreply, socket } = Root.handle_info(sub_data, socket)
-    { :noreply, prepare_steps(socket) }
+    {:noreply, socket} = Root.handle_info(sub_data, socket)
+    {:noreply, prepare_steps(socket)}
   end
   def handle_info(%{topic: _, event: _, payload: %Screenshot{}} = sub_data, socket) do
     Logger.debug("#{__MODULE__} Received a screenshot broadcast")
-    { :noreply, socket } = Root.handle_info(sub_data, socket)
+    {:noreply, socket} = Root.handle_info(sub_data, socket)
     if socket.assigns.step do
-      { :noreply, socket |> prepare_step(socket.assigns.step.id) }
+      {:noreply, socket |> prepare_step(socket.assigns.step.id)}
     else
-      { :noreply, socket |> prepare_steps() }
+      {:noreply, socket |> prepare_steps()}
     end
   end
   def handle_info(%{topic: _, event: _, payload: %UserDocs.Web.Annotation{}} = sub_data, socket) do
     Logger.debug("#{__MODULE__} Received an annotation broadcast")
-    { :noreply, socket } = Root.handle_info(sub_data, socket)
-    { :noreply, prepare_steps(socket) }
+    {:noreply, socket} = Root.handle_info(sub_data, socket)
+    {:noreply, prepare_steps(socket)}
   end
   def handle_info(n, s), do: Root.handle_info(n, s)
 
@@ -277,58 +277,57 @@ defmodule UserDocsWeb.StepLive.Index do
       pages_select: pages_select(socket),
       strategies: strategies_select(socket),
       versions: versions_select(socket)
-    }
+   }
   end
 
-  def annotation_types_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
-    order = [ %{ field: :id, order: :asc } ]
+  def annotation_types_select(%{assigns: %{state_opts: state_opts}} = socket) do
+    order = [%{field: :id, order: :asc}]
     opts = Keyword.put(state_opts, :order, order)
     Web.list_annotation_types(socket, opts)
     |> Helpers.select_list(:name, :false)
   end
   def annotation_types_select(_), do: []
 
-  def content_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
+  def content_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Documents.list_content(socket, state_opts)
     |> Helpers.select_list(:name, :true)
   end
   def content_select(_), do: []
 
-  def processes_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
+  def processes_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Automation.list_processes(socket, state_opts)
     |> Helpers.select_list(:name, :false)
   end
   def processes_select(_), do: []
 
-  def step_types_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
+  def step_types_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Automation.list_step_types(socket, state_opts)
     |> Helpers.select_list(:name, :true)
   end
   def step_types_select(_), do: []
 
-  def pages_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
+  def pages_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Web.list_pages(socket, state_opts)
     |> Helpers.select_list(:name, :true)
   end
   def pages_select(_), do: []
 
-  def strategies_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
+  def strategies_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Web.list_strategies(socket, state_opts)
     |> Helpers.select_list(:name, :false)
   end
   def strategies_select(_), do: []
 
-  def versions_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
+  def versions_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Projects.list_versions(socket, state_opts)
     |> Helpers.select_list(:name, :false)
   end
 
-
-  def assign_strategy_id(%{ assigns: %{ current_version: version }} = socket) do
+  def assign_strategy_id(%{assigns: %{current_version: version}} = socket) do
     assign(socket, :strategy_id, version.strategy_id)
   end
 
-  def send_default_strategy(%{ assigns: %{ current_strategy_id: id }} = socket) do
+  def send_default_strategy(%{assigns: %{current_strategy_id: id}} = socket) do
     strategy =
       Web.list_strategies()
       |> Enum.filter(fn(s) -> s.id == id end)
@@ -338,8 +337,8 @@ defmodule UserDocsWeb.StepLive.Index do
       type: "configuration",
       payload: %{
         strategy: Strategy.safe(strategy)
-      }
-    }
+     }
+   }
 
     socket
     |> push_event("configure", message)
@@ -356,13 +355,13 @@ defmodule UserDocsWeb.StepLive.Index do
         :element,
         :process,
         :step_instances,
-        [ annotation: :annotation_type ],
-        [ annotation: :content ],
-        [ element: :strategy ],
-      ]
+        [annotation: :annotation_type],
+        [annotation: :content],
+        [element: :strategy],
+     ]
 
-    order = [ %{ field: :order, order: :asc }, step_instances: %{ field: :id, order: :desc} ]
-    limit = [ step_instances: 5 ]
+    order = [%{field: :order, order: :asc}, step_instances: %{field: :id, order: :desc}]
+    limit = [step_instances: 5]
 
     opts =
       socket.assigns.state_opts
@@ -390,7 +389,7 @@ defmodule UserDocsWeb.StepLive.Index do
           annotation_type_id: a.annotation_type_id,
           content_id: a.content_id,
           content_version_id: a.content_version_id
-        }
+       }
       else
         %Web.AnnotationForm{}
       end
@@ -412,7 +411,7 @@ defmodule UserDocsWeb.StepLive.Index do
       screenshot: step.screenshot,
       step_type_id: step.step_type_id,
       process_id: step.process_id
-    }
+   }
 
     socket
     |> assign(:step_form, step_form)
@@ -421,7 +420,7 @@ defmodule UserDocsWeb.StepLive.Index do
     |> prepare_steps(step.process_id) # This has to go
   end
 
-  def prepare_steps(%{ assigns: %{ process: %{ id: id }}} = socket), do: prepare_steps(socket, id)
+  def prepare_steps(%{assigns: %{process: %{id: id}}} = socket), do: prepare_steps(socket, id)
   def prepare_steps(socket, process_id) do
     preloads =
       [
@@ -431,17 +430,17 @@ defmodule UserDocsWeb.StepLive.Index do
         :annotation,
         :element,
         :step_instances,
-        [ annotation: :content ],
-        [ annotation: :annotation_type ],
-        [ element: :strategy ],
-      ]
+        [annotation: :content],
+        [annotation: :annotation_type],
+        [element: :strategy],
+     ]
 
     opts =
       socket.assigns.state_opts
       |> Keyword.put(:preloads, preloads)
-      |> Keyword.put(:order, [ %{ field: :order, order: :asc }, step_instances: %{ field: :id, order: :desc} ])
-      |> Keyword.put(:limit,  [ step_instances: 5 ])
-      |> Keyword.put(:filter, { :process_id, process_id })
+      |> Keyword.put(:order, [%{field: :order, order: :asc}, step_instances: %{field: :id, order: :desc}])
+      |> Keyword.put(:limit,  [step_instances: 5])
+      |> Keyword.put(:filter, {:process_id, process_id})
 
     assign(socket, :steps, Automation.list_steps(socket, opts))
   end
