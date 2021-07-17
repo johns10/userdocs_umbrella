@@ -29,17 +29,17 @@ div
         type: Step
 
     = if @live_action in [:screenshot_workflow] do 
-      = live_component @socket, UserDocsWeb.ScreenshotLive.Approve, 
+      = live_component @socket, Approve, 
         [ id: "screenshot-approval-modal", step: @step, team: @current_team ]
 
   .is-flex.is-justify-content-space-between
     p.title = @process.name
     .field.has-addons.mr-4
       p.control 
-        = live_component(@socket, UserDocsWeb.ProcessLive.Runner, 
+        = live_component(@socket, ProcessLive.Runner, 
           [ id: "process-" <> Integer.to_string(@process.id), process: @process, class: "button" ])
       p.control 
-        = live_component(@socket, UserDocsWeb.ProcessLive.Queuer, 
+        = live_component(@socket, ProcessLive.Queuer, 
           [ id: "process-" <> Integer.to_string(@process.id) <> "-queuer", process: @process, class: "button" ])
 
   aside.menu 
@@ -51,14 +51,14 @@ div
             = link to: "", class: "is-flex-grow-1" do 
               = step.name
             .is-flex.is-flex-direction-row.is-flex-grow-0
-              = live_component(@socket, Status, 
+              = live_component(@socket, StepLive.Status, 
                 [ id: "step-" <> Integer.to_string(step.id) <> "-status", step: step ])
-              = live_component(@socket, Queuer, 
+              = live_component(@socket, StepLive.Queuer, 
                 [ id: "step-" <> Integer.to_string(step.id) <> "-queuer",
                 step: step, 
                 step_type_name: step.step_type.name,
                 class: "navbar-item" ])
-              = live_component(@socket, Runner, 
+              = live_component(@socket, StepLive.Runner, 
                 [ id: "step-" <> Integer.to_string(step.id),
                 step: step, 
                 current_user: @current_user,
