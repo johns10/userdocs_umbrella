@@ -9,35 +9,6 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
   alias UserDocs.Web
   alias UserDocsWeb.Router.Helpers
 
-  def handle(socket, state) do
-    step_params = params(state)
-    handle_action(socket, step_params)
-  end
-
-  defp handle_action(%Socket{assigns: %{live_action: :index}} = socket, %{"action" => "item_selected"}), do: socket
-  defp handle_action(%Socket{assigns: %{live_action: action}} = socket, %{"action" => "item_selected"} = params) when action in [:new, :edit] do
-    Phoenix.LiveView.assign(socket, :step_params, params)
-  end
-  defp handle_action(%Socket{assigns: %{live_action: :index}} = socket, %{} = params) do
-    route = Helpers.step_index_path(socket, :new, socket.assigns.process, %{step_params: params})
-    socket
-    |> Phoenix.LiveView.push_patch(to: route)
-  end
-  defp handle_action(%Socket{assigns: %{live_action: :new}} = socket, %{} = params) do
-    socket
-    |> Phoenix.LiveView.assign(:step_params, params)
-  end
-  defp handle_action(%Socket{assigns: %{live_action: :edit}} = socket, %{} = params) do
-    socket
-    |> Phoenix.LiveView.assign(:step_params, params)
-  end
-  defp handle_action(%Socket{assigns: %{live_action: action}}, _params) do
-    throw("Action handler not implemented for #{action}")
-  end
-  defp handle_action(_socket, _params) do
-    throw("Action Probably not on socket")
-  end
-
   def step_type_id(payload) do
     step_type(payload)
     |> Map.get(:id, nil)
@@ -58,7 +29,7 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
     |> Enum.at(0)
   end
 
-  defp params(%{payload: %{"action" => "Navigate", "href" => href} = payload}) do
+  def params(%{payload: %{"action" => "Navigate", "href" => href} = payload}) do
     %{
       "step_type_id" => step_type_id(payload),
       "page_reference" => "page",
@@ -68,7 +39,7 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
       }
     }
   end
-  defp params(%{payload: %{"action" => "Click", "selector" => selector} = payload, page_id: page_id}) do
+  def params(%{payload: %{"action" => "Click", "selector" => selector} = payload, page_id: page_id}) do
     %{
       "step_type_id" => step_type_id(payload),
       "page_id" => page_id,
@@ -79,7 +50,7 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
       }
     }
   end
-  defp params(%{payload: %{"action" => "Element Screenshot", "selector" => selector} = payload, page_id: page_id}) do
+  def params(%{payload: %{"action" => "Element Screenshot", "selector" => selector} = payload, page_id: page_id}) do
     %{
       "step_type_id" => step_type_id(payload),
       "page_id" => page_id,
@@ -90,7 +61,7 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
       }
     }
   end
-  defp params(%{payload: %{"action" => "Apply Annotation", "selector" => selector} = payload, page_id: page_id}) do
+  def params(%{payload: %{"action" => "Apply Annotation", "selector" => selector} = payload, page_id: page_id}) do
     %{
       "step_type_id" => step_type_id(payload),
       "page_id" => page_id,
@@ -105,9 +76,9 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
       }
     }
   end
-  defp params(%{payload: %{"action" => "ITEM_SELECTED", "selector" => selector} = payload, page_id: page_id}) do
+  def params(%{payload: %{"action" => "ITEM_SELECTED", "selector" => selector} = payload, page_id: page_id}) do
     %{
-      "step_type_id" => step_type_id(payload),
+      "step_type_id" => "do_not_update",
       "page_id" => page_id,
       "action" => "item_selected",
       "element" => %{

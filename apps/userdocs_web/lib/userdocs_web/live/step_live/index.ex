@@ -117,11 +117,20 @@ defmodule UserDocsWeb.StepLive.Index do
 
   def handle_event("browser-event", payload, socket) do
     payload = UserDocsWeb.LiveHelpers.underscored_map_keys(payload)
-
     state = %{payload: payload, page_id: recent_navigated_page_id(socket)}
-    socket = BrowserEvents.handle(socket, state)
+    step_params = BrowserEvents.params(state)
 
-    {:noreply, socket}
+    case socket.assigns.live_action do
+      :index ->
+        route = Routes.step_index_path(socket, :new, socket.assigns.process, %{step_params: step_params})
+        {:noreply, push_patch(socket, to: route)}
+      :new ->
+        send_update(UserDocsWeb.StepLive.FormComponent, %{id: "step-form", step_params: step_params})
+        {:noreply, socket}
+      :edit ->
+        send_update(UserDocsWeb.StepLive.FormComponent, %{id: "step-form", step_params: step_params})
+        {:noreply, socket}
+    end
   end
 
   defp recent_navigated_page_id(socket) do

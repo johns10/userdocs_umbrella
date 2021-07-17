@@ -5,16 +5,36 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   alias UserDocsWeb.AnnotationLive
   alias UserDocsWeb.ElementLive
-  alias UserDocsWeb.PageLive
   alias UserDocsWeb.Layout
+  alias UserDocsWeb.PageLive
   alias UserDocsWeb.StepLive.FormComponent.Helpers
 
   alias UserDocs.Automation
   alias UserDocs.Automation.StepForm
   alias UserDocs.Web
 
+  def preserve_existing_params(params, changeset) do
+    params
+    |> preserve_order(changeset)
+    |> maybe_preserve_step_type_id(changeset)
+  end
+
+  def preserve_order(params, changeset) do
+    order = Ecto.Changeset.get_field(changeset, :order)
+    Map.put(params, "order", order)
+  end
+
+  def maybe_preserve_step_type_id(%{"step_type_id" => "do_not_update"} = params, changeset) do
+    step_type_id = Ecto.Changeset.get_field(changeset, :step_type_id)
+    Map.put(params, "step_type_id", step_type_id)
+  end
+  def maybe_preserve_step_type_id(params, _changeset), do: params
+
   @impl true
-  def update(%{ step_params: step_params }, socket) when step_params != nil do
+  def update(%{step_params: step_params}, socket) when step_params != nil do
+    # This handler deals with step_params left by browser events
+    step_params = preserve_existing_params(step_params, socket.assigns.changeset)
+
     original_step_form = socket.assigns.step_form
     last_step_form = socket.assigns.last_step_form
 
@@ -38,9 +58,9 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       |> assign(:last_step_form, last_step_form)
       |> assign(:changeset, changeset)
       |> assign(:step_params, nil)
-    }
+   }
   end
-  def update(%{ step_form: step_form } = assigns, socket) do
+  def update(%{step_form: step_form} = assigns, socket) do
     # This is because on a new form we need to make the changeset, but I think the second clause here is wrong.  Not sure why we'd reuse the existing changes
     changeset =
       case Map.get(socket.assigns, :changeset, nil) do
@@ -56,7 +76,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       |> Helpers.enabled_annotation_fields(assigns)
 
     # We do this for the new case
-    annotation_type_id =
+    _annotation_type_id =
       step_form
       |> Map.get(:annotation, nil)
       |> case do
@@ -77,7 +97,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       |> assign(:select_lists, select_lists)
       |> assign(:state_opts, assigns.state_opts)
       |> assign(:last_step_form, step_form)
-    }
+   }
   end
 
   @impl true
@@ -103,7 +123,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
         socket
         |> assign(:last_step_form, last_step_form)
         |> assign(:changeset, changeset)
-      }
+     }
   end
 
   @impl true
@@ -119,7 +139,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       socket
       |> assign(:changeset, changeset)
       |> assign(:step, changeset.data)
-    }
+   }
   end
   def handle_event("new-page", _, socket) do
     changeset = Automation.new_step_page(
@@ -130,7 +150,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       socket
       |> assign(:changeset, changeset)
       |> assign(:step, changeset.data)
-    }
+   }
   end
   def handle_event("new-annotation", _, socket) do
     changeset = Automation.new_step_annotation(
@@ -141,9 +161,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       socket
       |> assign(:changeset, changeset)
       |> assign(:step, changeset.data)
-    }
+   }
   end
-
 
   def handle_param_updates(params, %Ecto.Changeset{} = changeset, state) do
     params
@@ -187,22 +206,22 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   defp save_step(socket, :edit, step_form_params) do
     changeset = Automation.change_fields(socket.assigns.step, step_form_params)
-    { :ok, step } = UserDocs.Repo.update(changeset)
+    {:ok, step} = UserDocs.Repo.update(changeset)
     changeset = Automation.change_assocs(step, step_form_params)
     changeset = Automation.Step.names_changeset(changeset)
     case UserDocs.Repo.update(changeset) do
       {:ok, step} ->
         opts = socket.assigns.state_opts |> Keyword.put(:action, :update)
         UserDocs.Subscription.broadcast_children(step, changeset, opts)
-        send(self(), { :broadcast, "update", step })
+        send(self(), {:broadcast, "update", step})
         {
           :noreply,
           socket
           |> put_flash(:info, "Step updated successfully")
           |> push_redirect(to: socket.assigns.return_to)
-        }
+       }
 
-      {:error, %Ecto.Changeset{} = changeset} ->
+      {:error, %Ecto.Changeset{} = _changeset} ->
         temp_changeset = Automation.StepForm.changeset(socket.assigns.step_form, step_form_params)
         {:noreply, assign(socket, :changeset, temp_changeset)}
     end
@@ -214,15 +233,15 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     name = order <> ": " <> step_type.name
     case Automation.create_nested_step(Map.put(step_params, "name", name)) do
       {:ok, step} ->
-        send(self(), { :broadcast, "create", step })
+        send(self(), {:broadcast, "create", step})
         {
           :noreply,
           socket
           |> put_flash(:info, "Step created successfully")
           |> push_redirect(to: socket.assigns.return_to)
-        }
+       }
 
-      {:error, %Ecto.Changeset{} = changeset} ->
+      {:error, %Ecto.Changeset{} = _changeset} ->
         temp_changeset = Automation.StepForm.changeset(socket.assigns.step_form, step_params)
         {:noreply, assign(socket, :changeset, temp_changeset)}
     end
@@ -278,12 +297,12 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
 
 
-  def handle_event("new-content", %{ "annotation-id" => _ }, socket) do
+  def handle_event("new-content", %{"annotation-id" => _}, socket) do
     annotation = socket.assigns.step.annotation
 
-    { :ok, new_annotation } =
+    {:ok, new_annotation} =
       annotation
-      |> UserDocs.Web.update_annotation(%{ content_id: nil })
+      |> UserDocs.Web.update_annotation(%{content_id: nil})
 
     cleared_annotation = Map.put(new_annotation, :content, nil)
 
@@ -314,17 +333,17 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       socket
       |> assign(:step, new_step)
       |> assign(:changeset, new_changeset)
-    }
+   }
   end
 
-  def elements_select(%{ state_opts: state_opts } = socket, page_id) do
-    opts = Keyword.put(state_opts, :filter, { :page_id, page_id })
+  def elements_select(%{state_opts: state_opts} = socket, page_id) do
+    opts = Keyword.put(state_opts, :filter, {:page_id, page_id})
     Web.list_elements(socket, opts)
     |> UserDocs.Helpers.select_list(:name, true)
   end
 
-  def annotations_select(%{ state_opts: state_opts } = socket, page_id) do
-    opts = Keyword.put(state_opts, :filter, { :page_id, page_id })
+  def annotations_select(%{state_opts: state_opts} = socket, page_id) do
+    opts = Keyword.put(state_opts, :filter, {:page_id, page_id})
     Web.list_annotations(socket, opts)
     |> UserDocs.Helpers.select_list(:name, true)
   end
