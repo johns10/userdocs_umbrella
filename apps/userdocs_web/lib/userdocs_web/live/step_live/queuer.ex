@@ -1,4 +1,7 @@
 defmodule UserDocsWeb.StepLive.Queuer do
+  @moduledoc """
+    The queuer component, which is used to add steps to a job
+  """
   use UserDocsWeb, :live_component
   use Phoenix.HTML
 
