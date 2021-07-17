@@ -16,7 +16,7 @@ aside.menu
     = for process <- @processes do
       li class=""
         .is-flex
-          = link to: Routes.process_index_path(@socket, :edit,process.id), class: "is-flex-grow-1" do
+          = link to: Routes.step_index_path(@socket, :index, process.id), class: "is-flex-grow-1" do
             = process.name
           .is-flex.is-flex-direction-row.is-flex-grow-0
             = live_component(@socket, Status, 
