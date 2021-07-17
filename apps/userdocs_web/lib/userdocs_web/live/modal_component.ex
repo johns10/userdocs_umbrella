@@ -1,4 +1,7 @@
 defmodule UserDocsWeb.ModalComponent do
+  @moduledoc """
+    A generic modal component, mostly used for displaying forms.
+  """
   use UserDocsWeb, :live_component
 
   @impl true
@@ -16,7 +19,7 @@ defmodule UserDocsWeb.ModalComponent do
         phx-click="close"
         phx-target="<%= @myself.cid %>"
       ></div>
-      <div class="modal-content">
+      <div class="modal-content" style="overflow:visible">
         <div class="box">
           <div
             class="modal-close is-large"
@@ -33,6 +36,6 @@ defmodule UserDocsWeb.ModalComponent do
   @impl true
   def handle_event("close", _, socket) do
     opts = socket.assigns.opts
-    { :noreply, push_patch(socket, to: opts[:return_to])}
+    {:noreply, push_patch(socket, to: opts[:return_to])}
   end
 end
