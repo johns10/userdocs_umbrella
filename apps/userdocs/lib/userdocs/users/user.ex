@@ -28,6 +28,8 @@ defmodule UserDocs.Users.User do
     field :selected_version_id, :integer
     embeds_one :selected_version, Version
 
+    embeds_many :project_url_overrides, ProjectURLOverride, on_replace: :delete
+
     has_many :team_users, TeamUser
 
     many_to_many :teams,
@@ -40,7 +42,7 @@ defmodule UserDocs.Users.User do
 
   def change_browser_session(user, attrs) do
     user
-    |> cast(attrs, [ :browser_session ])
+    |> cast(attrs, [:browser_session])
   end
 
   @doc false
@@ -67,8 +69,9 @@ defmodule UserDocs.Users.User do
 
   def change_options(user, attrs) do
     user
-    |> cast(attrs, [ :default_team_id, :selected_team_id, :selected_project_id, :selected_version_id, :image_path, :user_data_dir_path ])
+    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id, :image_path, :user_data_dir_path])
     |> cast_assoc(:team_users)
+    |> cast_embed(:project_url_overrides)
     |> ChangesetHelpers.check_only_one_default(:team_users)
   end
 

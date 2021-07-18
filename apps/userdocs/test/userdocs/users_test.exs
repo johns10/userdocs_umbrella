@@ -44,8 +44,10 @@ defmodule UserDocs.UsersTest do
       attrs =
         attrs
         |> Map.put(:current_password, password)
-      assert {:ok, %User{} = user} = Users.update_user(user, attrs)
-      assert user.email == attrs.email
+
+      {:ok, %User{} = user} = Users.update_user(user, attrs)
+
+      assert user.unconfirmed_email == attrs.email
     end
 
     test "update_user/2 with invalid data returns error changeset" do
@@ -74,7 +76,7 @@ defmodule UserDocs.UsersTest do
       team = UsersFixtures.team()
       team_user = UsersFixtures.team_user(user.id, team.id)
       preloads = [ teams: :teams ]
-      state = %{ teams: [team], users: [user], team_users: [team_user]}
+      state = %{teams: [team], users: [user], team_users: [team_user]}
       result = Users.get_user!(user.id, preloads, [], state, @opts)
       assert result.teams == [team]
     end
@@ -86,7 +88,7 @@ defmodule UserDocs.UsersTest do
       preloads = [ teams: [ :teams ] ]
       team_user_one = UsersFixtures.team_user(user.id, team_one.id)
       team_user_two = UsersFixtures.team_user(user.id, team_two.id)
-      state = %{ teams: [team_one, team_two], users: [user], team_users: [team_user_one, team_user_two]}
+      state = %{teams: [team_one, team_two], users: [user], team_users: [team_user_one, team_user_two]}
       result = Users.get_user!(user.id, preloads, [], state, @opts)
       assert result.teams == [team_one, team_two]
     end
@@ -97,7 +99,7 @@ defmodule UserDocs.UsersTest do
       team_user = UsersFixtures.team_user(user.id, team.id)
       project = ProjectsFixtures.project(team.id)
       preloads = [ teams: [ :teams, [ teams: :projects ] ] ]
-      state = %{ teams: [team], users: [user], team_users: [team_user], projects: [project]}
+      state = %{teams: [team], users: [user], team_users: [team_user], projects: [project]}
       result = Users.get_user!(user.id, preloads, [], state, @opts)
       assert project == result.teams |> Enum.at(0) |> Map.get(:projects) |> Enum.at(0)
     end
@@ -109,15 +111,35 @@ defmodule UserDocs.UsersTest do
       project = ProjectsFixtures.project(team.id)
       version = ProjectsFixtures.version(project.id)
       preloads = [ teams: [ :teams, [ teams: :projects ], [ teams: [ projects: :versions]] ] ]
-      state = %{ teams: [team], users: [user], team_users: [team_user],
+      state = %{teams: [team], users: [user], team_users: [team_user],
         projects: [project], versions: [version]}
       result = Users.get_user!(user.id, preloads, [], state, @opts)
       assert version == result.teams |> Enum.at(0) |> Map.get(:projects)
       |> Enum.at(0) |> Map.get(:versions) |> Enum.at(0)
     end
 
+    test "update_user/2 with valid project overrides updates the user" do
+      password = UUID.uuid4()
+      user = UsersFixtures.user(password)
+      team = UsersFixtures.team()
+      team_user = UsersFixtures.team_user(user.id, team.id)
+      project = ProjectsFixtures.project(team.id)
+      version = ProjectsFixtures.version(project.id)
+      project_url_overrides = [%{project_id: project.id, url: "https://www.google.com/"}]
+      attrs = UsersFixtures.user_attrs(:valid)
+      attrs = attrs |> Map.put(:project_url_overrides, project_url_overrides)
+
+      {:ok, %User{} = user} = Users.update_user_options(user, attrs)
+      assert user.project_url_overrides |> Enum.at(0) |> Map.get(:project_id) == project.id
+
+      UserDocs.Projects.delete_project(project)
+      {:error, changeset} = Users.update_user_options(user, attrs)
+      { error, _ } = changeset.changes.project_url_overrides |> Enum.at(1) |> Map.get(:errors) |> Keyword.get(:project_id)
+      assert error == "This project ID does exist. Pick a new project."
+    end
+
   end
-  """
+
   describe "teams" do
     alias UserDocs.Users.Team
 
@@ -136,12 +158,12 @@ defmodule UserDocs.UsersTest do
 
     test "list_teams/0 returns all teams" do
       team = team_fixture()
-      assert Users.list_teams(%{ users: true }) == [team]
+      assert Users.list_teams(%{users: true}) == [team]
     end
 
     test "get_team!/1 returns the team with given id" do
       team = team_fixture()
-      assert Users.get_team!(team.id, %{ users: true }) == team
+      assert Users.get_team!(team.id, %{users: true}) == team
     end
 
     test "create_team/1 with valid data creates a team" do
@@ -168,9 +190,7 @@ defmodule UserDocs.UsersTest do
     test "delete_team/1 deletes the team" do
       team = team_fixture()
       assert {:ok, %Team{}} = Users.delete_team(team)
-      # TODO figure out why Users.get_team!(team.id) doesn't raise a NoResultsError
-      # assert_raise Ecto.NoResultsError, fn -> Users.get_team!(team.id) end
-      assert Users.get_team!(team.id) == nil
+      assert_raise Ecto.NoResultsError, fn -> Users.get_team!(team.id) end
     end
 
     test "change_team/1 returns a team changeset" do
@@ -178,5 +198,5 @@ defmodule UserDocs.UsersTest do
       assert %Ecto.Changeset{} = Users.change_team(team)
     end
   end
-  """
+
 end
