@@ -7,7 +7,7 @@ defmodule UserDocsWeb.Layout do
 
   def checkbox(form,
     name \\ :default,
-    _select_options \\ [ { None, ""}],
+    _select_options \\ [{None, ""}],
     placeholder \\ None,
     id \\ "checkbox-input",
     readonly \\ false,
@@ -20,11 +20,11 @@ defmodule UserDocsWeb.Layout do
         "field is-hidden"
       end
 
-    content_tag(:div, [ class: class ]) do
+    content_tag(:div, [class: class]) do
       [
-        label(form, name, [ class: "label" ]),
-        content_tag(:div, [ class: "control" ]) do
-          content_tag(:div, [ class: "checkbox" ]) do
+        label(form, name, [class: "label"]),
+        content_tag(:div, [class: "control"]) do
+          content_tag(:div, [class: "checkbox"]) do
             Form.checkbox(form, name, [
               type: "checkbox",
               placeholder: placeholder,
@@ -42,26 +42,26 @@ defmodule UserDocsWeb.Layout do
     wrapper(opts, wrapper_class, edit_item_button(event, opts))
   end
   def edit_item_button(event, opts) do
-    item_button(event, opts ++ [{ :icon_class, "fa fa-edit" }])
+    item_button(event, opts ++ [{:icon_class, "fa fa-edit"}])
   end
 
   def new_item_button(event, opts, wrapper_class) do
     wrapper(opts, wrapper_class, new_item_button(event, opts))
   end
   def new_item_button(event, opts) do
-    item_button(event, opts ++ [{ :icon_class, "fa fa-plus" }])
+    item_button(event, opts ++ [{:icon_class, "fa fa-plus"}])
   end
 
   def item_button(event, opts) do
-    icon_opts = [ class: opts[:icon_class], aria_hidden: true ]
+    icon_opts = [class: opts[:icon_class], aria_hidden: true]
     button_opts =
-      [ class: :button, phx_click: event ]
+      [class: :button, phx_click: event]
       |> maybe_opt(opts, :target)
       |> maybe_opt(opts, :phx_target)
       |> maybe_opt(opts, :button_class, :button)
 
     content_tag(button_opts[:button_class], button_opts) do
-      content_tag(:span, [ class: :i ]) do
+      content_tag(:span, [class: :i]) do
         content_tag(:i, "", icon_opts)
       end
     end
@@ -76,15 +76,15 @@ defmodule UserDocsWeb.Layout do
       []
       |> maybe_opt(opts, :label, true)
 
-    content_tag(:div, [ class: maybe_hidden(input_opts, "field") ]) do
+    content_tag(:div, [class: maybe_hidden(input_opts, "field")]) do
       [
         if layout[:label] do
-          label(form, name, [ class: :label ])
+          label(form, name, [class: :label])
         else
           ""
         end,
-        content_tag(:div, [ class: :control ]) do
-          content_tag(:div, [ class: :select ]) do
+        content_tag(:div, [class: :control]) do
+          content_tag(:div, [class: :select]) do
             Form.select(form, name, select_options, input_opts)
           end
         end,
@@ -106,14 +106,14 @@ defmodule UserDocsWeb.Layout do
       []
       |> maybe_opt(opts, :label, true)
 
-    content_tag(:div, [ class: maybe_hidden(input_opts, "field") ]) do
+    content_tag(:div, [class: maybe_hidden(input_opts, "field")]) do
       [
         if layout[:label] do
-          label(form, name, [ class: :label ])
+          label(form, name, [class: :label])
         else
           ""
         end,
-        content_tag(:div, [ class: :control ]) do
+        content_tag(:div, [class: :control]) do
           Form.text_input(form, name, input_opts)
         end,
         ErrorHelpers.error_tag(form, name)
@@ -128,14 +128,14 @@ defmodule UserDocsWeb.Layout do
 
   def maybe_opt(opts, source, key, default) do
     try do
-      opts ++ [{ key, Keyword.fetch!(source, key)}]
+      opts ++ [{key, Keyword.fetch!(source, key)}]
     rescue
-      _ -> opts ++ [{ key, default}]
+      _ -> opts ++ [{key, default}]
     end
   end
   def maybe_opt(opts, source, key) do
     try do
-      opts ++ [{ key, Keyword.fetch!(source, key)}]
+      opts ++ [{key, Keyword.fetch!(source, key)}]
     rescue
       _ -> opts
     end
@@ -159,10 +159,10 @@ defmodule UserDocsWeb.Layout do
     # Required Options
     input_opts = input_opts(opts)
 
-    content_tag(:div, [ class: maybe_hidden(input_opts, "field") ]) do
+    content_tag(:div, [class: maybe_hidden(input_opts, "field")]) do
       [
-        label(form, name, [ class: :label ]),
-        content_tag(:div, [ class: "control" ]) do
+        label(form, name, [class: :label]),
+        content_tag(:div, [class: "control"]) do
           Form.number_input(form, name, input_opts)
         end,
         ErrorHelpers.error_tag(form, name)
@@ -176,8 +176,8 @@ defmodule UserDocsWeb.Layout do
   end
 
   def form_row(content) do
-    content_tag(:div, [ class: "field is-horizontal" ]) do
-      content_tag(:div, [ class: "field-body" ]) do
+    content_tag(:div, [class: "field is-horizontal"]) do
+      content_tag(:div, [class: "field-body"]) do
         content
       end
     end
@@ -188,7 +188,7 @@ defmodule UserDocsWeb.Layout do
       []
       |> maybe_opt(opts, :hidden)
 
-    content_tag(:div, [ class: maybe_hidden(wrapper_opts, class) ]) do
+    content_tag(:div, [class: maybe_hidden(wrapper_opts, class)]) do
       content
     end
   end
