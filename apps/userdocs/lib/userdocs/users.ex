@@ -80,9 +80,9 @@ defmodule UserDocs.Users do
       left_join: team in assoc(user, :default_team),
       left_join: project in assoc(team, :default_project),
       left_join: version in assoc(project, :default_version),
-      preload: [ default_team: team ],
-      preload: [ default_team: { team, default_project: project } ],
-      preload: [ default_team: { team, default_project: { project, default_version: version } } ]
+      preload: [default_team: team],
+      preload: [default_team: {team, default_project: project}],
+      preload: [default_team: {team, default_project: {project, default_version: version}}]
     )
   end
 
@@ -144,11 +144,11 @@ defmodule UserDocs.Users do
     |> join(:left, [u, tu, t], t in Team, on: tu.team_id == t.id)
     |> join(:left, [u, tu, t, p], p in Project, on: p.team_id == t.id)
     |> join(:left, [u, tu, t, p, v], v in Version, on: v.project_id == p.id)
-    |> preload(    [u, tu, t, p, v], [ team_users: tu ])
-    |> preload(    [u, tu, t, p, v], [ teams: t ])
-    |> preload(    [u, tu, t, p, v], [ team_users: { tu, team: t } ])
-    |> preload(    [u, tu, t, p, v], [ team_users: { tu, team: { t, projects: p } } ])
-    |> preload(    [u, tu, t, p, v], [ team_users: { tu, team: { t, projects: { p, versions: v } } } ])
+    |> preload([u, tu, t, p, v], [team_users: tu])
+    |> preload([u, tu, t, p, v], [teams: t])
+    |> preload([u, tu, t, p, v], [team_users: {tu, team: t}])
+    |> preload([u, tu, t, p, v], [team_users: {tu, team: {t, projects: p}}])
+    |> preload([u, tu, t, p, v], [team_users: {tu, team: {t, projects: {p, versions: v}}}])
     |> Repo.one!()
   end
 
@@ -179,8 +179,8 @@ defmodule UserDocs.Users do
   def validate_signup(attrs) do
     changeset = User.signup_changeset(%User{}, attrs)
     case Ecto.Changeset.apply_action(changeset, :insert) do
-      { :error, inner_changeset } -> { :error, inner_changeset }
-      { :ok, _user } -> { :ok, changeset }
+      {:error, inner_changeset} -> {:error, inner_changeset}
+      {:ok, _user} -> {:ok, changeset}
     end
   end
 
@@ -444,7 +444,7 @@ defmodule UserDocs.Users do
   # and get my on_delete stuff right.
   def try_get_team!(id) do
     try do
-      get_team!(id, %{ preloads: %{ job: %{ step_instances: true, process_instances: true }}})
+      get_team!(id, %{preloads: %{job: %{step_instances: true, process_instances: true}}})
     rescue
       e ->
         Logger.error("Failed to retreive selected team, error: ")
@@ -452,11 +452,11 @@ defmodule UserDocs.Users do
         nil
     end
   end
-  def get_team!(id, %{ preloads: %{ job: %{ step_instances: true, process_instances: true }}}) do
+  def get_team!(id, %{preloads: %{job: %{step_instances: true, process_instances: true}}}) do
     from(t in Team, as: :team)
     |> where([team: t], t.id == ^id)
     |> join(:left, [team: t], job in assoc(t, :job), as: :job)
-    |> preload([ job: j  ], [ job: j ])
+    |> preload([job: j], [job: j])
     |> Repo.one()
   end
   def get_team!(id, params \\ %{}) do
