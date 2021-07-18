@@ -7,30 +7,30 @@ defmodule UserDocsWeb.UserLiveTest do
   alias UserDocs.WebFixtures
   alias UserDocs.ProjectsFixtures
 
-  defp create_user(%{ password: password }), do: %{user: UsersFixtures.user(password)}
+  defp create_user(%{password: password}), do: %{user: UsersFixtures.user(password)}
   defp create_team(_), do: %{team: UsersFixtures.team()}
   defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
-  defp create_project(%{ team: team }) do
+  defp create_project(%{team: team}) do
     attrs = ProjectsFixtures.project_attrs(:default, team.id)
-    { :ok, project } = UserDocs.Projects.create_project(attrs)
-    %{ project: project }
+    {:ok, project} = UserDocs.Projects.create_project(attrs)
+    %{project: project}
   end
-  defp create_version(%{ project: project, strategy: strategy }), do: %{version: ProjectsFixtures.version(project.id, strategy.id)}
+  defp create_version(%{project: project, strategy: strategy}), do: %{version: ProjectsFixtures.version(project.id, strategy.id)}
 
-  defp create_password(_), do: %{ password: UUID.uuid4()}
-  defp grevious_workaround(%{ conn: conn, user: user, password: password }) do
-    conn = post(conn, "session", %{ user: %{ email: user.email, password: password } })
+  defp create_password(_), do: %{password: UUID.uuid4()}
+  defp grevious_workaround(%{conn: conn, user: user, password: password}) do
+    conn = post(conn, "session", %{user: %{email: user.email, password: password}})
     :timer.sleep(100)
-    %{ authed_conn: conn }
+    %{authed_conn: conn}
   end
 
-  defp make_selections(%{ user: user, team: team, project: project, version: version }) do
-    { :ok, user } = UserDocs.Users.update_user_selections(user, %{
+  defp make_selections(%{user: user, team: team, project: project, version: version}) do
+    {:ok, user} = UserDocs.Users.update_user_selections(user, %{
       selected_team_id: team.id,
       selected_project_id: project.id,
       selected_version_id: version.id
-    })
+   })
     %{user: user}
   end
 
@@ -101,7 +101,7 @@ defmodule UserDocsWeb.UserLiveTest do
       refute has_element?(index_live, "#user-" <> to_string(user.id))
     end
 
-    test "index handles standard events", %{authed_conn: conn, team: team, user: user, version: version } do
+    test "index handles standard events", %{authed_conn: conn, team: team, user: user, version: version} do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert live
@@ -149,7 +149,7 @@ defmodule UserDocsWeb.UserLiveTest do
       assert html =~ valid_attrs.email
     end
 
-    test "show handles standard events", %{authed_conn: conn, team: team, user: user, version: version } do
+    test "show handles standard events", %{authed_conn: conn, team: team, user: user, version: version} do
       {:ok, show_live, html} = live(conn, Routes.user_show_path(conn, :show, user))
       send(show_live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert show_live
