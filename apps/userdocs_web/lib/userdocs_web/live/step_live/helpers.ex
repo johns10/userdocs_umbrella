@@ -11,12 +11,12 @@ defmodule UserDocsWeb.StepLive.FormComponent.Helpers do
     |> maybe_update_enabled_annotation_fields(state)
   end
 
-  def maybe_update_enabled_step_fields(%Ecto.Changeset{ changes: %{ step_type_id: _ }} = changeset, state) do
+  def maybe_update_enabled_step_fields(%Ecto.Changeset{changes: %{step_type_id: step_type_id}} = changeset, state) do
     enabled_step_fields(changeset, state)
   end
   def maybe_update_enabled_step_fields(%Ecto.Changeset{} = changeset, _), do: changeset
 
-  def maybe_update_enabled_annotation_fields(%Ecto.Changeset{ changes: %{ annotation: %{ changes: %{ annotation_type_id: _ } } } } = changeset, state) do
+  def maybe_update_enabled_annotation_fields(%Ecto.Changeset{changes: %{annotation: %{changes: %{annotation_type_id: _}}}} = changeset, state) do
     enabled_annotation_fields(changeset, state)
   end
   def maybe_update_enabled_annotation_fields(%Ecto.Changeset{} = changeset, _), do: changeset
@@ -25,8 +25,8 @@ defmodule UserDocsWeb.StepLive.FormComponent.Helpers do
     step_type = Automation.get_step_type!(changeset.changes.step_type_id, state, state.state_opts)
     enable_fields(changeset, StepForm.enabler_fields(), step_type.args)
   end
-  def enabled_step_fields(%StepForm{ step_type_id: nil} = step_form, _), do: step_form
-  def enabled_step_fields(%StepForm{ step_type_id: step_type_id} = step_form, state) do
+  def enabled_step_fields(%StepForm{step_type_id: nil} = step_form, _), do: step_form
+  def enabled_step_fields(%StepForm{step_type_id: step_type_id} = step_form, state) do
     step_type = Automation.get_step_type!(step_type_id, state, state.state_opts)
     enable_fields(step_form, StepForm.enabler_fields(), step_type.args)
   end
@@ -37,9 +37,9 @@ defmodule UserDocsWeb.StepLive.FormComponent.Helpers do
     annotation_form = enable_fields(changeset.changes.annotation, AnnotationForm.enabler_fields(), annotation_type.args)
     Ecto.Changeset.put_change(changeset, :annotation, annotation_form)
   end
-  def enabled_annotation_fields(%StepForm{ annotation: nil } = step_form, _), do: step_form
-  def enabled_annotation_fields(%StepForm{ annotation: %{ annotation_type_id: nil }} = step_form, _), do: step_form
-  def enabled_annotation_fields(%StepForm{ annotation: %{ annotation_type_id: annotation_type_id } = annotation } = step_form, state) do
+  def enabled_annotation_fields(%StepForm{annotation: nil} = step_form, _), do: step_form
+  def enabled_annotation_fields(%StepForm{annotation: %{annotation_type_id: nil}} = step_form, _), do: step_form
+  def enabled_annotation_fields(%StepForm{annotation: %{annotation_type_id: annotation_type_id} = annotation} = step_form, state) do
     annotation_type = Web.get_annotation_type!(annotation_type_id, state, state.state_opts)
     annotation_form = enable_fields(annotation, AnnotationForm.enabler_fields(), annotation_type.args)
     Map.put(step_form, :annotation, annotation_form)
