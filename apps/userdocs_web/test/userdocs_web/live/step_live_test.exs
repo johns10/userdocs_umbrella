@@ -13,7 +13,7 @@ defmodule UserDocsWeb.StepLiveTest do
     %{
       order: nil,
       process_id: process_id
-    }
+}
   end
 
   defp valid_attrs(process_id, step_type_id) do
@@ -21,25 +21,25 @@ defmodule UserDocsWeb.StepLiveTest do
       order: 1,
       process_id: process_id,
       step_type_id: step_type_id
-    }
+}
   end
 
-  defp create_password(_), do: %{ password: UUID.uuid4()}
-  defp create_user(%{ password: password }), do: %{user: UsersFixtures.user(password)}
+  defp create_password(_), do: %{password: UUID.uuid4()}
+  defp create_user(%{password: password}), do: %{user: UsersFixtures.user(password)}
   defp create_team(_), do: %{team: UsersFixtures.team()}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
   defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
-  defp create_project(%{ team: team }), do: %{project: ProjectsFixtures.project(team.id)}
-  defp create_version(%{ project: project, strategy: strategy }), do: %{version: ProjectsFixtures.version(project.id, strategy.id)}
-  defp create_process(%{ version: version }), do: %{process: AutomationFixtures.process(version.id)}
-  defp create_page(%{ version: version }), do: %{page: WebFixtures.page(version.id)}
-  defp create_element(%{ page: page, strategy: strategy}), do: %{element: WebFixtures.element(page.id, strategy.id)}
-  defp create_annotation(%{ page: page }), do: %{annotation: WebFixtures.annotation(page.id)}
+  defp create_project(%{team: team}), do: %{project: ProjectsFixtures.project(team.id)}
+  defp create_version(%{project: project, strategy: strategy}), do: %{version: ProjectsFixtures.version(project.id, strategy.id)}
+  defp create_process(%{version: version}), do: %{process: AutomationFixtures.process(version.id)}
+  defp create_page(%{version: version}), do: %{page: WebFixtures.page(version.id)}
+  defp create_element(%{page: page, strategy: strategy}), do: %{element: WebFixtures.element(page.id, strategy.id)}
+  defp create_annotation(%{page: page}), do: %{annotation: WebFixtures.annotation(page.id)}
   defp create_step_type(_), do: %{step_type: AutomationFixtures.step_type()}
   defp create_step_types(_), do: %{step_types: AutomationFixtures.all_valid_step_types()}
   defp create_annotation_types(_), do: %{annotation_types: WebFixtures.all_valid_annotation_types()}
-  defp create_step(%{ page: page, process: p, element: e, annotation: a, step_type: st }) do
-    %{ step: AutomationFixtures.step(page.id, p.id, e.id, a.id, st.id)}
+  defp create_step(%{page: page, process: p, element: e, annotation: a, step_type: st}) do
+    %{step: AutomationFixtures.step(page.id, p.id, e.id, a.id, st.id)}
   end
 
   defp first_page(), do: Web.list_pages() |> Enum.at(0)
@@ -51,12 +51,12 @@ defmodule UserDocsWeb.StepLiveTest do
   defp first_annotation(), do: Web.list_annotations() |> Enum.at(0)
   defp second_annotation(), do: Web.list_annotations() |> Enum.at(1)
 
-  defp make_selections(%{ user: user, team: team, project: project, version: version }) do
-    { :ok, user } = UserDocs.Users.update_user_selections(user, %{
+  defp make_selections(%{user: user, team: team, project: project, version: version}) do
+    {:ok, user} = UserDocs.Users.update_user_selections(user, %{
       selected_team_id: team.id,
       selected_project_id: project.id,
       selected_version_id: version.id
-    })
+})
     %{user: user}
   end
 
@@ -70,23 +70,23 @@ defmodule UserDocsWeb.StepLiveTest do
     routes_backend: UserDocsWeb.Pow.Routes
   ]
 
-  defp setup_session(%{ conn: conn, user: user  }) do
+  defp setup_session(%{conn: conn, user: user}) do
     opts = Pow.Plug.Session.init(@default_opts)
     conn =
       conn
-      |> Plug.Test.init_test_session(%{ current_user: user })
+      |> Plug.Test.init_test_session(%{current_user: user})
       |> Pow.Plug.Session.call(opts)
       |> Pow.Plug.Session.do_create(user, opts)
 
     :timer.sleep(100)
 
-    %{ conn: conn }
+    %{conn: conn}
   end
 
-  defp grevious_workaround(%{ conn: conn, user: user, password: password }) do
-    conn = post(conn, "session", %{ user: %{ email: user.email, password: password } })
+  defp grevious_workaround(%{conn: conn, user: user, password: password}) do
+    conn = post(conn, "session", %{user: %{email: user.email, password: password}})
     :timer.sleep(100)
-    %{ authed_conn: conn }
+    %{authed_conn: conn}
   end
 
   defp step_type_from_name(step_types, name) do
@@ -194,7 +194,7 @@ defmodule UserDocsWeb.StepLiveTest do
       # change the page
       index_live
       |> form("#step-form", step_form: attrs)
-      |> render_change(%{ "step_form" => %{ "page_id" => second_page().id |> to_string() } } )
+      |> render_change(%{"step_form" => %{"page_id" => second_page().id |> to_string()}} )
 
       assert index_live
              |> element("#step-form_page_name")
@@ -203,7 +203,7 @@ defmodule UserDocsWeb.StepLiveTest do
       # change it back to the first page
       index_live
       |> form("#step-form", step_form: attrs)
-      |> render_change(%{ "step_form" => %{ "page_id" => first_page().id |> to_string() } } )
+      |> render_change(%{"step_form" => %{"page_id" => first_page().id |> to_string()}} )
 
       assert index_live
              |> element("#step-form_page_name")
@@ -212,7 +212,7 @@ defmodule UserDocsWeb.StepLiveTest do
       # put some new text on the page
       index_live
       |> form("#step-form", step_form: attrs)
-      |> render_change(%{ "step_form" => %{ "name" => "value" } } )
+      |> render_change(%{"step_form" => %{"name" => "value"}} )
 
       assert index_live
              |> form("#step-form", step_form: attrs)
@@ -221,7 +221,7 @@ defmodule UserDocsWeb.StepLiveTest do
     end
 
 
-    test "changing the annotation_id updates the form", %{authed_conn: conn, step: step, step_types: step_types, process: process, element: element, annotation: annotation, page: page } do
+    test "changing the annotation_id updates the form", %{authed_conn: conn, step: step, step_types: step_types, process: process, element: element, annotation: annotation, page: page} do
       aa_step_type = step_type_from_name(step_types, "Apply Annotation")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :edit, step))
       attrs =
@@ -230,30 +230,30 @@ defmodule UserDocsWeb.StepLiveTest do
         |> Map.delete(:element_id)
         |> Map.delete(:name)
 
-      changes = %{ "step_type_id" => aa_step_type.id |> to_string() }
+      changes = %{"step_type_id" => aa_step_type.id |> to_string()}
 
       index_live
       |> form("#step-form", step_form: attrs)
-      |> render_change(%{ "step_form" => changes })
+      |> render_change(%{"step_form" => changes})
 
       changes = %{"annotation_id" => second_annotation().id |> to_string()}
 
       # change the annotation_id
       index_live
       |> form("#step-form", step_form: attrs)
-      |> render_change(%{ "step_form" => changes })
+      |> render_change(%{"step_form" => changes})
 
       # Annotation form changes
       assert index_live
       |> element("#step-form_annotation_id")
       |> render() =~ second_annotation().name
 
-      second_changes = %{ "annotation_id" => first_annotation().id |> to_string() }
+      second_changes = %{"annotation_id" => first_annotation().id |> to_string()}
 
       # change it back
       index_live
       |> form("#step-form", step_form: attrs)
-      |> render_change(%{ "step_form" => second_changes })
+      |> render_change(%{"step_form" => second_changes})
 
       # Annotation form changes
       assert index_live
@@ -266,7 +266,7 @@ defmodule UserDocsWeb.StepLiveTest do
       # put some new text on the page, save it
       index_live
       |> form("#step-form", step_form: attrs)
-      |> render_change(%{ "step_form" => %{ "annotation" => %{ "name" => "updated name" } } } )
+      |> render_change(%{"step_form" => %{"annotation" => %{"name" => "updated name"}}} )
 
       assert index_live
              |> form("#step-form", step_form: attrs)
@@ -274,7 +274,7 @@ defmodule UserDocsWeb.StepLiveTest do
              |> follow_redirect(conn, Routes.step_index_path(conn, :index, process.id))
     end
 
-    test "changing the element_id updates the form", %{authed_conn: conn, step: step, step_types: step_types, process: process } do
+    test "changing the element_id updates the form", %{authed_conn: conn, step: step, step_types: step_types, process: process} do
       step_type = step_type_from_name(step_types, "Apply Annotation")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :edit, step))
       attrs = valid_attrs(step.process_id, step_type.id)
@@ -283,12 +283,12 @@ defmodule UserDocsWeb.StepLiveTest do
         "step_type_id" => step_type.id |> to_string(),
         "annotation_id" => second_annotation().id |> to_string(),
         "element_id" => second_element().id |> to_string()
-      }
+}
 
       # change the element_id
       index_live
       |> form("#step-form", step_form: attrs)
-      |> render_change(%{ "step_form" => changes })
+      |> render_change(%{"step_form" => changes})
 
       assert index_live
       |> element("#step-form_element_name")
@@ -297,10 +297,10 @@ defmodule UserDocsWeb.StepLiveTest do
       # change it back
       index_live
       |> form("#step-form", step_form: attrs)
-      |> render_change(%{ "step_form" => %{
+      |> render_change(%{"step_form" => %{
           "step_type_id" => step_type.id |> to_string(),
           "element_id" => first_element().id |> to_string()
-        }})
+}})
 
       # Element Form Changes
       assert index_live
@@ -315,7 +315,7 @@ defmodule UserDocsWeb.StepLiveTest do
       # put some new text on the page, save it
       index_live
       |> form("#step-form", step_form: attrs)
-      |> render_change(%{ "step_form" => %{ "element" => %{ "name" => "updated name" } } } )
+      |> render_change(%{"step_form" => %{"element" => %{"name" => "updated name"}}} )
 
       assert index_live
             |> form("#step-form", step_form: attrs)
@@ -335,7 +335,7 @@ defmodule UserDocsWeb.StepLiveTest do
       refute has_element?(index_live, "#delete-step-"<> Integer.to_string(step.id))
     end
 
-    test "click event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step: step, step_types: step_types } do
+    test "click event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step: step, step_types: step_types} do
       step_type = step_type_from_name(step_types, "Click")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :index, process.id))
       attrs =
@@ -343,7 +343,7 @@ defmodule UserDocsWeb.StepLiveTest do
         |> Map.put(:page_id, first_page().id)
         |> Map.delete(:step_type_id)
 
-      event = %{ action: "Click", selector: "test_selector" }
+      event = %{action: "Click", selector: "test_selector"}
 
       # Pass the click browser event
       html = index_live |> render_hook(:"browser-event", event)
@@ -358,8 +358,8 @@ defmodule UserDocsWeb.StepLiveTest do
           "element" => %{
             "name" => "test_element_name",
             "page_id" => attrs.page_id |> to_string()
-          }
-        }}
+}
+}}
 
       index_live
       |> form("#step-form", step_form: attrs)
@@ -375,14 +375,14 @@ defmodule UserDocsWeb.StepLiveTest do
       assert html =~ "Step created successfully"
     end
 
-    test "navigate event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step: step, step_types: step_types } do
+    test "navigate event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step: step, step_types: step_types} do
       step_type = step_type_from_name(step_types, "Navigate")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :index, process.id))
       attrs =
         valid_attrs(step.process_id, step_type.id)
         |> Map.delete(:step_type_id)
 
-      event = %{ action: "Navigate", href: "https://www.google.com" }
+      event = %{action: "Navigate", href: "https://www.google.com"}
 
       # Pass the navigate browser event
       html = index_live |> render_hook(:"browser-event", event)
@@ -395,9 +395,9 @@ defmodule UserDocsWeb.StepLiveTest do
           "order" => attrs.order |> to_string(),
           "page" => %{
             "name" => "test_page_name"
-          }
-        }
-      }
+}
+}
+}
 
       index_live
       |> form("#step-form", step_form: attrs)
@@ -413,7 +413,7 @@ defmodule UserDocsWeb.StepLiveTest do
       assert html =~ "Step created successfully"
     end
 
-    test "Click, then navigate does the expected thing", %{authed_conn: conn, process: process, step: step, step_types: step_types } do
+    test "Click, then navigate does the expected thing", %{authed_conn: conn, process: process, step: step, step_types: step_types} do
       step_type = step_type_from_name(step_types, "Click")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :index, process.id))
       attrs =
@@ -421,19 +421,19 @@ defmodule UserDocsWeb.StepLiveTest do
         |> Map.put(:page_id, first_page().id)
         |> Map.delete(:step_type_id)
 
-      event = %{ action: "Click", selector: "test_selector" }
+      event = %{action: "Click", selector: "test_selector"}
 
       # Pass the click browser event
       html = index_live |> render_hook(:"browser-event", event)
       assert html =~ "Click"
       assert html =~ event.selector
 
-      event = %{ action: "Navigate", href: "https://www.google.com" }
+      event = %{action: "Navigate", href: "https://www.google.com"}
 
       # Pass the navigate browser event
       html = index_live |> render_hook(:"browser-event", event)
-      assert html =~ "Navigate"
-      assert html =~ event.href
+      assert index_live |> element("#step-type-select") |> render()  =~ "Navigate"
+      assert index_live |> element("#page-url-input") |> render()  =~ event.href
 
       # Create and put the changes required to make the form valid
       changes = %{
@@ -441,9 +441,9 @@ defmodule UserDocsWeb.StepLiveTest do
           "order" => attrs.order |> to_string(),
           "page" => %{
             "name" => "test_page_name"
-          }
-        }
-      }
+}
+}
+}
 
       # This could spell trouble, add the additional fields and save
       attrs = Map.delete(attrs, :page_id)
@@ -461,7 +461,7 @@ defmodule UserDocsWeb.StepLiveTest do
       assert html =~ "Step created successfully"
     end
 
-    test "browser events update the Edit form", %{authed_conn: conn, step: step, step_types: step_types, process: process, element: element, annotation: annotation, page: page } do
+    test "browser events update the Edit form", %{authed_conn: conn, step: step, step_types: step_types, process: process, element: element, annotation: annotation, page: page} do
       aa_step_type = step_type_from_name(step_types, "Apply Annotation")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :edit, step))
       attrs =
@@ -470,22 +470,22 @@ defmodule UserDocsWeb.StepLiveTest do
         |> Map.delete(:element_id)
         |> Map.delete(:name)
 
-      changes = %{ "step_type_id" => aa_step_type.id |> to_string() }
+      changes = %{"step_type_id" => aa_step_type.id |> to_string()}
 
       index_live
       |> form("#step-form", step_form: attrs)
-      |> render_change(%{ "step" => changes })
+      |> render_change(%{"step" => changes})
 
-      event = %{ action: "Click", selector: "test_selector" }
+      event = %{action: "Click", selector: "test_selector"}
 
       # Pass the click browser event
       html = index_live |> render_hook(:"browser-event", event)
 
-      assert html =~ "selected=\"selected\">Click"
-      assert html =~ event.selector
+      assert index_live |> element("#step-type-select") |> render() =~ "selected=\"selected\">Click"
+      assert index_live |> element("#element-selector-input") |> render() =~ event.selector
     end
 
-    test "Apply Annotation event opens form, filling additional fields and saving works", %{ authed_conn: conn, process: process, step_types: step_types, annotation: annotation, element: element, page: page } do
+    test "Apply Annotation event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step_types: step_types, annotation: annotation, element: element, page: page} do
       aa_step_type = step_type_from_name(step_types, "Apply Annotation")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :index, process.id))
       _attrs =
@@ -494,7 +494,7 @@ defmodule UserDocsWeb.StepLiveTest do
         |> Map.delete(:element_id)
         |> Map.delete(:name)
 
-      event = %{ action: "Apply Annotation", selector: "test_selector", annotation_type: "Badge" }
+      event = %{action: "Apply Annotation", selector: "test_selector", annotation_type: "Badge"}
 
       # Pass the navigate browser event
       html = index_live |> render_hook(:"browser-event", event)
@@ -502,7 +502,7 @@ defmodule UserDocsWeb.StepLiveTest do
       assert html =~ event.selector
     end
 
-    test "index handles standard events", %{authed_conn: conn, version: version } do
+    test "index handles standard events", %{authed_conn: conn, version: version} do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert live
