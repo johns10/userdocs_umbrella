@@ -10,7 +10,7 @@ config :userdocs, UserDocs.Repo,
   pool_size: 10
 
 config :userdocs, UserDocs.Mailer,
-adapter: Bamboo.LocalAdapter
+  adapter: Bamboo.LocalAdapter
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
