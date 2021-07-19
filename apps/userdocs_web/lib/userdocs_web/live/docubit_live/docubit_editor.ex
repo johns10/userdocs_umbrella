@@ -19,8 +19,8 @@ defmodule UserDocsWeb.DocubitEditorLive do
   end
 
   @impl true
-  def update(%{ close_all_dropdowns: true }, socket) do
-    { :ok, assign(socket, :display_settings_menu, false) }
+  def update(%{close_all_dropdowns: true}, socket) do
+    {:ok, assign(socket, :display_settings_menu, false)}
   end
   def update(assigns, socket) do
     docubit = assigns.docubit
@@ -28,14 +28,14 @@ defmodule UserDocsWeb.DocubitEditorLive do
     preloads = [
       :docubits,
       :docubit_type,
-      [ docubits: :content ],
-      [ docubits: :screenshot ],
-      [ docubits: :through_annotation ],
-      [ docubits: :through_step ],
-      [ docubits: :docubit_type ],
-      [ docubits: [ content: :content_versions ] ],
-      [ docubits: [ content: :annotation ] ],
-      [ docubits: [ content: [ content_versions: :version ]]]
+      [docubits: :content],
+      [docubits: :screenshot],
+      [docubits: :through_annotation],
+      [docubits: :through_step],
+      [docubits: :docubit_type],
+      [docubits: [content: :content_versions]],
+      [docubits: [content: :annotation]],
+      [docubits: [content: [content_versions: :version]]]
     ]
 
     state_opts =
@@ -122,7 +122,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
             </div>
           </div>
         </div>
-        <%= live_component(@socket, @renderer, [
+        <%= live_component(@renderer, [
           editor: true,
           component: true,
           role: :editor,
@@ -135,7 +135,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
           img_path: @img_path
         ]) do %>
           <%= for docubit <- @docubit.docubits do %>
-            <%= live_component(@socket, DocubitEditorLive, [
+            <%= live_component(DocubitEditorLive, [
               id: "docubit-editor-" <> Integer.to_string(docubit.id),
               current_language_code_id: @current_language_code_id,
               current_version: @current_version,
@@ -162,7 +162,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
   def get_state_opts(assigns) do
     case Map.get(assigns, :state_opts, nil) do
       nil -> raise(RuntimeError, "Failed to get state opts from assigns")
-      [ _ | _ ] = state_opts -> state_opts
+      [_ | _] = state_opts -> state_opts
     end
   end
 
@@ -170,7 +170,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
     StateHandlers.delete(socket, payload, state_opts)
   end
   @impl true
-  def handle_event("delete-docubit", %{"id" => id }, socket) do
+  def handle_event("delete-docubit", %{"id" => id}, socket) do
     id = String.to_integer(id)
 
     attrs = %{
@@ -207,8 +207,8 @@ defmodule UserDocsWeb.DocubitEditorLive do
     end
   end
   def handle_event("create-docubit", %{"type" => type, "docubit-id" => docubit_id}, socket) do
-    send(self(), { :close_all_dropdowns, [ String.to_integer(docubit_id) ] })
-    send(self(), { :create_docubit, %{type: type, docubit: socket.assigns.docubit}} )
+    send(self(), {:close_all_dropdowns, [String.to_integer(docubit_id)]})
+    send(self(), {:create_docubit, %{type: type, docubit: socket.assigns.docubit}} )
     {:noreply, socket}
   end
 
@@ -229,18 +229,18 @@ defmodule UserDocsWeb.DocubitEditorLive do
         "Content" -> [
           :annotation,
           :content_versions,
-          [ content_versions: :version]
+          [content_versions: :version]
         ]
         "Step" -> [
           :annotation,
-          [ annotation: :content ],
-          [ annotation: [ content: :content_versions ]],
-          [ annotation: [ content: [ content_versions: :version ]]],
+          [annotation: :content],
+          [annotation: [content: :content_versions]],
+          [annotation: [content: [content_versions: :version]]],
         ]
         "Annotation" -> [
           :content,
-          [ content: :content_versions ],
-          [ content: [ content_versions: :version ]]
+          [content: :content_versions],
+          [content: [content_versions: :version]]
         ]
       end
 
@@ -269,7 +269,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
           socket
           |> assign(:docubit, docubit)
         }
-      { :error, message } ->
+      {:error, message} ->
         IO.puts("Hydrate Error")
         {
           :noreply,
@@ -281,7 +281,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
 
 
   end
-  def handle_event("move-docubit-up-one", %{"docubit-order" => docubit_order }, socket) do
+  def handle_event("move-docubit-up-one", %{"docubit-order" => docubit_order}, socket) do
     IO.puts("move-docubit #{docubit_order} up-one")
     docubit_order = String.to_integer(docubit_order)
     first_order = docubit_order - 1
@@ -289,9 +289,9 @@ defmodule UserDocsWeb.DocubitEditorLive do
 
     updated_docubit = swap_adjacent_docubits(socket.assigns.docubit, first_order, second_order)
 
-    { :noreply, assign(socket, :docubit, updated_docubit) }
+    {:noreply, assign(socket, :docubit, updated_docubit)}
   end
-  def handle_event("move-docubit-down-one", %{"docubit-order" => docubit_order }, socket) do
+  def handle_event("move-docubit-down-one", %{"docubit-order" => docubit_order}, socket) do
     IO.puts("move-docubit #{docubit_order} down-one")
     docubit_order = String.to_integer(docubit_order)
     first_order = docubit_order
@@ -299,10 +299,10 @@ defmodule UserDocsWeb.DocubitEditorLive do
 
     updated_docubit = swap_adjacent_docubits(socket.assigns.docubit, first_order, second_order)
 
-    { :noreply, assign(socket, :docubit, updated_docubit) }
+    {:noreply, assign(socket, :docubit, updated_docubit)}
   end
   def handle_event("display-settings-menu", %{"docubit-id" => docubit_id}, socket) do
-    send(self(), { :close_all_dropdowns, [ String.to_integer(docubit_id) ] })
+    send(self(), {:close_all_dropdowns, [String.to_integer(docubit_id)]})
     {:noreply, assign(socket, :display_settings_menu, not socket.assigns.display_settings_menu)}
   end
   def handle_event("edit-docubit" = name, %{"id" => id}, socket) do
@@ -314,9 +314,9 @@ defmodule UserDocsWeb.DocubitEditorLive do
       |> Map.put(:channel, Defaults.channel(socket))
       |> Map.put(:state_opts, get_state_opts(socket.assigns))
 
-    { :noreply, invalid_socket } = Root.handle_event(name, params, socket)
-    send(self(), { :update_form_data, invalid_socket.assigns.form_data })
-    { :noreply, socket }
+    {:noreply, invalid_socket} = Root.handle_event(name, params, socket)
+    send(self(), {:update_form_data, invalid_socket.assigns.form_data})
+    {:noreply, socket}
   end
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
@@ -341,7 +341,7 @@ defmodule UserDocsWeb.DocubitEditorLive do
     )
     |> Enum.sort(fn(x, y) -> x.order < y.order end)
 
-    { :ok, updated_docubit } = Documents.update_docubit(parent_docubit, %{ docubits: attrs })
+    {:ok, updated_docubit} = Documents.update_docubit(parent_docubit, %{docubits: attrs})
     updated_docubit
   end
 end
