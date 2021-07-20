@@ -75,7 +75,7 @@ defmodule UserDocs.Users do
   end
 
   defp maybe_preload_default_team_project_version(query, nil), do: query
-  defp maybe_preload_default_team_project_version(query, preloads) do
+  defp maybe_preload_default_team_project_version(query, _preloads) do
     from(user in query,
       left_join: team in assoc(user, :default_team),
       left_join: project in assoc(team, :default_project),
@@ -128,7 +128,7 @@ defmodule UserDocs.Users do
       |> Map.get(:team)
     rescue
       BadMapError -> nil
-      e -> raise(e)
+      e -> Kernel.reraise(e, __STACKTRACE__)
     end
   end
 
@@ -452,6 +452,8 @@ defmodule UserDocs.Users do
         nil
     end
   end
+
+  def get_team!(id, params \\ %{})
   def get_team!(id, %{preloads: %{job: %{step_instances: true, process_instances: true}}}) do
     from(t in Team, as: :team)
     |> where([team: t], t.id == ^id)
@@ -459,7 +461,7 @@ defmodule UserDocs.Users do
     |> preload([job: j], [job: j])
     |> Repo.one()
   end
-  def get_team!(id, params \\ %{}) do
+  def get_team!(id, params) do
     preloads = Map.get(params, :preloads, [])
     base_team_query(id)
     |> maybe_preload_team_users(preloads[:users])
@@ -469,6 +471,7 @@ defmodule UserDocs.Users do
     |> maybe_preload_content(preloads[:content])
     |> Repo.one!()
   end
+
   def get_team!(id, state, opts) when is_list(opts) do
     StateHandlers.get(state, id, Team, opts)
     |> maybe_preload(opts[:preloads], state, opts)
@@ -548,7 +551,7 @@ defmodule UserDocs.Users do
       e in BadMapError ->
         Logger.error(e)
         nil
-      e -> raise(e)
+      e -> Kernel.reraise(e, __STACKTRACE__)
     end
   end
 
@@ -591,7 +594,7 @@ defmodule UserDocs.Users do
 
   """
   #TODO this could be more elegant, probably
-  def update_team(%Team{} = team, attrs = %{"users" => _users}) do
+  def update_team(%Team{} = team, %{"users" => _users} = attrs) do
     users =
       User
       |> where([user], user.id in ^attrs["users"])
@@ -648,5 +651,10 @@ defmodule UserDocs.Users do
   """
   def change_team(%Team{} = team, attrs \\ %{}) do
     Team.changeset(team, attrs)
+  end
+
+  alias UserDocs.Users.Override
+  def change_override(%Override{} = override, attrs \\ %{}) do
+    Override.changeset(override, attrs)
   end
 end
