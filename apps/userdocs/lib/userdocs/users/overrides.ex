@@ -1,9 +1,12 @@
-defmodule ProjectURLOverride do
+defmodule UserDocs.Users.Override do
+  @moduledoc """
+    This object is used to override the URL of a project, and may be expanded to override other objects later
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
   @primary_key false
-
+  @derive {Jason.Encoder, only: [:url, :project_id]}
   embedded_schema do
     field :url, :string
     field :project_id, :integer
