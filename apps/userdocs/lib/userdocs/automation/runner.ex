@@ -31,7 +31,9 @@ defmodule UserDocs.Automation.Runner do
       annotation_type: &AnnotationType.safe/2,
       page: &Page.safe/2,
       process: &Process.safe/2,
-      screenshot: &Screenshot.safe/2
+      screenshot: &Screenshot.safe/2,
+      version: &Version.safe/2,
+      project: &Project.safe/2
     }
 
     Process.safe(process, handlers)
