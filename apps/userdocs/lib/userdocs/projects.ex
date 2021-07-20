@@ -108,7 +108,7 @@ defmodule UserDocs.Projects do
       |> Enum.filter(fn(v) -> v.default == true end)
       |> Enum.at(0)
     rescue
-      e -> raise(e)
+      e -> Kernel.reraise(e, __STACKTRACE__)
     end
   end
 
@@ -265,7 +265,7 @@ defmodule UserDocs.Projects do
   # and get my on_delete stuff right.
   def try_get_version!(id) do
     try do
-      get_version!(id, %{ strategy: true })
+      get_version!(id, %{strategy: true})
     rescue
       e ->
         Logger.error("Failed to retreive selected version, error: ")
@@ -292,7 +292,7 @@ defmodule UserDocs.Projects do
     StateHandlers.preload(state, versions, preloads, opts)
   end
 
-  def get_version!(%{ versions: versions }, id, _params, _filters) do
+  def get_version!(%{versions: versions}, id, _params, _filters) do
     versions
     |> Enum.filter(fn(v) -> v.id == id end)
     |> Enum.at(0)
