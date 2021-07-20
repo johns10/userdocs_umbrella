@@ -13,7 +13,6 @@ defmodule UserDocsWeb.Router do
     plug :put_secure_browser_headers
   end
 
-
   def root_layout(conn, _opts) do
     case conn.host do
       "dev-electron-app.user-docs.com" ->
