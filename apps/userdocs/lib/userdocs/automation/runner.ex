@@ -1,4 +1,7 @@
 defmodule UserDocs.Automation.Runner do
+  @moduledoc """
+    The runner module is basically responsible for converting structs to string key maps for consumption over the wire by hooks
+  """
   alias UserDocs.Automation.Step
   alias UserDocs.Automation.Process
   alias UserDocs.Automation.StepType
@@ -13,6 +16,8 @@ defmodule UserDocs.Automation.Runner do
   alias UserDocs.StepInstances.StepInstance
   alias UserDocs.ProcessInstances.ProcessInstance
   alias UserDocs.Jobs.JobInstance
+  alias UserDocs.Projects.Version
+  alias UserDocs.Projects.Project
 
   def parse(process = %UserDocs.Automation.Process{}) do
     handlers = %{
@@ -42,7 +47,9 @@ defmodule UserDocs.Automation.Runner do
       annotation_type: &AnnotationType.safe/2,
       page: &Page.safe/2,
       process: &Process.safe/2,
-      screenshot: &Screenshot.safe/2
+      screenshot: &Screenshot.safe/2,
+      version: &Version.safe/2,
+      project: &Project.safe/2
     }
 
     Step.safe(step, handlers)
