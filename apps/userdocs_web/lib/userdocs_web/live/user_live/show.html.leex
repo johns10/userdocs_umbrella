@@ -18,6 +18,6 @@
 </ul>
 
 <div class="buttons">
-  <%= live_patch "Options", to: Routes.user_show_path(@socket, :options, @user), class: "button" %>
+  <%= live_patch "Options", to: Routes.user_show_path(@socket, :options, @user), class: "button", id: "user-options" %>
   <%= live_patch "Edit", to: Routes.user_show_path(@socket, :edit, @user), class: "button" %>
 </div>
