@@ -72,7 +72,9 @@ defmodule UserDocs.Automation.Runner do
       process: &Process.safe/2,
       screenshot: &Screenshot.safe/2,
       job_process: &JobProcess.Safe.apply/2,
-      job_step: &JobStep.Safe.apply/2
+      job_step: &JobStep.Safe.apply/2,
+      version: &Version.safe/2,
+      project: &Project.safe/2
     }
 
     UserDocs.Jobs.Job.Safe.apply(job, handlers)
