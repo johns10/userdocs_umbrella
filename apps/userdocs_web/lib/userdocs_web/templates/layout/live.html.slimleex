@@ -55,6 +55,7 @@ css:
       strategy: @current_version.strategy.name |> to_string(),
       user_data_dir_path: @current_user.user_data_dir_path,
       css: @current_team.css,
+      overrides: @current_user.overrides,
       test: "value" ])
   - else 
     p Select a Version, your configs aren't being passed.
