@@ -10,6 +10,7 @@ defmodule UserDocs.Users.User do
   alias UserDocs.Users.TeamUser
   alias UserDocs.Projects.Project
   alias UserDocs.Projects.Version
+  alias UserDocs.Users.Override
 
   schema "users" do
     pow_user_fields()
@@ -28,7 +29,7 @@ defmodule UserDocs.Users.User do
     field :selected_version_id, :integer
     embeds_one :selected_version, Version
 
-    embeds_many :project_url_overrides, ProjectURLOverride, on_replace: :delete
+    embeds_many :overrides, Override, on_replace: :delete
 
     has_many :team_users, TeamUser
 
@@ -71,7 +72,7 @@ defmodule UserDocs.Users.User do
     user
     |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id, :image_path, :user_data_dir_path])
     |> cast_assoc(:team_users)
-    |> cast_embed(:project_url_overrides)
+    |> cast_embed(:overrides)
     |> ChangesetHelpers.check_only_one_default(:team_users)
   end
 
