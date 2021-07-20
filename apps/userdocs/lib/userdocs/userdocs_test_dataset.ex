@@ -24,18 +24,12 @@ defmodule UserDocs.TestDataset do
   alias UserDocs.Web.Element
   alias UserDocs.Web.Strategy
 
-  alias UserDocs.Automation
   alias UserDocs.Automation.Step
   alias UserDocs.Automation.StepType
   alias UserDocs.Automation.Process
 
   alias UserDocs.Media.File
   alias UserDocs.Media.Screenshot
-
-  alias UserDocs.Jobs
-  alias UserDocs.Jobs.Job
-
-  alias UserDocs.ProcessInstances
 
   alias UserDocs.Repo
 
@@ -69,10 +63,10 @@ defmodule UserDocs.TestDataset do
     strategies = [
       _xpath_strategy = %{
         name: "xpath"
-      },
+     },
       _css_strategy = %{
         name: "css"
-      }
+     }
     ]
 
     Enum.each(strategies, fn(strategy) -> UserDocs.Web.create_strategy(strategy) end)
@@ -81,25 +75,25 @@ defmodule UserDocs.TestDataset do
       %{
         args: ["color", "thickness"],
         name: "Outline"
-      },
+     },
       %{
         args: ["color", "thickness"],
         name: "Blur"
-      },
+     },
       %{
         args: ["x_orientation", "y_orientation", "size", "label", "color", "x_offset", "y_offset", "font_size"],
         name: "Badge"
-      },
+     },
       %{
         args: ["x_orientation", "y_orientation", "size", "label", "color",
          "x_offset", "y_offset", "font_size"],
         name: "Badge Blur"
-      },
+     },
       %{
         args: ["x_orientation", "y_orientation", "size", "label", "color",
          "thickness", "x_offset", "y_offset", "font_size"],
         name: "Badge Outline"
-      }
+     }
     ]
 
     Enum.each(annotation_types, fn(annotation_type) -> UserDocs.Web.create_annotation_type(annotation_type) end)
@@ -108,45 +102,45 @@ defmodule UserDocs.TestDataset do
       %{
         args: ["page_form"],
         name: "Navigate"
-      },
+     },
       %{
         args: ["element_id", "element_form"],
         name: "Wait for Element"
-      },
+     },
       %{
         args: ["element_id", "element_form"],
         name: "Click"
-      },
+     },
       %{
         args: ["element_id", "element_form", "text"],
         name: "Fill Field"
-      },
+     },
       %{
         args: ["annotation_id", "annotation_form", "element_id", "element_form"],
         name: "Apply Annotation"
-      },
+     },
       %{
         args: ["width", "height"],
         name: "Set Size Explicit"
-      },
+     },
       %{
         args: [],
         name: "Full Screen Screenshot"
-      },
+     },
       %{
         args: [],
         name: "Clear Annotations"
-      },
+     },
       %{
         args: ["element_id", "element_form"],
         name: "Element Screenshot"
-      },
-      %{ args: ["element_id", "element_form"], name: "Scroll to Element" },
-      %{ args: ["element_id", "element_form"], name: "Send Enter Key" },
+     },
+      %{args: ["element_id", "element_form"], name: "Scroll to Element"},
+      %{args: ["element_id", "element_form"], name: "Send Enter Key"},
       %{
         args: ["element_id", "element_form"],
         name: "Submit Form"
-      },
+     },
     ]
 
     Enum.each(step_types, fn(step_type) -> UserDocs.Automation.create_step_type(step_type) end)
@@ -157,18 +151,18 @@ defmodule UserDocs.TestDataset do
   _strategies = [
     xpath_strategy = %{
       name: "xpath"
-    },
+   },
     css_strategy = %{
       name: "css"
-    }
+   }
   ]
 
-  {:ok, %UserDocs.Web.Strategy{ id: xpath_strategy_id}} =
+  {:ok, %UserDocs.Web.Strategy{id: xpath_strategy_id}} =
     %Strategy{}
     |> Strategy.changeset(xpath_strategy)
     |> Repo.insert()
 
-  {:ok, %Strategy{ id: css_strategy_id}} =
+  {:ok, %Strategy{id: css_strategy_id}} =
     %Strategy{}
     |> Strategy.changeset(css_strategy)
     |> Repo.insert()
@@ -179,29 +173,29 @@ defmodule UserDocs.TestDataset do
     outline = %{
       args: ["color", "thickness"],
       name: "Outline"
-    },
+   },
     blur = %{
       args: ["color", "thickness"],
       name: "Blur"
-    },
+   },
     badge = %{
       args: ["x_orientation", "y_orientation", "size", "label", "color", "x_offset", "y_offset", "font_size"],
       name: "Badge"
-    },
+   },
     badge_blur = %{
       args: ["x_orientation", "y_orientation", "size", "label", "color",
        "x_offset", "y_offset", "font_size"],
       name: "Badge Blur"
-    },
+   },
     badge_outline = %{
       args: ["x_orientation", "y_orientation", "size", "label", "color",
        "thickness", "x_offset", "y_offset", "font_size"],
       name: "Badge Outline"
-    },
+   },
     none = %{
       args: [],
       name: "None"
-    }
+   }
   ]
 
   {:ok, %AnnotationType{id: outline_id}} =
@@ -239,45 +233,45 @@ defmodule UserDocs.TestDataset do
     navigate = %{
       args: ["page_form"],
       name: "Navigate"
-    },
+   },
     wait = %{
       args: ["element_id", "element_form"],
       name: "Wait for Element"
-    },
+   },
     click = %{
       args: ["element_id", "element_form"],
       name: "Click"
-    },
+   },
     fill_field = %{
       args: ["element_id", "element_form", "text"],
       name: "Fill Field"
-    },
+   },
     apply_annotation = %{
       args: ["annotation_id", "annotation_form", "element_id", "element_form"],
       name: "Apply Annotation"
-    },
+   },
     set_size_explicit = %{
       args: ["width", "height"],
       name: "Set Size Explicit"
-    },
+   },
     full_screen_screenshot = %{
       args: [],
       name: "Full Screen Screenshot"
-    },
+   },
     clear_annotations = %{
       args: [],
       name: "Clear Annotations"
-    },
+   },
     element_screenshot = %{
       args: ["element_id", "element_form"],
       name: "Element Screenshot"
-    },
-    scroll_to_element = %{ args: ["element_id", "element_form"], name: "Scroll to Element" },
-    send_enter = %{ args: ["element_id", "element_form"], name: "Send Enter Key" },
+   },
+    scroll_to_element = %{args: ["element_id", "element_form"], name: "Scroll to Element"},
+    send_enter = %{args: ["element_id", "element_form"], name: "Send Enter Key"},
     submit_form = %{
       args: ["element_id", "element_form"],
       name: "Submit Form"
-    },
+   },
   ]
 
   {:ok, %StepType{id: navigate_id}} =
@@ -348,48 +342,52 @@ defmodule UserDocs.TestDataset do
       %{
         email: "johns10davenport@gmail.com",
         password: default_password,
-        password_confirmation: default_password
-      }
+        password_confirmation: default_password,
+        email_confirmed_at: DateTime.utc_now()
+     }
 
     user_2 =
       %{
         email: "johns10@gmail.com",
         password: default_password,
-        password_confirmation: default_password
-      }
+        password_confirmation: default_password,
+        email_confirmed_at: DateTime.utc_now()
+     }
 
     test_user_1 =
       %{
         email: "user@organization.com",
         password: "testtesttest",
-        password_confirmation: "testtesttest"
-      }
+        password_confirmation: "testtesttest",
+        email_confirmed_at: DateTime.utc_now()
+     }
 
     test_user_2 =
       %{
         email: "user2@organization.com",
         password: "testtesttest",
-        password_confirmation: "testtesttest"
-      }
+        password_confirmation: "testtesttest",
+        email_confirmed_at: DateTime.utc_now()
+     }
 
     {:ok, user_1 = %User{id: user1_id}} =
       %User{}
-      |> User.changeset(user_1)
+      |> User.test_fixture_changeset(user_1)
       |> Repo.insert()
 
     {:ok, user_2 = %User{id: user2_id}} =
     %User{}
-    |> User.changeset(user_2)
+    |> User.test_fixture_changeset(user_2)
     |> Repo.insert()
 
-    {:ok, _ } =
+    {:ok, _} =
       %User{}
-      |> User.changeset(test_user_1)
+      |> User.test_fixture_changeset(test_user_1)
       |> Repo.insert()
 
-    {:ok, _ } =
+    {:ok, _} =
       %User{}
-      |> User.changeset(test_user_2)
+      |> User.test_fixture_changeset(test_user_2)
       |> Repo.insert()
 
     # Team Data
@@ -401,12 +399,12 @@ defmodule UserDocs.TestDataset do
         aws_access_key_id: "AKIAT5VKLWBUOAYXO656",
         aws_secret_access_key: "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",
         aws_region: "us-east-2"
-      }
+     }
 
     loreline_team =
       %{
         name: "LoreLine"
-      }
+     }
 
     {:ok, userdocs_team = %Team{id: userdocs_team_id}} =
       %Team{}
@@ -420,12 +418,12 @@ defmodule UserDocs.TestDataset do
 
     Users.update_user(
       user_1,
-      %{ default_team_id: userdocs_team_id, current_password: default_password }
+      %{default_team_id: userdocs_team_id, current_password: default_password}
     )
 
     Users.update_user(
       user_2,
-      %{ default_team_id: userdocs_team_id, current_password: default_password }
+      %{default_team_id: userdocs_team_id, current_password: default_password}
     )
 
     # Team Users
@@ -434,18 +432,18 @@ defmodule UserDocs.TestDataset do
       %{
         team_id: userdocs_team_id,
         user_id: user1_id
-      },
+     },
       %{
         team_id: userdocs_team_id,
         user_id: user2_id
-      },
+     },
       %{
         team_id: loreline_team_id,
         user_id: user1_id
-      }
+     }
     ]
 
-    Enum.map(team_users,
+    _result = Enum.map(team_users,
       fn(tu) ->
         %TeamUser{}
         |> TeamUser.changeset(tu)
@@ -460,20 +458,20 @@ defmodule UserDocs.TestDataset do
         base_url: "https://the-internet.herokuapp.com",
         name: "The Internet",
         team_id: userdocs_team_id
-      }
+     }
     userdocs_project =
       %{
         base_url: "https://app.user-docs.com",
         name: "Userdocs",
         team_id: userdocs_team_id
-      }
+     }
 
     john_davenport_rocks_project =
       %{
         base_url: "https://www.davenport.rocks",
         name: "John Davenport Rocks",
         team_id: loreline_team_id
-      }
+     }
 
     {:ok, the_internet_project = %Project{id: the_internet_project_id}} =
       %Project{}
@@ -491,7 +489,7 @@ defmodule UserDocs.TestDataset do
       |> Repo.insert()
 
 
-    Users.update_team(userdocs_team, %{ default_project_id: userdocs_project_id})
+    Users.update_team(userdocs_team, %{default_project_id: userdocs_project_id})
 
     # Versions
 
@@ -500,20 +498,20 @@ defmodule UserDocs.TestDataset do
       order: 1,
       project_id: the_internet_project_id,
       strategy_id: css_strategy_id
-    }
+   }
 
     version_0_0_2 = %{
       name: "0.0.2",
       order: 2,
       project_id: userdocs_project_id,
       strategy_id: css_strategy_id
-    }
+   }
 
     version_1 = %{
       name: "Version 1",
       project_id: john_davenport_rocks_project_id,
       strategy_id: css_strategy_id
-    }
+   }
 
     {:ok, _version_0_0_1 = %Version{id: version_0_0_1_id}} =
       %Version{}
@@ -534,12 +532,12 @@ defmodule UserDocs.TestDataset do
     Projects.update_project(userdocs_project, %{default_version_id: version_0_0_2_id})
     Projects.update_project(john_davenport_rocks_project, %{default_version_id: version_1_id})
 
-    { :ok, _user_1 } = Users.update_user(user_1, %{
+    {:ok, _user_1} = Users.update_user(user_1, %{
       current_password: default_password,
       selected_team_id: userdocs_team_id,
       selected_project_id: userdocs_project_id,
       selected_version_id: version_0_0_1_id
-    })
+   })
 
     # Pages
 
@@ -548,28 +546,28 @@ defmodule UserDocs.TestDataset do
       order: 1,
       url: "https://the-internet.herokuapp.com/add_remove_elements/",
       version_id: version_0_0_1_id
-    }
+   }
 
     login_page = %{
       name: "Login Page",
       order: 1,
       url: "https://the-internet.herokuapp.com/login",
       version_id: version_0_0_1_id
-    }
+   }
 
     processes_page = %{
       name: "Login",
       order: 2,
       url: "https://app.user-docs.com/processes",
       version_id: version_0_0_2_id
-    }
+   }
 
     secure_page = %{
       name: "Secure",
       order: 3,
       url: "https://the-internet.herokuapp.com/secure",
       version_id: version_0_0_1_id
-    }
+   }
 
     {:ok, %Page{id: add_remove_page_id}} =
       %Page{}
@@ -610,7 +608,7 @@ defmodule UserDocs.TestDataset do
         x_orientation: nil,
         y_offset: nil,
         y_orientation: nil
-      },
+     },
       badge_remove_button = %{
         annotation_type_id: outline_id,
         color: "#7FBE7F",
@@ -627,7 +625,7 @@ defmodule UserDocs.TestDataset do
         x_orientation: "R",
         y_offset: 0,
         y_orientation: "T"
-      },
+     },
       badge_username_input = %{
         annotation_type_id: badge_id,
         color: "green",
@@ -644,7 +642,7 @@ defmodule UserDocs.TestDataset do
         x_orientation: "R",
         y_offset: 0,
         y_orientation: "T"
-      },
+     },
       badge_password_input = %{
         annotation_type_id: badge_id,
         color: "green",
@@ -661,7 +659,7 @@ defmodule UserDocs.TestDataset do
         x_orientation: "R",
         y_offset: 0,
         y_orientation: "T"
-      },
+     },
       outline_login_button = %{
         annotation_type_id: outline_id,
         color: "green",
@@ -678,7 +676,7 @@ defmodule UserDocs.TestDataset do
         x_orientation: nil,
         y_offset: nil,
         y_orientation: nil
-      },
+     },
       badge_outline_secure_button = %{
         annotation_type_id: badge_outline_id,
         color: "green",
@@ -695,15 +693,15 @@ defmodule UserDocs.TestDataset do
         x_orientation: "R",
         y_offset: 0,
         y_orientation: "T"
-      }
+     }
     ]
 
-    {:ok, %Annotation{id: add_outline_id}} =
+    {:ok, %Annotation{id: _add_outline_id}} =
       %Annotation{}
       |> Annotation.changeset(add_outline)
       |> Repo.insert()
 
-    {:ok, %Annotation{id: badge_remove_button_id}} =
+    {:ok, %Annotation{id: _badge_remove_button_id}} =
       %Annotation{}
       |> Annotation.changeset(badge_remove_button)
       |> Repo.insert()
@@ -734,43 +732,43 @@ defmodule UserDocs.TestDataset do
         page_id: add_remove_page_id,
         selector: "//button[.='Add Element']",
         strategy_id: xpath_strategy_id
-      },
+     },
       delete_element = %{
         name: "Delete Button",
         page_id: add_remove_page_id,
         selector: "//button[.='Delete]",
         strategy_id: xpath_strategy_id
-      },
+     },
       login_button = %{
         name: "Delete Button",
         page_id: add_remove_page_id,
         selector: "//button[@type='submit']",
         strategy_id: xpath_strategy_id
-      },
+     },
       login_form = %{
         name: "Login Form",
         page_id: login_page_id,
         selector: "//div[@id='content']",
         strategy_id: xpath_strategy_id
-      },
+     },
       username_input = %{
         name: "username input",
         page_id: login_page_id,
         selector: "//input[@id='username']",
         strategy_id: xpath_strategy_id
-      },
+     },
       password_input = %{
         name: "password input",
         page_id: login_page_id,
         selector: "//input[@id='password']",
         strategy_id: xpath_strategy_id
-      },
+     },
       logout_button = %{
         name: "Logout Button",
         page_id: secure_page_id,
         selector: "//a[@href='/logout']",
         strategy_id: xpath_strategy_id
-      }
+     }
     ]
 
     {:ok, %Element{id: add_element_id}} =
@@ -813,17 +811,17 @@ defmodule UserDocs.TestDataset do
         name: "Add and Remove Elements",
         order: 1,
         version_id: version_0_0_1_id
-      },
+     },
       add_process = %{
         name: "Add Process",
         order: 2,
         version_id: version_0_0_2_id
-      },
+     },
       test_everything = %{
         name: "Test Everything",
         order: 3,
         version_id: version_0_0_1_id
-      }
+     }
     ]
 
     {:ok, %Process{id: add_remove_process_id}} =
@@ -836,7 +834,7 @@ defmodule UserDocs.TestDataset do
       |> Process.changeset(add_process)
       |> Repo.insert()
 
-    {:ok, %Process{id: test_everything_process_id} } =
+    {:ok, %Process{id: test_everything_process_id}} =
       %Process{}
       |> Process.changeset(test_everything)
       |> Repo.insert()
@@ -856,7 +854,7 @@ defmodule UserDocs.TestDataset do
         step_type_id: navigate_id,
         text: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: nil,
         element_id: nil,
@@ -870,7 +868,7 @@ defmodule UserDocs.TestDataset do
         text: nil,
         url: nil,
         width: 1280
-      },
+     },
       %{
         annotation_id: nil,
         element_id: nil,
@@ -884,7 +882,7 @@ defmodule UserDocs.TestDataset do
         text: nil,
         url: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: nil,
         element_id: nil,
@@ -898,7 +896,7 @@ defmodule UserDocs.TestDataset do
         text: nil,
         url: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: nil,
         element_id: add_element_id,
@@ -912,7 +910,7 @@ defmodule UserDocs.TestDataset do
         text: nil,
         url: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: nil,
         element_id: nil,
@@ -926,7 +924,7 @@ defmodule UserDocs.TestDataset do
         text: nil,
         url: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: nil,
         element_id: nil,
@@ -940,7 +938,7 @@ defmodule UserDocs.TestDataset do
         text: nil,
         url: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: nil,
         element_id: add_element_id,
@@ -954,7 +952,7 @@ defmodule UserDocs.TestDataset do
         text: nil,
         url: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: nil,
         element_id: nil,
@@ -967,7 +965,7 @@ defmodule UserDocs.TestDataset do
         step_type_id: navigate_id,
         text: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: nil,
         element_id: login_button_id,
@@ -980,7 +978,7 @@ defmodule UserDocs.TestDataset do
         text: nil,
         height: 768,
         width: 1280
-      },
+     },
       %{
         annotation_id: badge_username_input_id,
         element_id: username_input_id,
@@ -993,7 +991,7 @@ defmodule UserDocs.TestDataset do
         step_type_id: apply_annotation_id,
         text: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: badge_password_input_id,
         element_id: password_input_id,
@@ -1006,7 +1004,7 @@ defmodule UserDocs.TestDataset do
         step_type_id: apply_annotation_id,
         text: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: outline_login_button_id,
         element_id: login_button_id,
@@ -1019,7 +1017,7 @@ defmodule UserDocs.TestDataset do
         step_type_id: apply_annotation_id,
         text: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: nil,
         element_id: username_input_id,
@@ -1032,7 +1030,7 @@ defmodule UserDocs.TestDataset do
         step_type_id: fill_field_id,
         text: "tomsmith",
         width: nil
-      },
+     },
       %{
         annotation_id: nil,
         element_id: password_input_id,
@@ -1045,7 +1043,7 @@ defmodule UserDocs.TestDataset do
         step_type_id: fill_field_id,
         text: "SuperSecretPassword!",
         width: nil
-      },
+     },
       %{
         annotation_id: nil,
         element_id: nil,
@@ -1058,7 +1056,7 @@ defmodule UserDocs.TestDataset do
         step_type_id: clear_annotations_id,
         text: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: nil,
         element_id: nil,
@@ -1071,7 +1069,7 @@ defmodule UserDocs.TestDataset do
         step_type_id: full_screen_screenshot_id,
         text: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: nil,
         element_id: login_form_id,
@@ -1084,7 +1082,7 @@ defmodule UserDocs.TestDataset do
         step_type_id: element_screenshot_id,
         text: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: nil,
         element_id: login_button_id,
@@ -1097,7 +1095,7 @@ defmodule UserDocs.TestDataset do
         step_type_id: click_id,
         text: nil,
         width: nil
-      },
+     },
       %{
         annotation_id: badge_outline_secure_button_id,
         element_id: logout_button_id,
@@ -1110,7 +1108,7 @@ defmodule UserDocs.TestDataset do
         step_type_id: apply_annotation_id,
         text: nil,
         width: nil
-      },
+     },
     ]
 
     Enum.each(steps,
@@ -1125,11 +1123,11 @@ defmodule UserDocs.TestDataset do
       add_element_button = %{
         name: "Add Element Button",
         team_id: userdocs_team_id
-      },
+     },
       delete_button = %{
         name: "Delete Element button",
         team_id: userdocs_team_id
-      }
+     }
     ]
 
     {:ok, %Content{id: add_element_button_id}} =
@@ -1145,11 +1143,11 @@ defmodule UserDocs.TestDataset do
 
     english_language_code = %{
       name: "en-US"
-    }
+   }
 
     great_britain_language_code = %{
       name: "en-GB"
-    }
+   }
 
     {:ok, %LanguageCode{id: english_language_code_id}} =
       %LanguageCode{}
@@ -1176,28 +1174,28 @@ defmodule UserDocs.TestDataset do
         body: "The add element button adds an element",
         content_id: add_element_button_id,
         version_id: version_0_0_1_id,
-      },
+     },
       _login_button_2020_1_en_gb = %{
         language_code_id: great_britain_language_code_id,
         name: "Add Element",
         body: "The add element button shall add an element",
         content_id: add_element_button_id,
         version_id: version_0_0_1_id,
-      },
+     },
       _manager_button_2020_1_en_us = %{
         language_code_id: english_language_code_id,
         name: "Delete Button",
         body: "This button deletes an element",
         content_id: delete_button_id,
         version_id: version_0_0_1_id,
-      },
+     },
       _manager_button_2020_1_en_gb = %{
         language_code_id: great_britain_language_code_id,
         name: "Delete Button",
         body: "This button shall delete an element",
         content_id: delete_button_id,
         version_id: version_0_0_1_id,
-      }
+     }
     ]
 
     Enum.each(content_versions,
@@ -1213,16 +1211,16 @@ defmodule UserDocs.TestDataset do
       name: "Cycle Profile Form Reference",
       title: "Cycle Profile Form Reference",
       project_id: userdocs_project_id
-    }
+   }
 
-    { :ok, %Document{id: document_id} } =
+    {:ok, %Document{id: document_id}} =
       Documents.create_document(document_attrs)
 
     _docubit_types =
       Enum.map(
         UserDocs.Documents.DocubitType.attrs(),
         fn(attrs) ->
-          { :ok, docubit_type } = Documents.create_docubit_type(attrs)
+          {:ok, docubit_type} = Documents.create_docubit_type(attrs)
           docubit_type
         end
       )
@@ -1232,7 +1230,7 @@ defmodule UserDocs.TestDataset do
       title: "test",
       version_id: version_0_0_1_id,
       document_id: document_id
-    }
+   }
 
     {:ok, %DocumentVersion{id: _document_version_id}} =
       Documents.create_document_version(document_version)
