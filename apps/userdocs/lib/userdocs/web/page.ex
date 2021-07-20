@@ -35,8 +35,9 @@ defmodule UserDocs.Web.Page do
   end
 
   def safe(page, handlers \\ %{})
-  def safe(page = %UserDocs.Web.Page{}, _handlers) do
+  def safe(page = %UserDocs.Web.Page{}, handlers) do
     base_safe(page)
+    |> maybe_safe_version(handlers[:version], page.version, handlers)
   end
   def safe(nil, _), do: nil
   def safe(page, _), do: raise(ArgumentError, "Web.Page.Safe failed because it got an invalid argument: #{inspect(page)}")
@@ -47,5 +48,11 @@ defmodule UserDocs.Web.Page do
       order: page.order,
       url: page.url,
     }
+  end
+
+  defp maybe_safe_version(page, _, %Ecto.Association.NotLoaded{}, _), do: page
+  defp maybe_safe_version(page, nil, _, _), do: page
+  defp maybe_safe_version(page, handler, version, handlers) do
+    Map.put(page, :version, handler.(version, handlers))
   end
 end
