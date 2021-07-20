@@ -116,7 +116,7 @@ defmodule UserDocs.Automation do
 
   """
   def get_step_type!(id), do: Repo.get!(StepType, id)
-  def get_step_type!(%{ step_types: step_types }, id), do: get_step_type!(step_types, id)
+  def get_step_type!(%{step_types: step_types}, id), do: get_step_type!(step_types, id)
   def get_step_type!(step_types, id) when is_list(step_types) do
     base_step_type_query(id)
     |> Repo.one!()
@@ -348,7 +348,7 @@ defmodule UserDocs.Automation do
     StateHandlers.preload(state, step, opts)
   end
 
-  #def step_status(%Step{ screenshot} = step)
+  #def step_status(%Step{screenshot} = step)
 
   @doc """
   Creates a step.
@@ -363,25 +363,25 @@ defmodule UserDocs.Automation do
 
   """
   def create_step(attrs \\ %{}) do
-    %Step{  }
+    %Step{}
     |> Step.changeset(attrs)
     |> Repo.insert()
   end
 
   def create_nested_step(attrs) do
-    { :ok, step } =
+    {:ok, step} =
       %Step{}
       |> Step.fields_changeset(attrs)
       |> Repo.insert()
 
     page = case step do # TODO: Add for other objects
-      %Step{ page_id: nil } -> nil
-      %Step{ page_id: page_id } -> UserDocs.Web.get_page!(page_id)
+      %Step{page_id: nil} -> nil
+      %Step{page_id: page_id} -> UserDocs.Web.get_page!(page_id)
     end
 
     element = case step do
-      %Step{ element_id: nil } -> nil
-      %Step{ element_id: element_id } -> UserDocs.Web.get_element!(element_id)
+      %Step{element_id: nil} -> nil
+      %Step{element_id: element_id} -> UserDocs.Web.get_element!(element_id)
     end
 
     step
@@ -417,14 +417,9 @@ defmodule UserDocs.Automation do
     |> Repo.update()
   end
 
-  def update_nested_step(%Step{} = step, last_step, attrs, socket, action) do
-    Step.nested_changeset(step, last_step, attrs, socket, action)
-    |> Repo.update()
-  end
-
   def put_blank_step_instance(%Step{} = step, process_instance_id \\ nil) do
-    attrs = %{ status: "not_started", step_id: step.id, name: step.name, order: step.order, process_instance_id: process_instance_id }
-    { :ok, step_instance } = UserDocs.StepInstances.create_step_instance(attrs)
+    attrs = %{status: "not_started", step_id: step.id, name: step.name, order: step.order, process_instance_id: process_instance_id}
+    {:ok, step_instance} = UserDocs.StepInstances.create_step_instance(attrs)
     Map.put(step, :last_step_instance, step_instance)
   end
 
@@ -451,11 +446,11 @@ defmodule UserDocs.Automation do
     |> Ecto.Changeset.put_change(foreign_key, nil)
   end
 
-  def clear_association(%Step{ id: nil } = step, _, _), do: step
+  def clear_association(%Step{id: nil} = step, _, _), do: step
   def clear_association(%Step{} = step, foreign_key, key) do
-    { :ok, new_step } =
+    {:ok, new_step} =
       step
-      |> Step.changeset(%{ foreign_key => nil })
+      |> Step.changeset(%{foreign_key => nil})
       |> Repo.update()
 
     Map.put(new_step, key, nil)
@@ -516,10 +511,6 @@ defmodule UserDocs.Automation do
     step
     |> Ecto.Changeset.cast(attrs, [])
     |> Step.assoc_changeset()
-  end
-
-  def change_nested_step(%Step{} = step, %Step{} = last_step, attrs \\ %{}, state, validate) do
-    Step.nested_changeset(step, last_step, attrs, state, validate)
   end
 
   alias UserDocs.Automation.Process
@@ -603,7 +594,7 @@ defmodule UserDocs.Automation do
 
   """
   def get_process!(id, params \\ %{})
-  def get_process!(id, %{ preloads: "*"}) do
+  def get_process!(id, %{preloads: "*"}) do
     Repo.one! from process in Process,
       where: process.id == ^id,
       left_join: step in assoc(process, :steps),
@@ -615,14 +606,14 @@ defmodule UserDocs.Automation do
       left_join: element in assoc(step, :element),
       left_join: strategy in assoc(element, :strategy),
       preload: [
-        steps: { step,
+        steps: {step,
           page: page,
           annotation: annotation,
           element: element,
           step_type: step_type,
           process: process,
           screenshot: screenshot,
-          annotation: { annotation, annotation_type: annotation_type }
+          annotation: {annotation, annotation_type: annotation_type}
         }
       ]
   end
@@ -686,8 +677,8 @@ defmodule UserDocs.Automation do
   end
 
   def put_blank_process_and_step_instances(%Process{} = process) do
-    attrs = %{ status: "not_started", process_id: process.id, name: process.name, order: process.order }
-    { :ok, process_instance } = UserDocs.ProcessInstances.create_process_instance(attrs)
+    attrs = %{status: "not_started", process_id: process.id, name: process.name, order: process.order}
+    {:ok, process_instance} = UserDocs.ProcessInstances.create_process_instance(attrs)
     steps = Enum.map(process.steps, fn(step) -> put_blank_step_instance(step, process_instance.id) end)
 
     process
