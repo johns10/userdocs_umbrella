@@ -1,4 +1,7 @@
 defmodule UserDocs.Projects.Version do
+  @moduledoc """
+    The version object represents a specific version of a software product or project.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -33,7 +36,7 @@ defmodule UserDocs.Projects.Version do
 
   def change_default_version(version, attrs) do
     version
-    |> cast(attrs, [ :default ])
+    |> cast(attrs, [:default])
   end
 
   def processes(version = %UserDocs.Projects.Version{}, processes) do
@@ -41,5 +44,9 @@ defmodule UserDocs.Projects.Version do
   end
   def processes(version_id, processes) when is_integer(version_id) do
     Enum.filter(processes, fn(p) -> p.version_id == version_id end)
+  end
+
+  def safe(step, handlers) do
+    UserDocs.Projects.Version.Safe.apply(step, handlers)
   end
 end
