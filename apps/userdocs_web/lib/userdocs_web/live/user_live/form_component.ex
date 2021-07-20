@@ -3,6 +3,7 @@ defmodule UserDocsWeb.UserLive.FormComponent do
   alias UserDocsWeb.Layout
 
   alias UserDocs.Users
+  alias UserDocs.Users.Override
 
   @impl true
   def render(%{ action: :options } = assigns) do
@@ -18,6 +19,24 @@ defmodule UserDocsWeb.UserLive.FormComponent do
         <%= Layout.text_input f, :email, [], "control" %>
         <%= Layout.text_input f, :image_path, [], "control" %>
         <%= Layout.text_input f, :user_data_dir_path, [], "control" %>
+
+        <%= label f, :overrides, class: "label" %>
+        <%= inputs_for f, :overrides, fn puof -> %>
+          <div class="field is-grouped">
+            <div class="control">
+              <div class="select">
+                <%= select puof, :project_id, @project_select_options %>
+              </div>
+            </div>
+            <div class="control is-expanded">
+              <%= text_input puof, :url, class: :input %>
+            </div>
+          </div>
+        <% end %>
+
+        <%= link to: "#", phx_click: "add-override", phx_target: @myself.cid, id: "add-override" do %>
+          <p>New Override</p>
+        <% end %>
 
         <%= inputs_for f, :team_users, fn tuf -> %>
           <div class="field is-grouped">
@@ -82,11 +101,17 @@ defmodule UserDocsWeb.UserLive.FormComponent do
   @impl true
   def update(%{user: user} = assigns, socket) do
     changeset = Users.change_user(user)
+    project_select_options =
+      UserDocs.Projects.list_projects(%{}, %{ user_id: user.id })
+      |> UserDocs.Helpers.select_list(:name, false)
 
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign(:changeset, changeset)}
+    {
+      :ok,
+      socket
+      |> assign(assigns)
+      |> assign(:changeset, changeset)
+      |> assign(:project_select_options, project_select_options)
+    }
   end
 
   @impl true
@@ -108,6 +133,26 @@ defmodule UserDocsWeb.UserLive.FormComponent do
     save_user(socket, socket.assigns.action, user_params)
   end
 
+  def handle_event("add-override", _, socket) do
+    existing_overrides =
+      Map.get(
+        socket.assigns.changeset.changes, :overrides,
+        socket.assigns.user.overrides
+      )
+
+    overrides =
+      existing_overrides
+      |> Enum.concat([
+        Users.change_override(%Override{})
+      ])
+
+    changeset =
+      socket.assigns.changeset
+      |> Ecto.Changeset.put_embed(:overrides, overrides)
+
+    {:noreply, assign(socket, changeset: changeset)}
+  end
+
   defp save_user(socket, :edit, user_params) do
     case Users.update_user(socket.assigns.user, user_params) do
       {:ok, _user} ->
@@ -125,7 +170,7 @@ defmodule UserDocsWeb.UserLive.FormComponent do
 
   defp save_user(socket, :new, user_params) do
     case Users.create_user(user_params) do
-      {:ok, user} ->
+      {:ok, _user} ->
         {
           :noreply,
           socket
