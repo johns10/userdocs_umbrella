@@ -4,10 +4,8 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
     The module assigns step_params to the socket. step_params is used in `StepLive.FormComponent` to do the things.
   """
   require Logger
-  alias Phoenix.LiveView.Socket
   alias UserDocs.Automation
   alias UserDocs.Web
-  alias UserDocsWeb.Router.Helpers
 
   def step_type_id(payload) do
     step_type(payload)
