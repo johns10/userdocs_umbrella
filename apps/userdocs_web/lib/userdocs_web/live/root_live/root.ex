@@ -45,10 +45,10 @@ defmodule UserDocsWeb.Root do
   end
 
   def initialize(socket, opts)
-  def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket, opts) do
+  def initialize(%{assigns: %{auth_state: :logged_in}} = socket, opts) do
     socket
     |> StateHandlers.initialize(opts)
-    |> assign(:form_data, %{ action: :show })
+    |> assign(:form_data, %{action: :show})
     |> subscribe()
     |> assign(:state_opts, opts)
   end
@@ -70,13 +70,13 @@ defmodule UserDocsWeb.Root do
 
   def validate_logged_in(socket, session) do
     case maybe_assign_current_user(socket, session) do
-      %{ assigns: %{ current_user: nil }} ->
+      %{assigns: %{current_user: nil}} ->
         Logger.debug("No user found in socket")
         socket
         |> assign(:auth_state, :not_logged_in)
         |> assign(:changeset, Users.change_user(%User{}))
         |> push_redirect(to: UserDocsWeb.Router.Helpers.pow_session_path(socket, :new))
-      %{ assigns: %{ current_user: current_user }} ->
+      %{assigns: %{current_user: current_user}} ->
         Logger.debug("User #{current_user.id} found in socket")
         socket
         |> maybe_assign_current_user(session)
@@ -91,7 +91,7 @@ defmodule UserDocsWeb.Root do
     end
   end
 
-  def prepare_user(%{ assigns: %{ current_user: current_user } } = socket) do
+  def prepare_user(%{assigns: %{current_user: current_user}} = socket) do
     current_user = Users.get_user_and_configs!(current_user.id)
 
     current_user =
@@ -103,10 +103,10 @@ defmodule UserDocsWeb.Root do
     assign(socket, :current_user, current_user)
   end
 
-  def assign_current(%{ assigns: %{ current_user: current_user } } = socket) do
-    { default_team, current_team } = current_team(current_user)
-    { default_project, current_project } = current_project(current_user, default_team)
-    { default_version, current_version } = current_version(current_user, default_project)
+  def assign_current(%{assigns: %{current_user: current_user}} = socket) do
+    {default_team, current_team} = current_team(current_user)
+    {default_project, current_project} = current_project(current_user, default_team)
+    {default_version, current_version} = current_version(current_user, default_project)
 
     current_user = assign_defaults(current_user, default_team, default_project, default_version)
 
@@ -171,7 +171,7 @@ defmodule UserDocsWeb.Root do
     Map.put(user, :default_team, nil)
   end
 
-  def put_app_name(socket, %{ "app_name" => app_name }) do
+  def put_app_name(socket, %{"app_name" => app_name}) do
     uri =
       if Mix.env() in [:dev, :test] do
         URI.parse("https://dev.user-docs.com:4002")
@@ -183,8 +183,8 @@ defmodule UserDocsWeb.Root do
     |> assign(:uri, uri)
   end
 
-  def app_assigns(%{ assigns: %{ app_name: "electron" } } = socket), do: socket
-  def app_assigns(%{ assigns: %{ app_name: "web" } } = socket), do: socket
+  def app_assigns(%{assigns: %{app_name: "electron"}} = socket), do: socket
+  def app_assigns(%{assigns: %{app_name: "web"}} = socket), do: socket
 
   def handle_event("delete-document-version", p, s) do
     UserDocsWeb.DocumentVersionLive.EventHandlers.handle_event("delete", p, s)
@@ -215,35 +215,36 @@ defmodule UserDocsWeb.Root do
   end
   def handle_event("new-content", params, socket) do
     IO.puts("Root making new Content")
-    { :noreply, ModalMenus.new_content(socket, params) }
+    {:noreply, ModalMenus.new_content(socket, params)}
   end
   def handle_event("edit-content", params, socket) do
     IO.puts("Root handling Content")
-    { :noreply, ModalMenus.edit_content(socket, params) }
+    {:noreply, ModalMenus.edit_content(socket, params)}
   end
   def handle_event("edit-user", params, socket) do
     IO.puts("Root opening user form")
-    { :noreply, ModalMenus.edit_user(socket, params) }
+    {:noreply, ModalMenus.edit_user(socket, params)}
   end
-  def handle_event("select-version", %{"version-id" => version_id, "project-id" => project_id, "team-id" => team_id } = _payload, socket) do
+  def handle_event("select-version", %{"version-id" => version_id, "project-id" => project_id, "team-id" => team_id} = _payload, socket) do
     changes = %{
       selected_team_id: String.to_integer(team_id),
       selected_project_id: String.to_integer(project_id),
       selected_version_id: String.to_integer(version_id)
     }
 
-    { :ok, user } =
+    {:ok, user} =
       Users.update_user_selections(socket.assigns.current_user, changes)
 
-    send(self(), { :broadcast, "update", user })
+    send(self(), {:broadcast, "update", user})
 
-    version = Projects.get_version!(version_id, %{ strategy: true })
+    version = Projects.get_version!(version_id, %{strategy: true})
 
     configuration = [
       id: "configuration",
       image_path: socket.assigns.current_user.image_path,
       strategy: version.strategy.name |> to_string,
-      user_data_dir_path: socket.assigns.current_user.user_data_dir_path
+      user_data_dir_path: socket.assigns.current_user.user_data_dir_path,
+      overrides: socket.assigns.current_user.overrides
     ]
     send_update(UserDocsWeb.Configuration, configuration)
 
@@ -261,7 +262,7 @@ defmodule UserDocsWeb.Root do
 
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
     schema = case payload do
-      %{ objects: [ object | _ ]} -> object.__meta__.schema
+      %{objects: [ object | _ ]} -> object.__meta__.schema
       object -> object.__meta__.schema
     end
     Logger.debug("Root handling info on topic #{topic}, event #{event}, view: #{socket.view}, type: #{schema}")
@@ -278,10 +279,10 @@ defmodule UserDocsWeb.Root do
         false -> socket
       end
 
-    { :noreply, socket }
+    {:noreply, socket}
   end
   def handle_info({:update_form_data, form_data}, socket) do
-    { :noreply, assign(socket, :form_data, form_data )}
+    {:noreply, assign(socket, :form_data, form_data )}
   end
   def handle_info({:broadcast, action, data}, socket) do
     Logger.debug("Handling #{data.__meta__.schema} Broadcast")
@@ -290,19 +291,19 @@ defmodule UserDocsWeb.Root do
       |> Keyword.put(:action, action)
 
     StateHandlers.broadcast(socket, data, opts)
-    { :noreply, socket }
+    {:noreply, socket}
   end
-  def handle_info({ :update_session, params }, socket) do
+  def handle_info({:update_session, params}, socket) do
     IO.puts("Attempting to update session")
     socket =
       Enum.reduce(params, socket,
-        fn({ k, v }, inner_socket) ->
+        fn({k, v}, inner_socket) ->
           PhoenixLiveSession.put_session(inner_socket, k, v)
         end
       )
-    { :noreply, socket }
+    {:noreply, socket}
   end
-  def handle_info({ :live_session_updated, params }, socket) do
+  def handle_info({:live_session_updated, params}, socket) do
   IO.puts("Handling info for a live session update")
   {
     :noreply,

@@ -1,4 +1,7 @@
 defmodule UserDocsWeb.Configuration do
+  @moduledoc """
+    This module manages sending configuration data to the client
+  """
   use UserDocsWeb, :live_component
 
   @impl true
@@ -15,7 +18,8 @@ defmodule UserDocsWeb.Configuration do
       image_path: assigns.image_path || "/images/",
       strategy: assigns.strategy || "xpath",
       user_data_dir_path: assigns.user_data_dir_path || nil,
-      css: assigns.css || ""
+      css: assigns.css || "",
+      overrides: assigns.overrides || %{}
     }
     {
       :ok,
