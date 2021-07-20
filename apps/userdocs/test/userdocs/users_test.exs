@@ -3,7 +3,7 @@ defmodule UserDocs.UsersTest do
 
   alias UserDocs.Users
 
-  @opts [ data_type: :list, strategy: :by_type, loader: &Phoenix.LiveView.assign/3 ]
+  @opts [data_type: :list, strategy: :by_type, loader: &Phoenix.LiveView.assign/3]
 
   describe "users" do
     alias UserDocs.Users.User
@@ -75,7 +75,7 @@ defmodule UserDocs.UsersTest do
       user = UsersFixtures.user()
       team = UsersFixtures.team()
       team_user = UsersFixtures.team_user(user.id, team.id)
-      preloads = [ teams: :teams ]
+      preloads = [teams: :teams]
       state = %{teams: [team], users: [user], team_users: [team_user]}
       result = Users.get_user!(user.id, preloads, [], state, @opts)
       assert result.teams == [team]
@@ -85,7 +85,7 @@ defmodule UserDocs.UsersTest do
       user = UsersFixtures.user()
       team_one = UsersFixtures.team()
       team_two = UsersFixtures.team()
-      preloads = [ teams: [ :teams ] ]
+      preloads = [teams: [:teams]]
       team_user_one = UsersFixtures.team_user(user.id, team_one.id)
       team_user_two = UsersFixtures.team_user(user.id, team_two.id)
       state = %{teams: [team_one, team_two], users: [user], team_users: [team_user_one, team_user_two]}
@@ -98,7 +98,7 @@ defmodule UserDocs.UsersTest do
       team = UsersFixtures.team()
       team_user = UsersFixtures.team_user(user.id, team.id)
       project = ProjectsFixtures.project(team.id)
-      preloads = [ teams: [ :teams, [ teams: :projects ] ] ]
+      preloads = [teams: [:teams, [teams: :projects]]]
       state = %{teams: [team], users: [user], team_users: [team_user], projects: [project]}
       result = Users.get_user!(user.id, preloads, [], state, @opts)
       assert project == result.teams |> Enum.at(0) |> Map.get(:projects) |> Enum.at(0)
@@ -110,7 +110,7 @@ defmodule UserDocs.UsersTest do
       team_user = UsersFixtures.team_user(user.id, team.id)
       project = ProjectsFixtures.project(team.id)
       version = ProjectsFixtures.version(project.id)
-      preloads = [ teams: [ :teams, [ teams: :projects ], [ teams: [ projects: :versions]] ] ]
+      preloads = [teams: [:teams, [teams: :projects], [teams: [projects: :versions]]]]
       state = %{teams: [team], users: [user], team_users: [team_user],
         projects: [project], versions: [version]}
       result = Users.get_user!(user.id, preloads, [], state, @opts)
@@ -125,16 +125,16 @@ defmodule UserDocs.UsersTest do
       team_user = UsersFixtures.team_user(user.id, team.id)
       project = ProjectsFixtures.project(team.id)
       version = ProjectsFixtures.version(project.id)
-      project_url_overrides = [%{project_id: project.id, url: "https://www.google.com/"}]
+      overrides = [%{project_id: project.id, url: "https://www.google.com/"}]
       attrs = UsersFixtures.user_attrs(:valid)
-      attrs = attrs |> Map.put(:project_url_overrides, project_url_overrides)
+      attrs = attrs |> Map.put(:overrides, overrides)
 
       {:ok, %User{} = user} = Users.update_user_options(user, attrs)
-      assert user.project_url_overrides |> Enum.at(0) |> Map.get(:project_id) == project.id
+      assert user.overrides |> Enum.at(0) |> Map.get(:project_id) == project.id
 
       UserDocs.Projects.delete_project(project)
       {:error, changeset} = Users.update_user_options(user, attrs)
-      { error, _ } = changeset.changes.project_url_overrides |> Enum.at(1) |> Map.get(:errors) |> Keyword.get(:project_id)
+      {error, _} = changeset.changes.overrides |> Enum.at(1) |> Map.get(:errors) |> Keyword.get(:project_id)
       assert error == "This project ID does exist. Pick a new project."
     end
 
