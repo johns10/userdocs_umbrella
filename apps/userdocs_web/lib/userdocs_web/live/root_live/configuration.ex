@@ -15,8 +15,8 @@ defmodule UserDocsWeb.Configuration do
   @impl true
   def update(assigns, socket) do
     configuration = %{
-      image_path: assigns.image_path || "/images/",
-      strategy: assigns.strategy || "xpath",
+      image_path: assigns.image_path || "",
+      strategy: assigns.strategy || "css",
       user_data_dir_path: assigns.user_data_dir_path || nil,
       css: assigns.css || "",
       overrides: assigns.overrides || %{}
