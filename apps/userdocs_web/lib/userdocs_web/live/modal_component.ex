@@ -19,7 +19,7 @@ defmodule UserDocsWeb.ModalComponent do
         phx-click="close"
         phx-target="<%= @myself.cid %>"
       ></div>
-      <div class="modal-content" style="overflow:visible">
+      <div class="modal-content" style="overflow:auto; max-height:calc(100vh - 125px);">
         <div class="box">
           <div
             class="modal-close is-large"
