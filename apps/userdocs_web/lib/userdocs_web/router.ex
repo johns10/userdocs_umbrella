@@ -37,6 +37,8 @@ defmodule UserDocsWeb.Router do
   pipeline :protected do
     plug Pow.Plug.RequireAuthenticated,
       error_handler: Pow.Phoenix.PlugErrorHandler
+    plug UserDocsWeb.API.Auth.Plug,
+      otp_app: :userdocs_web
   end
 
   pipeline :not_authenticated do
@@ -46,11 +48,13 @@ defmodule UserDocsWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-    plug UserDocsWeb.API.Auth.Plug, otp_app: :userdocs_web
+    plug UserDocsWeb.API.Auth.Plug,
+      otp_app: :userdocs_web
   end
 
   pipeline :api_protected do
-    plug Pow.Plug.RequireAuthenticated, error_handler: UserDocsWeb.API.Auth.ErrorHandler
+    plug Pow.Plug.RequireAuthenticated,
+      error_handler: UserDocsWeb.API.Auth.ErrorHandler
     plug UserDocsWeb.API.Auth.Context
   end
 
@@ -77,8 +81,8 @@ defmodule UserDocsWeb.Router do
     #pipe_through :api
     pipe_through [:api, :api_protected]
 
-    forward "/", Absinthe.Plug,
-      schema: UserDocsWeb.API.Schema
+    post "/session/convert", UserDocsWeb.TokenToSessionController, :new
+    forward "/", Absinthe.Plug, schema: UserDocsWeb.API.Schema
 
   end
 
