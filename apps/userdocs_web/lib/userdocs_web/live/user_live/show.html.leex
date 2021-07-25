@@ -10,6 +10,14 @@
     return_to: Routes.user_show_path(@socket, :show, @user) %>
 <% end %>
 
+<%= if @live_action in [:local_options] do %>
+  <%= live_modal @socket, UserDocsWeb.UserLive.LocalFormComponent,
+    id: "local-options",
+    title: @page_title,
+    action: @live_action,
+    return_to: Routes.user_show_path(@socket, :show, @user) %>
+<% end %>
+
 <ul>
   <li>
     <strong>Email:</strong>
@@ -19,5 +27,6 @@
 
 <div class="buttons">
   <%= live_patch "Options", to: Routes.user_show_path(@socket, :options, @user), class: "button", id: "user-options" %>
+  <%= live_patch "Local Options", to: Routes.user_show_path(@socket, :local_options, @user), class: "button", id: "user-local-options" %>
   <%= live_patch "Edit", to: Routes.user_show_path(@socket, :edit, @user), class: "button" %>
 </div>
