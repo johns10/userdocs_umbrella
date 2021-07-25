@@ -1,3 +1,34 @@
+const { GraphQLClient, gql } = require('graphql-request')
+var PORT
+var CLIENT
+const configurationQuery = gql`
+  query Query {
+    configuration {
+      maxRetries
+      imagePath
+      userDataDirPath
+    }
+  }
+`
+function configurationMutation(config) {
+  return gql`
+    mutation Mutation {
+      configuration(maxRetries: ${config.maxRetries}, imagePath: "${config.imagePath}", userDataDirPath: "${config.userDataDirPath}") {
+        maxRetries
+        imagePath
+        userDataDirPath
+      }
+    }
+  `
+}
+
+window.userdocs.port()
+  .then(port => {
+    PORT = port
+    console.log(PORT)
+    CLIENT = new GraphQLClient(`http://localhost:${port}`)
+  })
+
 let Hooks = {}
 
 Hooks.testSelector = {
@@ -77,7 +108,25 @@ Hooks.configuration = {
   }
 }
 
-
+Hooks.configurationV2 = {
+  mounted() {
+    this.handleEvent("get-configuration", (message) => {
+      const result = 
+        CLIENT.request(configurationQuery)
+          .then(result => {
+            this.pushEventTo('#configuration-v2-hook', "configuration-response", result)
+          })
+    }),
+    this.handleEvent("put-configuration", (message) => {
+      const mutation = configurationMutation(message)
+      const result = 
+        CLIENT.request(mutation)
+        .then(result => {
+          this.pushEventTo('#configuration-v2-hook', "configuration-saved", result)
+        })
+    })
+  }
+}
 
 
 
