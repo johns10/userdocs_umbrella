@@ -62,22 +62,22 @@ defmodule UserDocs.Automation.Step do
     last_change = changeset(last_step, attrs)
     step
   # |> change page
-    |> cast(attrs, [ :page_id ])
+    |> cast(attrs, [:page_id])
     |> foreign_key_constraint(:page)
     |> Changeset.handle_page_id_change(state)
     |> Changeset.maybe_replace_page_params(last_change, state)
   # |> change annotation
-    |> Changeset.cast_changeset_params([ :annotation_id ])
+    |> Changeset.cast_changeset_params([:annotation_id])
     |> foreign_key_constraint(:annotation)
     |> Changeset.handle_annotation_id_change(state)
     |> Changeset.maybe_replace_annotation_params(last_change, state)
   # |> change element
-    |> Changeset.cast_changeset_params([ :element_id ])
+    |> Changeset.cast_changeset_params([:element_id])
     |> foreign_key_constraint(:element)
     |> Changeset.handle_element_id_change(state)
     |> Changeset.maybe_replace_element_params(last_change, state)
   # |> update step fk's
-    |> Changeset.cast_changeset_params([ :page_id, :annotation_id, :element_id ])
+    |> Changeset.cast_changeset_params([:page_id, :annotation_id, :element_id])
     |> Changeset.update_foreign_keys(action)
   # |> change content
     |> cast_assoc(:annotation, with: &Annotation.content_id_changeset/2)
@@ -88,8 +88,8 @@ defmodule UserDocs.Automation.Step do
     |> Changeset.update_foreign_keys(action)
     |> cast_assoc(:screenshot)
   # |> final changes
-    |> Changeset.cast_changeset_params([ :process_id, :step_type_id ])
-    |> Changeset.cast_changeset_params([ :name, :order, :url, :text, :width, :height, :page_reference ])
+    |> Changeset.cast_changeset_params([:process_id, :step_type_id])
+    |> Changeset.cast_changeset_params([:name, :order, :url, :text, :width, :height, :page_reference])
     |> foreign_key_constraint(:process)
     |> foreign_key_constraint(:step_type)
     |> assoc_changeset()
@@ -100,13 +100,13 @@ defmodule UserDocs.Automation.Step do
   def create_nested_changeset(step, attrs) do
     IO.puts("create_nested_changeset")
     step
-    |> cast(attrs, [ :page_id, :annotation_id, :element_id, :process_id, :step_type_id ])
+    |> cast(attrs, [:page_id, :annotation_id, :element_id, :process_id, :step_type_id])
   end
 
   def fields_changeset(step, attrs) do
     step
-    |> cast(attrs, [ :order, :name, :url, :text, :width, :height, :page_reference ])
-    |> cast(attrs, [ :process_id, :page_id, :element_id, :annotation_id, :step_type_id ])
+    |> cast(attrs, [:order, :name, :url, :text, :width, :height, :page_reference])
+    |> cast(attrs, [:process_id, :page_id, :element_id, :annotation_id, :step_type_id])
     |> foreign_key_constraint(:process)
     |> foreign_key_constraint(:page)
     |> foreign_key_constraint(:element)
@@ -132,8 +132,8 @@ defmodule UserDocs.Automation.Step do
     UserDocs.Automation.Step.Safe.apply(step, handlers)
   end
 
-  def put_annotation_name(%{ data: %{ annotation: %Ecto.Association.NotLoaded{} }} = changeset), do: changeset
-  def put_annotation_name(%{ data: %{ element: %Ecto.Association.NotLoaded{} }} = changeset), do: changeset
+  def put_annotation_name(%{data: %{annotation: %Ecto.Association.NotLoaded{}}} = changeset), do: changeset
+  def put_annotation_name(%{data: %{element: %Ecto.Association.NotLoaded{}}} = changeset), do: changeset
   def put_annotation_name(changeset) do
     case get_field(changeset, :annotation, nil) do
       nil -> changeset
@@ -150,7 +150,7 @@ defmodule UserDocs.Automation.Step do
     end
   end
 
-  def put_name(%{ data: %{ step_type: %Ecto.Association.NotLoaded{} }} = changeset) do
+  def put_name(%{data: %{step_type: %Ecto.Association.NotLoaded{}}} = changeset) do
     changeset
   end
   def put_name(changeset) do
