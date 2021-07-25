@@ -57,4 +57,5 @@ defmodule UserDocsWeb.UserLive.Show do
   defp page_title(:show), do: "Show User"
   defp page_title(:edit), do: "Edit User"
   defp page_title(:options), do: "User Options"
+  defp page_title(:local_options), do: "Local Options"
 end
