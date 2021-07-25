@@ -25,7 +25,7 @@ defmodule UserDocsWeb.UserLive.Index do
     }
   end
 
-  def initialize(%{ assigns: %{ current_user: %{ email: "johns10davenport@gmail.com" }}} = socket) do
+  def initialize(%{assigns: %{current_user: %{email: "johns10davenport@gmail.com"}}} = socket) do
     socket
     |> assign(:users, list_users())
   end
@@ -40,6 +40,11 @@ defmodule UserDocsWeb.UserLive.Index do
   @impl true
   def handle_params(params, _url, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  end
+
+  defp apply_action(socket, :local_options, _) do
+    socket
+    |> assign(:page_title, "Edit Local Options")
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
