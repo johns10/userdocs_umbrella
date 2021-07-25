@@ -657,4 +657,15 @@ defmodule UserDocs.Users do
   def change_override(%Override{} = override, attrs \\ %{}) do
     Override.changeset(override, attrs)
   end
+
+  alias UserDocs.Users.LocalOptions
+  def change_local_options(%LocalOptions{} = local_options, attrs \\ %{}) do
+    LocalOptions.changeset(local_options, attrs)
+  end
+
+  def update_local_options(%LocalOptions{} = local_options, attrs \\ %{}) do
+    local_options
+    |> LocalOptions.changeset(attrs)
+    |> Ecto.Changeset.apply_action(:update)
+  end
 end
