@@ -1,0 +1,41 @@
+h2.title
+  = @title  
+
+= if @changeset do
+  = f = form_for @changeset, "#",
+    id: "local-options-form",
+    phx_target: @myself.cid,
+    phx_change: "validate",
+    phx_submit: "save"
+
+    .field.is-horizontal
+      .field-label.is-normal
+        = label f, :max_retries, class: "label"
+      .field-body
+        .control
+          = number_input f, :max_retries, [ class: "input", type: "text" ]
+          = error_tag(f, :max_retries)
+
+    .field.is-horizontal
+      .field-label.is-normal
+        = label f, :image_path, class: "label"
+      .field-body
+        .control.is-expanded
+          = text_input f, :image_path, [ class: "input", type: "text" ]
+          = error_tag(f, :image_path)
+
+    .field.is-horizontal
+      .field-label.is-normal
+        = label f, :user_data_dir, class: "label"
+      .field-body
+        .control.is-expanded
+          = text_input f, :user_data_dir, [ class: "input", type: "text" ]
+          = error_tag(f, :user_data_dir)
+
+
+    = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
+
+  </form>
+
+
+div phx-hook="configurationV2" id="configuration-v2-hook"
