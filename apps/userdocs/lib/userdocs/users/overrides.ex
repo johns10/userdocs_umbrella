@@ -5,16 +5,19 @@ defmodule UserDocs.Users.Override do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key false
+  @primary_key {:id, :binary_id, autogenerate: true}
   @derive {Jason.Encoder, only: [:url, :project_id]}
   embedded_schema do
+    field :temp_id, :string, virtual: true
     field :url, :string
     field :project_id, :integer
+    field :delete, :boolean, virtual: true
   end
 
   def changeset(override, attrs) do
     override
-    |> cast(attrs, [:project_id, :url])
+    |> cast(attrs, [:id, :temp_id, :project_id, :url, :delete])
+    |> maybe_mark_for_deletion()
     |> valid_project_id?()
   end
 
@@ -28,6 +31,14 @@ defmodule UserDocs.Users.Override do
         rescue
           Ecto.NoResultsError -> add_error(changeset, :project_id, "This project ID does exist. Pick a new project.")
         end
+    end
+  end
+
+  defp maybe_mark_for_deletion(changeset) do
+    if get_change(changeset, :delete) do
+      %{changeset | action: :delete}
+    else
+      changeset
     end
   end
 end
