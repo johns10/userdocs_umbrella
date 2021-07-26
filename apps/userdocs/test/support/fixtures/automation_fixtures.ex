@@ -16,7 +16,7 @@ defmodule UserDocs.AutomationFixtures do
   def state(state, opts) do
     opts =
       opts
-      |> Keyword.put(:types, [ Process, StepType, Step ])
+      |> Keyword.put(:types, [Process, StepType, Step])
 
     v = Projects.list_versions(state, opts) |> Enum.at(0)
     process = process(v.id)
@@ -34,7 +34,7 @@ defmodule UserDocs.AutomationFixtures do
   end
 
   def process(version_id) do
-    { :ok, process } =
+    {:ok, process} =
       process_attrs(:valid, version_id)
       |> Automation.create_process()
     process
@@ -44,21 +44,21 @@ defmodule UserDocs.AutomationFixtures do
     UserDocs.AutomationFixtures.StepTypes.data()
     |> Enum.map(
       fn(st) ->
-        { :ok, step_type } = Automation.create_step_type(st)
+        {:ok, step_type} = Automation.create_step_type(st)
         step_type
       end
     )
   end
 
   def step_type() do
-    {:ok, step_type } =
+    {:ok, step_type} =
       step_type_attrs(:valid)
       |> Automation.create_step_type()
     step_type
   end
 
   def step(:both) do
-    {:ok, step } =
+    {:ok, step} =
       step_attrs(:valid)
       |> Automation.create_step()
 
@@ -76,7 +76,7 @@ defmodule UserDocs.AutomationFixtures do
       annotation: annotation_attrs
     }
 
-    { :ok, step } =
+    {:ok, step} =
       step
       |> Map.put(:element, nil)
       |> Map.put(:annotation, nil)
@@ -86,7 +86,7 @@ defmodule UserDocs.AutomationFixtures do
   end
   def step(page_id \\ nil, process_id \\ nil,
     element_id \\ nil, annotation_id \\ nil, step_type_id \\ nil) do
-    {:ok, step } =
+    {:ok, step} =
       step_attrs(:valid, page_id, process_id, element_id,
         annotation_id, step_type_id)
       |> Automation.create_step()
@@ -94,7 +94,7 @@ defmodule UserDocs.AutomationFixtures do
   end
   def step_form(page_id \\ nil, process_id \\ nil,
     element_id \\ nil, annotation_id \\ nil, step_type_id \\ nil) do
-    {:ok, step } =
+    {:ok, step} =
       step_attrs(:valid, page_id, process_id, element_id,
         annotation_id, step_type_id)
       |> Automation.create_step_form()
@@ -131,7 +131,7 @@ defmodule UserDocs.AutomationFixtures do
     }
   end
   def step_type_attrs(:invalid) do
-    %{ args: nil, name: nil }
+    %{args: nil, name: nil}
   end
 
   def process_attrs(status, version_id \\ nil)

@@ -104,7 +104,7 @@ defmodule StateHandlers.Helpers do
     ##IO.puts("maybe_put_in_state by type without location")
     loader.(state, type(schema), data)
   end
-  def reload({ state, location_data, nil, nil}, _schema, loader, :by_type, location) do
+  def reload({state, location_data, nil, nil}, _schema, loader, :by_type, location) do
     ##IO.puts("maybe_put_in_state by type with location #{location}")
     loader.(state, location, location_data)
   end

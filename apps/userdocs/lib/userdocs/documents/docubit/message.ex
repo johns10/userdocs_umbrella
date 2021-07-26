@@ -2,10 +2,10 @@ defmodule UserDocs.Docubit.Messages do
   alias UserDocs.Helpers
 
   def edit_modal_menu(socket, params) do
-    required_keys = [ :docubit, :channel, :state_opts ]
+    required_keys = [:docubit, :channel, :state_opts]
     params = Helpers.validate_params(params, required_keys, __MODULE__)
 
-    %{ target: "ModalMenus" }
+    %{target: "ModalMenus"}
     |> init(socket, params.channel)
     |> edit(socket, params.docubit, params.state_opts)
   end
