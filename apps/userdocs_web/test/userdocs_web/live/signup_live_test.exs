@@ -17,19 +17,19 @@ defmodule UserDocsWeb.SignupLiveTest do
     test "creates new user", %{conn: conn} do
       {:ok, index_live, _html} = live(conn, Routes.signup_index_path(conn, :new))
 
-      valid_attrs = %{ email: "test@test.com", password: "asdf", password_confirmation: "asdf1234asdf" }
-      expected_email = UserDocs.Email.welcome_email(client)
+      valid_attrs = %{email: "test@test.com", password: "asdf", password_confirmation: "asdf1234asdf"}
+      expected_email = UserDocs.Email.confirmation_email(valid_attrs)
 
       assert index_live
-      |> form("#signup-form", user: %{ email: nil })
+      |> form("#signup-form", user: %{email: nil})
       |> render_change() =~ "can&#39;t be blank"
 
       assert index_live
-      |> form("#signup-form", user: %{ email: "test@test.com" })
+      |> form("#signup-form", user: %{email: "test@test.com"})
       |> render_change() =~ "can&#39;t be blank"
 
       assert index_live
-      |> form("#signup-form", user: %{ email: "test@test.com", password: "asdf1234asdf" })
+      |> form("#signup-form", user: %{email: "test@test.com", password: "asdf1234asdf"})
       |> render_change() =~ "does not match confirmation"
 
       assert index_live
