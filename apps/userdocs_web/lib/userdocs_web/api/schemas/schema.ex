@@ -17,6 +17,9 @@ defmodule UserDocsWeb.API.Schema do
   import_types UserDocsWeb.API.Schema.JobStep
   import_types UserDocsWeb.API.Schema.Error
   import_types UserDocsWeb.API.Schema.Warning
+  import_types UserDocsWeb.API.Schema.User
+  import_types UserDocsWeb.API.Schema.Configuration
+  import_types UserDocsWeb.API.Schema.Override
 
   alias UserDocsWeb.API.Resolvers
 
@@ -26,6 +29,12 @@ defmodule UserDocsWeb.API.Schema do
     field :job, :job do
       arg :id, non_null(:id)
       resolve &Resolvers.Job.get_job!/3
+    end
+
+    @desc "Get a user"
+    field :user, :user do
+      arg :id, non_null(:id)
+      resolve &Resolvers.User.get_user!/3
     end
 
   end

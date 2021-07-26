@@ -55,7 +55,8 @@ defmodule UserDocs.UsersFixtures do
       aws_bucket: "userdocs-test",
       aws_access_key_id: "AKIAT5VKLWBUOAYXO656",
       aws_secret_access_key: "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",
-      aws_region: "us-east-2"
+      aws_region: "us-east-2",
+      css: "{test: value}"
     }
   end
   def team_attrs(:invalid) do
