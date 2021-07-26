@@ -25,7 +25,7 @@ defmodule UserDocsWeb.StepLiveTest do
   end
 
   defp create_password(_), do: %{password: UUID.uuid4()}
-  defp create_user(%{password: password}), do: %{user: UsersFixtures.user(password)}
+  defp create_user(%{password: password}), do: %{user: UsersFixtures.confirmed_user(password)}
   defp create_team(_), do: %{team: UsersFixtures.team()}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
   defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
