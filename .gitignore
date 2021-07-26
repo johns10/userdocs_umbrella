@@ -24,8 +24,12 @@ erl_crash.dump
 
 # ignore the mnesia files
 /Mnesia.nonode@nohost/
+/Mnesia.nonode@nohost*
 
 # Ignore the files in tmp
 
 # Ignore any lockfiles
 mix.lock
+
+# elixirls
+/.elixir_ls/
