@@ -142,26 +142,28 @@ defmodule UserDocsWeb.StepLive.FormComponent do
    }
   end
   def handle_event("new-page", _, socket) do
-    changeset = Automation.new_step_page(
-      socket.assigns.step, socket.assigns.changeset)
+    updated_params =
+      socket.assigns.changeset.params
+      |> Map.put("page_id", nil)
+      |> Map.put("page", %{})
 
-    {
-      :noreply,
-      socket
-      |> assign(:changeset, changeset)
-      |> assign(:step, changeset.data)
-   }
+    changeset =
+      StepForm.changeset(%StepForm{}, updated_params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, socket |> assign(:changeset, changeset)}
   end
   def handle_event("new-annotation", _, socket) do
-    changeset = Automation.new_step_annotation(
-      socket.assigns.step, socket.assigns.changeset)
+    updated_params =
+      socket.assigns.changeset.params
+      |> Map.put("annotation_id", nil)
+      |> Map.put("annotation", %{})
 
-    {
-      :noreply,
-      socket
-      |> assign(:changeset, changeset)
-      |> assign(:step, changeset.data)
-   }
+    changeset =
+      StepForm.changeset(%StepForm{}, updated_params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, socket |> assign(:changeset, changeset)}
   end
 
   def handle_param_updates(params, %Ecto.Changeset{} = changeset, state) do
