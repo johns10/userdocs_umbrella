@@ -71,6 +71,7 @@ defmodule UserDocsWeb.Router do
     scope "/api", as: :api do
       pipe_through :api
 
+      #forward "/", Absinthe.Plug, schema: UserDocsWeb.API.Schema
       forward "/graphiql", Absinthe.Plug.GraphiQL,
         schema: UserDocsWeb.API.Schema
 
@@ -96,6 +97,7 @@ defmodule UserDocsWeb.Router do
     live "/users/:id", UserLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/users/:id/show/edit", UserLive.Show, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/users/:id/show/options", UserLive.Show, :options, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/users/:id/show/local", UserLive.Show, :local_options, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/users/:id/edit", UserLive.Index, :edit
 
     live "/teams/new", TeamLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
