@@ -22,12 +22,16 @@ function configurationMutation(config) {
   `
 }
 
-window.userdocs.port()
-  .then(port => {
-    PORT = port
-    console.log(PORT)
-    CLIENT = new GraphQLClient(`http://localhost:${port}`)
-  })
+try {
+  window.userdocs.port()
+    .then(port => {
+      PORT = port
+      console.log(PORT)
+      CLIENT = new GraphQLClient(`http://localhost:${port}`)
+    })
+} catch(e) {
+  console.log("No port, web only")
+}
 
 let Hooks = {}
 
