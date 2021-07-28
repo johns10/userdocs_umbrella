@@ -85,20 +85,12 @@ defmodule UserDocsWeb.State do
     |> Map.put(:elements, elements(version_id))
   end
 
-  def initialize_configuration(state) do
-    state
-    |> Map.put(:annotation_types, annotation_types())
-    |> Map.put(:step_types, step_types())
-    |> Map.put(:language_codes, language_codes())
-    |> Map.put(:strategies, strategies())
-  end
-
   def team_users(user_id) do
-    Users.list_team_users(%{}, %{ user_id: user_id })
+    Users.list_team_users(%{}, %{user_id: user_id})
   end
 
   def teams(user_id) do
-    Users.list_teams(%{}, %{ user_id: user_id })
+    Users.list_teams(%{}, %{user_id: user_id})
   end
 
   def processes(version_id) do
@@ -147,11 +139,11 @@ defmodule UserDocsWeb.State do
   end
 
   def versions(user_id) do
-    Projects.list_versions(%{}, %{ user_id: user_id })
+    Projects.list_versions(%{}, %{user_id: user_id})
   end
 
   def projects(user_id) do
-    Projects.list_projects(%{}, %{ user_id: user_id })
+    Projects.list_projects(%{}, %{user_id: user_id})
   end
 
   def plural("element"), do: "elements"

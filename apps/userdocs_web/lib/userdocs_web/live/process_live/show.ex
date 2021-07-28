@@ -55,7 +55,7 @@ defmodule UserDocsWeb.ProcessLive.Show do
     }
   end
 
-  def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
+  def initialize(%{assigns: %{auth_state: :logged_in}} = socket) do
     opts = Defaults.state_opts(socket)
 
     socket
@@ -70,7 +70,7 @@ defmodule UserDocsWeb.ProcessLive.Show do
   def initialize(socket), do: socket
 
   @impl true
-  def handle_params(%{ "id" => id, "team_id" => team_id, "project_id" => project_id, "version_id" => version_id }, _, socket) do
+  def handle_params(%{"id" => id, "team_id" => team_id, "project_id" => project_id, "version_id" => version_id}, _, socket) do
     opts = Defaults.opts(socket, @subscribed_types)
     process = Automation.get_process!(String.to_integer(id))
     {
@@ -97,11 +97,11 @@ defmodule UserDocsWeb.ProcessLive.Show do
   end
 
   @impl true
-  def handle_event("expand", %{ "id" => id }, %{ assigns: assigns } = socket) do
+  def handle_event("expand", %{"id" => id}, %{assigns: assigns} = socket) do
     id = String.to_integer(id)
     status = Map.get(assigns.expanded, id, false)
     expanded = Map.put(assigns.expanded, id, !status)
-    { :noreply, assign(socket, :expanded, expanded) }
+    {:noreply, assign(socket, :expanded, expanded)}
   end
 
   @imple true
@@ -109,12 +109,12 @@ defmodule UserDocsWeb.ProcessLive.Show do
 
   @impl true
   def handle_info(%{topic: _, event: _, payload: %Step{}} = sub_data, socket) do
-    { :noreply, socket } = Root.handle_info(sub_data, socket)
-    { :noreply, prepare_process(socket) }
+    {:noreply, socket} = Root.handle_info(sub_data, socket)
+    {:noreply, prepare_process(socket)}
   end
   def handle_info(%{topic: _, event: _, payload: %Element{}} = sub_data, socket) do
-    { :noreply, socket } = Root.handle_info(sub_data, socket)
-    { :noreply, prepare_process(socket) }
+    {:noreply, socket} = Root.handle_info(sub_data, socket)
+    {:noreply, prepare_process(socket)}
   end
   def handle_info(n, s), do: Root.handle_info(n, s)
 
@@ -134,50 +134,50 @@ defmodule UserDocsWeb.ProcessLive.Show do
     }
   end
 
-  def processes_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
+  def processes_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Automation.list_processes(socket, state_opts)
     |> Helpers.select_list(:name, :false)
   end
   def processes_select(_), do: []
 
-  def step_types_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
+  def step_types_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Automation.list_step_types(socket, state_opts)
     |> Helpers.select_list(:name, :false)
   end
   def step_types_select(_), do: []
 
-  def pages_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
+  def pages_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Web.list_pages(socket, state_opts)
     |> Helpers.select_list(:name, :false)
   end
   def pages_select(_), do: []
 
-  def elements_select(%{ assigns: %{ state_opts: state_opts }} = socket, step) do
+  def elements_select(%{assigns: %{state_opts: state_opts}} = socket, step) do
     Web.list_elements(socket, state_opts)
     |> Helpers.select_list(:name, :false)
   end
   def elements_select(_, _), do: []
 
-  def strategies_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
+  def strategies_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Web.list_strategies(socket, state_opts)
     |> Helpers.select_list(:name, :false)
   end
   def strategies_select(_), do: []
 
-  def annotation_types_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
+  def annotation_types_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Web.list_annotation_types(socket, state_opts)
     |> Helpers.select_list(:name, :false)
   end
   def annotation_types_select(_), do: []
 
-  def content_select(%{ assigns: %{ state_opts: state_opts }} = socket) do
+  def content_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Documents.list_content(socket, state_opts)
     |> Helpers.select_list(:name, :false)
   end
   def content_select(_), do: []
 
-  def annotations_select(%{ assigns: %{ state_opts: state_opts }} = socket, step) do
-    opts = Keyword.put(state_opts, :filter, { :page_id, step.page_id} )
+  def annotations_select(%{assigns: %{state_opts: state_opts}} = socket, step) do
+    opts = Keyword.put(state_opts, :filter, {:page_id, step.page_id} )
 
     Web.list_annotations(socket, opts)
     |> Helpers.select_list(:name, :false)
@@ -200,41 +200,23 @@ defmodule UserDocsWeb.ProcessLive.Show do
     end
   end
 
-  def assign_strategy_id(%{ assigns: %{ version: version }} = socket) do
+  def assign_strategy_id(%{assigns: %{version: version}} = socket) do
     assign(socket, :strategy_id, version.strategy_id)
-  end
-
-  def send_default_strategy(%{ assigns: %{ current_strategy_id: id }} = socket) do
-    strategy =
-      Web.list_strategies()
-      |> Enum.filter(fn(s) -> s.id == id end)
-      |> Enum.at(0)
-
-    message = %{
-      type: "configuration",
-      payload: %{
-        strategy: Strategy.safe(strategy)
-      }
-    }
-
-    socket
-    |> push_event("configure", message)
-    |> assign(:current_strategy, strategy)
   end
 
   def prepare_process(socket) do
     preloads =
       [
         :steps,
-        [ steps: :step_type ],
-        [ steps: :page ],
-        [ steps: :annotation ],
-        [ steps: [ annotation: :annotation_type ] ],
-        [ steps: :element ],
-        [ steps: [ element: :strategy ] ],
+        [steps: :step_type],
+        [steps: :page],
+        [steps: :annotation],
+        [steps: [annotation: :annotation_type]],
+        [steps: :element],
+        [steps: [element: :strategy]],
       ]
 
-    order = [ steps: %{ field: :order, order: :asc } ]
+    order = [steps: %{field: :order, order: :asc}]
 
     opts =
       socket.assigns.state_opts

@@ -335,24 +335,6 @@ defmodule UserDocsWeb.StepLive.Index do
     assign(socket, :strategy_id, version.strategy_id)
   end
 
-  def send_default_strategy(%{assigns: %{current_strategy_id: id}} = socket) do
-    strategy =
-      Web.list_strategies()
-      |> Enum.filter(fn(s) -> s.id == id end)
-      |> Enum.at(0)
-
-    message = %{
-      type: "configuration",
-      payload: %{
-        strategy: Strategy.safe(strategy)
-     }
-   }
-
-    socket
-    |> push_event("configure", message)
-    |> assign(:current_strategy, strategy)
-  end
-
   def prepare_step(socket, id) do
     preloads =
       [
