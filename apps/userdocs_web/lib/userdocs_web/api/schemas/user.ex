@@ -1,4 +1,5 @@
 defmodule UserDocsWeb.API.Schema.User do
+  @moduledoc "Schema for user"
   use Absinthe.Schema.Notation
   alias UserDocsWeb.API.Resolvers
 
