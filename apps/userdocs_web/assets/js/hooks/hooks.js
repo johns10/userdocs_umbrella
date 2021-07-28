@@ -7,6 +7,7 @@ const configurationQuery = gql`
       maxRetries
       imagePath
       userDataDirPath
+      css
     }
   }
 `
@@ -17,6 +18,7 @@ function configurationMutation(config) {
         maxRetries
         imagePath
         userDataDirPath
+        css
       }
     }
   `
@@ -123,11 +125,10 @@ Hooks.configurationV2 = {
     }),
     this.handleEvent("put-configuration", (message) => {
       const mutation = configurationMutation(message)
-      const result = 
-        CLIENT.request(mutation)
-        .then(result => {
-          this.pushEventTo('#configuration-v2-hook', "configuration-saved", result)
-        })
+      CLIENT.request(mutation)
+      .then(result => {
+        this.pushEventTo('#configuration-v2-hook', "configuration-saved", result)
+      })
     })
   }
 }
