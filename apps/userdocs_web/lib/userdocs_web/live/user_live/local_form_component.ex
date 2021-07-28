@@ -37,9 +37,13 @@ defmodule UserDocsWeb.UserLive.LocalFormComponent do
   end
 
   def handle_event("configuration-response", %{"configuration" => configuration_params}, socket) do
-    snake_cased_params = LiveHelpers.underscored_map_keys(configuration_params)
+    snake_cased_params =
+      LiveHelpers.underscored_map_keys(configuration_params)
+      |> Map.put("css", socket.assigns.current_team.css)
+
     changeset = Users.change_local_options(%LocalOptions{}, snake_cased_params)
     local_options = Ecto.Changeset.apply_changes(changeset)
+
     {
       :noreply,
       socket
