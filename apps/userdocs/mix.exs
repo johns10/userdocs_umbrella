@@ -36,6 +36,7 @@ defmodule UserDocs.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bodyguard, "~> 2.4"},
       {:phoenix_pubsub, "~> 2.0.0"},
       {:ecto_sql, "~> 3.5"},
       {:postgrex, ">= 0.0.0"},
@@ -56,7 +57,7 @@ defmodule UserDocs.MixProject do
       {:state_handlers, in_umbrella: true},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
-      {:mix_test_watch, "~> 1.0", only: :dev, runtime: false}
+      {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
     ]
   end
 
