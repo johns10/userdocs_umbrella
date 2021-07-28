@@ -9,6 +9,10 @@ defmodule UserDocs.Users do
 
   alias UserDocs.Users.User
 
+  @behaviour Bodyguard.Policy
+  def authorize(:get_user!, %{id: user_id} = _current_user, %{id: user_id} = _user), do: :ok
+  def authorize(:get_user!, _current_user, _user), do: :error
+
   @doc """
   Returns the list of users.
 
