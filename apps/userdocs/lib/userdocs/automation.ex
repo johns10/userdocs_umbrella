@@ -426,7 +426,7 @@ defmodule UserDocs.Automation do
   def clear_last_step_instance(%Step{} = step) do
     Map.put(step, :last_step_instance, nil)
   end
-
+"""
   def new_step_element(step, changeset) do
     new_step_nested_object(step, changeset, :element_id, :element, %Element{})
   end
@@ -469,7 +469,7 @@ defmodule UserDocs.Automation do
     |> Step.changeset(changeset.params)
     |> Ecto.Changeset.put_change(key, struct)
   end
-
+"""
   defp base_steps_query(), do: from(steps in Step)
 
   def action(:insert), do: "create"
