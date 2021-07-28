@@ -7,11 +7,12 @@ defmodule UserDocs.Users.LocalOptions do
     field :image_path, :string
     field :max_retries, :integer
     field :user_data_dir_path, :string
+    field :css, :string
   end
 
   @doc false
   def changeset(local_options, attrs) do
     local_options
-    |> cast(attrs, [:image_path, :max_retries, :user_data_dir_path])
+    |> cast(attrs, [:image_path, :max_retries, :user_data_dir_path, :css])
   end
 end
