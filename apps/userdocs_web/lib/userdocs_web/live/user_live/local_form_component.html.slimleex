@@ -32,6 +32,17 @@ h2.title
           = text_input f, :user_data_dir, [ class: "input", type: "text" ]
           = error_tag(f, :user_data_dir)
 
+    .field.is-horizontal
+      .field-label.is-normal
+        = label f, :css, class: "label"
+      .field-body
+        .control.is-expanded
+          = textarea f, :css, [ class: "input", type: "text", disabled: true ]
+          p.help 
+            | CSS must be changed on the 
+            =< link "team form", to: Routes.team_index_path(@socket, :edit, @current_team)
+
+
 
     = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
 
