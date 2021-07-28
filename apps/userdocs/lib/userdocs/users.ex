@@ -67,7 +67,7 @@ defmodule UserDocs.Users do
     |> maybe_preload_default_team_project_version(params[:team_project_version])
     |> maybe_preload_user_teams(params[:teams])
     |> maybe_preload_user_team_users(params[:team_users])
-    |> maybe_preload_user_selected_team(params[:selected_team])
+    #|> maybe_preload_user_selected_team(params[:selected_team])
     |> maybe_preload_user_selected_project(params[:selected_project])
     |> maybe_preload_user_selected_version(params[:selected_version])
     |> Repo.one!()
@@ -99,12 +99,12 @@ defmodule UserDocs.Users do
   defp maybe_preload_user_team_users(query, _) do
     from(users in query, preload: [:team_users])
   end
-
+  _unuseable_preloads = """
   defp maybe_preload_user_selected_team(query, nil), do: query
   defp maybe_preload_user_selected_team(query, _) do
     from(users in query, preload: [:selected_team])
   end
-
+  """
   defp maybe_preload_user_selected_project(query, nil), do: query
   defp maybe_preload_user_selected_project(query, _) do
     from(users in query, preload: [:selected_project])
