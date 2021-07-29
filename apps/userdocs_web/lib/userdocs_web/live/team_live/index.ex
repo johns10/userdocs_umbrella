@@ -28,7 +28,7 @@ defmodule UserDocsWeb.TeamLive.Index do
     }
   end
 
-  def initialize(%{ assigns: %{ auth_state: :logged_in, state_opts: opts }} = socket) do
+  def initialize(%{assigns: %{auth_state: :logged_in, state_opts: opts}} = socket) do
     socket
     |> assign(:modal_action, :show)
     |> load_teams()
@@ -38,7 +38,7 @@ defmodule UserDocsWeb.TeamLive.Index do
   def initialize(socket), do: socket
 
   @impl true
-  def handle_params(params, _url, %{ assigns: %{ auth_state: :not_logged_in }} = socket) do
+  def handle_params(params, _url, %{assigns: %{auth_state: :not_logged_in}} = socket) do
     {:noreply, socket}
   end
   def handle_params(params, _url, socket) do
@@ -46,7 +46,7 @@ defmodule UserDocsWeb.TeamLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    team = Users.get_team!(id, %{ preloads: [ users: true, projects: true, team_users: true ] })
+    team = Users.get_team!(id, %{preloads: [ users: true, projects: true, team_users: true ]})
     socket
     |> assign(:page_title, "Edit Team")
     |> assign(:team, team)
@@ -58,7 +58,7 @@ defmodule UserDocsWeb.TeamLive.Index do
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Team")
-    |> assign(:team, %Team{ users: [], projects: [] })
+    |> assign(:team, %Team{users: [], projects: []})
     |> assign(:projects_select_options, [])
     |> assign(:language_codes_select_options, language_codes_select_list(socket))
     |> prepare_teams()
@@ -77,7 +77,7 @@ defmodule UserDocsWeb.TeamLive.Index do
     team = Users.get_team!(id)
     {:ok, _} = Users.delete_team(team)
 
-    { :noreply, socket }
+    {:noreply, socket}
   end
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
@@ -89,7 +89,7 @@ defmodule UserDocsWeb.TeamLive.Index do
   defp load_teams(socket) do
     opts =
       socket.assigns.state_opts
-      |> Keyword.put(:filters, %{ user_id: socket.assigns.current_user.id})
+      |> Keyword.put(:filters, %{user_id: socket.assigns.current_user.id})
     socket
     |> Users.load_teams(opts)
   end
