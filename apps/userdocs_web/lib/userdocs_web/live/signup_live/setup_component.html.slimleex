@@ -1,0 +1,34 @@
+h2.text-xl.text-black
+  = @title
+p.text-black.py-1
+  | A confirmation email has been sent to
+  span.text-blue-700<
+    = @user.email
+  | .
+p.text-black.py-1
+  | While you're waiting for the email to arrive:
+= if @os in @linux_agents do
+  = link to: @linux_path do
+    button.button 
+      span.icon.is-large
+        i.fab.fa-linux aria-hidden="true"
+      span.is-size-5 Download UserDocs Desktop
+= if @os in @macintosh_agents do
+  = link to: @macintosh_path do
+    button.button 
+      span.icon.is-large
+        i.fab.fa-windows aria-hidden="true"
+      span.is-size-4 Download UserDocs Desktop
+= if @os in @windows_agents do
+  = link to: @windows_path do
+    button.button 
+      span.icon.is-large
+        i.fab.fa-apple aria-hidden="true"
+      span.is-size-4 Download UserDocs Desktop
+
+div.content
+  p.text-lg.pt-4.text-black Not your OS? UserDocs is available for
+  ul
+    li class="text-blue-700 hover:text-blue-700 hover:underline" = link "Windows", to: @windows_path
+    li class="text-blue-700 hover:text-blue-700 hover:underline" = link "Macintosh", to: @macintosh_path
+    li class="text-blue-700 hover:text-blue-700 hover:underline" = link "Linux", to: @linux_path

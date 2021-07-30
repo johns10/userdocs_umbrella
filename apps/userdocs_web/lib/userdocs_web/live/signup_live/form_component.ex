@@ -31,9 +31,11 @@ defmodule UserDocsWeb.SignupLive.FormComponent do
       {:ok, changeset} ->
         IO.puts("OK")
         IO.inspect(socket.assigns.trigger_submit)
+        {:ok, user} = Ecto.Changeset.apply_action(changeset, :insert)
         {
           :noreply,
           socket
+          |> assign(:user, user)
           |> assign(:changeset, changeset)
           |> assign(:trigger_submit, true)
         }
@@ -60,17 +62,16 @@ defmodule UserDocsWeb.SignupLive.FormComponent do
 
   defp save_user(socket, :new, user_params) do
     case Users.create_user(user_params) do
-      {:ok, _user} ->
+      {:ok, user} ->
         {
           :noreply,
           socket
           |> put_flash(:info, "User created successfully")
-          |> push_redirect(to: Routes.signup_index_path(socket, :setup))
+          |> assign(:user, user)
+          |> push_redirect(to: Routes.signup_index_path(socket, :edit))
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        IO.puts("No user created")
-        IO.inspect(changeset)
         {:noreply, assign(socket, changeset: changeset)}
     end
   end

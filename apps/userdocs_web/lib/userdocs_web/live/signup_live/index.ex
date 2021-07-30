@@ -1,14 +1,15 @@
 defmodule UserDocsWeb.SignupLive.Index do
+  @moduledoc """
+  Index for signups
+  """
   use UserDocsWeb, :live_view
-
   use UserdocsWeb.LiveViewPowHelper
-
   alias UserDocs.Users.User
-
+  alias UserDocs.Users
   require Logger
 
   @impl true
-  def mount(_params, %{ "os" => os}, socket) do
+  def mount(_params, %{"os" => os}, socket) do
     {
       :ok,
       socket
@@ -28,9 +29,9 @@ defmodule UserDocsWeb.SignupLive.Index do
     |> assign(:user, %User{})
   end
 
-  defp apply_action(socket, :setup, _params) do
+  defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Set Up UserDocs")
-    |> assign(:user, %User{})
+    |> assign(:user, Users.get_user!(id))
   end
 end
