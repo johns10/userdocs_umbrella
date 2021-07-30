@@ -6,6 +6,7 @@ defmodule UserDocsWeb.UserLive.LocalFormComponent do
 
   alias UserDocs.Users
   alias UserDocs.Users.LocalOptions
+  alias UserDocs.Users.Override
   alias UserDocsWeb.LiveHelpers
 
   @impl true
@@ -37,9 +38,14 @@ defmodule UserDocsWeb.UserLive.LocalFormComponent do
   end
 
   def handle_event("configuration-response", %{"configuration" => configuration_params}, socket) do
+    overrides =
+      socket.assigns.current_user.overrides
+      |> Enum.map(fn(o) -> Map.take(o, Override.__schema__(:fields)) end)
+
     snake_cased_params =
       LiveHelpers.underscored_map_keys(configuration_params)
       |> Map.put("css", socket.assigns.current_team.css)
+      |> Map.put("overrides", overrides)
 
     changeset = Users.change_local_options(%LocalOptions{}, snake_cased_params)
     local_options = Ecto.Changeset.apply_changes(changeset)
@@ -64,8 +70,13 @@ defmodule UserDocsWeb.UserLive.LocalFormComponent do
   defp save_user(socket, _, local_options_params) do
     case Users.update_local_options(socket.assigns.local_options, local_options_params) do
       {:ok, local_options} ->
+        overrides =
+          local_options.overrides
+          |> Enum.map(fn(o) -> Map.take(o, [:url, :project_id]) end)
+
         snake_cased_local_options =
           local_options
+          |> Map.put(:overrides, overrides)
           |> Map.take(LocalOptions.__schema__(:fields))
           |> LiveHelpers.camel_cased_map_keys()
 
