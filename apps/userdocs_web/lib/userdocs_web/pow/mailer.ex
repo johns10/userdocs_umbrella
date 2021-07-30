@@ -1,4 +1,7 @@
 defmodule UserDocsWeb.Pow.Mailer do
+  @moduledoc """
+    Pow mailer module
+  """
   use Pow.Phoenix.Mailer
   require Logger
 
@@ -9,7 +12,6 @@ defmodule UserDocsWeb.Pow.Mailer do
   def process(email) do
     email
     |> UserDocs.Email.confirmation_email()
-    |> IO.inspect()
     |> UserDocs.Email.send()
   end
 end
