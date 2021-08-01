@@ -19,9 +19,6 @@ import NProgress from "nprogress"
 import {LiveSocket} from "phoenix_live_view"
 import {Hooks} from "./hooks/hooks.js"
 
-console.log("Running web appss")
-console.log(window.location)
-
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   params: {_csrf_token: csrfToken},
