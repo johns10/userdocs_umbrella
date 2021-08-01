@@ -57,11 +57,17 @@ let Hooks = {}
 Hooks.servicesStatus = {
   mounted() {
     this.handleEvent("get-services-status", () => {
-      window.userdocs.serviceStatus()
-        .then(result => {
-          console.log(result)
-          this.pushEventTo('#services-status-hook', "put-services-status", result)
-        })
+      const browserStatus = {server: "not_running", client: "not_running", runner: "not_running"}
+      if (!window.userdocs) this.pushEventTo('#services-status-hook', "put-services-status", browserStatus)
+      else {
+        window.userdocs.serviceStatus()
+          .then(result => {
+            this.pushEventTo('#services-status-hook', "put-services-status", result)
+          })
+      }
+    }),
+    this.el.addEventListener("put-services-status", (message) => {
+      this.pushEventTo("#services-status-hook", "put-services-status", message.detail)
     })
   }
 }
@@ -69,10 +75,19 @@ Hooks.servicesStatus = {
 Hooks.authenticationEvents = {
   mounted() {
     this.handleEvent("login-succeeded", (message) => {
-      window.userdocs.putTokens(message)
-        .then(result => {
-          if (result.status == "ok") window.userdocs.startServices()
-        })
+      const browserStatus = {server: "not_running", client: "not_running", runner: "not_running"}
+      if (!window.userdocs) this.pushEventTo('#services-status-hook', "put-services-status", browserStatus)
+      else {
+        window.userdocs.putTokens(message)
+          .then(result => {
+            if (result.status == "ok") {
+              window.userdocs.startServices()
+                .then(result => {
+                  this.pushEventTo('#services-status-hook', "put-services-status", result)
+                })
+            }
+          })
+      }
     })
   }
 }
