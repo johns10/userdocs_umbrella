@@ -1,0 +1,16 @@
+.min-h-screen.flex.items-center.justify-center.py-12.px-4.sm_px-6.lg_px-8
+  .max-w-md.w-full.space-y-8
+    div
+      img.mx-auto.h-12.w-auto alt="Logo" src="/images/logo.svg" /
+      h2.mt-6.text-center.text-3xl.font-extrabold.text-gray-900
+        | Sign in to your account
+      = if @live_action in [:create] do 
+        = live_component @socket, UserDocsWeb.SessionLive.FormComponent,
+          id: "signin",
+          title: @page_title,
+          action: @live_action,
+          user: @user,
+          trigger_submit: false,
+          signin_failed: false
+
+div phx-hook="authenticationEvents" id="authentication-events-hook"

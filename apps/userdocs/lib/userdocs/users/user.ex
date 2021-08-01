@@ -1,4 +1,7 @@
 defmodule UserDocs.Users.User do
+  @moduledoc """
+  The User Module
+  """
   use Ecto.Schema
   import Ecto.Changeset
   use Pow.Ecto.Schema
@@ -44,6 +47,12 @@ defmodule UserDocs.Users.User do
   def change_browser_session(user, attrs) do
     user
     |> cast(attrs, [:browser_session])
+  end
+
+  def signin_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :password])
+    |> validate_required([:email, :password])
   end
 
   @doc false

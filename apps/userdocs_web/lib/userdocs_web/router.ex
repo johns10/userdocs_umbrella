@@ -148,6 +148,11 @@ defmodule UserDocsWeb.Router do
     live "/content/:id/show/edit", ContentLive.Show, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
   end
 
+  scope "/" do
+    pipe_through :browser
+    pow_routes()
+    pow_extension_routes()
+  end
   scope "/", UserDocsWeb do
     pipe_through [:browser, :not_authenticated, :put_user_agent_data]
 
@@ -159,18 +164,12 @@ defmodule UserDocsWeb.Router do
     ua = get_req_header(conn, "user-agent")
     ua =
       case ua do
-        [ ua | _ ] -> ua
+        [ua | _] -> ua
         [] -> "Mozilla/5.0 (Linux; Android 7.0; SM-G930VC Build/NRD90M; wv)"
       end
 
     conn
     |> put_session(:os, UAInspector.parse(ua).os.name)
-  end
-
-  scope "/" do
-    pipe_through :browser
-    pow_routes()
-    pow_extension_routes()
   end
 
 
@@ -232,11 +231,6 @@ defmodule UserDocsWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     forward "/sent_emails", Bamboo.SentEmailViewerPlug
-
-    scope "/" do
-      pipe_through :browser
-      pow_routes()
-    end
 
     scope "/" do
       pipe_through [:browser, :protected]

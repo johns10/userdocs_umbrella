@@ -17,6 +17,18 @@ defmodule UserDocsWeb.ErrorHelpers do
     end)
   end
 
+  def absolute_error_tag(form, field) do
+    Enum.map(Keyword.get_values(form.errors, field), fn error ->
+      content_tag(:div, style: "position: relative; width: 0; height: 0") do
+        content_tag(:span, translate_error(error),
+          class: "help is-danger w-64",
+          phx_feedback_for: input_name(form, field),
+          style: "position: absolute;"
+        )
+      end
+    end)
+  end
+
   @doc """
   Translates an error message using gettext.
   """

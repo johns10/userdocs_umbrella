@@ -188,6 +188,14 @@ defmodule UserDocs.Users do
     end
   end
 
+  def validate_signin(attrs) do
+    changeset = User.signin_changeset(%User{}, attrs)
+    case Ecto.Changeset.apply_action(changeset, :insert) do
+      {:error, inner_changeset} -> {:error, inner_changeset}
+      {:ok, _user} -> {:ok, changeset}
+    end
+  end
+
   @doc """
   Updates a user.
 
@@ -611,6 +619,7 @@ defmodule UserDocs.Users do
     |> Repo.update()
   end
   def update_team(%Team{} = team, attrs) do
+    IO.inspect(attrs)
     team
     |> Team.changeset(attrs)
     |> Repo.update()

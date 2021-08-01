@@ -8,34 +8,79 @@ const configurationQuery = gql`
       imagePath
       userDataDirPath
       css
+      overrides {
+        projectId
+        url
+      }
     }
   }
 `
-function configurationMutation(config) {
-  return gql`
-    mutation Mutation {
-      configuration(maxRetries: ${config.maxRetries}, imagePath: "${config.imagePath}", userDataDirPath: "${config.userDataDirPath}") {
-        maxRetries
-        imagePath
-        userDataDirPath
-        css
+
+const CONFIGURATION_MUTATION = gql`
+  mutation Mutation(
+    $maxRetries: Int!, 
+    $imagePath: String!, 
+    $userDataDirPath: String!, 
+    $css: String!, 
+    $overrides: [OverrideInput]
+  ) {
+    configuration(
+      maxRetries: $maxRetries, 
+      imagePath: $imagePath, 
+      userDataDirPath: $userDataDirPath, 
+      css: $css, 
+      overrides: $overrides
+    ) {
+      maxRetries: maxRetries
+      imagePath: imagePath
+      userDataDirPath: userDataDirPath
+      css: css
+      overrides: overrides {
+        projectId
+        url
       }
     }
-  `
-}
+  }
+
+`
 
 try {
   window.userdocs.port()
     .then(port => {
       PORT = port
-      console.log(PORT)
       CLIENT = new GraphQLClient(`http://localhost:${port}`)
     })
-} catch(e) {
-  console.log("No port, web only")
-}
+} catch(e) {}
 
 let Hooks = {}
+
+Hooks.authenticationEvents = {
+  mounted() {
+    this.handleEvent("login-succeeded", (message) => {
+      window.userdocs.putTokens(message)
+        .then(result => {
+          if (result.status == "ok") window.userdocs.startServices()
+        })
+    })
+  }
+}
+
+Hooks.configurationV2 = {
+  mounted() {
+    this.handleEvent("get-configuration", (message) => {
+      CLIENT.request(configurationQuery)
+        .then(result => {
+          this.pushEventTo('#configuration-v2-hook', "configuration-response", result)
+        })
+    }),
+    this.handleEvent("put-configuration", (message) => {
+      CLIENT.request(CONFIGURATION_MUTATION, message)
+        .then(result => {
+          this.pushEventTo('#configuration-v2-hook', "configuration-saved", result)
+        })
+    })
+  }
+}
 
 Hooks.testSelector = {
   mounted() {
@@ -47,36 +92,26 @@ Hooks.testSelector = {
 Hooks.automatedBrowserCommands = {
   mounted() {
     this.handleEvent("open-browser", (message) => {
-      console.log("open browser")
       window.userdocs.openBrowser()
     })
     this.handleEvent("close-browser", (message) => {
-      console.log("close browser")
       window.userdocs.closeBrowser()
     })
   }
 };
-
 Hooks.automatedBrowserEvents = {
   mounted() {
     this.el.addEventListener("browser-opened", (message) => {
-      console.log("automation browser opened in hook")
-      console.log(message)
       this.pushEventTo("#automated-browser-controls", "browser-opened", message.detail)
     })
     this.el.addEventListener("browser-closed", (message) => {
-      console.log("automation browser closed in hook")
-      console.log(message)
       this.pushEventTo("#automated-browser-controls", "browser-closed", message.detail)
     })
   }
 };
-
 Hooks.browserEventHandler = {
   mounted() {
     this.el.addEventListener("browser-event", (message) => {
-      console.log("browser event received by hook")
-      console.log(message)
       this.pushEventTo("#browser-event-handler", "browser-event", message.detail)
     })
   }
@@ -85,7 +120,6 @@ Hooks.browserEventHandler = {
 Hooks.fileTransfer = {
   mounted() {
     this.el.addEventListener("screenshot", e => {
-      console.log("Got a file")
       this.pushEventTo('#screenshot-handler-component', "create_screenshot", e.detail)
     })
   }
@@ -114,24 +148,6 @@ Hooks.configuration = {
   }
 }
 
-Hooks.configurationV2 = {
-  mounted() {
-    this.handleEvent("get-configuration", (message) => {
-      const result = 
-        CLIENT.request(configurationQuery)
-          .then(result => {
-            this.pushEventTo('#configuration-v2-hook', "configuration-response", result)
-          })
-    }),
-    this.handleEvent("put-configuration", (message) => {
-      const mutation = configurationMutation(message)
-      CLIENT.request(mutation)
-      .then(result => {
-        this.pushEventTo('#configuration-v2-hook', "configuration-saved", result)
-      })
-    })
-  }
-}
 
 
 
@@ -149,8 +165,6 @@ Hooks.configurationV2 = {
 Hooks.selectorTransfer = {
   mounted() {
     this.el.addEventListener("selector", e => {
-      console.log("Got a selector")
-      console.log(e.detail)
       this.pushEventTo('#selector-handler', "transfer_selector", e.detail)
     })
   }
@@ -158,7 +172,6 @@ Hooks.selectorTransfer = {
 Hooks.test = {
   mounted() {
     this.handleEvent("test", (message) => {
-      console.log("test")
     })
   }
 }
@@ -180,7 +193,6 @@ Hooks.jobRunner = {
       }
     }),
     this.el.addEventListener("message", e => {
-      console.log("Got a job update")
       var payload = {
         status: e.detail.status,
         error: e.detail.error
@@ -192,13 +204,8 @@ Hooks.jobRunner = {
 
 Hooks.CopySelector = {
   mounted: function mounted() {
-    this.el.addEventListener("click", function (e) {
-
-      console.log("Copying Selector");
-      console.log(e.srcElement.attributes)
-      
+    this.el.addEventListener("click", function (e) {      
       var element = e.target.closest('button');
-
       const selector = document.getElementById("selector-transfer-field").value;
       const strategy = document.getElementById("strategy-transfer-field").value;
 
