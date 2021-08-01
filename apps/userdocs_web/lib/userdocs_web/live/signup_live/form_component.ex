@@ -29,8 +29,6 @@ defmodule UserDocsWeb.SignupLive.FormComponent do
   def handle_event("save", %{"user" => user_params}, socket) do
     case Users.validate_signup(user_params) do
       {:ok, changeset} ->
-        IO.puts("OK")
-        IO.inspect(socket.assigns.trigger_submit)
         {:ok, user} = Ecto.Changeset.apply_action(changeset, :insert)
         {
           :noreply,
@@ -40,7 +38,7 @@ defmodule UserDocsWeb.SignupLive.FormComponent do
           |> assign(:trigger_submit, true)
         }
 
-      {:noreply, changeset} ->
+      {:error, changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
     end
   end

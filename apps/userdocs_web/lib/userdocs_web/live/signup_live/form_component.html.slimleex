@@ -7,7 +7,6 @@
 
   h2.is-size-4 
     = @title
-    = @trigger_submit
   .field
     = label f, Pow.Ecto.Schema.user_id_field(@changeset), class: "label"
       .control.has-icons-left
@@ -32,3 +31,5 @@
 
   .field
     = submit "Sign up", class: "button is-success"
+
+    
