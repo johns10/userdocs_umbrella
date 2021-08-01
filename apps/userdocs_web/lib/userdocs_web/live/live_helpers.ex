@@ -28,7 +28,7 @@ defmodule UserDocsWeb.LiveHelpers do
   def camel_cased_map_keys(val), do: val
 
   def which_app(conn) do
-    %{ "app_name" => Atom.to_string(conn.assigns.app_name) }
+    %{"app_name" => Atom.to_string(conn.assigns.app_name)}
   end
 
   def live_modal(socket, component, opts) do
