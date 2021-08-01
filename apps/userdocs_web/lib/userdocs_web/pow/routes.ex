@@ -16,6 +16,6 @@ defmodule UserDocsWeb.Pow.Routes do
       renewal_token: conn.private[:api_renewal_token]
     )
   end
-  def after_sign_out_path(conn), do: Routes.pow_session_path(conn, :create)
-  def user_not_authenticated_path(conn), do: Routes.pow_session_path(conn, :create)
+  def after_sign_out_path(conn), do: Routes.pow_session_path(conn, :new)
+  def user_not_authenticated_path(conn), do: Routes.pow_session_path(conn, :new)
 end
