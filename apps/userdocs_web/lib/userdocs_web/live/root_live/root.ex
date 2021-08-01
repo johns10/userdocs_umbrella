@@ -33,6 +33,7 @@ defmodule UserDocsWeb.Root do
     |> assign(:browser_opened, Map.get(session, "browser_opened", false))
     |> assign(:user_opened_browser, Map.get(session, "user_opened_browser", false))
     |> assign(:navigation_drawer_closed, Map.get(session, "navigation_drawer_closed", true))
+    |> push_event("get-services-status", %{})
     |> initialize(Defaults.opts(socket, types))
     |> assign_state_opts(types)
   end

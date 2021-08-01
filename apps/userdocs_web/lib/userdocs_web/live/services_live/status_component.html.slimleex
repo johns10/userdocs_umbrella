@@ -1,0 +1,8 @@
+div.flex.flex-col.justify-around.m-1
+  div.flex.flex-row.justify-around
+    = status_element("s", @server_status, "server-status")
+    = status_element("c", @client_status, "client-status")
+  div.flex.flex-row.justify-around
+    = status_element("r", @runner_status, "runner-status")
+
+div phx-hook="servicesStatus" id="services-status-hook"

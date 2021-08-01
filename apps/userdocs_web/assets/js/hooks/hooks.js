@@ -54,6 +54,18 @@ try {
 
 let Hooks = {}
 
+Hooks.servicesStatus = {
+  mounted() {
+    this.handleEvent("get-services-status", () => {
+      window.userdocs.serviceStatus()
+        .then(result => {
+          console.log(result)
+          this.pushEventTo('#services-status-hook', "put-services-status", result)
+        })
+    })
+  }
+}
+
 Hooks.authenticationEvents = {
   mounted() {
     this.handleEvent("login-succeeded", (message) => {
