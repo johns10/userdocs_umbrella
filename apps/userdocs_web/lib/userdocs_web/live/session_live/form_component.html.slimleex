@@ -4,8 +4,6 @@
   phx_change: "validate",
   phx_submit: "save",
   phx_trigger_action: @trigger_submit
-
-  = @trigger_submit
   
   input name="remember" type="hidden" value="true"
   div.mb-8
