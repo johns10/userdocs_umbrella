@@ -73,6 +73,11 @@ defmodule UserDocs.Users do
     |> Repo.one!()
   end
 
+  def get_user_by_email!(email) do
+    from(user in User, where: user.email == ^email)
+    |> Repo.one!()
+  end
+
   def get_user!(id, params, _filters, state, opts) do
     StateHandlers.get(state, id, User, opts)
     |> maybe_preload_user_teams(params[:teams], state, opts)
