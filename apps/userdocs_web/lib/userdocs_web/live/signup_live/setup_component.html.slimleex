@@ -1,12 +1,13 @@
 h2.text-xl.text-black
   = @title
-p.text-black.py-1
-  | A confirmation email has been sent to
-  span.text-blue-700<
-    = @user.email
-  | .
-p.text-black.py-1
-  | While you're waiting for the email to arrive:
+= if @user.email_confirmation_token != nil and @user.email_confirmed_at == nil do
+  p.text-black.py-1
+    | A confirmation email has been sent to
+    span.text-blue-700<
+      = @user.email
+    | .
+  p.text-black.py-1
+    | While you're waiting for the email to arrive:
 = if @os in @linux_agents do
   = link to: @linux_path do
     button.button 
