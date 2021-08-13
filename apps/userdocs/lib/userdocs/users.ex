@@ -535,7 +535,13 @@ defmodule UserDocs.Users do
   defp maybe_preload_users(query, _), do: from(items in query, preload: [:users])
 
   defp maybe_preload_team_users(query, nil), do: query
-  defp maybe_preload_team_users(query, _), do: from(items in query, preload: [:team_users])
+  defp maybe_preload_team_users(query, preloads) do
+    preloads = case preloads do
+      [user: true] -> [team_users: :user]
+      _ ->  [:team_users]
+    end
+    from(items in query, preload: ^preloads)
+  end
 
   defp maybe_preload_default_project(query, nil), do: query
   defp maybe_preload_default_project(query, _), do: from(items in query, preload: [:default_project])
