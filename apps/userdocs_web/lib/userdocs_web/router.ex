@@ -88,7 +88,13 @@ defmodule UserDocsWeb.Router do
   end
 
   scope "/", UserDocsWeb do
-    pipe_through [:browser, :protected]
+    pipe_through [:browser, :put_user_agent_data]
+
+    live "/setup/:id", SignupLive.Index, :edit
+  end
+
+  scope "/", UserDocsWeb do
+    pipe_through [:browser, :protected, :put_user_agent_data]
 
     live "/", PageLive, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
@@ -153,11 +159,11 @@ defmodule UserDocsWeb.Router do
     pow_routes()
     pow_extension_routes()
   end
+
   scope "/", UserDocsWeb do
     pipe_through [:browser, :not_authenticated, :put_user_agent_data]
 
     live "/signup", SignupLive.Index, :new
-    live "/setup", SignupLive.Index, :setup
   end
 
   def put_user_agent_data(conn, _opts) do
