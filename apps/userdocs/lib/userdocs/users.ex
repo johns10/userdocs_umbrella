@@ -420,15 +420,8 @@ defmodule UserDocs.Users do
     base_teams_query()
     |> maybe_filter_team_by_user(filters[:user_id])
     |> maybe_filter_by_ids(filters[:ids])
-    |> maybe_preload_teams_users(params[:users])
+    |> maybe_preload_team_users(params[:team_users])
     |> Repo.all()
-  end
-
-  defp maybe_preload_teams_users(query, nil), do: query
-  defp maybe_preload_teams_users(query, _) do
-    from(team in query,
-      left_join: users in assoc(team, :users)
-    )
   end
 
   defp maybe_filter_team_by_user(query, nil), do: query
