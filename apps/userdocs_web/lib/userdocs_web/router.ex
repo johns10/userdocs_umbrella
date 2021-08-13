@@ -2,7 +2,7 @@ defmodule UserDocsWeb.Router do
   use UserDocsWeb, :router
   use Pow.Phoenix.Router
   use Pow.Extension.Phoenix.Router,
-    extensions: [PowResetPassword, PowEmailConfirmation]
+    extensions: [PowResetPassword, PowEmailConfirmation, PowInvitation]
 
   pipeline :browser do
     plug :accepts, ["html"]
