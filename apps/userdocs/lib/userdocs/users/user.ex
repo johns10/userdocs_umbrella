@@ -57,6 +57,18 @@ defmodule UserDocs.Users.User do
     |> cast(attrs, [:email, :invited_by_id])
   end
 
+  def invite_changeset(user_or_changeset, attrs) do
+    invited_by =
+      case attrs do
+        %{"invited_by_id" => invited_by_id} -> UserDocs.Users.get_user!(invited_by_id)
+        %{invited_by_id: invited_by_id} -> UserDocs.Users.get_user!(invited_by_id)
+        _ -> raise("invited_by not set, invitation fails")
+      end
+    user_or_changeset
+    |> cast(attrs, [:email, :invited_by_id])
+    |> pow_invite_changeset(invited_by, attrs)
+  end
+
   def change_browser_session(user, attrs) do
     user
     |> cast(attrs, [:browser_session])
