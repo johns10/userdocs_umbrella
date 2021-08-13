@@ -52,6 +52,11 @@ defmodule UserDocs.Users.User do
     |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id])
   end
 
+  def email_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :invited_by_id])
+  end
+
   def change_browser_session(user, attrs) do
     user
     |> cast(attrs, [:browser_session])
