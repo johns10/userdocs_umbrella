@@ -269,6 +269,11 @@ defmodule UserDocs.Users do
     User.signup_changeset(user, attrs)
   end
 
+  def invite_user(%User{} = user, attrs \\ %{}) do
+    User.invite_changeset(user, attrs)
+    |> UserDocs.Repo.insert()
+  end
+
   alias UserDocs.Users.TeamUser
 
   def load_team_users(state, opts) do
