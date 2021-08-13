@@ -10,6 +10,7 @@ defmodule UserDocs.Users.TeamUser do
     field :delete, :boolean, virtual: true
 
     field :default, :boolean
+    field :type, :string
     belongs_to :team, Team
     belongs_to :user, User
 
