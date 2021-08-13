@@ -6,7 +6,7 @@ defmodule UserDocs.Users.User do
   import Ecto.Changeset
   use Pow.Ecto.Schema
   use Pow.Extension.Ecto.Schema,
-    extensions: [PowResetPassword, PowEmailConfirmation]
+    extensions: [PowResetPassword, PowEmailConfirmation, PowInvitation]
 
   alias UserDocs.ChangesetHelpers
   alias UserDocs.Users.Team
@@ -107,10 +107,11 @@ defmodule UserDocs.Users.User do
     |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id])
   end
 
-  def preload_teams(user = %UserDocs.Users.User{}, %{ teams: teams, team_users: team_users }) do
+  def preload_teams(user = %UserDocs.Users.User{}, %{teams: teams, team_users: team_users}) do
     Map.put(user, :teams, teams(user.id, teams, team_users))
   end
-  def teams(user = %UserDocs.Users.User{}, %{ teams: teams, team_users: team_users }) do
+
+  def teams(user = %UserDocs.Users.User{}, %{teams: teams, team_users: team_users}) do
     teams(user.id, teams, team_users)
   end
   def teams(user_id, teams, team_users) when is_integer(user_id) do
@@ -123,7 +124,7 @@ defmodule UserDocs.Users.User do
     Enum.filter(teams, fn(t) -> t.id in team_ids end)
   end
 
-  def preload_projects(user = %UserDocs.Users.User{ teams: teams }, %{ projects: projects }) do
+  def preload_projects(user = %UserDocs.Users.User{teams: teams}, %{projects: projects}) do
     teams =
       Enum.map(teams,
         fn(t) ->
@@ -132,7 +133,7 @@ defmodule UserDocs.Users.User do
     Map.put(user, :teams, teams)
   end
 
-  def preload_versions(user = %UserDocs.Users.User{ teams: teams }, %{ versions: versions }) do
+  def preload_versions(user = %UserDocs.Users.User{teams: teams}, %{versions: versions}) do
     teams =
       Enum.map(teams,
         fn(t) ->
