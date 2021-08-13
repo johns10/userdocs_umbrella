@@ -274,6 +274,13 @@ defmodule UserDocs.Users do
     |> UserDocs.Repo.insert()
   end
 
+  def send_email_invitation(attrs) do
+    attrs
+    |> Email.cast_onboarding()
+    |> Email.onboarding()
+    |> Email.send()
+  end
+
   alias UserDocs.Users.TeamUser
 
   def load_team_users(state, opts) do
