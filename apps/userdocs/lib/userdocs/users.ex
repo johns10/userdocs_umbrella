@@ -8,6 +8,7 @@ defmodule UserDocs.Users do
   alias UserDocs.Repo
 
   alias UserDocs.Users.User
+  alias UserDocs.Email
 
   @behaviour Bodyguard.Policy
   def authorize(:get_user!, %{id: user_id} = _current_user, %{id: user_id} = _user), do: :ok
