@@ -1,0 +1,40 @@
+css:
+  body { overflow: hidden; }
+    
+section.bg-green-400
+  div.container
+    div.flex.items-center.justify-center.h-screen
+      div.bg-white.rounded-lg.border.shadow-lg.p-10.max-w-2xl
+        .flex.items-center.justify-center.p-4.sm_px-6.lg_px-8
+          .w-full.space-y-8
+            img.mx-auto.h-12.w-auto alt="Logo" src="/images/logo.svg" /
+            h2.mt-6.text-center.text-3xl.font-extrabold.text-gray-900
+              | Register
+
+            = form_for @changeset, @action, [as: :user, class: "mt-8"], fn f ->
+              = if @changeset.action do 
+                div.alert.alert-danger
+                  p Oops, something went wrong! Please check the errors below.
+
+              div.mb-8
+                = label f, Pow.Ecto.Schema.user_id_field(@changeset), class: "text-gray-700 text-sm font-bold mb-2"
+                = text_input f, Pow.Ecto.Schema.user_id_field(@changeset), class: "appearance-none shadow-sm rounded-md relative w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus_outline-none focus_ring- focus_border-green-400 focus_z-10 sm_text-sm"
+                = absolute_error_tag f, Pow.Ecto.Schema.user_id_field(@changeset)
+
+              div.mb-8
+                = label f, :password, class: "text-gray-700 text-sm font-bold mb-2"
+                = password_input f, :password, class: "appearance-none shadow-sm rounded-md relative w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus_outline-none focus_ring- focus_border-green-400 focus_z-10 sm_text-sm"
+                = error_tag f, :password
+
+              div.mb-8
+                = label f, :password_confirmation, class: "text-gray-700 text-sm font-bold mb-2"
+                = password_input f, :password_confirmation, class: "appearance-none shadow-sm rounded-md relative w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus_outline-none focus_ring- focus_border-green-400 focus_z-10 sm_text-sm"
+                = error_tag f, :password_confirmation
+
+              div type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-400 hover_bg-green-400 focus_outline-none focus_ring-2 focus_ring-offset-2 focus_ring-green-400"
+                = submit "Submit" 
+
+            span = link "Sign in", to: Routes.pow_session_path(@conn, :new)
+
+
+
