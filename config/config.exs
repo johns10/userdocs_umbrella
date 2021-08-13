@@ -36,7 +36,7 @@ config :userdocs_web, :pow,
   cache_store_backend: Pow.Store.Backend.MnesiaCache,
   backend: Pow.Store.Backend.MnesiaCache,
   routes_backend: UserDocsWeb.Pow.Routes,
-  extensions: [PowResetPassword, PowEmailConfirmation],
+  extensions: [PowResetPassword, PowEmailConfirmation, PowInvitation],
   controller_callbacks: Pow.Extension.Phoenix.ControllerCallbacks,
   mailer_backend: UserDocsWeb.Pow.Mailer
 
