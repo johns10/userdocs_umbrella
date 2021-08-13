@@ -117,7 +117,6 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
 
         %{
           url: Routes.pow_invitation_invitation_path(socket, :edit, signed_token),
-          module: UserDocsWeb.PowInvitation.MailerView,
           user: user,
           invited_by: socket.assigns.current_user,
         }
