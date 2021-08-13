@@ -46,7 +46,7 @@ defmodule UserDocsWeb.TeamLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    team = Users.get_team!(id, %{preloads: [ users: true, projects: true, team_users: true ]})
+    team = Users.get_team!(id, %{preloads: [users: true, projects: true, team_users: [user: true]]})
     socket
     |> assign(:page_title, "Edit Team")
     |> assign(:team, team)
@@ -82,14 +82,20 @@ defmodule UserDocsWeb.TeamLive.Index do
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   def prepare_teams(socket) do
+    opts =
+      socket.assigns.state_opts
+      |> Keyword.put(:params, [:team_users, [team_users: :user]])
+
     socket
-    |> assign(:teams, Users.list_teams(socket, socket.assigns.state_opts))
+    |> assign(:teams, Users.list_teams(socket, opts))
   end
 
   defp load_teams(socket) do
     opts =
       socket.assigns.state_opts
       |> Keyword.put(:filters, %{user_id: socket.assigns.current_user.id})
+      |> Keyword.put(:params, %{team_users: [user: true]})
+
     socket
     |> Users.load_teams(opts)
   end
