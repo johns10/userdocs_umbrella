@@ -1,6 +1,0 @@
-# comment
-binary-dist/*
-dist/*
-lib/*
-node_modules/*
-test/*
