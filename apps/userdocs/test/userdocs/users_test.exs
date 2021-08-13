@@ -2,13 +2,15 @@ defmodule UserDocs.UsersTest do
   use UserDocs.DataCase
 
   alias UserDocs.Users
+  alias UserDocs.Users.TeamUser
+  alias UserDocs.UsersFixtures
 
   @opts [data_type: :list, strategy: :by_type, loader: &Phoenix.LiveView.assign/3]
-
   describe "users" do
     alias UserDocs.Users.User
     alias UserDocs.UsersFixtures
     alias UserDocs.ProjectsFixtures
+
 
     test "list_users/0 returns all teams" do
       user = UsersFixtures.user()
@@ -122,9 +124,9 @@ defmodule UserDocs.UsersTest do
       password = UUID.uuid4()
       user = UsersFixtures.user(password)
       team = UsersFixtures.team()
-      team_user = UsersFixtures.team_user(user.id, team.id)
+      _team_user = UsersFixtures.team_user(user.id, team.id)
       project = ProjectsFixtures.project(team.id)
-      version = ProjectsFixtures.version(project.id)
+      _version = ProjectsFixtures.version(project.id)
       overrides = [%{project_id: project.id, url: "https://www.google.com/"}]
       attrs = UsersFixtures.user_attrs(:valid)
       attrs = attrs |> Map.put(:overrides, overrides)
@@ -137,7 +139,6 @@ defmodule UserDocs.UsersTest do
       {error, _} = changeset.changes.overrides |> Enum.at(1) |> Map.get(:errors) |> Keyword.get(:project_id)
       assert error == "This project ID does exist. Pick a new project."
     end
-
   end
 
   describe "teams" do
@@ -198,5 +199,4 @@ defmodule UserDocs.UsersTest do
       assert %Ecto.Changeset{} = Users.change_team(team)
     end
   end
-
 end
