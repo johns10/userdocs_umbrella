@@ -487,7 +487,7 @@ defmodule UserDocs.Users do
   def get_team!(id, params) do
     preloads = Map.get(params, :preloads, [])
     base_team_query(id)
-    |> maybe_preload_team_users(preloads[:users])
+    |> maybe_preload_team_users(preloads[:team_users])
     |> maybe_preload_users(preloads[:users])
     |> maybe_preload_default_project(preloads[:default_project])
     |> maybe_preload_projects(preloads[:projects])
