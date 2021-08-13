@@ -21,7 +21,8 @@ defmodule UserDocs.Users.TeamUser do
   def changeset(team_user, attrs) do
     team_user
     |> Map.put(:temp_id, (team_user.temp_id || attrs["temp_id"]))
-    |> cast(attrs, [ :team_id, :user_id, :delete, :default ])
+    |> cast(attrs, [:team_id, :user_id, :delete, :default, :type])
+    |> cast_assoc(:user, with: &User.email_changeset/2)
     |> foreign_key_constraint(:team_id)
     |> foreign_key_constraint(:user_id)
     |> unique_constraint(:user_id, name: :team_id_user_id_index)
