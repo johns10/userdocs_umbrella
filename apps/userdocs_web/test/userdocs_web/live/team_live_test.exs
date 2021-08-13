@@ -1,5 +1,6 @@
 defmodule UserDocsWeb.TeamLiveTest do
   use UserDocsWeb.ConnCase
+  use Bamboo.Test, shared: :true
 
   import Phoenix.LiveViewTest
 
@@ -7,7 +8,7 @@ defmodule UserDocsWeb.TeamLiveTest do
   alias UserDocs.WebFixtures
   alias UserDocs.ProjectsFixtures
 
-  defp create_user(%{password: password}), do: %{user: UsersFixtures.user(password)}
+  defp create_user(%{password: password}), do: %{user: UsersFixtures.confirmed_user(password)}
   defp create_team(_), do: %{team: UsersFixtures.team()}
   defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
@@ -43,8 +44,8 @@ defmodule UserDocsWeb.TeamLiveTest do
       :create_team_user,
       :create_project,
       :create_version,
-      :make_selections,
-      :grevious_workaround
+      :grevious_workaround,
+      :make_selections
     ]
 
     test "lists all teams", %{authed_conn: conn, team: team} do
@@ -77,7 +78,8 @@ defmodule UserDocsWeb.TeamLiveTest do
       assert html =~ valid_attrs.name
     end
 
-    test "updates team in listing", %{authed_conn: conn, team: team} do
+    test "updates team in listing", %{authed_conn: conn, team: team, user: user} do
+      invited_email = UUID.uuid4() <> "@user-docs.com"
       {:ok, index_live, _html} = live(conn, Routes.team_index_path(conn, :index))
 
       assert index_live |> element("#edit-team-" <> to_string(team.id)) |> render_click() =~
@@ -89,14 +91,29 @@ defmodule UserDocsWeb.TeamLiveTest do
              |> form("#team-form", team: UsersFixtures.team_attrs(:invalid))
              |> render_change() =~ "can&#39;t be blank"
 
+      team_user_attrs = %{"1" => %{"user" => %{"email" => invited_email, "invited_by_id" => user.id}, "team_id" => team.id}}
       valid_attrs = UsersFixtures.team_attrs(:valid)
+
+      assert index_live
+      |> element("#add-user")
+      |> render_click() =~ "delete"
+
+      assert index_live
+      |> element("#team-form")
+      |> render_change(%{team: valid_attrs |> Map.put(:team_users, team_user_attrs)})
+
+      assert index_live
+      |> element("[phx-click=send-invitation]")
+      |> render_click()
 
       {:ok, _, html} =
         index_live
         |> form("#team-form", team: valid_attrs)
-        |> render_submit()
+        |> render_submit(%{"team_id" => team.id, "type" => "invited"})
         |> follow_redirect(conn, Routes.team_index_path(conn, :index))
 
+      #assert_email_delivered_with(subject: ~r/has invited you to join UserDocs!/) # arg still don't pass
+      #assert_email_delivered_with(from: "welcome@user-docs.com") # arg still don't pass
       assert html =~ "Team updated successfully"
       assert html =~ valid_attrs.name
     end
@@ -112,9 +129,10 @@ defmodule UserDocsWeb.TeamLiveTest do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert live
-             |> element("#version-picker-#{version.id}")
+             |> element("#version-picker-" <> to_string(version.id))
              |> render_click() =~ version.name
     end
+
   end
 
   describe "Show" do
@@ -136,8 +154,9 @@ defmodule UserDocsWeb.TeamLiveTest do
       assert html =~ "Show Team"
       assert html =~ team.name
     end
-    """
+
     # We don't support a form on this page yet
+
     test "updates team within modal", %{authed_conn: conn, team: team} do
       {:ok, show_live, _html} = live(conn, Routes.team_show_path(conn, :show, team))
 
@@ -163,13 +182,13 @@ defmodule UserDocsWeb.TeamLiveTest do
       assert html =~ "Team updated successfully"
       assert html =~ valid_attrs.name
     end
-    """
+
 
     test "show handles standard events", %{authed_conn: conn, version: version} do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert live
-             |> element("#version-picker-#{version.id}")
+             |> element("#version-picker-" <> to_string(version.id))
              |> render_click() =~ version.name
     end
   end
