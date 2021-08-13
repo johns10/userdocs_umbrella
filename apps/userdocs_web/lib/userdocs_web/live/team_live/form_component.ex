@@ -52,6 +52,7 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
       |> assign(:aws_region_select_options, @aws_region_select_options)
       |> assign(:changeset, changeset)
       |> assign(:users_select_options, users_select)
+      |> assign(:show_user_form, false)
     }
   end
 
@@ -71,43 +72,102 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
   end
 
   def handle_event("add-user", _, socket) do
-    existing_team_users =
-      Map.get(
-        socket.assigns.changeset.changes, :team_users,
-        socket.assigns.team.team_users
-      )
+    last_team_user_change = socket.assigns.changeset |> Ecto.Changeset.get_change(:team_users, []) |> Enum.at(-1)
+    new_team_user =
+      %TeamUser{temp_id: get_temp_id()}
+      |> Users.change_team_user()
+      |> Ecto.Changeset.put_change(:user, %Users.User{})
 
-    team_users =
-      existing_team_users
-      |> Enum.concat([
-        Users.change_team_user(%TeamUser{temp_id: get_temp_id()})
-      ])
+    team_user_changes =
+      socket.assigns.changeset
+      |> Ecto.Changeset.get_change(:team_users, socket.assigns.team.team_users)
+      |> Enum.concat([new_team_user])
 
     changeset =
       socket.assigns.changeset
-      |> Ecto.Changeset.put_assoc(:team_users, team_users)
+      |> Ecto.Changeset.put_change(:team_users, team_user_changes)
 
-    {:noreply, assign(socket, changeset: changeset)}
+      {:noreply, socket |> assign(:changeset, changeset) |> assign(:show_user_form, true)}
   end
 
   def handle_event("remove-user", %{"remove" => remove_id}, socket) do
-    team_users =
-      socket.assigns.changeset.changes.team_users
-      |> Enum.reject(fn %{data: team_user} ->
-        team_user.temp_id == remove_id
-      end)
+    team_user_changes =
+      socket.assigns.changeset
+      |> Ecto.Changeset.get_change(:team_users)
+      |> Enum.reject(fn(c) -> c.action == :insert end)
 
     changeset =
       socket.assigns.changeset
-      |> Ecto.Changeset.put_assoc(:team_users, team_users)
+      |> Ecto.Changeset.put_change(:team_users, team_user_changes)
 
-    {:noreply, assign(socket, changeset: changeset)}
+    {:noreply, socket |> assign(:changeset, changeset) |> assign(:show_user_form, false)}
+  end
+
+  def handle_event("send-invitation", _params, socket = %{assigns: %{changeset: %{params: %{"team_users" => team_users} = params}}}) do
+    {key, team_user_attrs} = team_users |> Enum.into([]) |> Enum.at(-1)
+    user_attrs = Map.get(team_user_attrs, "user")
+    team_user_attrs = Map.delete(team_user_attrs, "user")
+
+    case Users.invite_user(%Users.User{}, user_attrs) do
+      {:ok, user} ->
+        signed_token =
+          %Plug.Conn{secret_key_base: UserDocsWeb.Endpoint.config(:secret_key_base)}
+          |> Pow.Plug.put_config(otp_app: :userdocs_web)
+          |> PowInvitation.Plug.sign_invitation_token(user)
+
+        %{
+          url: Routes.pow_invitation_invitation_path(socket, :edit, signed_token),
+          module: UserDocsWeb.PowInvitation.MailerView,
+          user: user,
+          invited_by: socket.assigns.current_user,
+        }
+        |>  Users.send_email_invitation()
+
+        {:ok, _team_user} = Map.put(team_user_attrs, "user_id", user.id) |> Users.create_team_user()
+        team = Users.get_team!(socket.assigns.team.id, %{preloads: [team_users: [user: true], projects: true]})
+        team_user_params = team_users |> Enum.into([]) |> List.delete_at(-1)
+        params = params |> Map.delete("team_users") |> Map.put("team_users", team_user_params)
+        changeset = Users.change_team(team, params)
+
+        {
+          :noreply,
+          socket
+          |> assign(:team, team)
+          |> assign(:changeset, changeset)
+          |> assign(:append_team_users, [])
+          |> assign(:show_user_form, false)
+        }
+      {:error, %{changes: %{email: email}, errors: [email: {"has already been taken", _}]}} ->
+        IO.puts("Email taken")
+        user = Users.get_user_by_email!(email)
+
+        {:ok, _team_user} =
+          team_user_attrs
+          |> Map.put("user_id", user.id)
+          |> Users.create_team_user()
+
+        team = Users.get_team!(socket.assigns.team.id, %{preloads: [team_users: [user: true], projects: true]})
+        team_user_params = team_users |> Enum.into([]) |> List.delete_at(-1)
+        params = params |> Map.delete("team_users") |> Map.put("team_users", team_user_params)
+        changeset = Users.change_team(team, params)
+
+        {
+          :noreply,
+          socket
+          |> assign(:team, team)
+          |> assign(:changeset, changeset)
+          |> assign(:append_team_users, [])
+          |> assign(:show_user_form, false)
+        }
+      {:error, changeset} ->
+        {:noreply, socket}
+    end
   end
 
   defp get_temp_id, do: :crypto.strong_rand_bytes(5) |> Base.url_encode64 |> binary_part(0, 5)
 
   defp save_team(socket, :edit, team_params) do
-    case Users.update_team_and_default_project(socket.assigns.team, team_params) do
+    case Users.update_team(socket.assigns.team, team_params) do
       {:ok, _team} ->
         {
           :noreply,
@@ -122,7 +182,7 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
   end
 
   defp save_team(socket, :new, team_params) do
-    params = Map.put(team_params, "team_users", [ %{ "default" => "false", "user_id" => Integer.to_string(socket.assigns.current_user.id) }])
+    params = Map.put(team_params, "team_users", [%{"default" => "false", "user_id" => Integer.to_string(socket.assigns.current_user.id)}])
     case Users.create_team(params) do
       {:ok, _team} ->
         {:noreply,

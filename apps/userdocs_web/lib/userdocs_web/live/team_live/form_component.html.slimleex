@@ -32,16 +32,51 @@ h2.title = @title
 
   = inputs_for form, :team_users, fn tuf ->
     .field.is-grouped
-      = Layout.select_input(tuf, :user_id, @users_select_options, [], "control")
-      = if is_nil(tuf.data.temp_id) do
-        = Layout.checkbox(tuf, :delete)
+      = hidden_input tuf, :team_id, value: form.data.id
+      = if tuf.source.data.__meta__.state != :loaded do
+        = hidden_input tuf, :type, value: "invited"
+        = hidden_input tuf, :temp_id
+        div.flex.flex-col
+          div.pb-4
+            = inputs_for tuf, :user, fn uf ->
+              = hidden_input uf, :invited_by_id, value: @current_user.id
+              div.control
+                = text_input uf, :email, [label: false, class: "input", type: "text", placeholder: "Email Address"]
+                = error_tag(uf, :email)
+          div
+            = link to: "#", phx_click: "send-invitation", phx_value_send: tuf.data.temp_id, phx_target: @myself.cid do
+              div.mr-4.text-xs.inline-flex.items-center.font-bold.leading-sm.uppercase.px-3.py-2.bg-green-200.text-green-700.rounded-full
+                svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send mr-2"
+                  line x1="22" y1="2" x2="11" y2="13"
+                  polygon points="22 2 15 22 11 13 2 9 22 2"
+                | send
+            = link(to: "#", phx_click: "remove-user", phx_value_remove: tuf.data.temp_id, phx_target: @myself.cid) do 
+              div.mr-4.text-xs.inline-flex.items-center.font-bold.leading-sm.uppercase.px-3.py-2.bg-red-200.text-red-700.rounded-full
+                svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-circle"
+                  circle cx="12" cy="12" r="10"
+                  line x1="15" y1="9" x2="9" y2="15"
+                  line x1="9" y1="9" x2="15" y2="15"
+                | delete
       - else 
-        = hidden_input(tuf, :temp_id)
-        = link(to: "#", phx_click: "remove-user", phx_value_remove: tuf.data.temp_id, phx_target: @myself.cid) do 
-          span x
-
-  = link to: "#", phx_click: "add-user", phx_target: @myself.cid do
-    p New User
+        .control
+          = checkbox tuf, :delete, id: ("delete-input-" <> to_string(tuf.source.data.id)), hidden: true
+          label for=("delete-input-" <> to_string(tuf.source.data.id))
+            .flex-row.is-align-items-center
+              = if Ecto.Changeset.get_field(tuf.source, :delete) do
+                i.fa.fa-toggle-on.px-1
+                i.fa.fa-trash.px-1 style="color: green;"
+              - else 
+                i.fa.fa-toggle-off.px-1
+                i.fa.fa-trash.px-1 style="color: grey;"
+        = inputs_for tuf, :user, fn uf ->
+          = hidden_input uf, :invited_by_id, value: @current_user.id
+          .control
+            = uf.source.data.email
+        .control
+          = tuf.source.data.type
+  = if not @show_user_form do
+    = link to: "#", phx_click: "add-user", phx_target: @myself.cid, id: "add-user" do
+      p New User
 
   div.field
     = label form, :css, class: "label"
