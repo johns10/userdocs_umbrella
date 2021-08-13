@@ -40,7 +40,7 @@ defmodule UserDocs.Users.Team do
   @doc false
   def changeset(team, attrs) do
     team
-    |> cast(attrs, [ :name, :default_language_code_id, :aws_bucket, :aws_region, :aws_access_key_id, :aws_secret_access_key, :css ])
+    |> cast(attrs, [:name, :default_language_code_id, :aws_bucket, :aws_region, :aws_access_key_id, :aws_secret_access_key, :css])
     |> cast_assoc(:team_users)
     |> cast_assoc(:projects)
     |> foreign_key_constraint(:default_language_code_id)
