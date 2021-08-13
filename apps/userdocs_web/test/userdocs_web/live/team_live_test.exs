@@ -156,7 +156,7 @@ defmodule UserDocsWeb.TeamLiveTest do
     end
 
     # We don't support a form on this page yet
-
+"""
     test "updates team within modal", %{authed_conn: conn, team: team} do
       {:ok, show_live, _html} = live(conn, Routes.team_show_path(conn, :show, team))
 
@@ -182,7 +182,7 @@ defmodule UserDocsWeb.TeamLiveTest do
       assert html =~ "Team updated successfully"
       assert html =~ valid_attrs.name
     end
-
+"""
 
     test "show handles standard events", %{authed_conn: conn, version: version} do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
