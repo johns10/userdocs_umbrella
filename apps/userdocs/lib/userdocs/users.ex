@@ -636,7 +636,6 @@ defmodule UserDocs.Users do
     |> Repo.update()
   end
   def update_team(%Team{} = team, attrs) do
-    IO.inspect(attrs)
     team
     |> Team.changeset(attrs)
     |> Repo.update()
