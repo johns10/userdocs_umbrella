@@ -400,7 +400,7 @@ defmodule UserDocs.Users do
   alias UserDocs.Users.Team
 
   def load_teams(state, opts) do
-    StateHandlers.load(state, list_teams(%{}, opts[:filters]), Team, opts)
+    StateHandlers.load(state, list_teams(opts[:params], opts[:filters]), Team, opts)
   end
 
   @doc """
