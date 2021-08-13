@@ -39,7 +39,7 @@ defmodule UserDocsWeb.MixProject do
   defp deps do
     [
       {:phoenix, "~> 1.5"},
-      {:phoenix_ecto, "~> 4.2"},
+      {:phoenix_ecto, "~> 4.3"},
       {:phoenix_live_view, "~> 0.15.7"},
       {:phoenix_html, "~> 2.14"},
       {:phoenix_live_dashboard, "~> 0.4.0"},
