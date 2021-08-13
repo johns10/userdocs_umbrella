@@ -43,7 +43,7 @@ defmodule UserDocsWeb.Router do
 
   pipeline :not_authenticated do
     plug Pow.Plug.RequireNotAuthenticated,
-      error_handler: Pow.Plug.RequireNotAuthenticated
+      error_handler: Pow.Phoenix.PlugErrorHandler
   end
 
   pipeline :api do
