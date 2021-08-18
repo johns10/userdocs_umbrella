@@ -296,7 +296,6 @@ defmodule UserDocsWeb.Root do
     {:noreply, socket}
   end
   def handle_info({:live_session_updated, params}, socket) do
-  IO.puts("Handling info for a live session update")
   {
     :noreply,
     socket
