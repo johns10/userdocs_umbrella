@@ -34,11 +34,12 @@ div
 
   .is-flex.is-justify-content-space-between
     p.title = @process.name
-    .field.has-addons.mr-4
-      p.control 
-        = live_component(@socket, ProcessLive.Runner, 
-          [ id: "process-" <> Integer.to_string(@process.id), process: @process, class: "button" ])
-      p.control 
+    .field.mr-2.is-flex
+      p.control.mr-2
+        = if @browser_opened do
+          = live_component(@socket, ProcessLive.Runner, 
+            [ id: "process-" <> Integer.to_string(@process.id), process: @process, class: "button" ])
+      p.control.mr-2
         = live_component(@socket, ProcessLive.Queuer, 
           [ id: "process-" <> Integer.to_string(@process.id) <> "-queuer", process: @process, class: "button" ])
 
@@ -58,11 +59,12 @@ div
                 step: step, 
                 step_type_name: step.step_type.name,
                 class: "navbar-item" ])
-              = live_component(@socket, StepLive.Runner, 
-                [ id: "step-" <> Integer.to_string(step.id),
-                step: step, 
-                current_user: @current_user,
-                step_type_name: step.step_type.name])
+              = if @browser_opened do
+                = live_component(@socket, StepLive.Runner, 
+                  [ id: "step-" <> Integer.to_string(step.id),
+                  step: step, 
+                  current_user: @current_user,
+                  step_type_name: step.step_type.name])
               = live_patch class: "navbar-item", to: Routes.step_index_path(@socket, :edit, step.id), id: "edit-step-#{step.id}" do
                 span
                   i.fa.fa-edit
