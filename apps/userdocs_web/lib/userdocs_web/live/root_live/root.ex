@@ -61,6 +61,7 @@ defmodule UserDocsWeb.Root do
   end
 
   def subscribe(socket) do
+    UserDocsWeb.Endpoint.subscribe("user:" <> to_string(socket.assigns.current_user.id))
     case Defaults.channel(socket) do
       channel when is_binary(channel) ->
         UserDocsWeb.Endpoint.subscribe(channel)
