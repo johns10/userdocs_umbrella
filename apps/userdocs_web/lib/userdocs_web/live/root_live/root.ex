@@ -253,6 +253,29 @@ defmodule UserDocsWeb.Root do
     raise(FunctionClauseError, message: "Event #{inspect(name)} not implemented by Root")
   end
 
+  def handle_info(%{topic: _, event: "command:" <> command, payload: _}, socket), do: {:noreply, socket}
+  def handle_info(%{topic: "user:" <> user_id, event: "presence_diff", payload: %{joins: joins, leaves: leaves}}, socket) do
+    IO.inspect("Presence diff")
+    IO.inspect(joins)
+    IO.inspect(leaves)
+    {:noreply, socket}
+  end
+  def handle_info(%{topic: "user:" <> _user_id, event: "event:browser_opened"}, socket) do
+    IO.inspect("root:event:browser_opened")
+    {:noreply, PhoenixLiveSession.put_session(socket, "browser_opened", true)}
+  end
+  def handle_info(%{topic: "user:" <> _user_id, event: "event:user_opened_browser"}, socket) do
+    IO.inspect("root:event:user_opened_browser")
+    {:noreply, PhoenixLiveSession.put_session(socket, "user_opened_browser", true)}
+  end
+  def handle_info(%{topic: "user:" <> _user_id, event: "event:browser_closed"}, socket) do
+    IO.inspect("root:event:browser_closed")
+    {:noreply, PhoenixLiveSession.put_session(socket, "browser_opened", false)}
+  end
+  def handle_info(%{topic: "user:" <> _user_id, event: "event:user_closed_browser"}, socket) do
+    IO.inspect("root:event:user_opened_browser")
+    {:noreply, PhoenixLiveSession.put_session(socket, "user_opened_browser", false)}
+  end
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
     schema = case payload do
       %{objects: [ object | _ ]} -> object.__meta__.schema
