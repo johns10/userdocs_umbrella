@@ -50,4 +50,5 @@ div#sidebar.is-flex.is-flex-direction-column
         UserDocsWeb.AutomationManagerLive,
         [ id: "automation-manager", 
         current_team: @current_team,
+        current_user: @current_user,
         job_id: ( ( @current_team |> Map.get(:job) ) || %{ id: nil } ) |> Map.get(:id) ]
