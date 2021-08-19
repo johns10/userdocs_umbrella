@@ -398,7 +398,8 @@ defmodule UserDocs.TestDataset do
         aws_bucket: "userdocs-test",
         aws_access_key_id: "AKIAT5VKLWBUOAYXO656",
         aws_secret_access_key: "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",
-        aws_region: "us-east-2"
+        aws_region: "us-east-2",
+        css: "{key: value}"
      }
 
     loreline_team =
@@ -569,6 +570,13 @@ defmodule UserDocs.TestDataset do
       version_id: version_0_0_1_id
    }
 
+   failure_page = %{
+     name: "Fail",
+     order: 3,
+     url: "https://asdf3e33fushdg)*!#&%)*&",
+     version_id: version_0_0_1_id
+  }
+
     {:ok, %Page{id: add_remove_page_id}} =
       %Page{}
       |> Page.changeset(add_remove_page)
@@ -587,6 +595,11 @@ defmodule UserDocs.TestDataset do
     {:ok, %Page{id: secure_page_id}} =
       %Page{}
       |> Page.changeset(secure_page)
+      |> Repo.insert()
+
+    {:ok, %Page{id: failure_page_id}} =
+      %Page{}
+      |> Page.changeset(failure_page)
       |> Repo.insert()
 
     #
@@ -821,7 +834,12 @@ defmodule UserDocs.TestDataset do
         name: "Test Everything",
         order: 3,
         version_id: version_0_0_1_id
-     }
+     },
+     failing_process = %{
+       name: "Fail",
+       order: 3,
+       version_id: version_0_0_1_id
+    }
     ]
 
     {:ok, %Process{id: add_remove_process_id}} =
@@ -839,6 +857,11 @@ defmodule UserDocs.TestDataset do
       |> Process.changeset(test_everything)
       |> Repo.insert()
 
+    {:ok, %Process{id: fail_process_id}} =
+      %Process{}
+      |> Process.changeset(failing_process)
+      |> Repo.insert()
+
     # Processes
 
     steps = [
@@ -848,20 +871,20 @@ defmodule UserDocs.TestDataset do
         height: nil,
         name: "Navigate to Add Remove Elements",
         order: 10,
-        page_id: nil,
+        page_id: add_remove_page_id,
         page_reference: nil,
         process_id: add_remove_process_id,
         step_type_id: navigate_id,
         text: nil,
         width: nil
-     },
+      },
       %{
         annotation_id: nil,
         element_id: nil,
         height: 720,
         name: "Set Size",
         order: 20,
-        page_id: nil,
+        page_id: add_remove_page_id,
         page_reference: nil,
         process_id: add_remove_process_id,
         step_type_id: set_size_explicit_id,
@@ -875,7 +898,7 @@ defmodule UserDocs.TestDataset do
         height: nil,
         name: "Screenshot",
         order: 35,
-        page_id: nil,
+        page_id: add_remove_page_id,
         page_reference: nil,
         process_id: add_remove_process_id,
         step_type_id: full_screen_screenshot_id,
@@ -889,7 +912,7 @@ defmodule UserDocs.TestDataset do
         height: nil,
         name: "Clear",
         order: 37,
-        page_id: nil,
+        page_id: add_remove_page_id,
         page_reference: nil,
         process_id: add_remove_process_id,
         step_type_id: clear_annotations_id,
@@ -903,7 +926,7 @@ defmodule UserDocs.TestDataset do
         height: nil,
         name: "Click Add Element",
         order: 40,
-        page_id: nil,
+        page_id: add_remove_page_id,
         page_reference: nil,
         process_id: add_remove_process_id,
         step_type_id: click_id,
@@ -917,7 +940,7 @@ defmodule UserDocs.TestDataset do
         height: nil,
         name: "Screenshot",
         order: 45,
-        page_id: nil,
+        page_id: add_remove_page_id,
         page_reference: nil,
         process_id: add_remove_process_id,
         step_type_id: full_screen_screenshot_id,
@@ -931,7 +954,7 @@ defmodule UserDocs.TestDataset do
         height: nil,
         name: "Clear",
         order: 47,
-        page_id: nil,
+        page_id: add_remove_page_id,
         page_reference: nil,
         process_id: add_remove_process_id,
         step_type_id: clear_annotations_id,
@@ -945,7 +968,7 @@ defmodule UserDocs.TestDataset do
         height: nil,
         name: "Click Delete",
         order: 50,
-        page_id: nil,
+        page_id: add_remove_page_id,
         page_reference: nil,
         process_id: add_remove_process_id,
         step_type_id: click_id,
@@ -1109,6 +1132,19 @@ defmodule UserDocs.TestDataset do
         text: nil,
         width: nil
      },
+     %{
+       annotation_id: nil,
+       element_id: nil,
+       height: nil,
+       name: "Failure",
+       order: 10,
+       page_id: failure_page_id,
+       page_reference: nil,
+       process_id: fail_process_id,
+       step_type_id: navigate_id,
+       text: nil,
+       width: nil
+     }
     ]
 
     Enum.each(steps,
