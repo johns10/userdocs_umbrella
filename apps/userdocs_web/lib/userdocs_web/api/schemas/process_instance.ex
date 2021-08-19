@@ -1,4 +1,5 @@
 defmodule UserDocsWeb.API.Schema.ProcessInstance do
+  @moduledoc false
   use Absinthe.Schema.Notation
   alias UserDocsWeb.API.Resolvers
 
