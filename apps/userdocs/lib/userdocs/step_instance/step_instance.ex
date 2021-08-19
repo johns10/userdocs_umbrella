@@ -1,4 +1,5 @@
 defmodule UserDocs.StepInstances.StepInstance do
+  @moduledoc false
   #@derive {Inspect, only: [:id, :order, :status, :name ]}
 
   use Ecto.Schema
@@ -8,6 +9,7 @@ defmodule UserDocs.StepInstances.StepInstance do
   alias UserDocs.ProcessInstances.ProcessInstance
   alias UserDocs.Jobs.JobInstance
 
+  @derive {Jason.Encoder, only: [:id, :uuid, :order, :status, :name, :type]}
   schema "step_instances" do
     field :uuid, :binary_id
     field :order, :integer
@@ -15,8 +17,8 @@ defmodule UserDocs.StepInstances.StepInstance do
     field :name, :string
     field :type, :string
     field :attrs, :map
-    field :errors, { :array, :map }
-    field :warnings, { :array, :map }
+    field :errors, {:array, :map}
+    field :warnings, {:array, :map}
 
     belongs_to :job_instance, JobInstance, on_replace: :nilify
     belongs_to :process_instance, ProcessInstance, on_replace: :nilify
