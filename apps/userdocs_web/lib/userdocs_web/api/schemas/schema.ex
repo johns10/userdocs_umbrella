@@ -6,6 +6,7 @@ defmodule UserDocsWeb.API.Schema do
   import_types UserDocsWeb.API.Schema.StepType
   import_types UserDocsWeb.API.Schema.Element
   import_types UserDocsWeb.API.Schema.Screenshot
+  import_types UserDocsWeb.API.Schema.Version
   import_types UserDocsWeb.API.Schema.Process
   import_types UserDocsWeb.API.Schema.Strategy
   import_types UserDocsWeb.API.Schema.AnnotationType
@@ -20,10 +21,17 @@ defmodule UserDocsWeb.API.Schema do
   import_types UserDocsWeb.API.Schema.User
   import_types UserDocsWeb.API.Schema.Configuration
   import_types UserDocsWeb.API.Schema.Override
+  import_types UserDocsWeb.API.Schema.Project
 
   alias UserDocsWeb.API.Resolvers
 
   query do
+
+    @desc "Get a step"
+    field :step, :step do
+      arg :id, non_null(:id)
+      resolve &Resolvers.Step.get_step!/3
+    end
 
     @desc "Get a job"
     field :job, :job do
@@ -49,6 +57,13 @@ defmodule UserDocsWeb.API.Schema do
       resolve &Resolvers.Job.update_job/3
     end
 
+    @desc "Create a Process Instance"
+    field :create_process_instance, type: :process_instance do
+      arg :process_id, non_null(:id)
+      arg :status, non_null(:string)
+      resolve &Resolvers.ProcessInstance.create_process_instance/3
+    end
+
     @desc "Update a Process Instance"
     field :update_process_instance, type: :process_instance do
       arg :id, non_null(:id)
@@ -57,11 +72,20 @@ defmodule UserDocsWeb.API.Schema do
       resolve &Resolvers.ProcessInstance.update_process_instance/3
     end
 
+    @desc "Create a Step Instance"
+    field :create_step_instance, type: :step_instance do
+      arg :step_id, non_null(:id)
+      arg :status, non_null(:string)
+      resolve &Resolvers.StepInstance.create_step_instance/3
+    end
+
     @desc "Update a Step Instance"
     field :update_step_instance, type: :step_instance do
       arg :id, non_null(:id)
       arg :status, non_null(:string)
       arg :step, :step_input
+      arg :errors, list_of(:error_input)
+      arg :warnings, list_of(:warning_input)
       resolve &Resolvers.StepInstance.update_step_instance/3
     end
 
@@ -103,12 +127,6 @@ defmodule UserDocsWeb.API.Schema do
     field :step_instance, :step_instance do
       arg :id, non_null(:id)
       resolve &Resolvers.StepInstance.get_step_instance!/3
-    end
-
-    @desc "Get a step"
-    field :step, :step do
-      arg :id, non_null(:id)
-      resolve &Resolvers.Step.get_step!/3
     end
 
     @desc "Get an annotation"
