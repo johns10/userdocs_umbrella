@@ -21,7 +21,7 @@ defmodule UserDocs.StateFixtures do
   def base_state(state, opts) do
     opts =
       opts
-      |> Keyword.put(:types, [ User, TeamUser, Team, Project, Version ])
+      |> Keyword.put(:types, [User, TeamUser, Team, Project, Version])
 
     user = UsersFixtures.user()
     team = UsersFixtures.team()
@@ -115,14 +115,14 @@ defmodule UserDocs.StateFixtures do
 
     %{
       data: %{
-        users: [ user ],
-        teams: [ team ],
-        team_users: [ team_user ],
-        content: [ content_one, content_two, content_three ],
+        users: [user],
+        teams: [team],
+        team_users: [team_user],
+        content: [content_one, content_two, content_three],
         steps: [empty_step, step_with_annotation, step_with_element, step_with_both],
-        annotations: [ annotation_one, annotation_two ],
-        elements: [ element_one, element_two ],
-        strategies: [ strategy ],
+        annotations: [annotation_one, annotation_two],
+        elements: [element_one, element_two],
+        strategies: [strategy],
         annotation_types: [badge_annotation_type, outline_annotation_type]
       }
     }
