@@ -11,9 +11,8 @@ defmodule UserDocs.Web.Annotation do
   alias UserDocs.Web.Annotation.Name
   alias UserDocs.Web.Element
 
-  @derive {Jason.Encoder, only: [:name, :label, :x_orientation, :y_orientation,
-    :size, :color, :thickness, :x_offset, :y_offset, :font_size, :font_color, :page,
-    :annotation_type, :content, :content_version]}
+  @derive {Jason.Encoder, only: [:id, :name, :label, :x_orientation, :y_orientation,
+    :size, :color, :thickness, :x_offset, :y_offset, :font_size, :font_color]}
 
   schema "annotations" do
     field :name, :string

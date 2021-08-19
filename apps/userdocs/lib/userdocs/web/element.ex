@@ -4,7 +4,7 @@ defmodule UserDocs.Web.Element do
   alias UserDocs.Web.Page
   alias UserDocs.Web.Strategy
 
-  @derive {Jason.Encoder, only: [:name, :selector, :strategy, :page]}
+  @derive {Jason.Encoder, only: [:id, :name, :selector]}
   schema "elements" do
     field :name, :string
     field :selector, :string
