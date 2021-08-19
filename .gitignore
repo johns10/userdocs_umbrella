@@ -24,7 +24,8 @@ erl_crash.dump
 
 # ignore the mnesia files
 /Mnesia.nonode@nohost/
-/Mnesia.nonode@nohost*
+MnesiaCore.nonode@nohost*
+Mnesia.nonode@nohost*
 
 # Ignore the files in tmp
 
