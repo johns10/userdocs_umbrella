@@ -1,4 +1,5 @@
 defmodule UserDocs.JobsFixtures do
+  @moduledoc false
 
   alias UserDocs.Jobs
   alias UserDocs.StepInstances
