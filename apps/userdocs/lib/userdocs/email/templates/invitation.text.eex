@@ -9,7 +9,7 @@
                                       ------ Welcome to UserDocs ------
                                       Automatically Perfect Screenshots
 
-You've been invited by <%= @invited_by_user_email %>. Please use the following link to accept your invitation:
+You've been invited by <%= @invited_by_email %>. Please use the following link to accept your invitation:
 ------------------------------------- Write more and live more with UserDocs -----------------------------
 
 <%= @url %>
