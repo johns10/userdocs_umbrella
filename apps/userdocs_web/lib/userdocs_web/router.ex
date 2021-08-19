@@ -67,15 +67,14 @@ defmodule UserDocsWeb.Router do
     post "/session/renew", SessionController, :renew
   end
 
-  if Mix.env() in [:dev, :test] do
+  if Mix.env() in [:dev, :test, :integration] do
     scope "/api", as: :api do
       pipe_through :api
 
       #forward "/", Absinthe.Plug, schema: UserDocsWeb.API.Schema
-      forward "/graphiql", Absinthe.Plug.GraphiQL,
-        schema: UserDocsWeb.API.Schema
-
+      forward "/graphiql", Absinthe.Plug.GraphiQL, schema: UserDocsWeb.API.Schema
     end
+    forward "/integration", UserDocsWeb.Plug.Integration
   end
 
   scope "/api", as: :api do
