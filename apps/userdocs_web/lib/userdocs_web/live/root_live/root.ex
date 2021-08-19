@@ -253,8 +253,7 @@ defmodule UserDocsWeb.Root do
     raise(FunctionClauseError, message: "Event #{inspect(name)} not implemented by Root")
   end
 
-  def handle_info(%{topic: _, event: "command:" <> command, payload: _}, socket), do: {:noreply, socket}
-  def handle_info(%{topic: "user:" <> user_id, event: "presence_diff", payload: %{joins: joins, leaves: leaves}}, socket) do
+  def handle_info(%{topic: "user:" <> _user_id, event: "presence_diff", payload: %{joins: joins, leaves: leaves}}, socket) do
     IO.inspect("Presence diff")
     IO.inspect(joins)
     IO.inspect(leaves)
@@ -276,9 +275,20 @@ defmodule UserDocsWeb.Root do
     IO.inspect("root:event:user_opened_browser")
     {:noreply, PhoenixLiveSession.put_session(socket, "user_opened_browser", false)}
   end
+  def handle_info(%{topic: "user:" <> _user_id, event: "command:clear_browser"}, socket) do
+    IO.inspect("root:command:clear_browser")
+    {
+      :noreply,
+      socket
+      |> PhoenixLiveSession.put_session("user_opened_browser", false)
+      |> PhoenixLiveSession.put_session("browser_opened", false)
+    }
+  end
+  def handle_info(%{topic: _, event: "command:" <> command, payload: _}, socket), do: {:noreply, socket}
+
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
     schema = case payload do
-      %{objects: [ object | _ ]} -> object.__meta__.schema
+      %{objects: [object | _ ]} -> object.__meta__.schema
       object -> object.__meta__.schema
     end
     Logger.debug("Root handling info on topic #{topic}, event #{event}, view: #{socket.view}, type: #{schema}")
