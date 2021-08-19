@@ -11,7 +11,7 @@ defmodule UserDocs.SignupTest do
     end
 
     test "sends confirmation email", %{} do
-      %{ to: "test@test.com", subject: "test", text: "text", html: "<p>html</p>"}
+      %{to: "test@test.com", subject: "test", text: "text", html: "<p>html</p>"}
       |> Email.confirmation_email()
       |> Mailer.deliver_now!()
     end
