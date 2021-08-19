@@ -57,6 +57,8 @@ defmodule UserDocs.ProcessInstances do
     |> join(:left, [step: s], st in assoc(s, :step_type), as: :step_type)
     |> join(:left, [step: s], a in assoc(s, :annotation), as: :annotation)
     |> join(:left, [step: s], p in assoc(s, :page), as: :page)
+    |> join(:left, [page: p], v in assoc(p, :version), as: :version)
+    |> join(:left, [version: v], p in assoc(v, :project), as: :project)
     |> join(:left, [step: s], e in assoc(s, :element), as: :element)
     |> join(:left, [step: s], s in assoc(s, :screenshot), as: :screenshot)
     |> join(:left, [step: s], pr in assoc(s, :process), as: :process)
@@ -73,6 +75,8 @@ defmodule UserDocs.ProcessInstances do
         annotation: annotation,
         annotation_type: annotation_type,
         page: page,
+        version: version,
+        project: project,
         process: process,
         screenshot: screenshot
       ],
@@ -82,7 +86,7 @@ defmodule UserDocs.ProcessInstances do
             step_type: step_type,
             element: {element, strategy: strategy},
             annotation: {annotation, annotation_type: annotation_type},
-            page: page,
+            page: {page, version: {version, project: project}},
             process: process,
             screenshot: screenshot
           ]}

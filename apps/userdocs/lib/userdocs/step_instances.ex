@@ -6,6 +6,16 @@ defmodule UserDocs.StepInstances do
 
   alias UserDocs.StepInstances.StepInstance
 
+  @behaviour Bodyguard.Policy
+  def authorize(:create_step_instance!, %{team_users: team_users} = _current_user, %{process: %{version: %{project: %{team: %{id: team_id}}}}} = _step) do
+    if team_id in Enum.map(team_users, fn(tu) -> tu.team_id end) do
+      :ok
+    else
+      :error
+    end
+  end
+  def authorize(:create_step_instance!, _current_user, _user), do: :error
+
   def load_step_instances(state, opts) do
     StateHandlers.load(state, list_step_instances(opts[:params]), StepInstance, opts)
   end
@@ -26,9 +36,9 @@ defmodule UserDocs.StepInstances do
   alias UserDocs.Projects.Version
   def list_version_step_instances(version_id) do
     from(p in Version, as: :version)
-    |> join(:left, [ version: v ], p in assoc(v, :processes), as: :processes)
-    |> join(:left, [ processes: p ], s in assoc(p, :steps), as: :steps)
-    |> join(:inner_lateral, [ steps: s ], si in subquery(five_step_instances_subquery()), as: :step_instances)
+    |> join(:left, [version: v], p in assoc(v, :processes), as: :processes)
+    |> join(:left, [processes: p], s in assoc(p, :steps), as: :steps)
+    |> join(:inner_lateral, [steps: s], si in subquery(five_step_instances_subquery()), as: :step_instances)
     |> where([version: v], v.id == ^version_id)
     |> select([step_instances: si], %StepInstance{
         id: si.id, order: si.order, status: si.status, name: si.name, type: si.type,
@@ -38,7 +48,7 @@ defmodule UserDocs.StepInstances do
   end
 
   def five_step_instances_subquery() do
-    from si in StepInstance, where: parent_as(:steps).id == si.step_id, limit: 5, order_by: [ desc: si.id ]
+    from si in StepInstance, where: parent_as(:steps).id == si.step_id, limit: 5, order_by: [desc: si.id]
   end
 
   def maybe_filter_step_instances_by_version_id(query, nil), do: query
@@ -61,13 +71,15 @@ defmodule UserDocs.StepInstances do
     |> Repo.one!()
   end
 
-  def get_step_instance!(id, %{ preloads: "*"}) do
+  def get_step_instance!(id, %{preloads: "*"}) do
     from(si in StepInstance, as: :step_instance)
     |> where([step_instance: si], si.id == ^id)
     |> join(:left, [step_instance: si], s in assoc(si, :step), as: :step)
     |> join(:left, [step: s], st in assoc(s, :step_type), as: :step_type)
     |> join(:left, [step: s], a in assoc(s, :annotation), as: :annotation)
     |> join(:left, [step: s], p in assoc(s, :page), as: :page)
+    |> join(:left, [page: p], v in assoc(p, :version), as: :version)
+    |> join(:left, [version: v], p in assoc(v, :project), as: :project)
     |> join(:left, [step: s], e in assoc(s, :element), as: :element)
     |> join(:left, [step: s], s in assoc(s, :screenshot), as: :screenshot)
     |> join(:left, [step: s], pr in assoc(s, :process), as: :process)
@@ -83,15 +95,17 @@ defmodule UserDocs.StepInstances do
         annotation: annotation,
         annotation_type: annotation_type,
         page: page,
+        version: version,
+        project: project,
         process: process,
         screenshot: screenshot
       ],
       [
-        step: { step, [
+        step: {step, [
           step_type: step_type,
-          element: { element, strategy: strategy },
-          annotation: { annotation, annotation_type: annotation_type },
-          page: page,
+          element: {element, strategy: strategy},
+          annotation: {annotation, annotation_type: annotation_type},
+          page: {page, version: {version, project: project}},
           process: process,
           screenshot: screenshot
         ]}
@@ -153,17 +167,17 @@ defmodule UserDocs.StepInstances do
   end
 
   def step_instances_status([]), do: :none
-  def step_instances_status([ %StepInstance{ status: "failed" } | _ ]), do: :fail
-  def step_instances_status([ %StepInstance{ status: "started" } | _ ]), do: :started
-  def step_instances_status([ %StepInstance{ status: "not_started" } | _ ]), do: :warn
-  def step_instances_status([ %StepInstance{ status: "warn" } | _ ]), do: :warn
-  def step_instances_status([ %StepInstance{ status: "complete" } | rest ]) do
+  def step_instances_status([%StepInstance{status: "failed"} | _]), do: :fail
+  def step_instances_status([%StepInstance{status: "started"} | _]), do: :started
+  def step_instances_status([%StepInstance{status: "not_started"} | _]), do: :warn
+  def step_instances_status([%StepInstance{status: "warn"} | _]), do: :warn
+  def step_instances_status([%StepInstance{status: "complete"} | rest]) do
     rest
     |> status_counts()
     |> rest_status()
   end
 
-  def rest_status(%{ failed: 0, started: _, not_started: _, warn: 0, complete: _ }), do: :ok
+  def rest_status(%{failed: 0, started: _, not_started: _, warn: 0, complete: _}), do: :ok
   def rest_status(_), do: :warn
 
   @spec status_counts(list(%StepInstance{})) :: %{
@@ -183,25 +197,8 @@ defmodule UserDocs.StepInstances do
     }
   end
 
-  def count_status([ %StepInstance{} | _ ] = step_instances, status) do
+  def count_status([%StepInstance{} | _] = step_instances, status) do
     Enum.count(step_instances, fn(si) -> si.status == status end)
   end
   def count_status([], _) , do: 0
 end
-
-"""
-def format_step_instance_for_export(%StepInstance{} = step_instance) do
-  step_instance
-  |> Map.put(:attrs, UserDocs.Automation.Runner.parse(step_instance.step))
-  |> Map.take(StepInstance.__schema__(:fields))
-  |> Map.put(:type, StepInstance |> to_string() |> String.split(".") |> Enum.at(-1))
-end
-alias UserDocs.Jobs.Job
-alias UserDocs.Automation.Step
-
-def create_step_instance_from_job_and_step(%Step{} = step, %Job{} = job, order \\ 0) do
-  step_instance = Ecto.build_assoc(job, :step_instances)
-  attrs = base_step_instance_attrs(step, order)
-  create_step_instance(attrs, step_instance)
-end
-"""
