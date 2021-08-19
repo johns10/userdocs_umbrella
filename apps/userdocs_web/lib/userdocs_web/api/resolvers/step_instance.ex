@@ -1,5 +1,5 @@
 defmodule UserDocsWeb.API.Resolvers.StepInstance do
-  alias UserDocs.Users
+  @moduledoc false
   alias UserDocs.StepInstances
   alias UserDocs.ProcessInstances.ProcessInstance
   alias UserDocs.Jobs.JobStep
@@ -14,13 +14,13 @@ defmodule UserDocsWeb.API.Resolvers.StepInstance do
     {:ok, step_instance}
   end
 
-  def get_step_instance!(%JobStep{step_instance: step_instance}, _args, resolution) do
+  def get_step_instance!(%JobStep{step_instance: step_instance}, _args, _resolution) do
     {:ok, step_instance}
   end
   def get_step_instance!(%Step{last_step_instance: step_instance}, _args, _resolution) do
     {:ok, step_instance}
   end
-  def get_step_instance!(_parent, %{id: id}, resolution) do
+  def get_step_instance!(_parent, %{id: id}, _resolution) do
     step_instance = UserDocs.StepInstances.get_step_instance!(id, %{preloads: "*"})
     {:ok, step_instance}
   end
@@ -28,7 +28,6 @@ defmodule UserDocsWeb.API.Resolvers.StepInstance do
   def update_step_instance(_parent, %{id: id} = args, %{context: %{current_user: current_user}}) do
     step_instance = UserDocs.StepInstances.get_step_instance!(id, %{preloads: "*"})
     {:ok, step_instance} = StepInstances.update_step_instance(step_instance, args)
-    team_id = step_instance.step.page.version.project.team_id
     channel =  "user:" <> to_string(current_user.id)
     UserDocsWeb.Endpoint.broadcast(channel, "update", step_instance)
     {:ok, step_instance}
