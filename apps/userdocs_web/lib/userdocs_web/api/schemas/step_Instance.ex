@@ -18,5 +18,7 @@ defmodule UserDocsWeb.API.Schema.StepInstances do
   input_object :step_instance_input do
     field :id, :id
     field :status, non_null(:string)
+    field :errors, list_of(:error_input)
+    field :warnings, list_of(:warning_input)
   end
 end
