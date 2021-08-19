@@ -1,4 +1,5 @@
 defmodule UserDocsWeb.Defaults do
+  @moduledoc false
   def state_opts(type), do: Keyword.put(state_opts(), :type, type)
   def state_opts() do
     [
@@ -15,7 +16,7 @@ defmodule UserDocsWeb.Defaults do
   end
   def base_opts(), do: state_opts()
 
-  def opts(%{ assigns: assigns} = socket, types \\ []) do
+  def opts(%{assigns: assigns} = socket, types \\ []) do
     base_opts(types)
     |> Keyword.put(:broadcast, true)
     |> assign_channel(socket)
@@ -29,9 +30,8 @@ defmodule UserDocsWeb.Defaults do
     end
   end
 
-  def channel(%{ assigns: %{ current_team: %{ id: nil} }}), do: ""
-  def channel(%{ assigns: %{ current_team: %{ id: id } }}) when is_integer(id) do
-    "team-" <> Integer.to_string(id)
-  end
+  def channel(%{assigns: %{current_team: %{id: nil}}}), do: ""
+  def channel(%{assigns: %{current_team: %{id: id}}}), do: channel(id)
+  def channel(team_id) when is_integer(team_id), do: "team-" <> Integer.to_string(team_id)
   def channel(_), do: nil
 end
