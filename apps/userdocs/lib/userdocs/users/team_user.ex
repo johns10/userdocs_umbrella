@@ -5,6 +5,7 @@ defmodule UserDocs.Users.TeamUser do
   alias UserDocs.Users.User
   alias UserDocs.Users.Team
 
+  @derive {Jason.Encoder, only: [:default, :type, :team_id, :user_id]}
   schema "team_users" do
     field :temp_id, :string, virtual: true
     field :delete, :boolean, virtual: true
