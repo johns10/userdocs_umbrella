@@ -15,6 +15,7 @@ defmodule UserDocs.Users.User do
   alias UserDocs.Projects.Version
   alias UserDocs.Users.Override
 
+  @derive {Jason.Encoder, only: [:id, :email, :browser_session, :image_path, :user_data_dir_path, :default_team_id]}
   schema "users" do
     pow_user_fields()
 
