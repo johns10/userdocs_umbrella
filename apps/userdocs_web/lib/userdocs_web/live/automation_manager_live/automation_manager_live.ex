@@ -214,41 +214,14 @@ defmodule UserDocsWeb.AutomationManagerLive do
     {:noreply, job |> assign_job(socket) |> assign(:job_id, job.id)}
   end
   def handle_event("execute-step", %{"id" => step_id} = payload, socket) do
-    step =
-      AutomationManager.get_step!(step_id)
-      |> Automation.put_blank_step_instance()
-
-    safe_step =
-      step
-      |> Runner.parse()
-      |> UserDocsWeb.LiveHelpers.camel_cased_map_keys()
-
-    send(self(), {:broadcast, "create", step.last_step_instance})
-
-    {
-      :noreply,
-      socket
-      |> Phoenix.LiveView.push_event("execute", %{step: safe_step})
-   }
+    user_id = socket.assigns.current_user.id |> to_string
+    UserDocsWeb.Endpoint.broadcast("user:" <> user_id, "command:execute_step", %{step_id: step_id})
+    {:noreply, socket}
   end
   def handle_event("execute-process", %{"id" => process_id} = payload, socket) do
-    process =
-      AutomationManager.get_process!(process_id)
-      |> Automation.put_blank_process_and_step_instances()
-
-    safe_process =
-      process
-      |> Runner.parse()
-      |> UserDocsWeb.LiveHelpers.camel_cased_map_keys()
-
-    send(self(), {:broadcast, "create", process.last_process_instance})
-    Enum.each(process.steps, fn(step) -> send(self(), {:broadcast, "create", step.last_step_instance}) end)
-
-    {
-      :noreply,
-      socket
-      |> Phoenix.LiveView.push_event("executeProcess", %{process: safe_process})
-   }
+    user_id = socket.assigns.current_user.id |> to_string
+    UserDocsWeb.Endpoint.broadcast("user:" <> user_id, "command:execute_process", %{process_id: process_id})
+    {:noreply, socket}
   end
   def handle_event("execute-job", _payload, socket) do
     safe_job =
