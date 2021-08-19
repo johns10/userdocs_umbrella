@@ -1,4 +1,5 @@
 defmodule UserDocs.Jobs.Job do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -12,8 +13,8 @@ defmodule UserDocs.Jobs.Job do
     field :order, :integer
     field :status, :string
     field :name, :string
-    field :errors, { :array, :map }
-    field :warnings, { :array, :map }
+    field :errors, {:array, :map}
+    field :warnings, {:array, :map}
 
     has_one :last_job_instance, JobInstance
 
