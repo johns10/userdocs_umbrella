@@ -11,6 +11,7 @@ defmodule UserDocsWeb.Application do
       UserDocsWeb.Telemetry,
       # Start the Endpoint (http/https)
       UserDocsWeb.Endpoint,
+      UserDocsWeb.Presence,
       Pow.Store.Backend.MnesiaCache
     ]
 
