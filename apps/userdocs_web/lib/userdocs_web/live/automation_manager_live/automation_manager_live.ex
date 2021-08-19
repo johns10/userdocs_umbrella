@@ -2,8 +2,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
   use UserDocsWeb, :live_slime_component
 
   alias UserDocs.Automation
-  alias UserDocs.Automation.Process
-  alias UserDocs.Automation.Runner
   alias UserDocs.Automation.Step
   alias UserDocs.AutomationManager
   alias UserDocs.Jobs
@@ -12,8 +10,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
   alias UserDocs.StepInstances
 
   alias UserDocs.ProcessInstances
-  alias UserDocs.ProcessInstances.ProcessInstance
-  alias UserDocs.StepInstances.StepInstance
 
   require Logger
 
