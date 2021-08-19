@@ -8,7 +8,7 @@ defmodule UserDocsWeb.API.Auth.Context do
     Absinthe.Plug.put_options(conn, context: context)
   end
 
-  def build_context(%{ assigns: %{ current_user: current_user }}) do
-    %{current_user: current_user}
+  def build_context(%{assigns: %{current_user: current_user}}) do
+    %{current_user: UserDocs.Users.get_user!(current_user.id, %{team_users: true})}
   end
 end
