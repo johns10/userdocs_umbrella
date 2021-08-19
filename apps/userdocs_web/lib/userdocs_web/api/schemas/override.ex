@@ -3,7 +3,7 @@ defmodule UserDocsWeb.API.Schema.Override do
   use Absinthe.Schema.Notation
 
   object :override do
-    field :id, :id
-    field :value, :string
+    field :project_id, :id
+    field :url, :string
   end
 end
