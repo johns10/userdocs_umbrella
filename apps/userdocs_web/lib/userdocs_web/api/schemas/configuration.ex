@@ -10,6 +10,6 @@ defmodule UserDocsWeb.API.Schema.Configuration do
     field :strategy, :string
     field :user_data_dir_path, :string
     field :css, :string
-    field :overrides, :override, resolve: &Resolvers.Override.get_override!/3
+    field :overrides, list_of(:override), resolve: &Resolvers.Override.get_override!/3
   end
 end
