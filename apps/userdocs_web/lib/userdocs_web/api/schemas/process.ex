@@ -5,9 +5,7 @@ defmodule UserDocsWeb.API.Schema.Process do
   object :process do
     field :id, :id
     field :name, :string
-
     field :steps, list_of(:step), resolve: &Resolvers.Step.list_steps!/3
-
     field :last_process_instance, :process_instance, resolve: &Resolvers.ProcessInstance.get_process_instance!/3
   end
 
