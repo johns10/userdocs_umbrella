@@ -83,20 +83,20 @@ defmodule UserDocs.DocumentVersionLoadTest do
       %{
         content_one: content_one,
         data: %{
-          files: [ file_one, file_two, file_three, file_four ],
-          content: [ content_one, content_two, content_three ],
+          files: [file_one, file_two, file_three, file_four],
+          content: [content_one, content_two, content_three],
           steps: [empty_step, step_with_annotation, step_with_element, step_with_both],
-          annotations: [ annotation_one, annotation_two ],
-          elements: [ element_one, element_two ],
-          strategies: [ strategy ],
+          annotations: [annotation_one, annotation_two],
+          elements: [element_one, element_two],
+          strategies: [strategy],
           annotation_types: [badge_annotation_type, outline_annotation_type]
         }
       }
     end
 
     test "stored document_version is the same as the retreived document_version" do
-      attrs = %{ name: "test", title: "Test" }
-      { :ok, document_version } = Documents.create_document_version(attrs)
+      attrs = %{name: "test", title: "Test"}
+      {:ok, document_version} = Documents.create_document_version(attrs)
       retreived_document_version = Documents.get_document_version!(document_version.id)
       # TODO: Remove later.  Shouldn't be necessary.  Should take the preloads out of the changeset
       created = Map.delete(document_version, :body)
@@ -108,14 +108,14 @@ defmodule UserDocs.DocumentVersionLoadTest do
       state = state()
       document_version = empty_document_version()
       body = document_version.body
-      body = Documents.get_docubit!(body.id, %{ docubits: true } )
-      attrs = %{ docubits: [
+      body = Documents.get_docubit!(body.id, %{docubits: true} )
+      attrs = %{docubits: [
         DocubitFixtures.docubit_attrs(:row, document_version.id)
         |> Map.put(:content_id, state.content_one.id)
-      ] }
-      { :ok, body } = Documents.update_docubit(body, attrs)
+      ]}
+      {:ok, body} = Documents.update_docubit(body, attrs)
 
-      document_version = Documents.get_document_version!(document_version.id, %{ docubits: true })
+      document_version = Documents.get_document_version!(document_version.id, %{docubits: true})
       object = DocumentVersion.load(document_version, state)
     end
 
