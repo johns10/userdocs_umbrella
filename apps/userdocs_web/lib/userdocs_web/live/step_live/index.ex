@@ -15,15 +15,11 @@ defmodule UserDocsWeb.StepLive.Index do
   alias UserDocs.Media.Screenshot
   alias UserDocs.Projects
   alias UserDocs.Web
-  alias UserDocs.Web.Strategy
 
   alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.ProcessLive.Loaders
   alias UserDocsWeb.Root
   alias UserDocsWeb.ScreenshotLive.Approve
-  alias UserDocsWeb.StepLive.BrowserEvents
-  alias UserDocsWeb.StepLive
-  alias UserDocsWeb.ProcessLive
 
   @impl true
   def mount(_params, session, socket) do
@@ -31,7 +27,6 @@ defmodule UserDocsWeb.StepLive.Index do
       :ok,
       socket
       |> Root.apply(session, data_types())
-      |> assign(:sidebar_open, false)
       |> initialize()
    }
   end
@@ -228,7 +223,7 @@ defmodule UserDocsWeb.StepLive.Index do
       :noreply,
       socket
       |> assign(:select_lists, select_lists(socket))
-   }
+    }
   end
   def handle_info(%{topic: _, event: _, payload: %Step{}} = sub_data, socket) do
     Logger.debug("#{__MODULE__} Received a step broadcast")
