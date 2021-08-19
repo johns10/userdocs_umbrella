@@ -10,6 +10,7 @@ defmodule UserDocs.Users.Team do
   alias UserDocs.Users.TeamUser
   alias UserDocs.Jobs.Job
 
+  @derive {Jason.Encoder, only: [:name, :css, :aws_region, :aws_bucket]}
   schema "teams" do
     field :name, :string
 
