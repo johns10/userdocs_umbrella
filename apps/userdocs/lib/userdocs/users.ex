@@ -467,7 +467,7 @@ defmodule UserDocs.Users do
   # and get my on_delete stuff right.
   def try_get_team!(id) do
     try do
-      get_team!(id, %{preloads: %{job: %{step_instances: true, process_instances: true}}})
+      get_team!(id)
     rescue
       e ->
         Logger.error("Failed to retreive selected team, error: ")
