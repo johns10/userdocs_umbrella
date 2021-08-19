@@ -30,7 +30,7 @@ defmodule UserDocsWeb.MixProject do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(env) when env in [:test, :integration], do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
@@ -57,11 +57,12 @@ defmodule UserDocsWeb.MixProject do
       {:absinthe_plug, "~> 1.5.8"},
       {:userdocs, in_umbrella: true},
       {:floki, ">= 0.27.0", only: :test},
-      {:phoenix_live_reload, "~> 1.3", only: :dev},
+      {:phoenix_live_reload, "~> 1.3", only: [:dev, :integration]},
       {:dialyxir, "~> 1.1.0", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:absinthe, "~> 1.5", override: true},
+      {:nodejs, "~> 2.0", only: [:dev, :test]},
     ]
   end
 
