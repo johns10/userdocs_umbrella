@@ -11,7 +11,7 @@ defmodule UserDocsWeb.TokenToSessionController do
       {conn, user} = Pow.Plug.Session.create(conn, user, config)
       conn
       |> Pow.Plug.Session.do_create(user, config)
-      |> send_resp(:ok, "Session Created")
+      |> send_resp(:ok, Jason.encode!(%{user_id: user.id, status: "ok", message: "session created"}))
     end
   end
 end
