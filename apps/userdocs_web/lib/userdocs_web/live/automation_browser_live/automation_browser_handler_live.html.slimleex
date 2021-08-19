@@ -1,13 +1,19 @@
 div phx-hook="automatedBrowserEvents" id="<%= @id %>"
-  = if @user_opened_browser do 
-    = link to: "#", phx_click: "close-browser", phx_target: @myself.cid, class: "control" do
-      i.fa.fa-toggle-on.px-1
-  - else
-    = link to: "#", phx_click: "open-browser", phx_target: @myself.cid, class: "control" do
-      i.fa.fa-toggle-off.px-1
+= if not @user_opened_browser && not @browser_opened do 
+  = link to: "#", phx_click: "open-browser", phx_target: @myself.cid, class: "control" do
+    i.fa.fa-toggle-off.px-1
+= if @user_opened_browser and @browser_opened do
+  = link to: "#", phx_click: "close-browser", phx_target: @myself.cid, class: "control" do
+    i.fa.fa-toggle-on.px-1
+= if @user_opened_browser and not @browser_opened do
+    i.fas.fa-spinner.fa-spin.px-1
+= if not @user_opened_browser and @browser_opened do
+    i.fas.fa-spinner.fa-spin.px-1
 
+= if @browser_opened do 
+  i.fa.fa-chrome.pb-3.px-1.has-text-success
+- else
+  i.fa.fa-chrome.pb-3.px-1 style="color:grey;"
 
-  = if @browser_opened do 
-    i.fa.fa-chrome.pb-3.px-1.has-text-success
-  - else
-    i.fa.fa-chrome.pb-3.px-1 style="color:grey;"
+= link to: "#", phx_click: "clear-browser", phx_target: @myself.cid, class: "control" do
+  i.fas.fa-times-circle.px-1
