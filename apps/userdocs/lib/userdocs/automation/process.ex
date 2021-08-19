@@ -1,4 +1,5 @@
 defmodule UserDocs.Automation.Process do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -6,6 +7,7 @@ defmodule UserDocs.Automation.Process do
   alias UserDocs.Projects.Version
   alias UserDocs.ProcessInstances.ProcessInstance
 
+  @derive {Jason.Encoder, only: [:id, :order, :name]}
   schema "processes" do
     field :order, :integer
     field :name, :string

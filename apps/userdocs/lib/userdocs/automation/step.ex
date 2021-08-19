@@ -15,8 +15,7 @@ defmodule UserDocs.Automation.Step do
 
   alias UserDocs.Automation.Step.Changeset
 
-  @derive {Jason.Encoder, only: [:order, :name, :url, :text, :width, :height, :page_reference,
-    :screenshot, :page, :process, :element, :annotation, :step_type]}
+  @derive {Jason.Encoder, only: [:id, :order, :name, :url, :text, :width, :height, :page_reference]}
 
   schema "steps" do
     field :order, :integer

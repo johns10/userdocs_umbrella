@@ -1,4 +1,5 @@
 defmodule UserDocs.Projects.Project do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,6 +9,7 @@ defmodule UserDocs.Projects.Project do
 
   alias UserDocs.Users.Team
 
+  @derive {Jason.Encoder, only: [:default, :base_url, :name]}
   schema "projects" do
     field :default, :boolean
     field :base_url, :string

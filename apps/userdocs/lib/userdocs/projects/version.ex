@@ -10,7 +10,7 @@ defmodule UserDocs.Projects.Version do
   alias UserDocs.Automation.Process
   alias UserDocs.Projects.Project
 
-  @derive {Jason.Encoder, only: [:name, :project, :strategy, :pages, :processes]}
+  @derive {Jason.Encoder, only: [:default, :name, :order]}
   schema "versions" do
     field :default, :boolean
     field :name, :string

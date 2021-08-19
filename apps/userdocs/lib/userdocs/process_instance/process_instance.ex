@@ -1,5 +1,5 @@
 defmodule UserDocs.ProcessInstances.ProcessInstance do
-  #@derive {Inspect, only: [:id, :name, :order, :status, :step_instances ]}
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
@@ -10,6 +10,7 @@ defmodule UserDocs.ProcessInstances.ProcessInstance do
   alias UserDocs.Jobs.JobProcess
   alias UserDocs.ProcessInstances.ProcessInstance.Safe
 
+  @derive {Jason.Encoder, only: [:id, :uuid, :order, :status, :name, :type]}
   schema "process_instances" do
     field :uuid, :binary_id
     field :order, :integer
@@ -17,8 +18,8 @@ defmodule UserDocs.ProcessInstances.ProcessInstance do
     field :name, :string
     field :type, :string
     field :attrs, :map
-    field :errors, { :array, :map }
-    field :warnings, { :array, :map }
+    field :errors, {:array, :map}
+    field :warnings, {:array, :map}
     field :expanded, :boolean
 
     belongs_to :job_instance, JobInstance, on_replace: :nilify
