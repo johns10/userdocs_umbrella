@@ -30,8 +30,13 @@ defmodule UserDocsWeb.PageLive do
   end
 
   defp apply_action(socket, :index, %{"logged_in" => "true", "access_token" => access_token, "renewal_token" => renewal_token}) do
+    params = %{
+      access_token: access_token,
+      renewal_token: renewal_token,
+      user_id: socket.assigns.current_user.id
+    }
     socket
-    |> push_event("login-succeeded", %{access_token: access_token, renewal_token: renewal_token})
+    |> push_event("login-succeeded", params)
   end
   defp apply_action(socket, :index, _), do: socket
 
