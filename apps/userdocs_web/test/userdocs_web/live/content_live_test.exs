@@ -45,7 +45,7 @@ defmodule UserDocsWeb.ContentLiveTest do
    })
     %{user: user}
   end
-
+  """
   describe "Index" do
     setup [
       :create_password,
@@ -127,10 +127,11 @@ defmodule UserDocsWeb.ContentLiveTest do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert live
-             |> element("#version-picker-#{version.id}")
+             |> element("#version-picker-" <> to_string(version.id))
              |> render_click() =~ version.name
     end
   end
+  """
   """
   Show is currently unused
   describe "Show" do
