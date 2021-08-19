@@ -1,8 +1,8 @@
 defmodule UserDocsWeb.VersionLive.Index do
+  @moduledoc false
+
   use UserDocsWeb, :live_view
-
   use UserdocsWeb.LiveViewPowHelper
-
   alias UserDocs.Projects
   alias UserDocs.Projects.Version
   alias UserDocs.Web
@@ -28,7 +28,7 @@ defmodule UserDocsWeb.VersionLive.Index do
     }
   end
 
-  def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
+  def initialize(%{assigns: %{auth_state: :logged_in}} = socket) do
     socket
     |> assign(:modal_action, :show)
     |> assign(:select_lists, %{})
@@ -38,9 +38,9 @@ defmodule UserDocsWeb.VersionLive.Index do
   def initialize(socket), do: socket
 
   @impl true
-  def handle_params(%{ "project_id" => project_id } = params, url, socket) do
+  def handle_params(%{"project_id" => project_id} = params, url, socket) do
     project = Projects.get_project!(project_id)
-    team = Users.get_team!(project.team_id, %{ preloads: %{ job: %{ step_instances: true, process_instances: true }}})
+    team = Users.get_team!(project.team_id, %{preloads: %{job: %{step_instances: true, process_instances: true}}})
     socket =
       socket
       |> assign(:current_project, project)
@@ -87,7 +87,7 @@ defmodule UserDocsWeb.VersionLive.Index do
   end
   def handle_info(d, s), do: Root.handle_info(d, s)
 
-  defp apply_action(socket, :edit, %{ "id" => id }) do
+  defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Version")
     |> assign(:version, Projects.get_version!(String.to_integer(id), socket, socket.assigns.state_opts))
@@ -117,13 +117,13 @@ defmodule UserDocsWeb.VersionLive.Index do
         Web.list_strategies()
         |> Helpers.select_list(:name, false),
       projects:
-        Projects.list_projects(%{}, %{ team_id: team_id })
+        Projects.list_projects(%{}, %{team_id: team_id})
         |> Helpers.select_list(:name, false)
     }
   end
 
   def prepare_versions(socket, project_id) do
-    opts = Keyword.put(socket.assigns.state_opts, :filter, { :project_id, project_id })
+    opts = Keyword.put(socket.assigns.state_opts, :filter, {:project_id, project_id})
     versions = Projects.list_versions(socket, opts)
     socket
     |> assign(:versions, versions)
