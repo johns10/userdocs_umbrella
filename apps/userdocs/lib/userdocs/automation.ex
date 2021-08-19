@@ -15,6 +15,17 @@ defmodule UserDocs.Automation do
 
   alias UserDocs.Projects
 
+
+  @behaviour Bodyguard.Policy
+  def authorize(:get_step!, %{team_users: team_users} = current_user, %{process: %{version: %{project: %{team: %{id: team_id}}}}} = _step) do
+    if team_id in Enum.map(team_users, fn(tu) -> tu.team_id end) do
+      :ok
+    else
+      :error
+    end
+  end
+  def authorize(:get_user!, _current_user, _user), do: :error
+
   def details(version_id) do
     Repo.one from version in Projects.Version,
       where: version.id == ^version_id,
@@ -319,7 +330,7 @@ defmodule UserDocs.Automation do
         :annotation,
         :element,
         :step_type,
-        :process,
+        [process: [version: [project: :team]]],
         :screenshot,
         annotation: {annotation, :annotation_type},
         element: {element, :strategy},
