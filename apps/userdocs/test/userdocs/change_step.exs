@@ -69,9 +69,9 @@ defmodule UserDocs.StepChange do
         outline_annotation_type: outline_annotation_type,
         state: %{
           data: %{
-            annotations: [ annotation_one, annotation_two ],
-            elements: [ element_one, element_two ],
-            strategies: [ strategy ],
+            annotations: [annotation_one, annotation_two],
+            elements: [element_one, element_two],
+            strategies: [strategy],
             annotation_types: [badge_annotation_type, outline_annotation_type]
           }
         }
@@ -81,10 +81,10 @@ defmodule UserDocs.StepChange do
     def update_key_and_object(
       state, initial, id_key, object_key, object, excludes
     ) do
-      { changeset, result } =
+      ]changeset, result} =
         initial
         |> Automation.handle_foreign_key_changes(
-          %{ id_key => object.id }, state)
+          %{id_key => object.id}, state)
 
       assert Map.get(result, id_key) == object.id
 
@@ -93,11 +93,11 @@ defmodule UserDocs.StepChange do
 
       assert new_object == old_object
 
-      { changeset, result }
+      {changeset, result}
     end
 
     def excludes(object \\ %{}, excludes \\ [])
-    def excludes(object, [ :__meta__ ]) do
+    def excludes(object, [:__meta__]) do
       Map.delete(object, :__meta__)
     end
     def excludes(object, []), do: object
@@ -105,7 +105,7 @@ defmodule UserDocs.StepChange do
     test "changing the element id updates the changes" do
       fx = change_fixture()
 
-      changes = %{ element_id: fx.element_one.id }
+      changes = %{element_id: fx.element_one.id}
 
       # The step got updated, and we loaded the new element
       step =
@@ -114,7 +114,7 @@ defmodule UserDocs.StepChange do
 
       # The attrs will indicate the old element (two) and params
       element_attrs =
-        Map.take(fx.element_two, [ :name, :selector, :id ])
+        Map.take(fx.element_two, [:name, :selector, :id])
 
       # THe step attrs will include the new element id, but the old element
       step_attrs =
@@ -129,16 +129,16 @@ defmodule UserDocs.StepChange do
     test "update_step updates the data with preloads" do
       fx = change_fixture()
       step = fx.empty_step
-      attrs = %{ annotation_id: fx.annotation_one.id }
-      { :ok, new_step } = Automation.update_step_with_nested_data(step, attrs, fx.state)
+      attrs = %{annotation_id: fx.annotation_one.id}
+      {:ok, new_step} = Automation.update_step_with_nested_data(step, attrs, fx.state)
       assert new_step.annotation == fx.annotation_one
     end
 
     test "adding a new element doesn't wipe out the existing annotation" do
       fx = change_fixture()
       step = fx.step_with_annotation
-      attrs = %{ element_id: nil }
-      { :ok, new_step } = Automation.update_step_with_nested_data(step, attrs, fx.state)
+      attrs = %{element_id: nil}
+      {:ok, new_step} = Automation.update_step_with_nested_data(step, attrs, fx.state)
       assert new_step.annotation_id == fx.annotation_one.id
       assert step.annotation == fx.annotation_one
     end
@@ -146,8 +146,8 @@ defmodule UserDocs.StepChange do
     test "creating a step with an element, and changing to a nil element updates the preloads" do
       fx = change_fixture()
       step = fx.step_with_element
-      attrs = %{ element_id: nil }
-      { :ok, new_step } = Automation.update_step_with_nested_data(step, attrs, fx.state)
+      attrs = %{element_id: nil}
+      {:ok, new_step} = Automation.update_step_with_nested_data(step, attrs, fx.state)
       # This is how it was, and it might be right
       # assert Map.delete(new_step.element, :__meta__) == Map.delete(%Element{}, :__meta__)
       assert new_step.element == nil
@@ -156,8 +156,8 @@ defmodule UserDocs.StepChange do
     test "creating an empty step, and adding an element updates the preload" do
       fx = change_fixture()
       step = fx.empty_step
-      attrs = %{ element_id: fx.element_two.id }
-      { :ok, new_step } = Automation.update_step_with_nested_data(step, attrs, fx.state)
+      attrs = %{element_id: fx.element_two.id}
+      {:ok, new_step} = Automation.update_step_with_nested_data(step, attrs, fx.state)
       assert new_step.element == fx.element_two
     end
 
@@ -184,7 +184,7 @@ defmodule UserDocs.StepChange do
       annotation_attrs =
         WebFixtures.annotation_attrs(:valid)
           |> Map.put(:page_id, fx.page.id)
-      attrs = %{ annotation: annotation_attrs }
+      attrs = %{annotation: annotation_attrs}
       changeset = Automation.change_step_with_nested_data(step, attrs, fx.state)
       changeset = Automation.new_step_element(step, changeset)
       assert changeset.changes.annotation.changes.label == annotation_attrs.label
@@ -197,14 +197,14 @@ defmodule UserDocs.StepChange do
     test "creating a step, and changing to a nil element updates the preloads.  Adding attrs and applying creates a new element" do
       fx = change_fixture()
       step = fx.step_with_element
-      attrs = %{ element_id: nil }
-      { :ok, new_step } = Automation.update_step_with_nested_data(step, attrs, fx.state)
+      attrs = %{element_id: nil}
+      {:ok, new_step} = Automation.update_step_with_nested_data(step, attrs, fx.state)
       attrs = %{
         element:
           WebFixtures.element_attrs(:valid)
           |> Map.put(:strategy_id, fx.strategy.id)
       }
-      { :ok, final_step } = Automation.update_step_with_nested_data(new_step, attrs, fx.state)
+      {:ok, final_step} = Automation.update_step_with_nested_data(new_step, attrs, fx.state)
       updated_element = Web.get_element!(final_step.element.id)
       assert updated_element.name == attrs.element.name
       assert final_step.element.name == attrs.element.name
