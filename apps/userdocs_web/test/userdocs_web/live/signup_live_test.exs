@@ -57,7 +57,7 @@ defmodule UserDocsWeb.SignupLiveTest do
 
       expected_email = UserDocs.Email.confirmation_email(email_attrs)
 
-      assert "/setup" = redir_path = redirected_to(conn, 302)
+      assert "/setup/" <> _user_id = redir_path = redirected_to(conn, 302)
       conn = get(recycle(conn), redir_path)
     end
   end
