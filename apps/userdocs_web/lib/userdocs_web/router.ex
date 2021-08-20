@@ -151,6 +151,8 @@ defmodule UserDocsWeb.Router do
     get "/document_versions/:id/download", DocumentVersionDownloadController, :show
 
     live "/content/:id/show/edit", ContentLive.Show, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
+    post "/registration/send-confirmation-email", RegistrationController, :resend_confirmation_email
   end
 
   scope "/" do
@@ -172,6 +174,8 @@ defmodule UserDocsWeb.Router do
         [ua | _] -> ua
         [] -> "Mozilla/5.0 (Linux; Android 7.0; SM-G930VC Build/NRD90M; wv)"
       end
+
+    IO.inspect(UAInspector)
 
     conn
     |> put_session(:os, UAInspector.parse(ua).os.name)
