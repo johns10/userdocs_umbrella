@@ -1,4 +1,5 @@
 defmodule UserDocsWeb.ProcessLive.Queuer do
+  @moduledoc false
   use UserDocsWeb, :live_component
 
   @impl true
