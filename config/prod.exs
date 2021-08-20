@@ -75,3 +75,18 @@ config :logger, level: :info
 # Finally import the config/prod.secret.exs which loads secrets
 # and configuration from environment variables.
 import_config "prod.secret.exs"
+
+config :ua_inspector,
+  init: {InitUADB, :apply, []}
+
+defmodule InitUADB do
+  def apply() do
+    priv_dir = Application.app_dir(:userdocs_web, "priv")
+    Application.put_env(:ua_inspector, :database_path, priv_dir)
+    ua_readme_path = priv_dir |> Path.join("ua_inspector.readme.md")
+    if not File.exists?(ua_readme_path) do
+      UAInspector.Downloader.download()
+    end
+    Application.put_env(:ua_inspector, :database_path, priv_dir)
+  end
+end
