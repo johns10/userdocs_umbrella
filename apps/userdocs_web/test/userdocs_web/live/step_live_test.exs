@@ -56,7 +56,7 @@ defmodule UserDocsWeb.StepLiveTest do
       selected_team_id: team.id,
       selected_project_id: project.id,
       selected_version_id: version.id
-})
+    })
     %{user: user}
   end
 
