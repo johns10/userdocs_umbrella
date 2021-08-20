@@ -9,20 +9,18 @@ defmodule UserDocsWeb.ProjectLiveTest do
   alias UserDocs.WebFixtures
   alias UserDocs.ProjectsFixtures
 
-  defp create_user(%{password: password}), do: %{user: UsersFixtures.user(password)}
+  defp create_password(_), do: %{password: UUID.uuid4()}
+  defp create_user(%{password: password}), do: %{user: UsersFixtures.confirmed_user(password)}
   defp create_team(_), do: %{team: UsersFixtures.team()}
-  defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
   defp create_project(%{team: team}), do: %{project: ProjectsFixtures.project(team.id)}
+  defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
   defp create_version(%{project: project, strategy: strategy}), do: %{version: ProjectsFixtures.version(project.id, strategy.id)}
-
-  defp create_password(_), do: %{password: UUID.uuid4()}
   defp grevious_workaround(%{conn: conn, user: user, password: password}) do
     conn = post(conn, "session", %{user: %{email: user.email, password: password}})
     :timer.sleep(100)
     %{authed_conn: conn}
   end
-
   defp make_selections(%{user: user, team: team, project: project, version: version}) do
     {:ok, user} = UserDocs.Users.update_user_selections(user, %{
       selected_team_id: team.id,
@@ -83,7 +81,7 @@ defmodule UserDocsWeb.ProjectLiveTest do
     test "updates project in listing", %{authed_conn: conn, project: project, team: team} do
       {:ok, index_live, _html} = live(conn, Routes.project_index_path(conn, :index))
 
-      assert index_live |> element("#edit-project-#{project.id}") |> render_click() =~
+      assert index_live |> element("#edit-project-" <> to_string(project.id)) |> render_click() =~
                "Edit Project"
 
       assert_patch(index_live, Routes.project_index_path(conn, :edit, project))
@@ -107,19 +105,18 @@ defmodule UserDocsWeb.ProjectLiveTest do
     test "deletes project in listing", %{authed_conn: conn, project: project} do
       {:ok, index_live, _html} = live(conn, Routes.project_index_path(conn, :index))
 
-      assert index_live |> element("#delete-project-#{project.id}") |> render_click()
-      refute has_element?(index_live, "#project-#{project.id}")
+      assert index_live |> element("#delete-project-" <> to_string(project.id)) |> render_click()
+      refute has_element?(index_live, "#project-" <> to_string(project.id))
     end
 
     test "index handles standard events", %{authed_conn: conn, version: version} do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert live
-             |> element("#version-picker-#{version.id}")
+             |> element("#version-picker-" <> to_string(version.id))
              |> render_click() =~ version.name
     end
   end
-
   describe "Show" do
     setup [
       :create_password,
@@ -145,7 +142,7 @@ defmodule UserDocsWeb.ProjectLiveTest do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert live
-             |> element("#version-picker-#{version.id}")
+             |> element("#version-picker-" <> to_string(version.id))
              |> render_click() =~ version.name
     end
   end
