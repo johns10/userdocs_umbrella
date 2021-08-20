@@ -16,9 +16,12 @@ defmodule UserDocsWeb.StepLive.Index do
   alias UserDocs.Projects
   alias UserDocs.Web
 
+  alias UserDocsWeb.StepLive.BrowserEvents
   alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.ProcessLive.Loaders
+  alias UserDocsWeb.ProcessLive
   alias UserDocsWeb.Root
+  alias UserDocsWeb.StepLive
   alias UserDocsWeb.ScreenshotLive.Approve
 
   @impl true
