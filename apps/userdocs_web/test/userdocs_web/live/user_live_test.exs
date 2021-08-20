@@ -153,7 +153,7 @@ defmodule UserDocsWeb.UserLiveTest do
     test "updates user options in listing", %{authed_conn: conn, user: user, password: password, project: project} do
       {:ok, show_live, _html} = live(conn, Routes.user_show_path(conn, :show, user))
 
-      assert show_live |> element("a", "Options") |> render_click() =~ "User Options"
+      assert show_live |> element("#user-options") |> render_click() =~ "User Options"
 
       assert_patch(show_live, Routes.user_show_path(conn, :options, user))
 
