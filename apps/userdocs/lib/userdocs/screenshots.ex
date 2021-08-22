@@ -223,11 +223,12 @@ defmodule UserDocs.Screenshots do
       nil -> throw("Screenshot has no step id")
       step_id ->
         team = UserDocs.Users.get_step_team!(step_id)
+        temp_dir = maybe_create_temp_dir()
         state = %{
           aws: screenshot_path,
-          original: "./tmp/" <> UUID.uuid4() <> ".png",
-          updated: "./tmp/" <> UUID.uuid4() <> ".png",
-          diff: "./tmp/" <> UUID.uuid4() <> ".png",
+          original: temp_dir |> Path.join(UUID.uuid4() <> ".png"),
+          updated: temp_dir |> Path.join(UUID.uuid4() <> ".png"),
+          diff: temp_dir |> Path.join(UUID.uuid4() <> ".png"),
           opts: aws_opts(team),
           bucket: team.aws_bucket,
           base64: base64,
@@ -244,15 +245,23 @@ defmodule UserDocs.Screenshots do
       end
   end
 
-  def prepare_aws_file(%{aws: aws_path, original: local_path, updated: updated,
+  def maybe_create_temp_dir() do
+    {:ok, dirs} = :code.priv_dir(:userdocs_web) |> File.ls()
+    if "tmp" not in dirs do
+      :ok = File.mkdir(:code.priv_dir(:userdocs_web) |> Path.join("tmp"))
+    end
+    :code.priv_dir(:userdocs_web) |> Path.join("tmp")
+  end
+
+  def prepare_aws_file(%{aws: aws_path, original: original, updated: updated,
     bucket: bucket, base64: base64, opts: opts} = state
   ) do
-    case ExAws.S3.download_file(bucket, aws_path, local_path) |> ExAws.request(opts) do
+    case ExAws.S3.download_file(bucket, aws_path, original) |> ExAws.request(opts) do
       {:ok, :done} ->
         File.write(updated, Base.decode64!(base64))
         state
       {:error, "error downloading file"} ->
-        File.write(local_path, "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAAAMSURBVBhXY/j//z8ABf4C/qc1gYQAAAAASUVORK5CYII=")
+        File.write(original, "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAAAMSURBVBhXY/j//z8ABf4C/qc1gYQAAAAASUVORK5CYII=")
         File.write(updated, Base.decode64!(base64))
         state
       {:error, reason} ->
