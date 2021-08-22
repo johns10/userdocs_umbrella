@@ -5,7 +5,7 @@ defmodule UserDocsWeb.UserChannel do
 
   @impl true
   def join("user:" <> _user_id, %{"app" => app} = payload, socket) do
-    # IO.puts("SOmeone's joining")
+    #IO.puts("SOmeone's joining")
     if authorized?(payload) do
       send(self(), {:after_join, app})
       {:ok, socket}
@@ -34,6 +34,7 @@ defmodule UserDocsWeb.UserChannel do
     {:ok, _} = Presence.track(socket, app, %{
       online_at: inspect(System.system_time(:second))
     })
+    #IO.inspect(Presence.list(socket))
 
     push(socket, "presence_state", Presence.list(socket))
     {:noreply, socket}
