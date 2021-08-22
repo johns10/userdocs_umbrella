@@ -13,7 +13,6 @@ defmodule UserDocsWeb.Root do
 
   alias StateHandlers
   alias UserDocsWeb.Defaults
-  alias UserDocsWeb.ModalMenus
 
   def render(assigns) do
     ~L"""
@@ -191,42 +190,6 @@ defmodule UserDocsWeb.Root do
   def handle_event("delete-document-version", p, s) do
     UserDocsWeb.DocumentVersionLive.EventHandlers.handle_event("delete", p, s)
   end
-  def handle_event("new-document-version", params, socket) do
-    ModalMenus.new_document_version(socket, Map.put(params, :channel, Defaults.channel(socket)))
-  end
-  def handle_event("edit-document-version", params, socket) do
-    ModalMenus.edit_document_version(socket, Map.put(params, :channel, Defaults.channel(socket)))
-  end
-  def handle_event("edit-document", params, socket) do
-    ModalMenus.edit_document(socket, params)
-  end
-  def handle_event("new-document", params, socket) do
-    ModalMenus.new_document(socket, params)
-  end
-  def handle_event("new-process", params, socket) do
-    ModalMenus.new_process(socket, params)
-  end
-  def handle_event("new-step", params, socket) do
-    ModalMenus.new_step(socket, params)
-  end
-  def handle_event("delete-docubit", params, socket) do
-    UserDocsWeb.DocubitLive.EventHandlers.handle_event("delete", params, socket)
-  end
-  def handle_event("edit-docubit", params, socket) do
-    ModalMenus.edit_docubit(socket, params)
-  end
-  def handle_event("new-content", params, socket) do
-    IO.puts("Root making new Content")
-    {:noreply, ModalMenus.new_content(socket, params)}
-  end
-  def handle_event("edit-content", params, socket) do
-    IO.puts("Root handling Content")
-    {:noreply, ModalMenus.edit_content(socket, params)}
-  end
-  def handle_event("edit-user", params, socket) do
-    IO.puts("Root opening user form")
-    {:noreply, ModalMenus.edit_user(socket, params)}
-  end
   def handle_event("select-version", %{"version-id" => version_id, "project-id" => project_id, "team-id" => team_id} = _payload, socket) do
     changes = %{
       selected_team_id: String.to_integer(team_id),
@@ -298,7 +261,6 @@ defmodule UserDocsWeb.Root do
     {:noreply, socket}
   end
   def handle_info({:update_session, params}, socket) do
-    IO.puts("Attempting to update session")
     socket =
       Enum.reduce(params, socket,
         fn({k, v}, inner_socket) ->
