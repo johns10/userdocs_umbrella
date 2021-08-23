@@ -43,6 +43,9 @@ defmodule UserDocsWeb.API.Auth.Plug do
     # The store caches will use their default `:ttl` settting. To change the
     # `:ttl`, `Keyword.put(store_config, :ttl, :timer.minutes(10))` can be
     # passed in as the first argument instead of `store_config`.
+    # Here's a sample of how to configure it to shorten timeout for testing:
+    # CredentialsCache.put(Keyword.put(store_config, :ttl, :timer.seconds(60)), access_token, {user, [renewal_token: renewal_token]})
+
     CredentialsCache.put(store_config, access_token, {user, [renewal_token: renewal_token]})
     PersistentSessionCache.put(store_config, renewal_token, {user, [access_token: access_token]})
 
