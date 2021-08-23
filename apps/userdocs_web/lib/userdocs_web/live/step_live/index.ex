@@ -111,9 +111,7 @@ defmodule UserDocsWeb.StepLive.Index do
     {:noreply, socket}
   end
 
-  alias BrowserEvents
-
-  def handle_event("browser-event", payload, socket) do
+  def handle_info(%{topic: "user:" <> user_id, event: "event:browser_event", payload: payload} = sub_info, socket) do
     payload = UserDocsWeb.LiveHelpers.underscored_map_keys(payload)
     state = %{payload: payload, page_id: recent_navigated_page_id(socket)}
     step_params = BrowserEvents.params(state)
@@ -235,7 +233,7 @@ defmodule UserDocsWeb.StepLive.Index do
   end
   def handle_info(%{topic: _, event: _, payload: %UserDocs.StepInstances.StepInstance{}} = sub_data, socket) do
     Logger.debug("#{__MODULE__} Received a step Instance broadcast")
-    {:noreply, socket} = Root.handle_info(sub_data, socket)
+    socket = UserDocsWeb.UserChannelHandlers.apply(socket, sub_data)
     {:noreply, prepare_steps(socket)}
   end
   def handle_info(%{topic: _, event: _, payload: %Screenshot{}} = sub_data, socket) do
