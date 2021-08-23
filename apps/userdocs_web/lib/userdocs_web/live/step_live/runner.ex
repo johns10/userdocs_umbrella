@@ -1,4 +1,5 @@
 defmodule UserDocsWeb.StepLive.Runner do
+  @moduledoc false
   use UserDocsWeb, :live_component
   use Phoenix.HTML
 
