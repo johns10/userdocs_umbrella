@@ -14,10 +14,6 @@ defmodule UserDocsWeb.UserChannelHandlers do
     IO.inspect("Presence diff")
     socket
   end
-  def apply(socket, %{topic: "user:" <> _user_id, event: "event:user_clicked"}) do
-    IO.puts("root:event:user_clicked")
-    socket
-  end
   def apply(socket, %{topic: "user:" <> _user_id, event: "event:browser_opened"}) do
     IO.inspect("root:event:browser_opened")
     PhoenixLiveSession.put_session(socket, "browser_opened", true)
