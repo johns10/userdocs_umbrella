@@ -18,9 +18,9 @@ defmodule UserDocsWeb.UserChannel do
   def handle_in("ping", payload, socket) do
     {:reply, {:ok, payload}, socket}
   end
-  def handle_in("event:" <> event_name, _payload, socket) do
+  def handle_in("event:" <> event_name, payload, socket) do
     IO.inspect("socket:event:" <> event_name)
-    broadcast!(socket, "event:" <> event_name, %{})
+    broadcast!(socket, "event:" <> event_name, payload)
     {:noreply, socket}
   end
   def handle_in("command:" <> name, _payload, socket) do
