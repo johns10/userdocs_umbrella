@@ -55,13 +55,10 @@ defmodule UserDocsWeb.UserChannelHandlers do
       _ -> ""
     end
 
-    socket =
-      case schema in socket.assigns.state_opts[:types] do
-        true -> UserDocs.Subscription.handle_event(socket, event, payload, socket.assigns.state_opts)
-        false -> socket
-      end
-
-    {:noreply, socket}
+    case schema in socket.assigns.state_opts[:types] do
+      true -> UserDocs.Subscription.handle_event(socket, event, payload, socket.assigns.state_opts)
+      false -> socket
+    end
   end
 
 end
