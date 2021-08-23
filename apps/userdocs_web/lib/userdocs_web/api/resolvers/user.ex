@@ -10,4 +10,7 @@ defmodule UserDocsWeb.API.Resolvers.User do
       {:error, :unauthorized} -> {:error, %{message: "Unauthorized", status: 401}}
     end
   end
+  def get_user!(_parent, _args, %{context: %{current_user: current_user}}) do
+    {:ok, current_user}
+  end
 end

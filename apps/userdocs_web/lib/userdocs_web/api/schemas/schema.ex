@@ -41,7 +41,7 @@ defmodule UserDocsWeb.API.Schema do
 
     @desc "Get a user"
     field :user, :user do
-      arg :id, non_null(:id)
+      arg :id, :id
       resolve &Resolvers.User.get_user!/3
     end
 
