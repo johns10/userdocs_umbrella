@@ -175,8 +175,6 @@ defmodule UserDocsWeb.Router do
         [] -> "Mozilla/5.0 (Linux; Android 7.0; SM-G930VC Build/NRD90M; wv)"
       end
 
-    IO.inspect(UAInspector)
-
     conn
     |> put_session(:os, UAInspector.parse(ua).os.name)
   end
