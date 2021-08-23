@@ -18,13 +18,13 @@ h2.text-xl.text-black
   = link to: @macintosh_path do
     button.button 
       span.icon.is-large
-        i.fab.fa-windows aria-hidden="true"
+        i.fab.fa-apple aria-hidden="true"
       span.is-size-4 Download UserDocs Desktop
 = if @os in @windows_agents do
   = link to: @windows_path do
     button.button 
       span.icon.is-large
-        i.fab.fa-apple aria-hidden="true"
+        i.fab.fa-windows aria-hidden="true"
       span.is-size-4 Download UserDocs Desktop
 
 div.content
