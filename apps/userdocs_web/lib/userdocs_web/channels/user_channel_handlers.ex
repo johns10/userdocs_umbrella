@@ -40,6 +40,8 @@ defmodule UserDocsWeb.UserChannelHandlers do
     |> PhoenixLiveSession.put_session("user_opened_browser", false)
     |> PhoenixLiveSession.put_session("browser_opened", false)
   end
+  # These events are handled in the index/form, and can be "ignored" by the root
+  def apply(socket, %{topic: "user:" <> _user_id, event: "event:browser_event"}), do: socket
   def apply(socket, %{topic: _, event: "command:" <> _command, payload: _}), do: socket
 
   def apply(socket, %{topic: topic, event: event, payload: payload}) do
