@@ -283,7 +283,7 @@ defmodule UserDocsWeb.StepLiveTest do
         "step_type_id" => step_type.id |> to_string(),
         "annotation_id" => second_annotation().id |> to_string(),
         "element_id" => second_element().id |> to_string()
-}
+      }
 
       # change the element_id
       index_live
@@ -300,7 +300,7 @@ defmodule UserDocsWeb.StepLiveTest do
       |> render_change(%{"step_form" => %{
           "step_type_id" => step_type.id |> to_string(),
           "element_id" => first_element().id |> to_string()
-}})
+        }})
 
       # Element Form Changes
       assert index_live
@@ -358,8 +358,9 @@ defmodule UserDocsWeb.StepLiveTest do
           "element" => %{
             "name" => "test_element_name",
             "page_id" => attrs.page_id |> to_string()
-}
-}}
+          }
+          }
+        }
 
       index_live
       |> form("#step-form", step_form: attrs)
@@ -395,9 +396,9 @@ defmodule UserDocsWeb.StepLiveTest do
           "order" => attrs.order |> to_string(),
           "page" => %{
             "name" => "test_page_name"
-}
-}
-}
+          }
+        }
+      }
 
       index_live
       |> form("#step-form", step_form: attrs)
@@ -441,9 +442,9 @@ defmodule UserDocsWeb.StepLiveTest do
           "order" => attrs.order |> to_string(),
           "page" => %{
             "name" => "test_page_name"
-}
-}
-}
+          }
+        }
+      }
 
       # This could spell trouble, add the additional fields and save
       attrs = Map.delete(attrs, :page_id)
