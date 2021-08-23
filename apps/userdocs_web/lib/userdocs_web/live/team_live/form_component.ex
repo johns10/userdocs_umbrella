@@ -116,7 +116,7 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
           |> PowInvitation.Plug.sign_invitation_token(user)
 
         %{
-          url: Routes.pow_invitation_invitation_path(socket, :edit, signed_token),
+          url: UserDocsWeb.Endpoint.url <> Routes.pow_invitation_invitation_path(socket, :edit, signed_token),
           user: user,
           invited_by: socket.assigns.current_user,
         }
