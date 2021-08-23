@@ -216,15 +216,11 @@ defmodule UserDocsWeb.Root do
     raise(FunctionClauseError, message: "Event #{inspect(name)} not implemented by Root")
   end
 
-  def handle_info(%{topic: "user:" <> user_id, event: event, payload: payload}, %{assigns: %{current_user: user}} = socket) do
-    socket =
-      if String.to_integer(user_id) == user.id do
-        UserDocsWeb.UserChannelHandlers.apply(socket, %{topic: "user:" <> user_id, event: event, payload: payload})
-      else
-        Logger.error("Received invalid broadcast for a different user's channel")
-      end
-
-    {:noreply, socket}
+  def handle_info(%{topic: "user:" <> user_id} = sub_info, %{assigns: %{current_user: user}} = socket) do
+    case UserDocsWeb.UserChannelHandlers.precheck(socket, String.to_integer(user_id), user.id) do
+      :ok -> {:noreply, UserDocsWeb.UserChannelHandlers.apply(socket, sub_info)}
+      :error -> {:noreply, socket}
+    end
   end
 
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do

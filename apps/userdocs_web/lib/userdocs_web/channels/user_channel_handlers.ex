@@ -1,5 +1,14 @@
 defmodule UserDocsWeb.UserChannelHandlers do
   @moduledoc false
+  require Logger
+
+  def precheck(socket, subscription_user_id, socket_user_id) do
+    if subscription_user_id == socket_user_id do
+      :ok
+    else
+      :error
+    end
+  end
 
   def apply(socket, %{topic: "user:" <> _user_id, event: "presence_diff", payload: %{joins: _joins, leaves: _leaves}}) do
     IO.inspect("Presence diff")
