@@ -34,9 +34,10 @@ defmodule UserDocsWeb.UserChannel do
     {:ok, _} = Presence.track(socket, app, %{
       online_at: inspect(System.system_time(:second))
     })
-    #IO.inspect(Presence.list(socket))
-
-    push(socket, "presence_state", Presence.list(socket))
+    IO.puts("After Join hook")
+    presence_list = Presence.list(socket)
+    push(socket, "presence_state", presence_list)
+    broadcast!(socket, "presence_state", presence_list)
     {:noreply, socket}
   end
 
