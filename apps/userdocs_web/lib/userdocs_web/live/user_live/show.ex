@@ -24,10 +24,10 @@ defmodule UserDocsWeb.UserLive.Show do
   end
 
   @impl true
-  def handle_params(%{"id" => id}, _, %{ assigns: %{ current_user: current_user }} = socket) do
+  def handle_params(%{"id" => id}, _, %{assigns: %{current_user: current_user}} = socket) do
     case String.to_integer(id) == current_user.id do
       true ->
-        user = Users.get_user!(id, %{ team_users: true, teams: true })
+        user = Users.get_user!(id, %{team_users: true, teams: true})
         select_lists = %{
           teams: Helpers.select_list(user.teams, :name, true)
         }
@@ -51,6 +51,35 @@ defmodule UserDocsWeb.UserLive.Show do
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   @impl true
+  def handle_info(%{topic: "user:" <> _user_id, event: "event:configuration_fetched", payload: payload}, socket) do
+    IO.puts("#{__MODULE__} received broadcast")
+    case socket.assigns.live_action do
+      :local_options ->
+        send_update(UserDocsWeb.UserLive.LocalFormComponent, %{id: "local-options", params: payload})
+        {:noreply, socket}
+      _ -> {:noreply, socket}
+    end
+  end
+  def handle_info(%{topic: "user" <> _user_id, event: "event:configuration_saved"}, socket) do
+    case socket.assigns.live_action do
+      :local_options ->
+        #IO.puts("Closing modal on form")
+        #params = %{id: "local-options", event: "configuration_saved"}
+        #send_update(UserDocsWeb.UserLive.LocalFormComponent, params)
+        {:noreply, socket}
+      _ -> {:noreply, socket}
+    end
+  end
+  def handle_info(%{topic: "user" <> _user_id, event: "event:chrome_found", payload: %{"path" => chrome_path}}, socket) do
+    IO.puts("Handle Info")
+    IO.inspect(chrome_path)
+    case socket.assigns.live_action do
+      :local_options ->
+        send_update(UserDocsWeb.UserLive.LocalFormComponent, %{id: "local-options", chrome_path: chrome_path})
+        {:noreply, socket}
+      _ -> {:noreply, socket}
+    end
+  end
   def handle_info(n, s), do: Root.handle_info(n, s)
 
 

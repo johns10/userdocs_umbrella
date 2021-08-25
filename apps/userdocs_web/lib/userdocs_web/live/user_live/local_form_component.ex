@@ -10,17 +10,31 @@ defmodule UserDocsWeb.UserLive.LocalFormComponent do
   alias UserDocsWeb.LiveHelpers
 
   @impl true
-  def update(assigns, socket) do
+  def update(%{params: params} = assigns, %{assigns: %{current_user: user}} = socket) do
+    {:ok, socket |> put_configuration_response(params, user) |> assign(assigns)}
+  end
+  def update(%{event: "configuration_saved"}, socket) do
+    {:ok, complete_options_save(socket)}
+  end
+  def update(%{chrome_path: chrome_path}, socket) do
+    changeset = Ecto.Changeset.put_change(socket.assigns.changeset, :chrome_path, chrome_path)
+    {:ok, assign(socket, :changeset, changeset)}
+  end
+  def update(%{current_user: user} = assigns, socket) do
+    UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "command:get_configuration", %{})
     {
       :ok,
       socket
       |> assign(assigns)
       |> assign(:changeset, nil)
-      |> push_event("get-configuration", %{})
     }
   end
 
   @impl true
+  def handle_event("find-chrome", attrs, %{assigns: %{current_user: user}} = socket) do
+    UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "command:find_chrome", %{})
+    {:noreply, socket}
+  end
   def handle_event("validate", %{"local_options" => params}, socket) do
     changeset =
       socket.assigns.local_options
@@ -32,42 +46,11 @@ defmodule UserDocsWeb.UserLive.LocalFormComponent do
       assign(socket, :changeset, changeset)
     }
   end
-
   def handle_event("save", %{"local_options" => user_params}, socket) do
     save_user(socket, socket.assigns.action, user_params)
   end
 
-  def handle_event("configuration-response", %{"configuration" => configuration_params}, socket) do
-    overrides =
-      socket.assigns.current_user.overrides
-      |> Enum.map(fn(o) -> Map.take(o, Override.__schema__(:fields)) end)
-
-    snake_cased_params =
-      LiveHelpers.underscored_map_keys(configuration_params)
-      |> Map.put("css", socket.assigns.current_team.css)
-      |> Map.put("overrides", overrides)
-
-    changeset = Users.change_local_options(%LocalOptions{}, snake_cased_params)
-    local_options = Ecto.Changeset.apply_changes(changeset)
-
-    {
-      :noreply,
-      socket
-      |> assign(:changeset, changeset)
-      |> assign(:local_options, local_options)
-    }
-  end
-
-  def handle_event("configuration-saved", _payload, socket) do
-    {
-      :noreply,
-      socket
-      |> put_flash(:info, "Local Options updated successfully")
-      |> push_redirect(to: socket.assigns.return_to)
-    }
-  end
-
-  defp save_user(socket, _, local_options_params) do
+  defp save_user(%{assigns: %{current_user: user}} = socket, _, local_options_params) do
     case Users.update_local_options(socket.assigns.local_options, local_options_params) do
       {:ok, local_options} ->
         overrides =
@@ -80,14 +63,37 @@ defmodule UserDocsWeb.UserLive.LocalFormComponent do
           |> Map.take(LocalOptions.__schema__(:fields))
           |> LiveHelpers.camel_cased_map_keys()
 
-        {
-          :noreply,
-          socket
-          |> push_event("put-configuration", snake_cased_local_options)
-        }
+        UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "command:put_configuration", snake_cased_local_options)
+
+        {:noreply, socket}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
     end
+  end
+
+
+  defp put_configuration_response(socket, params, user) do
+    overrides =
+      user.overrides
+      |> Enum.map(fn(o) -> Map.take(o, Override.__schema__(:fields)) end)
+
+    snake_cased_params =
+      LiveHelpers.underscored_map_keys(params)
+      |> Map.put("css", socket.assigns.current_team.css)
+      |> Map.put("overrides", overrides)
+
+    changeset = Users.change_local_options(%LocalOptions{}, snake_cased_params)
+    local_options = Ecto.Changeset.apply_changes(changeset)
+
+    socket
+    |> assign(:changeset, changeset)
+    |> assign(:local_options, local_options)
+  end
+
+  defp complete_options_save(socket) do
+    socket
+    |> put_flash(:info, "Local Options updated successfully")
+    |> push_redirect(to: socket.assigns.return_to)
   end
 end

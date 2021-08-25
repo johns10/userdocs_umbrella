@@ -1,62 +1,73 @@
-h2.title
-  = @title  
+div id=@id
+  h2.title
+    = @title  
 
-= if @changeset do
-  = f = form_for @changeset, "#",
-    id: "local-options-form",
-    phx_target: @myself.cid,
-    phx_change: "validate",
-    phx_submit: "save"
+  = if @changeset do
+    = f = form_for @changeset, "#",
+      id: "local-options-form",
+      phx_target: @myself.cid,
+      phx_change: "validate",
+      phx_submit: "save"
 
-    .field.is-horizontal
-      .field-label.is-normal
-        = label f, :max_retries, class: "label"
-      .field-body
-        .control
-          = number_input f, :max_retries, [ class: "input", type: "text" ]
-          = error_tag(f, :max_retries)
+      .field.is-horizontal
+        .field-label.is-normal
+          = label f, :max_retries, class: "label"
+        .field-body
+          .control
+            = number_input f, :max_retries, [ class: "input", type: "text" ]
+            = error_tag(f, :max_retries)
 
-    .field.is-horizontal
-      .field-label.is-normal
-        = label f, :image_path, class: "label"
-      .field-body
-        .control.is-expanded
-          = text_input f, :image_path, [ class: "input", type: "text" ]
-          = error_tag(f, :image_path)
+      .field.is-horizontal
+        .field-label.is-normal
+          = label f, :image_path, class: "label"
+        .field-body
+          .control.is-expanded
+            = text_input f, :image_path, [ class: "input", type: "text" ]
+            = error_tag(f, :image_path)
 
-    .field.is-horizontal
-      .field-label.is-normal
-        = label f, :user_data_dir, class: "label"
-      .field-body
-        .control.is-expanded
-          = text_input f, :user_data_dir, [ class: "input", type: "text" ]
-          = error_tag(f, :user_data_dir)
+      .field.is-horizontal
+        .field-label.is-normal
+          = label f, :user_data_dir_path, class: "label"
+        .field-body
+          .control.is-expanded
+            = text_input f, :user_data_dir_path, [ class: "input", type: "text" ]
+            = error_tag(f, :user_data_dir_path)
 
-    .field.is-horizontal
-      .field-label.is-normal
-        = label f, :css, class: "label"
-      .field-body
-        .control.is-expanded
-          = textarea f, :css, [ class: "input", type: "text", disabled: true ]
-          p.help 
-            | CSS must be changed on the 
-            =< link "team form", to: Routes.team_index_path(@socket, :edit, @current_team)
+      .field.is-horizontal.has-addons
+        .field-label.is-normal
+          = label f, :chrome_path, class: "label"
+        .field-body
+          .control.is-expanded
+            = text_input f, :chrome_path, [ class: "input", type: "text" ]
+            = error_tag(f, :chrome_path)
+          .control
+            =< link "Find Chrome", to: "#", class: "button is-info", phx_click: "find-chrome", phx_target: @myself.cid
 
-    .field
-      .label
-        = label f, :overrides, class: "label"
-      = inputs_for f, :overrides, fn puof ->
-        .field-body.pb-4
-          .field
-            .control
-              = text_input puof, :project_id, class: "input", type: "text", disabled: true
-          .field
-            .control
-              = text_input puof, :url, class: "input", type: "text", disabled: true
+      .field.is-horizontal
+        .field-label.is-normal
+          = label f, :css, class: "label"
+        .field-body
+          .control.is-expanded
+            = textarea f, :css, [ class: "input", type: "text", disabled: true ]
+            p.help 
+              | CSS must be changed on the 
+              =< link "team form", to: Routes.team_index_path(@socket, :edit, @current_team)
 
-    = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
+      .field
+        .label
+          = label f, :overrides, class: "label"
+        = inputs_for f, :overrides, fn puof ->
+          .field-body.pb-4
+            .field
+              .control
+                = text_input puof, :project_id, class: "input", type: "text", disabled: true
+            .field
+              .control
+                = text_input puof, :url, class: "input", type: "text", disabled: true
 
-  </form>
+      = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
+
+    </form>
 
 
 div phx-hook="configurationV2" id="configuration-v2-hook"
