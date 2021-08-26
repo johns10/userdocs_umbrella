@@ -28,7 +28,7 @@ config :userdocs_web, UserDocsWeb.Endpoint,
   ],
   debug_errors: true,
   code_reloader: true,
-  check_origin: false,
+  check_origin: {UserDocsWeb.OriginChecker, :check, [Mix.env()]},
   watchers: [
     node: [
       "node_modules/webpack/bin/webpack.js",
