@@ -3,6 +3,7 @@ defmodule UserDocs.Web.Page do
   import Ecto.Changeset
 
   alias UserDocs.Projects.Version
+  alias UserDocs.Projects.Project
   alias UserDocs.Web.Element
   alias UserDocs.Web.Annotation
 
@@ -12,6 +13,7 @@ defmodule UserDocs.Web.Page do
     field :name, :string
     field :url, :string
 
+    belongs_to :project, Project
     belongs_to :version, Version
 
     has_many :elements, Element
@@ -23,14 +25,15 @@ defmodule UserDocs.Web.Page do
   @doc false
   def changeset(page, attrs) do
     page
-    |> cast(attrs, [:name, :url, :version_id])
+    |> cast(attrs, [:name, :url, :version_id, :project_id])
     |> foreign_key_constraint(:version_id)
+    |> foreign_key_constraint(:project_id)
     |> validate_required([:url])
   end
 
   def fields_changeset(page, attrs) do
     page
-    |> cast(attrs, [:name, :url, :version_id])
+    |> cast(attrs, [:name, :url, :version_id, :project_id])
     |> validate_required([:url])
   end
 
