@@ -76,5 +76,3 @@ div
 
   = live_patch to: Routes.step_index_path(@socket, :new, @process.id) do
     button.button.is-primary New Step 
-
-  div phx-hook="browserEventHandler" id="browser-event-handler"

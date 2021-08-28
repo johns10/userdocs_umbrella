@@ -47,13 +47,6 @@ Hooks.testSelector = {
     })
   }
 };
-Hooks.browserEventHandler = {
-  mounted() {
-    this.el.addEventListener("browser-event", (message) => {
-      this.pushEventTo("#browser-event-handler", "browser-event", message.detail)
-    })
-  }
-}
 
 Hooks.fileTransfer = {
   mounted() {
