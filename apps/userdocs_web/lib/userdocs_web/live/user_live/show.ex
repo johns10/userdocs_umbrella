@@ -63,16 +63,18 @@ defmodule UserDocsWeb.UserLive.Show do
   def handle_info(%{topic: "user" <> _user_id, event: "event:configuration_saved"}, socket) do
     case socket.assigns.live_action do
       :local_options ->
-        #IO.puts("Closing modal on form")
-        #params = %{id: "local-options", event: "configuration_saved"}
-        #send_update(UserDocsWeb.UserLive.LocalFormComponent, params)
-        {:noreply, socket}
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "Local Options updated successfully")
+          |> push_redirect(to: Routes.user_show_path(socket, :show, socket.assigns.current_user.id))
+        }
       _ -> {:noreply, socket}
     end
   end
   def handle_info(%{topic: "user" <> _user_id, event: "event:chrome_found", payload: %{"path" => chrome_path}}, socket) do
-    IO.puts("Handle Info")
-    IO.inspect(chrome_path)
+    #IO.puts("Handle Info")
+    #IO.inspect(chrome_path)
     case socket.assigns.live_action do
       :local_options ->
         send_update(UserDocsWeb.UserLive.LocalFormComponent, %{id: "local-options", chrome_path: chrome_path})

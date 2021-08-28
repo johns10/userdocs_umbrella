@@ -13,9 +13,6 @@ defmodule UserDocsWeb.UserLive.LocalFormComponent do
   def update(%{params: params} = assigns, %{assigns: %{current_user: user}} = socket) do
     {:ok, socket |> put_configuration_response(params, user) |> assign(assigns)}
   end
-  def update(%{event: "configuration_saved"}, socket) do
-    {:ok, complete_options_save(socket)}
-  end
   def update(%{chrome_path: chrome_path}, socket) do
     changeset = Ecto.Changeset.put_change(socket.assigns.changeset, :chrome_path, chrome_path)
     {:ok, assign(socket, :changeset, changeset)}
@@ -31,7 +28,7 @@ defmodule UserDocsWeb.UserLive.LocalFormComponent do
   end
 
   @impl true
-  def handle_event("find-chrome", attrs, %{assigns: %{current_user: user}} = socket) do
+  def handle_event("find-chrome", _attrs, %{assigns: %{current_user: user}} = socket) do
     UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "command:find_chrome", %{})
     {:noreply, socket}
   end
@@ -89,11 +86,5 @@ defmodule UserDocsWeb.UserLive.LocalFormComponent do
     socket
     |> assign(:changeset, changeset)
     |> assign(:local_options, local_options)
-  end
-
-  defp complete_options_save(socket) do
-    socket
-    |> put_flash(:info, "Local Options updated successfully")
-    |> push_redirect(to: socket.assigns.return_to)
   end
 end
