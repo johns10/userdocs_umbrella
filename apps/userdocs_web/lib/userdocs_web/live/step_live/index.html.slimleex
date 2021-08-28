@@ -12,6 +12,7 @@ div
         app_name: @app_name,
         current_version: @current_version,
         current_team: @current_team,
+        current_user: @current_user,
         data: @data,
         id: "step-form",
         new_element: false,

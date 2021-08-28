@@ -34,15 +34,33 @@ defmodule UserDocsWeb.PageLive.FormComponent do
           selected: @current_version.id || "",
           id: opts[:prefix] <> "page-id"
         ], "control") %>
-
         <%= Layout.text_input(form, [ field_name: :name ], "control is-expanded") %>
-
       </div>
-
-      <%= Layout.text_input(form, [
-        field_name: :url,
-        id: opts[:prefix] <> "url-input"
-      ], "control is-expanded") %>
+      <%= if String.at(form.data.url, 0) == "/" do %>
+        <div class="field">
+          <%= label form, :url, class: "label" %>
+          <p class="control is-expanded">
+            <div class="field has-addons">
+              <p class="control">
+                <a class="button is-static">
+                  <%= if form.data.project.id in Enum.map(@current_user.overrides, fn(o) -> o.project_id end) do %>
+                    <%= Enum.filter(@current_user.overrides, fn(o) -> o.project_id == form.data.project.id end) |> Enum.at(0) |> Map.get(:url) %>
+                  <% else %>
+                    <%= form.data.project.base_url %>
+                  <% end %>
+                </a>
+              </p>
+              <%= text_input form, :url, [ class: "input", type: "text" ] %>
+            </div>
+            <%= error_tag form, :selector %>
+          </p>
+        </div>
+      <% else %>
+        <%= Layout.text_input(form, [
+          field_name: :url,
+          id: opts[:prefix] <> "url-input"
+        ], "control is-expanded") %>
+      <% end %>
     """
   end
 
