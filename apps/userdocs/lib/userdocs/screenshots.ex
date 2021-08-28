@@ -246,11 +246,18 @@ defmodule UserDocs.Screenshots do
   end
 
   def maybe_create_temp_dir() do
-    {:ok, dirs} = :code.priv_dir(:userdocs_web) |> File.ls()
+    priv_dir =
+      if Mix.env() in [:test] do
+        :code.priv_dir(:userdocs)
+      else
+        :code.priv_dir(:userdocs_web)
+      end
+
+    {:ok, dirs} = priv_dir |> File.ls()
     if "tmp" not in dirs do
-      :ok = File.mkdir(:code.priv_dir(:userdocs_web) |> Path.join("tmp"))
+      :ok = File.mkdir(priv_dir |> Path.join("tmp"))
     end
-    :code.priv_dir(:userdocs_web) |> Path.join("tmp")
+    priv_dir |> Path.join("tmp")
   end
 
   def prepare_aws_file(%{aws: aws_path, original: original, updated: updated,
