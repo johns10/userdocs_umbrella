@@ -111,6 +111,11 @@ defmodule UserDocsWeb.StepLive.Index do
     send(self(), {:broadcast, "delete", deleted_step})
     {:noreply, socket}
   end
+  @impl true
+  def handle_event("select-version" = n, p, s) do
+    {:noreply, socket} = Root.handle_event(n, p, s)
+    {:noreply, redirect(socket, to: Routes.process_index_path(socket, :index))}
+  end
 
   def handle_info(%{topic: "user:" <> user_id, event: "event:browser_event", payload: payload} = sub_info, socket) do
     payload = UserDocsWeb.LiveHelpers.underscored_map_keys(payload)
