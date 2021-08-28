@@ -33,6 +33,14 @@ div id=@id
             = text_input f, :user_data_dir_path, [ class: "input", type: "text" ]
             = error_tag(f, :user_data_dir_path)
 
+      .field.is-horizontal
+        .field-label.is-normal
+          = label f, :browser_timeout, class: "label"
+        .field-body
+          .control.is-expanded
+            = number_input f, :browser_timeout, [ class: "input", type: "text" ]
+            = error_tag(f, :browser_timeout)
+
       .field.is-horizontal.has-addons
         .field-label.is-normal
           = label f, :chrome_path, class: "label"
