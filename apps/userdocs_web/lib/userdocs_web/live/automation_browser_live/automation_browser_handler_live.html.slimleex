@@ -1,4 +1,4 @@
-div phx-hook="automatedBrowserEvents" id="<%= @id %>"
+div id="<%= @id %>"
 = if not @user_opened_browser && not @browser_opened do 
   = link to: "#", phx_click: "open-browser", phx_target: @myself.cid, class: "control" do
     i.fa.fa-toggle-off.px-1

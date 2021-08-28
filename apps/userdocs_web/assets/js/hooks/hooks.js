@@ -220,17 +220,6 @@ Hooks.automatedBrowserCommands = {
   }
 };
 
-Hooks.automatedBrowserEvents = {
-  mounted() {
-    this.el.addEventListener("browser-opened", (message) => {
-      this.pushEventTo("#automated-browser-controls", "browser-opened", message.detail)
-    })
-    this.el.addEventListener("browser-closed", (message) => {
-      this.pushEventTo("#automated-browser-controls", "browser-closed", message.detail)
-    })
-  }
-};
-
 Hooks.automationManager = {
   mounted() {
     this.handleEvent("start-running", (message) => { window.userdocs.start(message) })
