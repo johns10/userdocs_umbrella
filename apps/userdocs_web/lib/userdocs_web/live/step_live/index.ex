@@ -53,6 +53,7 @@ defmodule UserDocsWeb.StepLive.Index do
     |> Loaders.annotations(opts)
     |> Loaders.elements(opts)
     |> Loaders.screenshots(opts)
+    |> Loaders.projects(opts)
     |> UserDocsWeb.Loaders.versions()
     |> turn_off_broadcast_associations()
   end
@@ -266,7 +267,8 @@ defmodule UserDocsWeb.StepLive.Index do
       UserDocs.Web.Element,
       UserDocs.Web.Page,
       UserDocs.Media.Screenshot,
-      UserDocs.StepInstances.StepInstance
+      UserDocs.StepInstances.StepInstance,
+      UserDocs.Projects.Project
    ]
   end
 
@@ -337,6 +339,7 @@ defmodule UserDocsWeb.StepLive.Index do
         :step_type,
         :screenshot,
         :page,
+        [page: :project],
         :annotation,
         :element,
         :process,
