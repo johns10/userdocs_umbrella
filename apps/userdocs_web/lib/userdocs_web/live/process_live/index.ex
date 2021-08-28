@@ -35,7 +35,7 @@ defmodule UserDocsWeb.ProcessLive.Index do
     }
   end
 
-  def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
+  def initialize(%{assigns: %{auth_state: :logged_in}} = socket) do
     opts = Defaults.opts(socket, types())
 
     socket
@@ -47,13 +47,13 @@ defmodule UserDocsWeb.ProcessLive.Index do
   def initialize(socket), do: socket
 
   @impl true
-  def handle_params(_params, _url, %{ assigns: %{ auth_state: :not_logged_in }} = socket) do
-    { :noreply, socket }
+  def handle_params(_params, _url, %{assigns: %{auth_state: :not_logged_in}} = socket) do
+    {:noreply, socket}
   end
-  def handle_params(%{ "version_id" => version_id } = params, _url, socket) do
+  def handle_params(%{"version_id" => version_id} = params, _url, socket) do
     version = Projects.get_version!(version_id, %{strategy: true})
     project = Projects.get_project!(version.project_id)
-    team = Users.get_team!(project.team_id, %{ preloads: %{ job: %{ step_instances: true, process_instances: true }}})
+    team = Users.get_team!(project.team_id, %{preloads: %{job: %{step_instances: true, process_instances: true}}})
     socket
     |> assign(:current_version, version)
     |> assign(:current_project, project)
@@ -97,12 +97,12 @@ defmodule UserDocsWeb.ProcessLive.Index do
 
   @impl true
   def handle_event("select-version" = n, p, s) do
-    { :noreply, socket } = Root.handle_event(n, p, s)
-    { :noreply, prepare_processes(socket, socket.assigns.current_version.id) }
+    {:noreply, socket} = Root.handle_event(n, p, s)
+    {:noreply, prepare_processes(socket, socket.assigns.current_version.id)}
   end
   def handle_event("delete", %{"id" => id}, socket) do
     process = Automation.get_process!(id)
-    { :ok, _ } = Automation.delete_process(process)
+    {:ok, _} = Automation.delete_process(process)
     {
       :noreply,
       socket
@@ -115,8 +115,8 @@ defmodule UserDocsWeb.ProcessLive.Index do
   @impl true
   def handle_info(%{topic: _, event: _, payload: %ProcessInstance{}} = sub_data, socket) do
     Logger.debug("#{__MODULE__} Received a ProcessInstance broadcast")
-    { :noreply, socket } = Root.handle_info(sub_data, socket)
-    { :noreply, prepare_processes(socket, socket.assigns.current_version.id) }
+    {:noreply, socket} = Root.handle_info(sub_data, socket)
+    {:noreply, prepare_processes(socket, socket.assigns.current_version.id)}
   end
   def handle_info(p, s), do: Root.handle_info(p, s)
 
@@ -131,9 +131,9 @@ defmodule UserDocsWeb.ProcessLive.Index do
   def prepare_processes(socket, version_id) do
     opts =
       socket.assigns.state_opts
-      |> Keyword.put(:filter, { :version_id, version_id })
-      |> Keyword.put(:preloads, [ :process_instances ])
-      |> Keyword.put(:limit,  [ process_instances: 5 ])
+      |> Keyword.put(:filter, {:version_id, version_id})
+      |> Keyword.put(:preloads, [:process_instances])
+      |> Keyword.put(:limit,  [process_instances: 5])
 
     socket
     |> assign(:processes, Automation.list_processes(socket, opts))
