@@ -199,7 +199,13 @@ defmodule UserDocsWeb.UserLive.FormComponent do
   defp save_user(socket, :options, user_params) do
     #user_params = Map.put(user_params, "overrides", [])
     case Users.update_user_options(socket.assigns.user, user_params) do
-      {:ok, _user} ->
+      {:ok, user} ->
+        overrides =
+          user.overrides
+          |> Enum.map(fn(o) -> Map.take(o, [:url, :project_id]) end)
+
+        UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "command:put_configuration", %{"overrides" => overrides})
+
         {
           :noreply,
           socket
