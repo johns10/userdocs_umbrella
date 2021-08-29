@@ -335,7 +335,7 @@ defmodule UserDocsWeb.StepLiveTest do
       refute has_element?(index_live, "#delete-step-"<> Integer.to_string(step.id))
     end
 
-    test "click event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step: step, step_types: step_types} do
+    test "click event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step: step, step_types: step_types, user: user} do
       step_type = step_type_from_name(step_types, "Click")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :index, process.id))
       attrs =
@@ -346,7 +346,8 @@ defmodule UserDocsWeb.StepLiveTest do
       event = %{action: "Click", selector: "test_selector"}
 
       # Pass the click browser event
-      html = index_live |> render_hook(:"browser-event", event)
+      UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
+      html = render(index_live)
       assert html =~ "Click"
       assert html =~ event.selector
 
@@ -359,8 +360,8 @@ defmodule UserDocsWeb.StepLiveTest do
             "name" => "test_element_name",
             "page_id" => attrs.page_id |> to_string()
           }
-          }
         }
+      }
 
       index_live
       |> form("#step-form", step_form: attrs)
@@ -376,7 +377,7 @@ defmodule UserDocsWeb.StepLiveTest do
       assert html =~ "Step created successfully"
     end
 
-    test "navigate event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step: step, step_types: step_types} do
+    test "navigate event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step: step, step_types: step_types, user: user} do
       step_type = step_type_from_name(step_types, "Navigate")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :index, process.id))
       attrs =
@@ -386,7 +387,8 @@ defmodule UserDocsWeb.StepLiveTest do
       event = %{action: "Navigate", href: "https://www.google.com"}
 
       # Pass the navigate browser event
-      html = index_live |> render_hook(:"browser-event", event)
+      UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
+      html = render(index_live)
       assert html =~ "Navigate"
       assert html =~ event.href
 
@@ -414,7 +416,7 @@ defmodule UserDocsWeb.StepLiveTest do
       assert html =~ "Step created successfully"
     end
 
-    test "Click, then navigate does the expected thing", %{authed_conn: conn, process: process, step: step, step_types: step_types} do
+    test "Click, then navigate does the expected thing", %{authed_conn: conn, process: process, step: step, step_types: step_types, user: user} do
       step_type = step_type_from_name(step_types, "Click")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :index, process.id))
       attrs =
@@ -425,14 +427,16 @@ defmodule UserDocsWeb.StepLiveTest do
       event = %{action: "Click", selector: "test_selector"}
 
       # Pass the click browser event
-      html = index_live |> render_hook(:"browser-event", event)
+      UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
+      html = render(index_live)
       assert html =~ "Click"
       assert html =~ event.selector
 
       event = %{action: "Navigate", href: "https://www.google.com"}
 
       # Pass the navigate browser event
-      html = index_live |> render_hook(:"browser-event", event)
+      UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
+      html = render(index_live)
       assert index_live |> element("#step-type-select") |> render()  =~ "Navigate"
       assert index_live |> element("#page-url-input") |> render()  =~ event.href
 
@@ -462,7 +466,33 @@ defmodule UserDocsWeb.StepLiveTest do
       assert html =~ "Step created successfully"
     end
 
-    test "browser events update the Edit form", %{authed_conn: conn, step: step, step_types: step_types, process: process, element: element, annotation: annotation, page: page} do
+    test "Apply Annotation event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step_types: step_types, annotation: annotation, element: element, page: page, user: user} do
+      aa_step_type = step_type_from_name(step_types, "Apply Annotation")
+      {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :index, process.id))
+      _attrs =
+        AutomationFixtures.step_attrs(:valid, page.id, process.id, element.id, annotation.id, aa_step_type.id)
+        |> Map.delete(:annotation_id)
+        |> Map.delete(:element_id)
+        |> Map.delete(:name)
+
+      event = %{action: "Apply Annotation", selector: "test_selector", annotation_type: "Badge"}
+
+      # Pass the navigate browser event
+      UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
+      html = render(index_live)
+      assert html =~ "Apply Annotation"
+      assert html =~ event.selector
+    end
+
+    test "index handles standard events", %{authed_conn: conn, version: version} do
+      {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
+      send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
+      assert live
+             |> element("#version-picker-" <> to_string(version.id))
+             |> render_click() =~ version.name
+    end
+
+    test "browser events update the Edit form", %{authed_conn: conn, step: step, step_types: step_types, process: process, element: element, annotation: annotation, page: page, user: user} do
       aa_step_type = step_type_from_name(step_types, "Apply Annotation")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :edit, step))
       attrs =
@@ -480,35 +510,11 @@ defmodule UserDocsWeb.StepLiveTest do
       event = %{action: "Click", selector: "test_selector"}
 
       # Pass the click browser event
-      html = index_live |> render_hook(:"browser-event", event)
+      UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
+      :timer.sleep(10)
 
       assert index_live |> element("#step-type-select") |> render() =~ "selected=\"selected\">Click"
       assert index_live |> element("#element-selector-input") |> render() =~ event.selector
-    end
-
-    test "Apply Annotation event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step_types: step_types, annotation: annotation, element: element, page: page} do
-      aa_step_type = step_type_from_name(step_types, "Apply Annotation")
-      {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :index, process.id))
-      _attrs =
-        AutomationFixtures.step_attrs(:valid, page.id, process.id, element.id, annotation.id, aa_step_type.id)
-        |> Map.delete(:annotation_id)
-        |> Map.delete(:element_id)
-        |> Map.delete(:name)
-
-      event = %{action: "Apply Annotation", selector: "test_selector", annotation_type: "Badge"}
-
-      # Pass the navigate browser event
-      html = index_live |> render_hook(:"browser-event", event)
-      assert html =~ "Apply Annotation"
-      assert html =~ event.selector
-    end
-
-    test "index handles standard events", %{authed_conn: conn, version: version} do
-      {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
-      send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
-      assert live
-             |> element("#version-picker-" <> to_string(version.id))
-             |> render_click() =~ version.name
     end
 
   end
