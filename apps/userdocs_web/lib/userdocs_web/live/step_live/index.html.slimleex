@@ -10,6 +10,7 @@ div
       = live_modal @socket, UserDocsWeb.StepLive.FormComponent,
         action: @live_action,
         app_name: @app_name,
+        current_project: @current_project,
         current_version: @current_version,
         current_team: @current_team,
         current_user: @current_user,

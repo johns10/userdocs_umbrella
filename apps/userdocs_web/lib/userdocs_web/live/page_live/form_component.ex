@@ -34,6 +34,9 @@ defmodule UserDocsWeb.PageLive.FormComponent do
           selected: @current_version.id || "",
           id: opts[:prefix] <> "page-id"
         ], "control") %>
+        <%= Layout.select_input(form, :project_id, @select_lists.projects, [
+          selected: @current_project.id || ""
+        ], "control") %>
         <%= Layout.text_input(form, [ field_name: :name ], "control is-expanded") %>
       </div>
       <%= if String.at(form.data.url, 0) == "/" do %>
