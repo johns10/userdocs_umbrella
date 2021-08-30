@@ -38,6 +38,7 @@ defmodule UserDocs.Automation.StepForm do
       field :url, :string
 
       field :version_id, :integer
+      field :project_id, :integer
     end
 
     field :element_id_enabled, :boolean
