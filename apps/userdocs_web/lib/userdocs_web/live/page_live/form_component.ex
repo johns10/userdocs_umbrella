@@ -43,10 +43,12 @@ defmodule UserDocsWeb.PageLive.FormComponent do
             <div class="field has-addons">
               <p class="control">
                 <a class="button is-static">
-                  <%= if form.data.project.id in Enum.map(@current_user.overrides, fn(o) -> o.project_id end) do %>
-                    <%= Enum.filter(@current_user.overrides, fn(o) -> o.project_id == form.data.project.id end) |> Enum.at(0) |> Map.get(:url) %>
-                  <% else %>
-                    <%= form.data.project.base_url %>
+                  <%= if form.data.project do %>
+                    <%= if form.data.project.id in Enum.map(@current_user.overrides, fn(o) -> o.project_id end) do %>
+                      <%= Enum.filter(@current_user.overrides, fn(o) -> o.project_id == form.data.project.id end) |> Enum.at(0) |> Map.get(:url) %>
+                    <% else %>
+                      <%= form.data.project.base_url %>
+                    <% end %>
                   <% end %>
                 </a>
               </p>
