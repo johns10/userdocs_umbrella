@@ -2,6 +2,7 @@ defmodule UserDocsWeb.PageLive.FormComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocs.Web
+  alias UserDocs.Projects.Project
 
   alias UserDocsWeb.LiveHelpers
   alias UserDocsWeb.Layout
@@ -46,7 +47,7 @@ defmodule UserDocsWeb.PageLive.FormComponent do
             <div class="field has-addons">
               <p class="control">
                 <a class="button is-static">
-                  <%= if form.data.project != nil do %>
+                  <%= if Kernel.is_struct(form.data.project, Project) do %>
                     <%= if form.data.project.id in Enum.map(@current_user.overrides, fn(o) -> o.project_id end) do %>
                       <%= Enum.filter(@current_user.overrides, fn(o) -> o.project_id == form.data.project.id end) |> Enum.at(0) |> Map.get(:url) %>
                     <% else %>
