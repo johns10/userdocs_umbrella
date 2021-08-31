@@ -13,8 +13,7 @@ defmodule UserDocsWeb.TeamLive.Index do
   def types() do
     [
       UserDocs.Users.Team,
-      UserDocs.Users.User,
-      UserDocs.Documents.LanguageCode
+      UserDocs.Users.User
     ]
   end
 
@@ -32,7 +31,6 @@ defmodule UserDocsWeb.TeamLive.Index do
     socket
     |> assign(:modal_action, :show)
     |> load_teams()
-    |> Documents.load_language_codes(opts)
     |> Users.load_users(opts)
   end
   def initialize(socket), do: socket
@@ -51,7 +49,6 @@ defmodule UserDocsWeb.TeamLive.Index do
     |> assign(:page_title, "Edit Team")
     |> assign(:team, team)
     |> assign(:projects_select_options, Helpers.select_list(team.projects, :name, false))
-    |> assign(:language_codes_select_options, language_codes_select_list(socket))
     |> prepare_teams()
   end
 
@@ -60,14 +57,12 @@ defmodule UserDocsWeb.TeamLive.Index do
     |> assign(:page_title, "New Team")
     |> assign(:team, %Team{users: [], projects: []})
     |> assign(:projects_select_options, [])
-    |> assign(:language_codes_select_options, language_codes_select_list(socket))
     |> prepare_teams()
   end
 
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Listing Teams")
-    |> assign(:language_codes_select_options, language_codes_select_list(socket))
     |> assign(:team, nil)
     |> prepare_teams()
   end
@@ -98,11 +93,6 @@ defmodule UserDocsWeb.TeamLive.Index do
 
     socket
     |> Users.load_teams(opts)
-  end
-
-  def language_codes_select_list(socket) do
-    Documents.list_language_codes(socket, socket.assigns.state_opts)
-    |> Helpers.select_list(:name, false)
   end
 
   @impl true

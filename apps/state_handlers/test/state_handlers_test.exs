@@ -1,6 +1,5 @@
 defmodule StateHandlers.StateFixtures do
 
-  alias UserDocs.DocumentVersionFixtures, as: DocumentFixtures
   alias UserDocs.UsersFixtures
   alias UserDocs.ProjectsFixtures
   alias UserDocs.DocubitFixtures
@@ -10,9 +9,6 @@ defmodule StateHandlers.StateFixtures do
   alias UserDocs.Users.Team
   alias UserDocs.Projects.Project
   alias UserDocs.Projects.Version
-  alias UserDocs.Documents.Document
-  alias UserDocs.Documents.DocubitType
-  alias UserDocs.Documents.DocumentVersion
 
   def state(opts) do
     opts =
@@ -25,11 +21,6 @@ defmodule StateHandlers.StateFixtures do
     project = ProjectsFixtures.project(team.id)
     v1 = ProjectsFixtures.version(project.id)
     v2 = ProjectsFixtures.version(project.id)
-    document = DocumentFixtures.document(project.id)
-    docubit_types = DocubitFixtures.create_docubit_types()
-    dv1 = DocumentFixtures.document_version(document.id, v1.id)
-    dv2 = DocumentFixtures.document_version(document.id, v2.id)
-    dv3 = DocumentFixtures.document_version(document.id, v2.id)
 
     %{}
     |> StateHandlers.initialize(opts)
@@ -38,9 +29,6 @@ defmodule StateHandlers.StateFixtures do
     |> StateHandlers.load([team_user], TeamUser, opts)
     |> StateHandlers.load([project], Project, opts)
     |> StateHandlers.load([v1, v2], Version, opts)
-    |> StateHandlers.load(docubit_types, DocubitType, opts)
-    |> StateHandlers.load([document], Document, opts)
-    |> StateHandlers.load([dv1, dv2, dv3], DocumentVersion, opts)
   end
 end
 
@@ -53,8 +41,6 @@ defmodule StateHandlersTest do
     alias UserDocs.Projects.Version
     alias UserDocs.UsersFixtures
     alias StateHandlers.StateFixtures
-    alias UserDocs.Documents.Document
-    alias UserDocs.Documents.DocumentVersion
 
     def broadcaster(_channel, _action, _data) do
       _inspect_stuff_code = """

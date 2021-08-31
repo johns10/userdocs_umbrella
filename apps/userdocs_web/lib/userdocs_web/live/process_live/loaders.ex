@@ -7,23 +7,6 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   alias UserDocs.StepInstances
   alias UserDocs.Projects
 
-  def content(socket, opts) do
-    opts =
-      opts
-      |> Keyword.put(:filters, %{team_id: socket.assigns.current_team.id})
-      |> Keyword.put(:params, %{})
-
-    Documents.load_content(socket, opts)
-  end
-
-  def content_versions(socket, opts) do
-    opts =
-      opts
-      |> Keyword.put(:filters, %{team_id: socket.assigns.current_team.id})
-
-    Documents.load_content_versions(socket, opts)
-  end
-
   def processes(socket, opts) do
     opts =
       opts

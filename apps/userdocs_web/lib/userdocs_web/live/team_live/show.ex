@@ -11,8 +11,7 @@ defmodule UserDocsWeb.TeamLive.Show do
 
   def types() do
     [
-      UserDocs.Users.Team,
-      UserDocs.Documents.Content
+      UserDocs.Users.Team
     ]
   end
 
@@ -34,7 +33,7 @@ defmodule UserDocsWeb.TeamLive.Show do
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
-    team = Users.get_team!(id, %{ preloads: [ projects: true, users: true, content: true ] })
+    team = Users.get_team!(id, %{preloads: [projects: true, users: true]})
     default_project = Users.team_default_project(team)
 
     {

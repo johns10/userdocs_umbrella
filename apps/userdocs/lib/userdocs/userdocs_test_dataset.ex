@@ -9,13 +9,6 @@ defmodule UserDocs.TestDataset do
   alias UserDocs.Projects.Project
   alias UserDocs.Projects.Version
 
-  alias UserDocs.Documents
-  alias UserDocs.Documents.DocubitType
-  alias UserDocs.Documents.Docubit
-  alias UserDocs.Documents.Document
-  alias UserDocs.Documents.DocumentVersion
-  alias UserDocs.Documents.Content
-  alias UserDocs.Documents.ContentVersion
   alias UserDocs.Documents.LanguageCode
 
   alias UserDocs.Web.Page
@@ -36,11 +29,8 @@ defmodule UserDocs.TestDataset do
   def delete() do
     Repo.delete_all(Screenshot)
     Repo.delete_all(File)
-    Repo.delete_all(ContentVersion)
     Repo.delete_all(Step)
     Repo.delete_all(Process)
-    Repo.delete_all(DocumentVersion)
-    Repo.delete_all(Document)
     Repo.delete_all(Annotation)
     Repo.delete_all(Element)
     Repo.delete_all(Page)
@@ -50,7 +40,6 @@ defmodule UserDocs.TestDataset do
     Repo.delete_all(Annotation)
     Repo.delete_all(AnnotationType)
     Repo.delete_all(Strategy)
-    Repo.delete_all(Content)
     Repo.delete_all(TeamUser)
     Repo.delete_all(LanguageCode)
     Repo.delete_all(Docubit)
@@ -608,7 +597,6 @@ defmodule UserDocs.TestDataset do
       add_outline = %{
         annotation_type_id: outline_id,
         color: "green",
-        content_id: nil,
         description: "Outline",
         font_color: nil,
         font_size: nil,
@@ -625,7 +613,6 @@ defmodule UserDocs.TestDataset do
       badge_remove_button = %{
         annotation_type_id: outline_id,
         color: "#7FBE7F",
-        content_id: nil,
         description: "Badge",
         font_color: nil,
         font_size: 24,
@@ -642,7 +629,6 @@ defmodule UserDocs.TestDataset do
       badge_username_input = %{
         annotation_type_id: badge_id,
         color: "green",
-        content_id: nil,
         description: "Badge",
         font_color: "white",
         font_size: 24,
@@ -659,7 +645,6 @@ defmodule UserDocs.TestDataset do
       badge_password_input = %{
         annotation_type_id: badge_id,
         color: "green",
-        content_id: nil,
         description: "Badge",
         font_color: nil,
         font_size: 24,
@@ -676,7 +661,6 @@ defmodule UserDocs.TestDataset do
       outline_login_button = %{
         annotation_type_id: outline_id,
         color: "green",
-        content_id: nil,
         description: "Outline Login",
         font_color: nil,
         font_size: nil,
@@ -693,7 +677,6 @@ defmodule UserDocs.TestDataset do
       badge_outline_secure_button = %{
         annotation_type_id: badge_outline_id,
         color: "green",
-        content_id: nil,
         description: "Badge Outline Secure Button",
         font_color: "white",
         font_size: 24,
@@ -1154,123 +1137,5 @@ defmodule UserDocs.TestDataset do
         |> Repo.insert()
       end
     )
-
-    _content = [
-      add_element_button = %{
-        name: "Add Element Button",
-        team_id: userdocs_team_id
-     },
-      delete_button = %{
-        name: "Delete Element button",
-        team_id: userdocs_team_id
-     }
-    ]
-
-    {:ok, %Content{id: add_element_button_id}} =
-      %Content{}
-      |> Content.changeset(add_element_button)
-      |> Repo.insert()
-
-    {:ok, %Content{id: delete_button_id}} =
-      %Content{}
-      |> Content.changeset(delete_button)
-      |> Repo.insert()
-
-
-    english_language_code = %{
-      name: "en-US"
-   }
-
-    great_britain_language_code = %{
-      name: "en-GB"
-   }
-
-    {:ok, %LanguageCode{id: english_language_code_id}} =
-      %LanguageCode{}
-      |> LanguageCode.changeset(english_language_code)
-      |> Repo.insert()
-
-    {:ok, %LanguageCode{id: great_britain_language_code_id}} =
-      %LanguageCode{}
-      |> LanguageCode.changeset(great_britain_language_code)
-      |> Repo.insert()
-
-    {:ok, _userdocs_team = %Team{}} =
-      userdocs_team
-      |> Users.update_team(%{default_language_code_id: english_language_code_id})
-
-    {:ok, _loreline_team = %Team{}} =
-      loreline_team
-      |> Users.update_team(%{default_language_code_id: english_language_code_id})
-
-    content_versions = [
-      _login_button_2020_1_en_us = %{
-        language_code_id: add_element_button_id,
-        name: "Add Element",
-        body: "The add element button adds an element",
-        content_id: add_element_button_id,
-        version_id: version_0_0_1_id,
-     },
-      _login_button_2020_1_en_gb = %{
-        language_code_id: great_britain_language_code_id,
-        name: "Add Element",
-        body: "The add element button shall add an element",
-        content_id: add_element_button_id,
-        version_id: version_0_0_1_id,
-     },
-      _manager_button_2020_1_en_us = %{
-        language_code_id: english_language_code_id,
-        name: "Delete Button",
-        body: "This button deletes an element",
-        content_id: delete_button_id,
-        version_id: version_0_0_1_id,
-     },
-      _manager_button_2020_1_en_gb = %{
-        language_code_id: great_britain_language_code_id,
-        name: "Delete Button",
-        body: "This button shall delete an element",
-        content_id: delete_button_id,
-        version_id: version_0_0_1_id,
-     }
-    ]
-
-    Enum.each(content_versions,
-      fn(cv) ->
-        IO.puts("Inserting cv")
-        %ContentVersion{}
-        |> ContentVersion.changeset(cv)
-        |> Repo.insert()
-      end
-    )
-
-    document_attrs = %{
-      name: "Cycle Profile Form Reference",
-      title: "Cycle Profile Form Reference",
-      project_id: userdocs_project_id
-   }
-
-    {:ok, %Document{id: document_id}} =
-      Documents.create_document(document_attrs)
-
-    _docubit_types =
-      Enum.map(
-        UserDocs.Documents.DocubitType.attrs(),
-        fn(attrs) ->
-          {:ok, docubit_type} = Documents.create_docubit_type(attrs)
-          docubit_type
-        end
-      )
-
-    document_version = %{
-      name: "test",
-      title: "test",
-      version_id: version_0_0_1_id,
-      document_id: document_id
-   }
-
-    {:ok, %DocumentVersion{id: _document_version_id}} =
-      Documents.create_document_version(document_version)
-
   end
-
 end

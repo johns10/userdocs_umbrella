@@ -5,8 +5,6 @@ defmodule UserDocs.Users.Team do
   alias UserDocs.ChangesetHelpers
   alias UserDocs.Users
   alias UserDocs.Projects.Project
-  alias UserDocs.Documents.LanguageCode
-  alias UserDocs.Documents.Content
   alias UserDocs.Users.TeamUser
   alias UserDocs.Jobs.Job
 
@@ -16,9 +14,7 @@ defmodule UserDocs.Users.Team do
 
     embeds_one :default_project, Project
 
-    belongs_to :default_language_code, LanguageCode
     has_many :projects, Project
-    has_many :content, Content
     has_many :team_users, TeamUser
     has_one :job, Job
 
@@ -41,10 +37,9 @@ defmodule UserDocs.Users.Team do
   @doc false
   def changeset(team, attrs) do
     team
-    |> cast(attrs, [:name, :default_language_code_id, :aws_bucket, :aws_region, :aws_access_key_id, :aws_secret_access_key, :css])
+    |> cast(attrs, [:name, :aws_bucket, :aws_region, :aws_access_key_id, :aws_secret_access_key, :css])
     |> cast_assoc(:team_users)
     |> cast_assoc(:projects)
-    |> foreign_key_constraint(:default_language_code_id)
     |> handle_users(attrs)
     |> unique_constraint(:name)
     |> validate_required([:name])

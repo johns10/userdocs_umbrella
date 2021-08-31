@@ -5,7 +5,6 @@ defmodule UserDocs.Projects.Project do
 
   alias UserDocs.ChangesetHelpers
   alias UserDocs.Projects.Version
-  alias UserDocs.Documents.Document
 
   alias UserDocs.Users.Team
 
@@ -20,7 +19,6 @@ defmodule UserDocs.Projects.Project do
     belongs_to :team, Team
 
     has_many :versions, Version
-    has_many :documents, Document
 
     timestamps()
   end

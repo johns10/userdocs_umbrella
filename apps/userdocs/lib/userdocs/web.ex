@@ -340,12 +340,6 @@ defmodule UserDocs.Web do
     from(element in Element, where: element.id == ^id)
   end
 
-
-  def get_content!(id, params, _filters, state) do
-    UserDocs.State.get!(state, id, :content, Content)
-    |> maybe_preload_strategy(params[:content_versions], state)
-  end
-
   @doc """
   Creates a element.
 
@@ -436,8 +430,6 @@ defmodule UserDocs.Web do
     |> maybe_filter_annotation_by_page(filters[:page_id])
     |> maybe_filter_annotation_by_version_id(filters[:version_id])
     |> maybe_filter_annotation_by_team_id(filters[:team_id])
-    |> maybe_preload_content(params[:content])
-    |> maybe_preload_content_versions(params[:content_versions])
     |> maybe_preload_annotation_type(params[:annotation_type])
     |> order_by(:name)
     |> Repo.all()
@@ -460,19 +452,6 @@ defmodule UserDocs.Web do
 
     object
     |> Map.put(:annotation_type, annotation_type)
-  end
-
-  defp maybe_preload_content(query, nil), do: query
-  defp maybe_preload_content(query, _), do: from(annotations in query, preload: [:content])
-
-  defp maybe_preload_content_versions(query, nil), do: query
-  defp maybe_preload_content_versions(query, _) do
-    from(annotation in query,
-      left_join: content in UserDocs.Documents.Content, on: annotation.content_id == content.id,
-      preload: [
-        :content,
-        content: :content_versions,
-      ])
   end
 
   defp maybe_filter_annotation_by_version_id(query, nil), do: query
@@ -557,13 +536,6 @@ defmodule UserDocs.Web do
     changeset = Annotation.changeset(annotation, attrs)
     {status, annotation} = Repo.update(changeset)
     { status, annotation }
-  end
-
-  def update_annotation_content_id(%Annotation{} = annotation, %{ content_id: content_id }) do
-    annotation
-    |> Annotation.changeset(%{})
-    |> Ecto.Changeset.put_change(:content_id, content_id)
-    |> Repo.update()
   end
 
   @doc """

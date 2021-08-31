@@ -491,7 +491,6 @@ defmodule UserDocs.Users do
     |> maybe_preload_users(preloads[:users])
     |> maybe_preload_default_project(preloads[:default_project])
     |> maybe_preload_projects(preloads[:projects])
-    |> maybe_preload_content(preloads[:content])
     |> Repo.one!()
   end
 
@@ -524,11 +523,6 @@ defmodule UserDocs.Users do
   defp maybe_preload(object, nil, _, _), do: object
   defp maybe_preload(object, preloads, state, opts) do
     StateHandlers.preload(state, object, preloads, opts)
-  end
-
-  defp maybe_preload_content(query, nil), do: query
-  defp maybe_preload_content(query, _) do
-    from(teams in query, preload: [:content])
   end
 
   defp maybe_preload_users(query, nil), do: query

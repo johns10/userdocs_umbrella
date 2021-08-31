@@ -6,8 +6,6 @@ defmodule UserDocs.Web.Annotation do
 
   alias UserDocs.Web.AnnotationType
   alias UserDocs.Web.Page
-  alias UserDocs.Documents.Content
-  alias UserDocs.Documents.ContentVersion
   alias UserDocs.Web.Annotation.Name
   alias UserDocs.Web.Element
 
@@ -30,8 +28,6 @@ defmodule UserDocs.Web.Annotation do
     belongs_to :page, Page
 
     belongs_to :annotation_type, AnnotationType
-    belongs_to :content, Content, on_replace: :update
-    belongs_to :content_version, ContentVersion
 
     timestamps()
   end
@@ -42,18 +38,11 @@ defmodule UserDocs.Web.Annotation do
     |> cast(attrs, [
         :name, :label, :x_orientation, :y_orientation,
         :size, :color, :thickness, :x_offset, :y_offset,
-        :font_size, :page_id, :annotation_type_id,
-        :content_id, :content_version_id ])
-    |> cast_assoc(:content)
+        :font_size, :page_id, :annotation_type_id])
     |> foreign_key_constraint(:page_id)
     |> foreign_key_constraint(:annotation_type_id)
     |> validate_required([:page_id])
     |> ignore_missing()
-  end
-
-  def content_id_changeset(annotation, attrs) do
-    annotation
-    |> cast(attrs, [ :content_id ])
   end
 
   def ignore_missing(changeset) do
@@ -70,7 +59,6 @@ defmodule UserDocs.Web.Annotation do
   def safe(annotation = %UserDocs.Web.Annotation{}, handlers) do
     base_safe(annotation)
     |> maybe_safe_annotation_type(handlers[:annotation_type], annotation.annotation_type, handlers)
-    |> maybe_safe_content(handlers[:content], annotation.content, handlers)
   end
   def safe(nil, _), do: nil
 
@@ -92,11 +80,6 @@ defmodule UserDocs.Web.Annotation do
   def maybe_safe_annotation_type(annotation, nil, _, _), do: annotation
   def maybe_safe_annotation_type(annotation, handler, annotation_type, handlers) do
     Map.put(annotation, :annotation_type, handler.(annotation_type, handlers))
-  end
-
-  def maybe_safe_content(annotation, nil, _, _), do: annotation
-  def maybe_safe_content(annotation, handler, content, handlers) do
-    Map.put(annotation, :content, handler.(content, handlers))
   end
 
   def put_name(changeset) do

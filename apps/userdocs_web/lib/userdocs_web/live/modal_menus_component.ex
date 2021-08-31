@@ -10,19 +10,11 @@ defmodule UserDocsWeb.ModalMenus do
   alias UserDocsWeb.ProcessLive.FormComponent, as: ProcessForm
   alias UserDocsWeb.StepLive.FormComponent, as: StepForm
 
-  alias UserDocsWeb.ContentLive.FormComponent, as: ContentForm
-  alias UserDocsWeb.DocumentLive.FormComponent, as: DocumentForm
-  alias UserDocsWeb.DocumentVersionLive.FormComponent, as: DocumentVersionForm
-  alias UserDocsWeb.DocubitLive.FormComponent, as: DocubitForm
-
   alias UserDocs.Project.Messages, as: ProjectMessage
   alias UserDocs.Version.Messages, as: VersionMessage
   alias UserDocs.Process.Messages, as: ProcessMessage
   alias UserDocs.Automation.Step.Messages, as: StepMessage
-  alias UserDocs.Document.Messages, as: DocumentMessage
-  alias UserDocs.DocumentVersion.Messages, as: DocumentVersionMessage
   alias UserDocs.Docubit.Messages, as: DocubitMessage
-  alias UserDocs.Documents.Content.Messages, as: ContentMessage
   alias UserDocs.Users.User.Messages, as: UserMessage
 
   @impl true
@@ -63,54 +55,6 @@ defmodule UserDocsWeb.ModalMenus do
                   select_lists: %{
                     versions: @form_data.select_lists.versions,
                   }
-              :document ->
-                LiveHelpers.live_modal @socket, DocumentForm,
-                  id: @form_data.object.id || :new,
-                  title: @form_data.title,
-                  action: @form_data.action,
-                  document: @form_data.object,
-                  team_id: @form_data.team_id,
-                  channel: @form_data.channel,
-                  select_lists: %{
-                    projects: @form_data.select_lists.projects,
-                  }
-              :document_version ->
-                LiveHelpers.live_modal @socket, DocumentVersionForm,
-                  id: @form_data.object.id || :new,
-                  title: @form_data.title,
-                  action: @form_data.action,
-                  document_version: @form_data.object,
-                  document_id: @form_data.document_id,
-                  version_id: @form_data.version_id,
-                  channel: @form_data.channel,
-                  select_lists: %{
-                    documents: @form_data.select_lists.documents,
-                    versions: @form_data.select_lists.versions
-                  }
-                :docubit ->
-                  LiveHelpers.live_modal @socket, DocubitForm,
-                    id: @form_data.object.id || :new,
-                    title: @form_data.title,
-                    action: @form_data.action,
-                    docubit: @form_data.object,
-                    document_version_id: @form_data.document_version_id,
-                    docubit_id: @form_data.docubit_id,
-                    channel: @form_data.channel
-                :content ->
-                  LiveHelpers.live_modal @socket, ContentForm,
-                  id: @form_data.object.id || :new,
-                    title: @form_data.title,
-                    action: @form_data.action,
-                    content: @form_data.object,
-                    team_id: @form_data.team_id,
-                    version_id: @form_data.version_id,
-                    channel: @form_data.channel,
-                    select_lists: %{
-                      teams: @form_data.select_lists.teams,
-                      versions: @form_data.select_lists.versions,
-                      language_codes: @form_data.select_lists.language_codes,
-                      content: @form_data.select_lists.content
-                    }
                 :step ->
                   LiveHelpers.live_modal @socket, StepForm,
                   id: @form_data.object.id || :new,
@@ -144,8 +88,6 @@ defmodule UserDocsWeb.ModalMenus do
       parent: Map.get(message, :parent, nil),
       parent_id: Map.get(message, :parent_id, nil),
       team_id: Map.get(message, :team_id, nil),
-      document_id: Map.get(message, :document_id, nil),
-      document_version_id: Map.get(message, :document_id, nil), # TODO: Is this bug?
       docubit_id: Map.get(message, :docubit_id, nil),
       version_id: Map.get(message, :version_id, nil),
       type: message.type,
@@ -222,56 +164,12 @@ defmodule UserDocsWeb.ModalMenus do
     }
   end
 
-  def new_document(socket, params) do
-    {
-      :noreply,
-      DocumentMessage.new_modal_menu(socket, params)
-      |> call_menu(socket)
-    }
-  end
-
-  def edit_document(socket, params) do
-    {
-      :noreply,
-      DocumentMessage.edit_modal_menu(socket, params)
-      |> call_menu(socket)
-    }
-  end
-
-  def new_document_version(socket, params) do
-    {
-      :noreply,
-      DocumentVersionMessage.new_modal_menu(socket, params)
-      |> call_menu(socket)
-    }
-  end
-
-  def edit_document_version(socket, params) do
-    {
-      :noreply,
-      DocumentVersionMessage.edit_modal_menu(socket, params)
-      |> call_menu(socket)
-    }
-  end
-
   def edit_docubit(socket, params) do
     {
       :noreply,
       DocubitMessage.edit_modal_menu(socket, params)
       |> call_menu(socket)
     }
-  end
-
-  def edit_content(socket, params) do
-    socket
-    |> ContentMessage.edit_modal_menu(params)
-    |> call_menu(socket)
-  end
-
-  def new_content(socket, params) do
-    socket
-    |> ContentMessage.new_modal_menu(params)
-    |> call_menu(socket)
   end
 
   def edit_user(socket, params) do

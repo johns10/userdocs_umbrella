@@ -43,13 +43,11 @@ defmodule UserDocsWeb.StepLive.Index do
     |> UserDocsWeb.Loaders.screenshots(opts)
     |> Web.load_annotation_types(opts)
     |> Web.load_strategies(opts)
-    |> Documents.load_language_codes(opts)
     |> Automation.load_step_types(opts)
     |> Loaders.step_instances(opts)
     |> Loaders.steps(opts)
     |> Loaders.processes(opts)
     |> Loaders.pages(opts)
-    |> Loaders.content(opts)
     |> Loaders.annotations(opts)
     |> Loaders.elements(opts)
     |> Loaders.screenshots(opts)
@@ -224,14 +222,6 @@ defmodule UserDocsWeb.StepLive.Index do
   end
 
   @impl true
-  def handle_info(%{topic: _, event: _, payload: %UserDocs.Documents.Content{}} = sub_data, socket) do
-    {:noreply, socket} = Root.handle_info(sub_data, socket)
-    {
-      :noreply,
-      socket
-      |> assign(:select_lists, select_lists(socket))
-    }
-  end
   def handle_info(%{topic: _, event: _, payload: %Step{}} = sub_data, socket) do
     Logger.debug("#{__MODULE__} Received a step broadcast")
     {:noreply, socket} = Root.handle_info(sub_data, socket)
@@ -263,8 +253,6 @@ defmodule UserDocsWeb.StepLive.Index do
       UserDocs.Web.AnnotationType,
       UserDocs.Web.Strategy,
       UserDocs.Projects.Version,
-      UserDocs.Documents.Content,
-      UserDocs.Documents.LanguageCode,
       UserDocs.Automation.StepType,
       UserDocs.Automation.Process,
       UserDocs.Automation.Step,
@@ -282,7 +270,6 @@ defmodule UserDocsWeb.StepLive.Index do
   def select_lists(socket) do
     %{
       annotation_types: annotation_types_select(socket),
-      content: content_select(socket),
       processes_select: processes_select(socket),
       step_types_select: step_types_select(socket),
       pages_select: pages_select(socket),
@@ -299,12 +286,6 @@ defmodule UserDocsWeb.StepLive.Index do
     |> Helpers.select_list(:name, :false)
   end
   def annotation_types_select(_), do: []
-
-  def content_select(%{assigns: %{state_opts: state_opts}} = socket) do
-    Documents.list_content(socket, state_opts)
-    |> Helpers.select_list(:name, :true)
-  end
-  def content_select(_), do: []
 
   def processes_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Automation.list_processes(socket, state_opts)
@@ -356,7 +337,6 @@ defmodule UserDocsWeb.StepLive.Index do
         :process,
         :step_instances,
         [annotation: :annotation_type],
-        [annotation: :content],
         [element: :strategy],
      ]
 
@@ -386,9 +366,7 @@ defmodule UserDocsWeb.StepLive.Index do
           y_offset: a.y_offset,
           font_size: a.font_size,
           page_id: a.page_id,
-          annotation_type_id: a.annotation_type_id,
-          content_id: a.content_id,
-          content_version_id: a.content_version_id
+          annotation_type_id: a.annotation_type_id
        }
       else
         %Web.AnnotationForm{}
@@ -430,7 +408,6 @@ defmodule UserDocsWeb.StepLive.Index do
         :annotation,
         :element,
         :step_instances,
-        [annotation: :content],
         [annotation: :annotation_type],
         [element: :strategy],
      ]

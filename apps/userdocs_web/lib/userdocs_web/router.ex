@@ -133,25 +133,6 @@ defmodule UserDocsWeb.Router do
     live "/steps/:id/edit", StepLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/steps/:id/screenshot", StepLive.Index, :screenshot_workflow, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
-    live "/content", ContentLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/teams/:team_id/content", ContentLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/content/new", ContentLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/teams/:team_id/content/new", ContentLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/content/:id/edit", ContentLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/teams/:team_id/content/:id/edit", ContentLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/content/:id", ContentLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/teams/:team_id/content/:id", ContentLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-
-    live "/projects/:project_id/documents", DocumentLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/documents/new", DocumentLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/documents", DocumentLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/documents/:id/edit", DocumentLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/documents/:id/editor", DocumentLive.Editor, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/documents/:id/viewer", DocumentLive.Viewer, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    get "/document_versions/:id/download", DocumentVersionDownloadController, :show
-
-    live "/content/:id/show/edit", ContentLive.Show, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-
     post "/registration/send-confirmation-email", RegistrationController, :resend_confirmation_email
   end
 

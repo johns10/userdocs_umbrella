@@ -4,7 +4,6 @@ defmodule UserDocs.Automation.Step.Changeset do
   require Logger
 
   alias UserDocs.Documents
-  alias UserDocs.Documents.Content
   alias UserDocs.Web
   alias UserDocs.Web.Annotation
   alias UserDocs.Web.Element
@@ -41,7 +40,7 @@ defmodule UserDocs.Automation.Step.Changeset do
 
   def handle_annotation_id_change(%{changes: %{annotation_id: annotation_id}} = changeset, state) do
     Logger.debug("Annotation id changed to #{annotation_id}")
-    opts = Keyword.put(state.assigns.state_opts, :preloads, [:content, :annotation_type ])
+    opts = Keyword.put(state.assigns.state_opts, :preloads, [:annotation_type ])
     annotation = Web.get_annotation!(annotation_id, state, opts)
 
     Map.put(changeset.data, :annotation, annotation)
@@ -59,7 +58,7 @@ defmodule UserDocs.Automation.Step.Changeset do
   end
   def maybe_replace_annotation_params(changeset, %{changes: %{annotation_id: annotation_id}}, state) do
     Logger.debug("Replacing Annotation #{annotation_id} Params")
-    opts = Keyword.put(state.assigns.state_opts, :preloads, [:content, :annotation_type ])
+    opts = Keyword.put(state.assigns.state_opts, :preloads, [:annotation_type ])
     annotation = Web.get_annotation!(annotation_id, state, opts)
     annotation_params = replace_params_with_fields(changeset.params["annotation"], annotation, Annotation)
     params =
@@ -103,37 +102,6 @@ defmodule UserDocs.Automation.Step.Changeset do
   end
   def maybe_replace_element_params(changeset, _last_changeset, _state), do: changeset
 
-  def handle_content_id_change(%{changes: %{annotation: %{changes: %{content_id: nil}}}} = changeset, _state), do: changeset
-  def handle_content_id_change(
-    %{changes: %{annotation: %{changes: %{content_id: content_id}}}} = changeset, state
-  ) do
-    Logger.debug("Content id changed to #{content_id}")
-    content = Documents.get_content!(content_id, state, state.assigns.state_opts)
-    step = changeset.data
-    annotation = Map.put(step.annotation, :content, content)
-    Map.put(step, :annotation, annotation)
-    |> cast(changeset.params, [])
-  end
-  def handle_content_id_change(changeset, _state) do
-    changeset
-  end
-
-  def maybe_replace_content_params(changeset, %{changes: %{annotation: %{changes: %{content_id: nil}}}}, _state), do: changeset
-  def maybe_replace_content_params(
-    changeset, %{changes: %{annotation: %{changes: %{content_id: content_id}}}}, state
-  ) do
-    content = Documents.get_content!(content_id, state, state.assigns.state_opts)
-    annotation_params = changeset |> Map.get(:params) |> Map.get("annotation")
-    content_params = annotation_params |> Map.get("content") |> replace_params_with_fields(content, Content)
-    params =
-      changeset.params
-      |> Kernel.put_in(["annotation", "content" ], content_params)
-      |> Kernel.put_in(["annotation", "content_id" ], Integer.to_string(content_id))
-
-    Map.put(changeset, :params, params)
-  end
-  def maybe_replace_content_params(changeset, _last_changeset, _state), do: changeset
-
   def update_foreign_keys(changeset, action) do
     _log_string = """
       Updating Foreign Keys.
@@ -141,7 +109,6 @@ defmodule UserDocs.Automation.Step.Changeset do
       Element ID: #{changeset.data.element_id}, param: #{changeset.params["element_id"]}
       Page ID: #{changeset.data.page_id}, param: #{changeset.params["page_id"]}
     """
-    #Content ID: #{changeset.data |> Map.get(:annotation, %{content_id: nil}) |> Map.get(:content_id, nil)}, param: #{changeset.params |> Map.get("annotation", %{"content_id" => nil}) |> Map.get("content_id", nil)}
 
     case action do
       :validate ->

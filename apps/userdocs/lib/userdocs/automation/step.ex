@@ -56,46 +56,6 @@ defmodule UserDocs.Automation.Step do
     |> cast_assoc(:last_step_instance, with: &UserDocs.StepInstances.StepInstance.changeset/2)
   end
 
-  """
-  def nested_changeset(step, last_step, attrs, state, action) do
-    last_change = changeset(last_step, attrs)
-    step
-  # |> change page
-    |> cast(attrs, [:page_id])
-    |> foreign_key_constraint(:page)
-    |> Changeset.handle_page_id_change(state)
-    |> Changeset.maybe_replace_page_params(last_change, state)
-  # |> change annotation
-    |> Changeset.cast_changeset_params([:annotation_id])
-    |> foreign_key_constraint(:annotation)
-    |> Changeset.handle_annotation_id_change(state)
-    |> Changeset.maybe_replace_annotation_params(last_change, state)
-  # |> change element
-    |> Changeset.cast_changeset_params([:element_id])
-    |> foreign_key_constraint(:element)
-    |> Changeset.handle_element_id_change(state)
-    |> Changeset.maybe_replace_element_params(last_change, state)
-  # |> update step fk's
-    |> Changeset.cast_changeset_params([:page_id, :annotation_id, :element_id])
-    |> Changeset.update_foreign_keys(action)
-  # |> change content
-    |> cast_assoc(:annotation, with: &Annotation.content_id_changeset/2)
-    |> Changeset.handle_content_id_change(state)
-    |> Changeset.maybe_replace_content_params(last_change, state)
-  # |> update annotation fk's
-    |> cast_assoc(:annotation, with: &Annotation.content_id_changeset/2)
-    |> Changeset.update_foreign_keys(action)
-    |> cast_assoc(:screenshot)
-  # |> final changes
-    |> Changeset.cast_changeset_params([:process_id, :step_type_id])
-    |> Changeset.cast_changeset_params([:name, :order, :url, :text, :width, :height, :page_reference])
-    |> foreign_key_constraint(:process)
-    |> foreign_key_constraint(:step_type)
-    |> assoc_changeset()
-    |> names_changeset()
-    |> validate_required([:order])
-  end
-  """
   def create_nested_changeset(step, attrs) do
     IO.puts("create_nested_changeset")
     step

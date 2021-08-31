@@ -37,7 +37,6 @@ defmodule UserDocs.Automation do
       left_join: screenshot in assoc(steps, :screenshot), order_by: screenshot.name,
       left_join: annotation in assoc(steps, :annotation), order_by: annotation.name,
       left_join: element in assoc(steps, :element), order_by: element.name,
-      left_join: content in assoc(annotation, :content), order_by: content.name,
       preload: [
         :pages,
         pages: :elements,
@@ -52,8 +51,6 @@ defmodule UserDocs.Automation do
         processes: {processes, steps: {steps, :page}},
         processes: {processes, steps: {steps, element: {element, :strategy}}},
         processes: {processes, steps: {steps, annotation: {annotation, :annotation_type}}},
-        processes: {processes, steps: {steps, annotation: {annotation, :content}}},
-        processes: {processes, steps: {steps, annotation: {annotation, content: {content, :content_versions}}}}
       ]
   end
 
@@ -232,7 +229,6 @@ defmodule UserDocs.Automation do
     |> maybe_preload_screenshot(params[:screenshot])
     |> maybe_preload_step_type(params[:step_type])
     |> maybe_preload_element(params[:element])
-    |> maybe_preload_content_versions(params[:content_versions])
     |> Repo.all()
   end
   def list_steps(state, opts) when is_list(opts) do
@@ -277,18 +273,6 @@ defmodule UserDocs.Automation do
       where: project.team_id == ^team_id,
       order_by: step.order
     )
-  end
-
-  defp maybe_preload_content_versions(query, nil), do: query
-  defp maybe_preload_content_versions(query, _) do
-    from(step in query,
-      left_join: annotation in assoc(step, :annotation), order_by: annotation.name,
-      left_join: content in assoc(annotation, :content), order_by: content.name,
-      preload: [
-        :annotation,
-        annotation: :content,
-        annotation: {annotation, content: {content, :content_versions}}
-      ])
   end
 
   defp maybe_preload_step_type(query, nil), do: query

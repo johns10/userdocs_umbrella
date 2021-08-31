@@ -2,8 +2,6 @@ defmodule UserDocs.Web.AnnotationForm do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias UserDocs.Documents.Content
-
   schema "annotation_form" do
     field :name_enabled, :string
     field :name, :string
@@ -30,11 +28,6 @@ defmodule UserDocs.Web.AnnotationForm do
 
     field :annotation_type_id, :integer
     field :page_id, :integer
-
-    field :content_id, :integer
-    field :content_version_id, :integer
-
-    embeds_one :content, Content, on_replace: :update
   end
 
   def changeset(annotation, attrs) do
@@ -42,8 +35,7 @@ defmodule UserDocs.Web.AnnotationForm do
     |> cast(attrs, [
         :name, :label, :x_orientation, :y_orientation,
         :size, :color, :thickness, :x_offset, :y_offset,
-        :font_size, :page_id, :annotation_type_id,
-        :content_id, :content_version_id ])
+        :font_size, :page_id, :annotation_type_id])
     |> validate_required([:page_id])
   end
 

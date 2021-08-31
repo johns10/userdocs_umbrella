@@ -33,10 +33,7 @@ defmodule UserDocsWeb.ProcessLive.Show do
     [
       UserDocs.Web.AnnotationType,
       UserDocs.Web.Strategy,
-      UserDocs.Documents.LanguageCode,
       UserDocs.Automation.StepType,
-      UserDocs.Documents.Content,
-      UserDocs.Documents.ContentVersion,
       UserDocs.Automation.Process,
       UserDocs.Automation.Step,
       UserDocs.Web.Annotation,
@@ -63,7 +60,6 @@ defmodule UserDocsWeb.ProcessLive.Show do
     |> assign(:state_opts, opts)
     |> Web.load_annotation_types(opts)
     |> Web.load_strategies(opts)
-    |> Documents.load_language_codes(opts)
     |> Automation.load_step_types(opts)
 
   end
@@ -81,8 +77,6 @@ defmodule UserDocsWeb.ProcessLive.Show do
       |> assign(:version, Projects.get_version!(version_id))
       |> assign(:page_title, page_title(socket.assigns.live_action))
       |> assign(:process, process)
-      |> Loaders.content(opts)
-      |> Loaders.content_versions(opts)
       |> assign_strategy_id()
       |> Loaders.processes(opts)
       |> Loaders.steps(opts)
@@ -129,8 +123,7 @@ defmodule UserDocsWeb.ProcessLive.Show do
       step_types_select: step_types_select(socket),
       pages_select: pages_select(socket),
       strategies: strategies_select(socket),
-      annotation_types: annotation_types_select(socket),
-      content: content_select(socket)
+      annotation_types: annotation_types_select(socket)
     }
   end
 
@@ -170,11 +163,6 @@ defmodule UserDocsWeb.ProcessLive.Show do
   end
   def annotation_types_select(_), do: []
 
-  def content_select(%{assigns: %{state_opts: state_opts}} = socket) do
-    Documents.list_content(socket, state_opts)
-    |> Helpers.select_list(:name, :false)
-  end
-  def content_select(_), do: []
 
   def annotations_select(%{assigns: %{state_opts: state_opts}} = socket, step) do
     opts = Keyword.put(state_opts, :filter, {:page_id, step.page_id} )

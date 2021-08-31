@@ -10,7 +10,6 @@
     team: @team,
     state_opts: @state_opts,
     projects_select_options: @projects_select_options,
-    language_codes_select_options: @language_codes_select_options,
     data: %{ users: @data.users },
     return_to: Routes.team_index_path(@socket, :index)
 

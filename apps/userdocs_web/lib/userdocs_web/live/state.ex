@@ -61,9 +61,6 @@ defmodule UserDocsWeb.State do
     |> Map.put(:available_step_types, step_types())
     |> Map.put(:available_processes, processes(version_id))
     |> Map.put(:available_elements, elements(team_id))
-    |> Map.put(:available_content, content(team_id))
-    |> Map.put(:available_content_versions, content_versions(team_id))
-    |> Map.put(:language_codes, language_codes())
     |> Map.put(:strategies, strategies())
   end
 
@@ -71,12 +68,6 @@ defmodule UserDocsWeb.State do
     state
     |> Map.put(:teams, teams(user_id))
     |> Map.put(:team_users, team_users(user_id))
-  end
-
-  def initialize_team(state, team_id) do
-    state
-    |> Map.put(:content, content(team_id))
-    |> Map.put(:content_versions, content_versions(team_id))
   end
 
   def initialize_version(state, version_id) do
@@ -121,18 +112,6 @@ defmodule UserDocsWeb.State do
     Web.list_annotation_types()
   end
 
-  def content(team_id) do
-    Documents.list_content(%{content_versions: true}, %{team_id: team_id})
-  end
-
-  def content_versions(team_id) do
-    Documents.list_content_versions(%{language_code: true}, %{team_id: team_id})
-  end
-
-  def language_codes() do
-    Documents.list_language_codes()
-  end
-
   @spec strategies :: any
   def strategies do
     Web.list_strategies()
@@ -149,7 +128,6 @@ defmodule UserDocsWeb.State do
   def plural("element"), do: "elements"
   def plural("step"), do: "steps"
   def plural("annotation"), do: "annotations"
-  def plural("content_version"), do: "content_versions"
   def plural(item) do
     raise(ArgumentError, "Plural not implemented for #{item}")
   end

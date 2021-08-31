@@ -83,38 +83,6 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
           div.control
             = text_input form, :thickness, class: "input", type: "text"
 
-    div.field.is-horizontal
-      div.field-label.is-normal
-        = label form, :content_id, class: "label"
-      div.field-body
-        div.field.has-addons
-          div.control
-            = content_tag :div,
-              [ value: form.data.content_id,
-              button_class: "div",
-              class: "button",
-              phx_click: "new-content",
-              phx_target: @myself.cid,
-              phx_value_annotation_id: form.data.id ] do
-
-              i.fa.fa-plus
-
-          = Layout.select_input(form, :content_id, @select_lists.content,
-            [ value: form.data.content_id,
-            id: prefix <> "content-select",
-            label: false ])
-
-    = error_tag(form, :content)
-
-    div.pl-2
-      = inputs_for form, :content, fn fc ->
-        div.field.is-grouped
-          = hidden_input(fc, :team_id, value: @current_team.id)
-          div.control.is-expanded
-            = Layout.text_input(fc, :name, [ ])
-          div.control
-            = Layout.text_input(fc, :title, [ ])
-
     """
   end
 
