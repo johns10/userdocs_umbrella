@@ -17,7 +17,7 @@ defmodule UserDocs.Automation do
 
 
   @behaviour Bodyguard.Policy
-  def authorize(:get_step!, %{team_users: team_users} = current_user, %{process: %{version: %{project: %{team: %{id: team_id}}}}} = _step) do
+  def authorize(:get_step!, %{team_users: team_users} = current_user, %{process: %{project: %{team: %{id: team_id}}}} = _step) do
     if team_id in Enum.map(team_users, fn(tu) -> tu.team_id end) do
       :ok
     else
@@ -25,55 +25,6 @@ defmodule UserDocs.Automation do
     end
   end
   def authorize(:get_user!, _current_user, _user), do: :error
-
-  def details(version_id) do
-    Repo.one from version in Projects.Version,
-      where: version.id == ^version_id,
-      left_join: pages in assoc(version, :pages), order_by: pages.order,
-      left_join: elements in assoc(pages, :elements), order_by: elements.name,
-      left_join: processes in assoc(version, :processes), order_by: processes.order,
-      left_join: annotations in assoc(pages, :annotations), order_by: annotations.name,
-      left_join: steps in assoc(processes, :steps), order_by: steps.order,
-      left_join: screenshot in assoc(steps, :screenshot), order_by: screenshot.name,
-      left_join: annotation in assoc(steps, :annotation), order_by: annotation.name,
-      left_join: element in assoc(steps, :element), order_by: element.name,
-      preload: [
-        :pages,
-        pages: :elements,
-        pages: {pages, elements: {elements, :strategy}},
-        pages: :annotations,
-        pages: {pages, annotations: {annotations, :annotation_type}},
-        processes: {processes, :steps},
-        processes: {processes, steps: {steps, :step_type}},
-        processes: {processes, steps: {steps, :element}},
-        processes: {processes, steps: {steps, :annotation}},
-        processes: {processes, steps: {steps, :screenshot}},
-        processes: {processes, steps: {steps, :page}},
-        processes: {processes, steps: {steps, element: {element, :strategy}}},
-        processes: {processes, steps: {steps, annotation: {annotation, :annotation_type}}},
-      ]
-  end
-
-  def project_details(user_id) do
-    Repo.one from user in User,
-      where: user.id == ^user_id,
-      left_join: teams in assoc(user, :teams),
-      left_join: projects in assoc(teams, :projects),
-      preload: [
-        :teams,
-        teams: :projects,
-        teams: {teams, projects: {projects, :versions}}
-      ]
-  end
-  def project_details(user, state, opts) do
-    preloads = [
-      user: :teams,
-      user: {:teams, :projects},
-      user: {:teams, {:projects, {:projects, :versions}}}
-    ]
-    state
-    |> StateHandlers.preload(user, preloads, opts)
-  end
 
   alias UserDocs.Automation.StepType
 
@@ -221,8 +172,8 @@ defmodule UserDocs.Automation do
   def list_steps(params, filters) when is_map(params) and is_map(filters) do
     base_steps_query()
     |> maybe_filter_by_process(filters[:process_id])
-    |> maybe_filter_steps_by_version(filters[:version_id])
     |> maybe_filter_by_team(filters[:team_id])
+    |> maybe_filter_by_project(filters[:project_id])
     |> maybe_preload_step_process(params[:processes])
     |> maybe_preload_annotation(params[:annotation])
     |> maybe_preload_annotation_type(params[:annotation_type])
@@ -244,15 +195,6 @@ defmodule UserDocs.Automation do
     )
   end
 
-  defp maybe_filter_steps_by_version(query, nil), do: query
-  defp maybe_filter_steps_by_version(query, version_id) do
-    from(step in query,
-      left_join: process in assoc(step, :process),
-      where: process.version_id == ^version_id,
-      order_by: step.order
-    )
-  end
-
   defp maybe_preload_annotation_type(query, nil), do: query
   defp maybe_preload_annotation_type(query, _) do
     from(step in query,
@@ -268,9 +210,17 @@ defmodule UserDocs.Automation do
   defp maybe_filter_by_team(query, team_id) do
     from(step in query,
       left_join: process in assoc(step, :process),
-      left_join: version in assoc(process, :version),
-      left_join: project in assoc(version, :project),
+      left_join: project in assoc(process, :project),
       where: project.team_id == ^team_id,
+      order_by: step.order
+    )
+  end
+
+  defp maybe_filter_by_project(query, nil), do: query
+  defp maybe_filter_by_project(query, project_id) do
+    from(step in query,
+      left_join: process in assoc(step, :process),
+      where: process.project_id == ^project_id,
       order_by: step.order
     )
   end
@@ -314,7 +264,7 @@ defmodule UserDocs.Automation do
         :annotation,
         :element,
         :step_type,
-        [process: [version: [project: :team]]],
+        [process: [project: :team]],
         :screenshot,
         annotation: {annotation, :annotation_type},
         element: {element, :strategy},
@@ -530,7 +480,6 @@ defmodule UserDocs.Automation do
   end
   def list_processes(params, filters) when is_map(params) and is_map(filters) do
     base_processes_query()
-    |> maybe_filter_by_version(filters[:version_id])
     |> maybe_filter_processes_by_user_id(filters[:user_id])
     |> maybe_filter_processes_by_team_id(filters[:team_id])
     |> Repo.all()
@@ -543,18 +492,10 @@ defmodule UserDocs.Automation do
     StateHandlers.preload(state, process, opts)
   end
 
-  defp maybe_filter_by_version(query, nil), do: query
-  defp maybe_filter_by_version(query, version_id) do
-    from(process in query,
-      where: process.version_id == ^version_id
-    )
-  end
-
   defp maybe_filter_processes_by_user_id(query, nil), do: query
   defp maybe_filter_processes_by_user_id(query, user_id) do
     from(process in query,
-      left_join: version in assoc(process, :version),
-      left_join: project in assoc(version, :project),
+      left_join: project in assoc(process, :project),
       left_join: team in assoc(project, :team),
       left_join: user in assoc(team, :users),
       where: user.id == ^user_id
@@ -564,8 +505,7 @@ defmodule UserDocs.Automation do
   defp maybe_filter_processes_by_team_id(query, nil), do: query
   defp maybe_filter_processes_by_team_id(query, team_id) do
     from(process in query,
-      left_join: version in assoc(process, :version),
-      left_join: project in assoc(version, :project),
+    left_join: project in assoc(process, :project),
       left_join: team in assoc(project, :team),
       where: team.id == ^team_id
     )
@@ -615,7 +555,6 @@ defmodule UserDocs.Automation do
   def get_process!(id, params) do
     base_process_query(id)
     |> maybe_preload_pages(params[:pages])
-    |> maybe_preload_versions(params[:versions])
     |> Repo.one!()
   end
   def get_process!(id, state, opts) when is_list(opts) do
@@ -630,9 +569,6 @@ defmodule UserDocs.Automation do
 #TODO Remove
   defp maybe_preload_pages(query, nil), do: query
   defp maybe_preload_pages(query, _), do: from(processes in query, preload: [:pages])
-#TODO Remove
-  defp maybe_preload_versions(query, nil), do: query
-  defp maybe_preload_versions(query, _), do: from(processes in query, preload: [:versions])
 
 
   @doc """

@@ -6,7 +6,6 @@ defmodule UserDocsWeb.API.Schema do
   import_types UserDocsWeb.API.Schema.StepType
   import_types UserDocsWeb.API.Schema.Element
   import_types UserDocsWeb.API.Schema.Screenshot
-  import_types UserDocsWeb.API.Schema.Version
   import_types UserDocsWeb.API.Schema.Process
   import_types UserDocsWeb.API.Schema.Strategy
   import_types UserDocsWeb.API.Schema.AnnotationType

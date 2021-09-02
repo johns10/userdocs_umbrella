@@ -7,7 +7,7 @@ defmodule UserDocs.StepInstances do
   alias UserDocs.StepInstances.StepInstance
 
   @behaviour Bodyguard.Policy
-  def authorize(:create_step_instance!, %{team_users: team_users} = _current_user, %{process: %{version: %{project: %{team: %{id: team_id}}}}} = _step) do
+  def authorize(:create_step_instance!, %{team_users: team_users} = _current_user, %{process: %{project: %{team: %{id: team_id}}}} = _step) do
     if team_id in Enum.map(team_users, fn(tu) -> tu.team_id end) do
       :ok
     else
@@ -20,26 +20,26 @@ defmodule UserDocs.StepInstances do
     StateHandlers.load(state, list_step_instances(opts[:params]), StepInstance, opts)
   end
 
-  def load_version_step_instances(state, opts) do
-    version_id = opts[:filters].version_id
-    StateHandlers.load(state, list_version_step_instances(version_id), StepInstance, opts)
+  def load_project_step_instances(state, opts) do
+    project_id = opts[:filters].project_id
+    StateHandlers.load(state, list_project_step_instances(project_id), StepInstance, opts)
   end
 
   def list_step_instances(params \\ %{}) do
     filters = Map.get(params, :filters, [])
     base_step_instances_query()
-    |> maybe_filter_step_instances_by_version_id(filters[:process_id])
+    |> maybe_filter_step_instances_by_project_id(filters[:project_id])
     |> Repo.all()
   end
 
 
-  alias UserDocs.Projects.Version
-  def list_version_step_instances(version_id) do
-    from(p in Version, as: :version)
-    |> join(:left, [version: v], p in assoc(v, :processes), as: :processes)
+  alias UserDocs.Projects.Project
+  def list_project_step_instances(project_id) do
+    from(p in Project, as: :project)
+    |> join(:left, [project: project], p in assoc(project, :processes), as: :processes)
     |> join(:left, [processes: p], s in assoc(p, :steps), as: :steps)
     |> join(:inner_lateral, [steps: s], si in subquery(five_step_instances_subquery()), as: :step_instances)
-    |> where([version: v], v.id == ^version_id)
+    |> where([project: project], project.id == ^project_id)
     |> select([step_instances: si], %StepInstance{
         id: si.id, order: si.order, status: si.status, name: si.name, type: si.type,
         errors: si.errors, warnings: si.warnings, step_id: si.step_id, process_instance_id: si.process_instance_id
@@ -51,12 +51,12 @@ defmodule UserDocs.StepInstances do
     from si in StepInstance, where: parent_as(:steps).id == si.step_id, limit: 5, order_by: [desc: si.id]
   end
 
-  def maybe_filter_step_instances_by_version_id(query, nil), do: query
-  def maybe_filter_step_instances_by_version_id(query, version_id) do
+  def maybe_filter_step_instances_by_project_id(query, nil), do: query
+  def maybe_filter_step_instances_by_project_id(query, project_id) do
     from(step_instance in query,
       left_join: step in assoc(step_instance, :step),
       left_join: process in assoc(step, :process),
-      where: process.version_id == ^version_id
+      where: process.project_id == ^project_id
     )
   end
 
@@ -78,8 +78,7 @@ defmodule UserDocs.StepInstances do
     |> join(:left, [step: s], st in assoc(s, :step_type), as: :step_type)
     |> join(:left, [step: s], a in assoc(s, :annotation), as: :annotation)
     |> join(:left, [step: s], p in assoc(s, :page), as: :page)
-    |> join(:left, [page: p], v in assoc(p, :version), as: :version)
-    |> join(:left, [version: v], p in assoc(v, :project), as: :project)
+    |> join(:left, [page: p], project in assoc(p, :project), as: :project)
     |> join(:left, [step: s], e in assoc(s, :element), as: :element)
     |> join(:left, [step: s], s in assoc(s, :screenshot), as: :screenshot)
     |> join(:left, [step: s], pr in assoc(s, :process), as: :process)
@@ -95,7 +94,6 @@ defmodule UserDocs.StepInstances do
         annotation: annotation,
         annotation_type: annotation_type,
         page: page,
-        version: version,
         project: project,
         process: process,
         screenshot: screenshot
@@ -105,7 +103,7 @@ defmodule UserDocs.StepInstances do
           step_type: step_type,
           element: {element, strategy: strategy},
           annotation: {annotation, annotation_type: annotation_type},
-          page: {page, version: {version, project: project}},
+          page: {page, project: project},
           process: process,
           screenshot: screenshot
         ]}

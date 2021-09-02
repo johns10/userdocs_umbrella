@@ -17,8 +17,6 @@ defmodule UserDocsWeb.TeamLiveTest do
     {:ok, project} = UserDocs.Projects.create_project(attrs)
     %{project: project}
   end
-  defp create_version(%{project: project, strategy: strategy}), do: %{version: ProjectsFixtures.version(project.id, strategy.id)}
-
   defp create_password(_), do: %{password: UUID.uuid4()}
   defp grevious_workaround(%{conn: conn, user: user, password: password}) do
     conn = post(conn, "session", %{user: %{email: user.email, password: password}})
@@ -26,11 +24,10 @@ defmodule UserDocsWeb.TeamLiveTest do
     %{authed_conn: conn}
   end
 
-  defp make_selections(%{user: user, team: team, project: project, version: version}) do
+  defp make_selections(%{user: user, team: team, project: project}) do
     {:ok, user} = UserDocs.Users.update_user_selections(user, %{
       selected_team_id: team.id,
-      selected_project_id: project.id,
-      selected_version_id: version.id
+      selected_project_id: project.id
     })
     %{user: user}
   end
@@ -43,7 +40,6 @@ defmodule UserDocsWeb.TeamLiveTest do
       :create_strategy,
       :create_team_user,
       :create_project,
-      :create_version,
       :grevious_workaround,
       :make_selections
     ]
@@ -125,12 +121,12 @@ defmodule UserDocsWeb.TeamLiveTest do
       refute has_element?(index_live, "#team-" <> to_string(team.id))
     end
 
-    test "index handles standard events", %{authed_conn: conn, version: version} do
+    test "index handles standard events", %{authed_conn: conn, project: project} do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert live
-             |> element("#version-picker-" <> to_string(version.id))
-             |> render_click() =~ version.name
+             |> element("#project-picker-" <> to_string(project.id))
+             |> render_click() =~ project.name
     end
 
   end
@@ -143,7 +139,6 @@ defmodule UserDocsWeb.TeamLiveTest do
       :create_strategy,
       :create_team_user,
       :create_project,
-      :create_version,
       :make_selections,
       :grevious_workaround
     ]
@@ -184,12 +179,12 @@ defmodule UserDocsWeb.TeamLiveTest do
     end
 """
 
-    test "show handles standard events", %{authed_conn: conn, version: version} do
+    test "show handles standard events", %{authed_conn: conn, project: project} do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert live
-             |> element("#version-picker-" <> to_string(version.id))
-             |> render_click() =~ version.name
+             |> element("#project-picker-" <> to_string(project.id))
+             |> render_click() =~ project.name
     end
   end
 end

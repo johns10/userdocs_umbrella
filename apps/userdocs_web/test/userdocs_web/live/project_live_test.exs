@@ -15,24 +15,17 @@ defmodule UserDocsWeb.ProjectLiveTest do
   defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
   defp create_project(%{team: team}), do: %{project: ProjectsFixtures.project(team.id)}
   defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
-  defp create_version(%{project: project, strategy: strategy}), do: %{version: ProjectsFixtures.version(project.id, strategy.id)}
   defp grevious_workaround(%{conn: conn, user: user, password: password}) do
     conn = post(conn, "session", %{user: %{email: user.email, password: password}})
     :timer.sleep(100)
     %{authed_conn: conn}
   end
-  defp make_selections(%{user: user, team: team, project: project, version: version}) do
+  defp make_selections(%{user: user, team: team, project: project}) do
     {:ok, user} = UserDocs.Users.update_user_selections(user, %{
       selected_team_id: team.id,
-      selected_project_id: project.id,
-      selected_version_id: version.id
+      selected_project_id: project.id
     })
     %{user: user}
-  end
-
-  defp set_default_version(%{project: project, version: version}) do
-    {:ok, project} = Projects.update_project(project, %{default_version_id: version.id})
-    %{project: project}
   end
 
   describe "Index" do
@@ -43,7 +36,6 @@ defmodule UserDocsWeb.ProjectLiveTest do
       :create_strategy,
       :create_team_user,
       :create_project,
-      :create_version,
       :grevious_workaround,
       :make_selections
     ]
@@ -109,12 +101,12 @@ defmodule UserDocsWeb.ProjectLiveTest do
       refute has_element?(index_live, "#project-" <> to_string(project.id))
     end
 
-    test "index handles standard events", %{authed_conn: conn, version: version} do
+    test "index handles standard events", %{authed_conn: conn, project: project} do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert live
-             |> element("#version-picker-" <> to_string(version.id))
-             |> render_click() =~ version.name
+             |> element("#project-picker-" <> to_string(project.id))
+             |> render_click() =~ project.name
     end
   end
   describe "Show" do
@@ -125,10 +117,8 @@ defmodule UserDocsWeb.ProjectLiveTest do
       :create_strategy,
       :create_team_user,
       :create_project,
-      :create_version,
       :make_selections,
-      :grevious_workaround,
-      :set_default_version
+      :grevious_workaround
     ]
 
     test "displays project", %{authed_conn: conn, project: project} do
@@ -138,12 +128,12 @@ defmodule UserDocsWeb.ProjectLiveTest do
       assert html =~ project.name
     end
 
-    test "index handles standard events", %{authed_conn: conn, version: version} do
+    test "index handles standard events", %{authed_conn: conn, project: project} do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert live
-             |> element("#version-picker-" <> to_string(version.id))
-             |> render_click() =~ version.name
+             |> element("#project-picker-" <> to_string(project.id))
+             |> render_click() =~ project.name
     end
   end
 end

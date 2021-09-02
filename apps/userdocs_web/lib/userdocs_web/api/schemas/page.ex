@@ -8,6 +8,6 @@ defmodule UserDocsWeb.API.Schema.Page do
     field :order, :integer
     field :name, :string
     field :url, :string
-    field :version, :version, resolve: &Resolvers.Version.get_version!/3
+    field :project, :project, resolve: &Resolvers.Project.get_project!/3
   end
 end

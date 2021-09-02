@@ -14,9 +14,8 @@ defmodule UserDocs.Screenshot do
 
 
   defp fixture(:project, team_id), do: ProjectsFixtures.project(team_id)
-  defp fixture(:version, project_id), do: ProjectsFixtures.version(project_id)
-  defp fixture(:process, version_id), do: AutomationFixtures.process(version_id)
-  defp fixture(:page, version_id), do: WebFixtures.page(version_id)
+  defp fixture(:process, project_id), do: AutomationFixtures.process(project_id)
+  defp fixture(:page, project_id), do: WebFixtures.page(project_id)
   defp fixture(:annotation, page_id), do: WebFixtures.annotation(page_id)
 
   defp fixture(:team_user, user_id, team_id), do: UsersFixtures.team_user(user_id, team_id)
@@ -31,9 +30,8 @@ defmodule UserDocs.Screenshot do
   defp create_team(_), do: %{team: fixture(:team)}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: fixture(:team_user, user.id, team.id)}
   defp create_project(%{team: team}), do: %{project: fixture(:project, team.id)}
-  defp create_version(%{project: project}), do: %{version: fixture(:version, project.id)}
-  defp create_process(%{version: version}), do: %{process: fixture(:process, version.id)}
-  defp create_page(%{version: version}), do: %{page: fixture(:page, version.id)}
+  defp create_process(%{project: project}), do: %{process: fixture(:process, project.id)}
+  defp create_page(%{project: project}), do: %{page: fixture(:page, project.id)}
   defp create_strategy(_), do: %{strategy: fixture(:strategy)}
   defp create_element(%{page: page, strategy: strategy}), do: %{element: fixture(:element, page.id, strategy.id)}
   defp create_annotation(%{page: page}), do: %{annotation: fixture(:annotation, page.id)}
@@ -62,7 +60,6 @@ defmodule UserDocs.Screenshot do
       :create_team,
       :create_team_user,
       :create_project,
-      :create_version,
       :create_process,
       :create_page,
       :create_strategy,

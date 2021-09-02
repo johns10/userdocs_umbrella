@@ -18,7 +18,7 @@ defmodule UserDocs.Users.Session do
   def changeset(user, attrs) do
     user
     |> pow_changeset(attrs)
-    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id])
+    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id])
   end
 
 end

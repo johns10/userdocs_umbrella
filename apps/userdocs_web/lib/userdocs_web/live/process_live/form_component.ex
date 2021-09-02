@@ -14,7 +14,6 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
       socket
       |> assign(assigns)
       |> assign(:changeset, changeset)
-      |> assign(:version_field_id, ID.form_field(process, :version_id))
       |> assign(:order_field_id, ID.form_field(process, :order))
       |> assign(:name_field_id, ID.form_field(process, :name))
     }
@@ -23,8 +22,8 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     process = Automation.get_process!(String.to_integer(id))
-    {:ok, deleted_process } = Automation.delete_process(process)
-    send(self(), { :broadcast, "delete", deleted_process })
+    {:ok, deleted_process} = Automation.delete_process(process)
+    send(self(), {:broadcast, "delete", deleted_process})
     {:noreply, socket}
   end
   def handle_event("validate", %{"process" => process_params}, socket) do
@@ -46,7 +45,7 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
   defp save_process(socket, :edit, process_params) do
     case Automation.update_process(socket.assigns.process, process_params) do
       {:ok, process} ->
-        send(self(), { :broadcast, "update", process })
+        send(self(), {:broadcast, "update", process})
         {
           :noreply,
           socket
@@ -62,7 +61,7 @@ defmodule UserDocsWeb.ProcessLive.FormComponent do
   defp save_process(socket, :new, process_params) do
     case Automation.create_process(process_params) do
       {:ok, process} ->
-        send(self(), { :broadcast, "create", process })
+        send(self(), {:broadcast, "create", process})
         {
           :noreply,
           socket

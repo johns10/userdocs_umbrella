@@ -40,7 +40,7 @@ defmodule UserDocsWeb.API.Resolvers.StepInstance do
       :ok ->
         {:ok, step_instance} = StepInstances.create_step_instance(args)
         step_instance = UserDocs.StepInstances.get_step_instance!(step_instance.id, %{preloads: "*"})
-        team_id = step_instance.step.page.version.project.team_id
+        team_id = step_instance.step.page.project.team_id
         channel = UserDocsWeb.Defaults.channel(team_id)
         UserDocsWeb.Endpoint.broadcast(channel, "create", step_instance)
         IO.puts("After broadcast")

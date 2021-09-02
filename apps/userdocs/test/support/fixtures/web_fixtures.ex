@@ -15,31 +15,9 @@ defmodule UserDocs.WebFixtures do
   alias UserDocs.Web.Strategy
 
 
-  def state(state, opts) do
-    opts =
-      opts
-      |> Keyword.put(:types, [ Page, Strategy, Annotation,
-        AnnotationType, Element, Strategy ])
-
-    v = Projects.list_versions(state, opts) |> Enum.at(0)
-    page = page(v.id)
-    strategy = strategy()
-    element = element(page, strategy)
-    annotation_type = annotation_type(:badge)
-    annotation = annotation(page)
-
-    state
-    |> StateHandlers.initialize(opts)
-    |> StateHandlers.load([page], Page, opts)
-    |> StateHandlers.load([strategy], Strategy, opts)
-    |> StateHandlers.load([element], Element, opts)
-    |> StateHandlers.load([annotation_type], AnnotationType, opts)
-    |> StateHandlers.load([annotation], Annotation, opts)
-  end
-
-  def page(version_id \\ nil) do
+  def page(project_id \\ nil) do
     {:ok, object } =
-      page_attrs(:valid, version_id)
+      page_attrs(:valid, project_id)
       |> Web.create_page()
     object
   end
@@ -91,11 +69,11 @@ defmodule UserDocs.WebFixtures do
     )
   end
 
-  def page_attrs(:valid, version_id \\ nil) do
+  def page_attrs(:valid, project_id \\ nil) do
     %{
       url: "some url",
       name: UUID.uuid4(),
-      version_id: version_id
+      project_id: project_id
     }
   end
 

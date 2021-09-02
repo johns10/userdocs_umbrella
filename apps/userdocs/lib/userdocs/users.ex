@@ -65,12 +65,10 @@ defmodule UserDocs.Users do
   """
   def get_user!(id, params \\ %{}, _filters \\ %{}) do
     base_user_query(id)
-    |> maybe_preload_default_team_project_version(params[:team_project_version])
     |> maybe_preload_user_teams(params[:teams])
     |> maybe_preload_user_team_users(params[:team_users])
     #|> maybe_preload_user_selected_team(params[:selected_team])
     |> maybe_preload_user_selected_project(params[:selected_project])
-    |> maybe_preload_user_selected_version(params[:selected_version])
     |> Repo.one!()
   end
 
@@ -82,18 +80,6 @@ defmodule UserDocs.Users do
   def get_user!(id, params, _filters, state, opts) do
     StateHandlers.get(state, id, User, opts)
     |> maybe_preload_user_teams(params[:teams], state, opts)
-  end
-
-  defp maybe_preload_default_team_project_version(query, nil), do: query
-  defp maybe_preload_default_team_project_version(query, _preloads) do
-    from(user in query,
-      left_join: team in assoc(user, :default_team),
-      left_join: project in assoc(team, :default_project),
-      left_join: version in assoc(project, :default_version),
-      preload: [default_team: team],
-      preload: [default_team: {team, default_project: project}],
-      preload: [default_team: {team, default_project: {project, default_version: version}}]
-    )
   end
 
   defp maybe_preload_user_teams(query, nil), do: query
@@ -114,11 +100,6 @@ defmodule UserDocs.Users do
   defp maybe_preload_user_selected_project(query, nil), do: query
   defp maybe_preload_user_selected_project(query, _) do
     from(users in query, preload: [:selected_project])
-  end
-
-  defp maybe_preload_user_selected_version(query, nil), do: query
-  defp maybe_preload_user_selected_version(query, _) do
-    from(users in query, preload: [:selected_version])
   end
 
   defp maybe_preload_user_teams(user, nil, _, _), do: user
@@ -145,7 +126,6 @@ defmodule UserDocs.Users do
   alias UserDocs.Users.Team
   alias UserDocs.Users.TeamUser
   alias UserDocs.Projects.Project
-  alias UserDocs.Projects.Version
 
   def get_user_and_configs!(id) do
     User
@@ -153,12 +133,10 @@ defmodule UserDocs.Users do
     |> join(:left, [u, tu], tu in TeamUser, on: tu.user_id == u.id)
     |> join(:left, [u, tu, t], t in Team, on: tu.team_id == t.id)
     |> join(:left, [u, tu, t, p], p in Project, on: p.team_id == t.id)
-    |> join(:left, [u, tu, t, p, v], v in Version, on: v.project_id == p.id)
     |> preload([u, tu, t, p, v], [team_users: tu])
     |> preload([u, tu, t, p, v], [teams: t])
     |> preload([u, tu, t, p, v], [team_users: {tu, team: t}])
     |> preload([u, tu, t, p, v], [team_users: {tu, team: {t, projects: p}}])
-    |> preload([u, tu, t, p, v], [team_users: {tu, team: {t, projects: {p, versions: v}}}])
     |> Repo.one!()
   end
 
@@ -502,8 +480,7 @@ defmodule UserDocs.Users do
   def get_screenshot_team!(id) do
     from(t in Team, as: :teams)
     |> join(:left, [teams: t], p in assoc(t, :projects), as: :projects)
-    |> join(:left, [projects: p], v in assoc(p, :versions), as: :versions)
-    |> join(:left, [versions: v], p in assoc(v, :processes), as: :processes)
+    |> join(:left, [projects: p], v in assoc(p, :processes), as: :processes)
     |> join(:left, [processes: p], s in assoc(p, :steps), as: :steps)
     |> join(:left, [steps: s], si in assoc(s, :screenshot), as: :screenshot)
     |> where([screenshot: s], s.id == ^id)
@@ -513,8 +490,7 @@ defmodule UserDocs.Users do
   def get_step_team!(id) do
     from(t in Team, as: :teams)
     |> join(:left, [teams: t], p in assoc(t, :projects), as: :projects)
-    |> join(:left, [projects: p], v in assoc(p, :versions), as: :versions)
-    |> join(:left, [versions: v], p in assoc(v, :processes), as: :processes)
+    |> join(:left, [projects: p], v in assoc(p, :processes), as: :processes)
     |> join(:left, [processes: p], s in assoc(p, :steps), as: :step)
     |> where([step: s], s.id == ^id)
     |> Repo.one!()
@@ -545,23 +521,6 @@ defmodule UserDocs.Users do
 
   defp base_team_query(id) do
     from(team in Team, where: team.id == ^id)
-  end
-
-  def get_version_team!(id) do
-    Repo.one from team in Team,
-      left_join: project in UserDocs.Projects.Project, on: project.team_id == team.id,
-      left_join: version in UserDocs.Projects.Version, on: version.project_id == project.id,
-      where: version.id == ^id
-  end
-
-  # TODO: Move this into base query
-  def get_annotation_team!(id) do
-    Repo.one from team in Team,
-      left_join: project in UserDocs.Projects.Project, on: project.team_id == team.id,
-      left_join: version in UserDocs.Projects.Version, on: version.project_id == project.id,
-      left_join: page in UserDocs.Web.Page, on: page.version_id == version.id,
-      left_join: annotation in UserDocs.Web.Annotation, on: annotation.page_id == page.id,
-      where: annotation.id == ^id
   end
 
   def team_default_project(nil), do: nil

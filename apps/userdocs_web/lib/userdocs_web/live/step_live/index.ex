@@ -52,7 +52,6 @@ defmodule UserDocsWeb.StepLive.Index do
     |> Loaders.elements(opts)
     |> Loaders.screenshots(opts)
     |> Loaders.projects(opts)
-    |> UserDocsWeb.Loaders.versions()
     |> turn_off_broadcast_associations()
   end
 
@@ -110,7 +109,7 @@ defmodule UserDocsWeb.StepLive.Index do
     {:noreply, socket}
   end
   @impl true
-  def handle_event("select-version" = n, p, s) do
+  def handle_event("select-project" = n, p, s) do
     {:noreply, socket} = Root.handle_event(n, p, s)
     {:noreply, redirect(socket, to: Routes.process_index_path(socket, :index))}
   end
@@ -252,7 +251,6 @@ defmodule UserDocsWeb.StepLive.Index do
     [
       UserDocs.Web.AnnotationType,
       UserDocs.Web.Strategy,
-      UserDocs.Projects.Version,
       UserDocs.Automation.StepType,
       UserDocs.Automation.Process,
       UserDocs.Automation.Step,
@@ -274,7 +272,6 @@ defmodule UserDocsWeb.StepLive.Index do
       step_types_select: step_types_select(socket),
       pages_select: pages_select(socket),
       strategies: strategies_select(socket),
-      versions: versions_select(socket),
       projects: projects_select(socket)
    }
   end
@@ -311,18 +308,13 @@ defmodule UserDocsWeb.StepLive.Index do
   end
   def strategies_select(_), do: []
 
-  def versions_select(%{assigns: %{state_opts: state_opts}} = socket) do
-    Projects.list_versions(socket, state_opts)
-    |> Helpers.select_list(:name, :false)
-  end
-
   def projects_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Projects.list_projects(socket, state_opts)
     |> Helpers.select_list(:name, :false)
   end
 
-  def assign_strategy_id(%{assigns: %{current_version: version}} = socket) do
-    assign(socket, :strategy_id, version.strategy_id)
+  def assign_strategy_id(%{assigns: %{current_project: project}} = socket) do
+    assign(socket, :strategy_id, project.strategy_id)
   end
 
   def prepare_step(socket, id) do

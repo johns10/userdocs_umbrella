@@ -10,19 +10,12 @@ h2.title
     [ selected: f.data.team_id || @parent_id || "",
     id: @field_ids.team_id ])
 
+  = Layout.select_input(f, :strategy_id, @select_lists.strategies,
+    [ selected: f.data.strategy_id || ""])
+
   = Layout.text_input(f, :name, [ id: @field_ids.name ])
 
   = Layout.text_input(f, :base_url, [ id: @field_ids.base_url ])
-
-  = if f.data.id do
-    h3.is-size-4 Default Version
-    = inputs_for f, :versions, fn vf ->
-      .field.is-grouped.pl-2
-        label.checkbox
-          = checkbox(vf, :default)
-          =< vf.data.name
-      
-    = error_tag f, :versions
 
   = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
 

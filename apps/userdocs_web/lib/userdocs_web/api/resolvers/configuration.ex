@@ -5,9 +5,9 @@ defmodule UserDocsWeb.API.Resolvers.Configuration do
   alias UserDocs.Users.User
   alias UserDocs.Projects
 
-  def get_configuration!(%User{selected_team_id: team_id, selected_version_id: version_id, overrides: overrides}, %{}, _resolution) do
+  def get_configuration!(%User{selected_team_id: team_id, selected_project_id: project_id, overrides: overrides}, %{}, _resolution) do
     team = Users.get_team!(team_id)
-    version = Projects.get_version!(version_id, %{strategy: true})
-    {:ok, %{css: team.css, strategy: version.strategy.name, overrides: overrides}}
+    project = Projects.get_project!(project_id, %{preloads: [strategy: true]})
+    {:ok, %{css: team.css, overrides: overrides, strategy: project.strategy.name}}
   end
 end

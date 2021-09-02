@@ -31,8 +31,8 @@ defmodule UserDocs.Web do
     base_pages_query()
     |> maybe_preload_elements(params[:elements])
     |> maybe_preload_annotations(params[:annotations])
-    |> maybe_filter_by_version(filters[:version_id])
     |> maybe_filter_pages_by_team_id(filters[:team_id])
+    |> maybe_filter_pages_by_project_id(filters[:project_id])
     |> Repo.all()
   end
 
@@ -42,20 +42,17 @@ defmodule UserDocs.Web do
   defp maybe_preload_annotations(query, nil), do: query
   defp maybe_preload_annotations(query, _), do: from(pages in query, preload: [:annotations])
 
-  defp maybe_filter_by_version(query, nil), do: query
-  defp maybe_filter_by_version(query, version_id) do
-    from(page in query,
-      where: page.version_id == ^version_id
-    )
-  end
-
   defp maybe_filter_pages_by_team_id(query, nil), do: query
   defp maybe_filter_pages_by_team_id(query, team_id) do
     from(page in query,
-      left_join: version in UserDocs.Projects.Version, on: version.id == page.version_id,
-      left_join: project in UserDocs.Projects.Project, on: version.project_id == project.id,
+      left_join: project in UserDocs.Projects.Project, on: page.project_id == project.id,
       left_join: team in UserDocs.Users.Team, on: project.team_id == team.id,
       where: team.id == ^team_id)
+  end
+
+  defp maybe_filter_pages_by_project_id(query, nil), do: query
+  defp maybe_filter_pages_by_project_id(query, project_id) do
+    from(page in query, where: page.project_id == ^project_id)
   end
 
   defp base_pages_query(), do: from(pages in Page)
@@ -271,7 +268,7 @@ defmodule UserDocs.Web do
   def list_elements(params, filters) when is_map(params) and is_map(filters) do
     base_elements_query()
     |> maybe_filter_element_by_page(filters[:page_id])
-    |> maybe_filter_by_version_id(filters[:team_id])
+    |> maybe_filter_element_by_project(filters[:project_id])
     |> maybe_preload_strategy(params[:strategy])
     |> Repo.all()
   end
@@ -282,31 +279,18 @@ defmodule UserDocs.Web do
   defp maybe_preload_strategy(query, nil), do: query
   defp maybe_preload_strategy(query, _), do: from(elements in query, preload: [:strategy])
 
-  defp maybe_preload_strategy(object, nil, _), do: object
-  defp maybe_preload_strategy(object, _, state) do
-    strategy =
-      state.strategies
-      |> Enum.filter(fn(s) -> s.id == object.strategy_id end)
-      |> Enum.at(0)
-
-    object
-    |> Map.put(:strategy, strategy)
-  end
-
-  defp maybe_filter_by_version_id(query, nil), do: query
-  defp maybe_filter_by_version_id(query, team_id) do
-    from(element in query,
-      left_join: page in UserDocs.Web.Page, on: page.id == element.page_id,
-      left_join: version in UserDocs.Projects.Version, on: version.id == page.version_id,
-      left_join: project in UserDocs.Projects.Project, on: project.id == version.project_id,
-      left_join: team in UserDocs.Users.Team, on: team.id == project.team_id,
-      where: team.id == ^team_id)
-  end
-
   defp maybe_filter_element_by_page(query, nil), do: query
   defp maybe_filter_element_by_page(query, page_id) do
     from(element in query,
       where: element.page_id == ^page_id
+    )
+  end
+
+  defp maybe_filter_element_by_project(query, nil), do: query
+  defp maybe_filter_element_by_project(query, project_id) do
+    from(element in query,
+      left_join: page in assoc(element, :page),
+      where: page.project_id == ^project_id
     )
   end
 
@@ -428,8 +412,8 @@ defmodule UserDocs.Web do
   def list_annotations(params, filters) when is_map(params) and is_map(filters) do
     base_annotation_query()
     |> maybe_filter_annotation_by_page(filters[:page_id])
-    |> maybe_filter_annotation_by_version_id(filters[:version_id])
     |> maybe_filter_annotation_by_team_id(filters[:team_id])
+    |> maybe_filter_annotation_by_project(filters[:project_id])
     |> maybe_preload_annotation_type(params[:annotation_type])
     |> order_by(:name)
     |> Repo.all()
@@ -443,7 +427,6 @@ defmodule UserDocs.Web do
 
   defp maybe_preload_annotation_type(query, nil), do: query
   defp maybe_preload_annotation_type(query, _), do: from(annotations in query, preload: [:annotation_type])
-  defp maybe_preload_annotation_type(object, nil, _), do: object
   defp maybe_preload_annotation_type(object, _, state) do
     annotation_type =
       state.annotation_types
@@ -454,21 +437,20 @@ defmodule UserDocs.Web do
     |> Map.put(:annotation_type, annotation_type)
   end
 
-  defp maybe_filter_annotation_by_version_id(query, nil), do: query
-  defp maybe_filter_annotation_by_version_id(query, version_id) do
-    from(annotation in query,
-      left_join: page in assoc(annotation, :page),
-      where: page.version_id == ^version_id)
-  end
-
   defp maybe_filter_annotation_by_team_id(query, nil), do: query
   defp maybe_filter_annotation_by_team_id(query, team_id) do
     from(annotation in query,
       left_join: page in UserDocs.Web.Page, on: page.id == annotation.page_id,
-      left_join: version in UserDocs.Projects.Version, on: version.id == page.version_id,
-      left_join: project in UserDocs.Projects.Project, on: version.project_id == project.id,
+      left_join: project in UserDocs.Projects.Project, on: page.project_id == project.id,
       left_join: team in UserDocs.Users.Team, on: project.team_id == team.id,
       where: team.id == ^team_id)
+  end
+
+  defp maybe_filter_annotation_by_project(query, nil), do: query
+  defp maybe_filter_annotation_by_project(query, project_id) do
+    from(annotation in query,
+      left_join: page in UserDocs.Web.Page, on: page.id == annotation.page_id,
+      where: page.project_id == ^project_id)
   end
 
 

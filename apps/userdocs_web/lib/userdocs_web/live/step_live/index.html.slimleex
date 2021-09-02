@@ -3,15 +3,13 @@ div
   .is-flex.is-flex-direction-row.is-justify-content-space-between
     = ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
       %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name },
-      %{ to: Routes.version_index_path(@socket, :index), name: @current_project.name },
-      %{ to: Routes.process_index_path(@socket, :index), name: @current_version.name }],
+      %{ to: Routes.process_index_path(@socket, :index), name: @current_project.name }],
       last_item: %{ to: "", name: @process.name } ])
     = if @live_action in [:edit, :new] do
       = live_modal @socket, UserDocsWeb.StepLive.FormComponent,
         action: @live_action,
         app_name: @app_name,
         current_project: @current_project,
-        current_version: @current_version,
         current_team: @current_team,
         current_user: @current_user,
         data: @data,

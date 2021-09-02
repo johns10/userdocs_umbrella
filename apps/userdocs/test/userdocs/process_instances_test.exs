@@ -13,9 +13,8 @@ defmodule UserDocs.ProcessInstancesTest do
   defp fixture(:step_types), do: AutomationFixtures.all_valid_step_types()
 
   defp fixture(:project, team_id), do: ProjectsFixtures.project(team_id)
-  defp fixture(:version, project_id), do: ProjectsFixtures.version(project_id)
-  defp fixture(:process, version_id), do: AutomationFixtures.process(version_id)
-  defp fixture(:page, version_id), do: WebFixtures.page(version_id)
+  defp fixture(:process, project_id), do: AutomationFixtures.process(project_id)
+  defp fixture(:page, project_id), do: WebFixtures.page(project_id)
   defp fixture(:annotation, page_id), do: WebFixtures.annotation(page_id)
 
   defp fixture(:team_user, user_id, team_id), do: UsersFixtures.team_user(user_id, team_id)
@@ -30,9 +29,8 @@ defmodule UserDocs.ProcessInstancesTest do
   defp create_team(_), do: %{team: fixture(:team)}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: fixture(:team_user, user.id, team.id)}
   defp create_project(%{team: team}), do: %{project: fixture(:project, team.id)}
-  defp create_version(%{project: project}), do: %{version: fixture(:version, project.id)}
-  defp create_process(%{version: version}), do: %{process: fixture(:process, version.id)}
-  defp create_page(%{version: version}), do: %{page: fixture(:page, version.id)}
+  defp create_process(%{project: project}), do: %{process: fixture(:process, project.id)}
+  defp create_page(%{project: project}), do: %{page: fixture(:page, project.id)}
   defp create_strategy(_), do: %{strategy: fixture(:strategy)}
   defp create_element(%{page: page, strategy: strategy}), do: %{element: fixture(:element, page.id, strategy.id)}
   defp create_annotation(%{page: page}), do: %{annotation: fixture(:annotation, page.id)}
@@ -50,7 +48,6 @@ defmodule UserDocs.ProcessInstancesTest do
       :create_team,
       :create_team_user,
       :create_project,
-      :create_version,
       :create_process,
       :create_page,
       :create_strategy,
@@ -60,8 +57,8 @@ defmodule UserDocs.ProcessInstancesTest do
       :create_step
     ]
 
-    test "list_process_process_instances/1 returns only 5 process instances", %{ user: user, version: version, process: process } do
-      process_two = fixture(:process, version.id)
+    test "list_process_process_instances/1 returns only 5 process instances", %{user: user, project: project, process: process} do
+      process_two = fixture(:process, project.id)
       Enum.each(1..7, fn(_pi) -> JobsFixtures.process_instance(process.id) end)
       Enum.each(1..7, fn(_pi) -> JobsFixtures.process_instance(process_two.id) end)
       pis = ProcessInstances.list_user_process_instances(user.id)
@@ -71,53 +68,53 @@ defmodule UserDocs.ProcessInstancesTest do
       assert process_two_pis |> Enum.count() == 5
     end
 
-    test "list_process_instance/0 returns all process instances", %{ process: process } do
+    test "list_process_instance/0 returns all process instances", %{process: process} do
       process_instance = JobsFixtures.process_instance(process.id)
-      assert ProcessInstances.list_process_instances() == [ process_instance ]
+      assert ProcessInstances.list_process_instances() == [process_instance]
     end
 
-    test "get_process_instance!/1 returns the process_instance with given id", %{ process: process } do
+    test "get_process_instance!/1 returns the process_instance with given id", %{process: process} do
       process_instance = JobsFixtures.process_instance(process.id)
       assert ProcessInstances.get_process_instance!(process_instance.id) == process_instance
     end
 
-    test "get_process_instance_by_uuid!/1 returns a process instance", %{ process: process } do
+    test "get_process_instance_by_uuid!/1 returns a process instance", %{process: process} do
       process_instance = JobsFixtures.process_instance(process.id)
       assert ProcessInstances.get_process_instance_by_uuid(process_instance.uuid) == process_instance
     end
 
-    test "create_process_instance/1 with valid data creates a process instance", %{ process: process } do
+    test "create_process_instance/1 with valid data creates a process instance", %{process: process} do
       attrs = JobsFixtures.process_instance_attrs(:valid, process.id)
       assert {:ok, %ProcessInstance{} = process_instance} = ProcessInstances.create_process_instance(attrs)
       assert process_instance.name == attrs.name
     end
 
-    test "create_process_instance/1 with invalid data returns error changeset", %{ process: process } do
+    test "create_process_instance/1 with invalid data returns error changeset", %{process: process} do
       attrs = JobsFixtures.process_instance_attrs(:invalid, process.id)
       assert {:error, %Ecto.Changeset{}} = ProcessInstances.create_process_instance(attrs)
     end
 
-    test "update_process_instance/2 with valid data updates the process instance", %{ process: process } do
+    test "update_process_instance/2 with valid data updates the process instance", %{process: process} do
       process_instance = JobsFixtures.process_instance(process.id)
       attrs = JobsFixtures.process_instance_attrs(:valid, process.id)
       assert {:ok, %ProcessInstance{} = process_instance} = ProcessInstances.update_process_instance(process_instance, attrs)
       assert process_instance.name == attrs.name
     end
 
-    test "update_process_instance/2 with invalid data returns error changeset", %{ process: process } do
+    test "update_process_instance/2 with invalid data returns error changeset", %{process: process} do
       process_instance = JobsFixtures.process_instance(process.id)
       attrs = JobsFixtures.process_instance_attrs(:invalid, process.id)
       assert {:error, %Ecto.Changeset{}} = ProcessInstances.update_process_instance(process_instance, attrs)
       assert process_instance == ProcessInstances.get_process_instance!(process_instance.id)
     end
 
-    test "delete_process_instance/1 deletes the step instance", %{ process: process } do
+    test "delete_process_instance/1 deletes the step instance", %{process: process} do
       process_instance = JobsFixtures.process_instance(process.id)
       assert {:ok, %ProcessInstance{}} = ProcessInstances.delete_process_instance(process_instance)
       assert_raise Ecto.NoResultsError, fn -> ProcessInstances.get_process_instance!(process_instance.id) end
     end
 
-    test "change_process_instance/1 returns a process_instance changeset", %{ process: process } do
+    test "change_process_instance/1 returns a process_instance changeset", %{process: process} do
       process_instance = JobsFixtures.process_instance(process.id)
       assert %Ecto.Changeset{} = ProcessInstances.change_process_instance(process_instance)
     end

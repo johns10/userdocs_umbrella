@@ -10,32 +10,13 @@ defmodule UserDocs.AutomationFixtures do
   alias UserDocs.Automation.Process
   alias UserDocs.Automation.StepType
   alias UserDocs.WebFixtures
+  alias UserDocs.ProjectsFixtures
 
   alias UserDocs.Web
 
-  def state(state, opts) do
-    opts =
-      opts
-      |> Keyword.put(:types, [Process, StepType, Step])
-
-    v = Projects.list_versions(state, opts) |> Enum.at(0)
-    process = process(v.id)
-    step_type = step_type()
-    p = Web.list_pages(state, opts) |> Enum.at(0)
-    e = Web.list_elements(state, opts) |> Enum.at(0)
-    a = Web.list_annotations(state, opts) |> Enum.at(0)
-    step = step(p.id, process.id, e.id, a.id, step_type.id)
-
-    state
-    |> StateHandlers.initialize(opts)
-    |> StateHandlers.load([process], Process, opts)
-    |> StateHandlers.load([step], Step, opts)
-    |> StateHandlers.load([step_type], StepType, opts)
-  end
-
-  def process(version_id) do
+  def process(project_id \\ nil) do
     {:ok, process} =
-      process_attrs(:valid, version_id)
+      process_attrs(:valid, project_id)
       |> Automation.create_process()
     process
   end
@@ -134,19 +115,19 @@ defmodule UserDocs.AutomationFixtures do
     %{args: nil, name: nil}
   end
 
-  def process_attrs(status, version_id \\ nil)
-  def process_attrs(:valid, version_id) do
+  def process_attrs(status, project_id \\ nil)
+  def process_attrs(:valid, project_id) do
     %{
       name: UUID.uuid4(),
       order: 1,
-      version_id: version_id
+      project_id: project_id
     }
   end
-  def process_attrs(:invalid, version_id) do
+  def process_attrs(:invalid, project_id) do
     %{
       name: nil,
       order: 1,
-      version_id: version_id
+      project_id: project_id
     }
   end
 

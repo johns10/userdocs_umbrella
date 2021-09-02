@@ -9,7 +9,6 @@ defmodule UserDocsWeb.Root do
   alias UserDocs.Users.Team
   alias UserDocs.Projects
   alias UserDocs.Projects.Project
-  alias UserDocs.Projects.Version
 
   alias StateHandlers
   alias UserDocsWeb.Defaults
@@ -99,7 +98,6 @@ defmodule UserDocsWeb.Root do
       current_user
       |> Map.put(:selected_team, Users.try_get_team!(current_user.selected_team_id))
       |> Map.put(:selected_project, Projects.try_get_project!(current_user.selected_project_id))
-      |> Map.put(:selected_version, Projects.try_get_version!(current_user.selected_version_id))
 
     assign(socket, :current_user, current_user)
   end
@@ -107,15 +105,13 @@ defmodule UserDocsWeb.Root do
   def assign_current(%{assigns: %{current_user: current_user}} = socket) do
     {default_team, current_team} = current_team(current_user)
     {default_project, current_project} = current_project(current_user, default_team)
-    {default_version, current_version} = current_version(current_user, default_project)
 
-    current_user = assign_defaults(current_user, default_team, default_project, default_version)
+    current_user = assign_defaults(current_user, default_team, default_project)
 
     socket
     |> assign(:current_user, current_user)
     |> assign(:current_team, current_team)
     |> assign(:current_project, current_project)
-    |> assign(:current_version, current_version)
   end
 
   def current_team(current_user) do
@@ -139,36 +135,18 @@ defmodule UserDocsWeb.Root do
     }
   end
 
-  def current_version(current_user, default_project) do
-    default_version = Projects.project_default_version(default_project)
-    {
-      default_version,
-      current_user.selected_version
-      || default_version
-      || nil
-    }
-  end
 
-  def assign_defaults(user, %Team{} = team, %Project{} = project, %Version{} = version) do
+  def assign_defaults(user, %Team{} = team, %Project{} = project) do
     Map.put(user, :default_team,
-      Map.put(team, :default_project,
-        Map.put(project, :default_version, version)
-      )
+      Map.put(team, :default_project, project)
     )
   end
-  def assign_defaults(user, %Team{} = team, %Project{} = project, nil) do
-    Map.put(user, :default_team,
-      Map.put(team, :default_project,
-        Map.put(project, :default_version, nil)
-      )
-    )
-  end
-  def assign_defaults(user, %Team{} = team, nil, nil) do
+  def assign_defaults(user, %Team{} = team, nil) do
     Map.put(user, :default_team,
       Map.put(team, :default_project, nil)
     )
   end
-  def assign_defaults(user, nil, nil, nil) do
+  def assign_defaults(user, nil, nil) do
     Map.put(user, :default_team, nil)
   end
 
@@ -187,22 +165,16 @@ defmodule UserDocsWeb.Root do
   def app_assigns(%{assigns: %{app_name: "electron"}} = socket), do: socket
   def app_assigns(%{assigns: %{app_name: "web"}} = socket), do: socket
 
-  def handle_event("delete-document-version", p, s) do
-    UserDocsWeb.DocumentVersionLive.EventHandlers.handle_event("delete", p, s)
-  end
-  def handle_event("select-version", %{"version-id" => version_id, "project-id" => project_id, "team-id" => team_id} = _payload, socket) do
+  def handle_event("select-project", %{"project-id" => project_id, "team-id" => team_id} = _payload, socket) do
     changes = %{
       selected_team_id: String.to_integer(team_id),
-      selected_project_id: String.to_integer(project_id),
-      selected_version_id: String.to_integer(version_id)
+      selected_project_id: String.to_integer(project_id)
     }
 
     {:ok, user} =
       Users.update_user_selections(socket.assigns.current_user, changes)
 
     send(self(), {:broadcast, "update", user})
-
-    version = Projects.get_version!(version_id, %{strategy: true})
 
     {
       :noreply,

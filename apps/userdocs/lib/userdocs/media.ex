@@ -16,7 +16,7 @@ defmodule UserDocs.Media do
   alias UserDocs.Media.Screenshot
 
   def load_screenshots(state, opts) do
-    StateHandlers.load(state, list_screenshots(), Screenshot, opts)
+    StateHandlers.load(state, list_screenshots(%{}, opts[:filters]), Screenshot, opts)
   end
   @doc """
   Returns the list of screenshots.
@@ -29,25 +29,24 @@ defmodule UserDocs.Media do
   """
   def list_screenshots(_params \\ %{}, filters \\ %{}) do
     base_screenshots_query()
-    |> maybe_filter_screenshots_by_version(filters[:version_id])
     |> maybe_filter_by_step_id(filters[:step_id])
+    |> maybe_filter_by_project_id(filters[:project_id])
     |> Repo.all()
-  end
-
-  defp maybe_filter_screenshots_by_version(query, nil), do: query
-  defp maybe_filter_screenshots_by_version(query, version_id) do
-    from(screenshot in query,
-      left_join: step in assoc(screenshot, :step),
-      left_join: process in assoc(step, :process),
-      where: process.version_id == ^version_id,
-      order_by: step.order
-    )
   end
 
   defp maybe_filter_by_step_id(query, nil), do: query
   defp maybe_filter_by_step_id(query, step_id) do
     from(screenshot in query,
       where: screenshot.step_id == ^step_id
+    )
+  end
+
+  defp maybe_filter_by_project_id(query, nil), do: query
+  defp maybe_filter_by_project_id(query, project_id) do
+    from(screenshot in query,
+      left_join: step in UserDocs.Automation.Step, on: screenshot.step_id == step.id,
+      left_join: process in UserDocs.Automation.Process, on: step.process_id == process.id,
+      where: process.project_id == ^project_id
     )
   end
 
@@ -69,10 +68,10 @@ defmodule UserDocs.Media do
   """
   def get_screenshot!(id), do: Repo.get!(Screenshot, id)
 
-  def get_screenshot_url(nil), do: { :no_screenshot, "" }
-  def get_screenshot_url(%Ecto.Association.NotLoaded{}), do: { :not_loaded, "" }
-  def get_screenshot_url(%Screenshot{ aws_file: nil }), do: { :nofile, "" }
-  def get_screenshot_url(%Screenshot{ aws_file: aws_file }) do
+  def get_screenshot_url(nil), do: {:no_screenshot, ""}
+  def get_screenshot_url(%Ecto.Association.NotLoaded{}), do: {:not_loaded, ""}
+  def get_screenshot_url(%Screenshot{aws_file: nil}), do: {:nofile, ""}
+  def get_screenshot_url(%Screenshot{aws_file: aws_file}) do
     region =
       Application.get_env(:userdocs, :ex_aws)
       |> Keyword.get(:region)
@@ -113,8 +112,8 @@ defmodule UserDocs.Media do
     |> Subscription.broadcast("screenshot", "create")
   end
 
-  def create_aws_file_and_screenshot(%{ "id" => step_id, "step_type" => %{ "name" => step_type_name },
-    "element" => element, "screenshot" => %{ "aws_file" => raw_encoded_image }
+  def create_aws_file_and_screenshot(%{"id" => step_id, "step_type" => %{"name" => step_type_name},
+    "element" => element, "screenshot" => %{"aws_file" => raw_encoded_image}
   }) do
       IO.puts("create_file_and_screenshot for step #{step_id}")
     %{
@@ -127,7 +126,7 @@ defmodule UserDocs.Media do
     |> ScreenshotHelpers.maybe_resize_image(step_type_name, element)
     |> ScreenshotHelpers.update_screenshot()
   end
-  def create_file_and_screenshot(%{}), do: { :error, "Missing encoded image.  Failed to create file"}
+  def create_file_and_screenshot(%{}), do: {:error, "Missing encoded image.  Failed to create file"}
   def create_file_and_screenshot(_) do
     raise(ArgumentError, message: "Passed an invalid variable to " <> Atom.to_string(__MODULE__))
   end
@@ -157,7 +156,7 @@ defmodule UserDocs.Media do
 
   def get_or_insert_screenshot(attrs, step_id) do
     try do
-      { :ok, get_screenshot_by_step_id!(step_id) }
+      {:ok, get_screenshot_by_step_id!(step_id)}
     rescue
       Ecto.NoResultsError ->
         create_screenshot(attrs)

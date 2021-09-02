@@ -30,9 +30,8 @@ defmodule UserDocsWeb.StepLiveTest do
   defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
   defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
   defp create_project(%{team: team}), do: %{project: ProjectsFixtures.project(team.id)}
-  defp create_version(%{project: project, strategy: strategy}), do: %{version: ProjectsFixtures.version(project.id, strategy.id)}
-  defp create_process(%{version: version}), do: %{process: AutomationFixtures.process(version.id)}
-  defp create_page(%{version: version}), do: %{page: WebFixtures.page(version.id)}
+  defp create_process(%{project: project}), do: %{process: AutomationFixtures.process(project.id)}
+  defp create_page(%{project: project}), do: %{page: WebFixtures.page(project.id)}
   defp create_element(%{page: page, strategy: strategy}), do: %{element: WebFixtures.element(page.id, strategy.id)}
   defp create_annotation(%{page: page}), do: %{annotation: WebFixtures.annotation(page.id)}
   defp create_step_type(_), do: %{step_type: AutomationFixtures.step_type()}
@@ -51,11 +50,10 @@ defmodule UserDocsWeb.StepLiveTest do
   defp first_annotation(), do: Web.list_annotations() |> Enum.at(0)
   defp second_annotation(), do: Web.list_annotations() |> Enum.at(1)
 
-  defp make_selections(%{user: user, team: team, project: project, version: version}) do
+  defp make_selections(%{user: user, team: team, project: project}) do
     {:ok, user} = UserDocs.Users.update_user_selections(user, %{
       selected_team_id: team.id,
-      selected_project_id: project.id,
-      selected_version_id: version.id
+      selected_project_id: project.id
     })
     %{user: user}
   end
@@ -103,7 +101,6 @@ defmodule UserDocsWeb.StepLiveTest do
       :create_team_user,
       :create_strategy,
       :create_project,
-      :create_version,
       :create_process,
       :create_page,
       :create_page,
@@ -484,12 +481,12 @@ defmodule UserDocsWeb.StepLiveTest do
       assert html =~ event.selector
     end
 
-    test "index handles standard events", %{authed_conn: conn, version: version} do
+    test "index handles standard events", %{authed_conn: conn, project: project} do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert live
-             |> element("#version-picker-" <> to_string(version.id))
-             |> render_click() =~ version.name
+             |> element("#project-picker-" <> to_string(project.id))
+             |> render_click() =~ project.name
     end
 
     test "browser events update the Edit form", %{authed_conn: conn, step: step, step_types: step_types, process: process, element: element, annotation: annotation, page: page, user: user} do

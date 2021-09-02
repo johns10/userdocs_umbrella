@@ -8,7 +8,7 @@
     title: @page_title,
     action: @live_action,
     project: @project,
-    select_lists: %{ teams: @teams_select_options },
+    select_lists: %{ teams: @teams_select_options, strategies: @strategies_select_options },
     state_opts: @state_opts,
     return_to: Routes.project_index_path(@socket, :index, @current_team.id)
 
@@ -18,7 +18,7 @@ aside.menu
     = for project <- @projects do
       li class=""
         .is-flex
-          = link to: Routes.version_index_path(@socket, :index, project.id), class: "is-flex-grow-1" do
+          = link to: "#", class: "is-flex-grow-1" do
             = project.name
           .is-flex.is-flex-direction-row.is-flex-grow-0
             = live_redirect to: Routes.project_show_path(@socket, :show, project) do

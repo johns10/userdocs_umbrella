@@ -25,7 +25,7 @@ defmodule UserDocsWeb.ProjectLive.Show do
     }
   end
 
-  def initialize(%{ assigns: %{ auth_state: :logged_in }} = socket) do
+  def initialize(%{assigns: %{auth_state: :logged_in}} = socket) do
     opts = Defaults.state_opts(socket)
 
     socket
@@ -35,8 +35,8 @@ defmodule UserDocsWeb.ProjectLive.Show do
   def initialize(socket), do: socket
 
   @impl true
-  def handle_params(%{ "id" => id }, _, socket) do
-    project = Projects.get_project!(String.to_integer(id), %{ versions: true, default_version: true })
+  def handle_params(%{"id" => id}, _, socket) do
+    project = Projects.get_project!(String.to_integer(id))
     {
       :noreply,
       socket
@@ -51,5 +51,6 @@ defmodule UserDocsWeb.ProjectLive.Show do
   @impl true
   def handle_info(n, s), do: Root.handle_info(n, s)
 
+  @impl true
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 end

@@ -7,9 +7,7 @@ h2.title =@title
   class: "form-horizontal"
 
   .field.is-grouped
-    = Layout.select_input(f, :version_id, @select_lists.versions, 
-      [ id: @version_field_id || "", 
-      selected: @parent_id || "", ], "control")
+    = Layout.select_input(f, :project_id, @select_lists.projects, [ selected: @parent_id || "", ], "control")
 
     = Layout.number_input(f, :order, 
       [ id: @order_field_id || "",

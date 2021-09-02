@@ -15,8 +15,7 @@ defmodule UserDocsWeb.ProcessLiveTest do
   defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
   defp create_project(%{team: team}), do: %{project: ProjectsFixtures.project(team.id)}
-  defp create_version(%{project: project, strategy: strategy}), do: %{version: ProjectsFixtures.version(project.id, strategy.id)}
-  defp create_process(%{version: version}), do: %{process: AutomationFixtures.process(version.id)}
+  defp create_process(%{project: project}), do: %{process: AutomationFixtures.process(project.id)}
   defp create_job(%{team: team}), do: %{job: JobsFixtures.job(team.id)}
   defp grevious_workaround(%{conn: conn, user: user, password: password}) do
     conn = post(conn, "session", %{user: %{email: user.email, password: password}})
@@ -24,11 +23,10 @@ defmodule UserDocsWeb.ProcessLiveTest do
     %{authed_conn: conn}
   end
 
-  defp make_selections(%{user: user, team: team, project: project, version: version}) do
+  defp make_selections(%{user: user, team: team, project: project}) do
     {:ok, user} = UserDocs.Users.update_user_selections(user, %{
       selected_team_id: team.id,
-      selected_project_id: project.id,
-      selected_version_id: version.id
+      selected_project_id: project.id
     })
     %{user: user}
   end
@@ -41,7 +39,6 @@ defmodule UserDocsWeb.ProcessLiveTest do
       :create_strategy,
       :create_team_user,
       :create_project,
-      :create_version,
       :create_process,
       :create_job,
       :make_selections,
@@ -67,7 +64,7 @@ defmodule UserDocsWeb.ProcessLiveTest do
       |> render_click() =~ process.name
     end
 
-    test "saves new process", %{authed_conn: conn, version: version} do
+    test "saves new process", %{authed_conn: conn, project: project} do
       {:ok, index_live, _html} = live(conn, Routes.process_index_path(conn, :index))
 
       assert index_live
@@ -77,10 +74,10 @@ defmodule UserDocsWeb.ProcessLiveTest do
       assert_patch(index_live, Routes.process_index_path(conn, :new))
 
       assert index_live
-      |> form("#process-form", process: AutomationFixtures.process_attrs(:invalid, version.id))
+      |> form("#process-form", process: AutomationFixtures.process_attrs(:invalid, project.id))
       |> render_change() =~ "can&#39;t be blank"
 
-      valid_attrs = AutomationFixtures.process_attrs(:valid, version.id)
+      valid_attrs = AutomationFixtures.process_attrs(:valid, project.id)
 
       {:ok, _, html} =
         index_live
@@ -92,7 +89,7 @@ defmodule UserDocsWeb.ProcessLiveTest do
       assert html =~ valid_attrs.name
     end
 
-    test "updates process in listing", %{authed_conn: conn, process: process, version: version} do
+    test "updates process in listing", %{authed_conn: conn, process: process, project: project} do
       {:ok, index_live, _html} = live(conn, Routes.process_index_path(conn, :index))
 
       assert index_live
@@ -102,10 +99,10 @@ defmodule UserDocsWeb.ProcessLiveTest do
       assert_patch(index_live, Routes.process_index_path(conn, :edit, process))
 
       assert index_live
-      |> form("#process-form", process: AutomationFixtures.process_attrs(:invalid, version.id))
+      |> form("#process-form", process: AutomationFixtures.process_attrs(:invalid, project.id))
       |> render_change() =~ "can&#39;t be blank"
 
-      valid_attrs = AutomationFixtures.process_attrs(:valid, version.id)
+      valid_attrs = AutomationFixtures.process_attrs(:valid, project.id)
 
       {:ok, _, html} =
         index_live
@@ -124,12 +121,12 @@ defmodule UserDocsWeb.ProcessLiveTest do
       refute has_element?(index_live, "#process-" <> to_string(process.id))
     end
 
-    test "index handles standard events", %{authed_conn: conn, version: version} do
+    test "index handles standard events", %{authed_conn: conn, project: project} do
       {:ok, live, _html} = live(conn, Routes.user_index_path(conn, :index))
       send(live.pid, {:broadcast, "update", %UserDocs.Users.User{}})
       assert live
-             |> element("#version-picker-#{version.id}")
-             |> render_click() =~ version.name
+             |> element("#project-picker-#{project.id}")
+             |> render_click() =~ project.name
     end
   end
 end

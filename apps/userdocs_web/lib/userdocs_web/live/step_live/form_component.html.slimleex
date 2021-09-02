@@ -124,6 +124,7 @@
           .pl-2
             = AnnotationLive.FormComponent.render_fields(assigns, fa, "annotation-")
 
+  = inspect(@last_step_form.screenshot_form_enabled)
   = if @last_step_form.screenshot_form_enabled do
     .field id="screenshot-subform"
       = inputs_for f, :screenshot, [], fn fp ->

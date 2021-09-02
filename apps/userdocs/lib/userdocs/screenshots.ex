@@ -20,19 +20,8 @@ defmodule UserDocs.Screenshots do
   """
   def list_screenshots(_params \\ %{}, filters \\ %{}) do
     base_screenshots_query()
-    |> maybe_filter_screenshots_by_version(filters[:version_id])
     |> maybe_filter_by_step_id(filters[:step_id])
     |> Repo.all()
-  end
-
-  defp maybe_filter_screenshots_by_version(query, nil), do: query
-  defp maybe_filter_screenshots_by_version(query, version_id) do
-    from(screenshot in query,
-      left_join: step in assoc(screenshot, :step),
-      left_join: process in assoc(step, :process),
-      where: process.version_id == ^version_id,
-      order_by: step.order
-    )
   end
 
   defp maybe_filter_by_step_id(query, nil), do: query

@@ -116,16 +116,8 @@ defmodule UserDocsWeb.Router do
     live "/projects/new", ProjectLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/projects/:id", ProjectLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
-    live "/projects/:project_id/versions", VersionLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/versions", VersionLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/versions/new", VersionLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/versions/:id", VersionLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/versions/:id/edit", VersionLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-
-    live "/versions/:version_id/processes", ProcessLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/processes", ProcessLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/processes/new", ProcessLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/processes/:id", ProcessLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/processes/:id/edit", ProcessLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
     live "/processes/:process_id/steps", StepLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}

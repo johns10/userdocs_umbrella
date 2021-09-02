@@ -4,11 +4,11 @@ defmodule UserDocs.Process.Messages do
   alias UserDocs.Helpers
 
   def new_modal_menu(socket, params) do
-    required_keys = [ :project_id, :versions, :version_id ]
+    required_keys = [ :project_id ]
     params = Helpers.validate_params(params, required_keys, __MODULE__)
 
     %{ target: "ModalMenus" }
-    |> init(socket, params.project_id, params.versions, params.version_id)
+    |> init(socket, params.project_id)
     |> new(socket)
   end
 
@@ -19,17 +19,9 @@ defmodule UserDocs.Process.Messages do
     |> Map.put(:title, "New Process")
   end
 
-  defp init(message, _socket, project_id, versions, version_id) do
-    select_lists = %{
-      versions:
-        versions
-        |> Helpers.select_list(:name, false),
-    }
-
+  defp init(message, _socket, project_id) do
     message
     |> Map.put(:type, :process)
     |> Map.put(:project_id, project_id)
-    |> Map.put(:version_id, version_id)
-    |> Map.put(:select_lists, select_lists)
   end
 end

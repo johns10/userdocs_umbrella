@@ -30,11 +30,6 @@ defmodule UserDocsWeb.PageLive.FormComponent do
   def render_fields(assigns, form, opts \\ []) do
     ~L"""
       <div class="field is-grouped">
-        <%= Layout.select_input(form, :version_id, @select_lists.versions, [
-          # TODO: Still a little funky
-          selected: @current_version.id || "",
-          id: opts[:prefix] <> "page-id"
-        ], "control") %>
         <%= Layout.select_input(form, :project_id, @select_lists.projects, [
           selected: @current_project.id || ""
         ], "control") %>
@@ -124,14 +119,12 @@ defmodule UserDocsWeb.PageLive.FormComponent do
 
   def field_ids(page = %Web.Page{}) do
     %{}
-    |> Map.put(:version_id, ID.form_field(page, :version_id))
     |> Map.put(:order, ID.form_field(page, :order))
     |> Map.put(:name, ID.form_field(page, :name))
     |> Map.put(:url, ID.form_field(page, :url))
   end
   def field_ids(_) do
     %{}
-    |> Map.put(:version_id, "")
     |> Map.put(:order, "")
     |> Map.put(:name, "")
     |> Map.put(:url, "")

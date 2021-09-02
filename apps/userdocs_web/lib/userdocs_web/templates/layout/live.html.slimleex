@@ -32,13 +32,10 @@ css:
         = link "Home", to: "#", class: "navbar-item" 
         = live_patch "Teams", class: "navbar-item", to: Routes.team_index_path(@socket, :index)
         = live_patch "Projects", class: "navbar-item", to: Routes.project_index_path(@socket, :index)
-        = live_patch "Versions", class: "navbar-item", to: Routes.version_index_path(@socket, :index)
-        = if is_struct(@current_version, UserDocs.Projects.Version) do
+        = if is_struct(@current_project, UserDocs.Projects.Project) do
           = live_patch "Processes", class: "navbar-item", to: Routes.process_index_path(@socket, :index)
-        = live_component(@socket, UserDocsWeb.VersionPicker, 
-        [ current_user: @current_user,
-          current_project: @current_project,
-          current_version: @current_version ])
+        = live_component(@socket, UserDocsWeb.ProjectPicker, 
+        [ current_user: @current_user, current_project: @current_project])
 
       .navbar-end
         .navbar-item
@@ -74,7 +71,6 @@ css:
               browser_opened: @browser_opened,
               user_opened_browser: @user_opened_browser,
               closed: @navigation_drawer_closed  ])
-
-      <!--<%= UserDocsWeb.LiveHelpers.live_modal_menus(@socket, [ id: "modal-menus", form_data: @form_data ]) %>-->
+              
 - else
   = @inner_content

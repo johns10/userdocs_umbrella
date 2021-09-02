@@ -7,7 +7,6 @@ defmodule UserDocs.TestDataset do
 
   alias UserDocs.Projects
   alias UserDocs.Projects.Project
-  alias UserDocs.Projects.Version
 
   alias UserDocs.Documents.LanguageCode
 
@@ -34,7 +33,6 @@ defmodule UserDocs.TestDataset do
     Repo.delete_all(Annotation)
     Repo.delete_all(Element)
     Repo.delete_all(Page)
-    Repo.delete_all(Version)
     Repo.delete_all(Project)
     Repo.delete_all(Step)
     Repo.delete_all(Annotation)
@@ -113,7 +111,7 @@ defmodule UserDocs.TestDataset do
         name: "Set Size Explicit"
      },
       %{
-        args: [],
+        args: ["screenshot_form"],
         name: "Full Screen Screenshot"
      },
       %{
@@ -121,7 +119,7 @@ defmodule UserDocs.TestDataset do
         name: "Clear Annotations"
      },
       %{
-        args: ["element_id", "element_form"],
+        args: ["element_id", "element_form", "screenshot_form"],
         name: "Element Screenshot"
      },
       %{args: ["element_id", "element_form"], name: "Scroll to Element"},
@@ -447,20 +445,23 @@ defmodule UserDocs.TestDataset do
       %{
         base_url: "https://the-internet.herokuapp.com",
         name: "The Internet",
-        team_id: userdocs_team_id
+        team_id: userdocs_team_id,
+        strategy_id: css_strategy_id
      }
     userdocs_project =
       %{
         base_url: "https://app.user-docs.com",
         name: "Userdocs",
-        team_id: userdocs_team_id
+        team_id: userdocs_team_id,
+        strategy_id: css_strategy_id
      }
 
     john_davenport_rocks_project =
       %{
         base_url: "https://www.davenport.rocks",
         name: "John Davenport Rocks",
-        team_id: loreline_team_id
+        team_id: loreline_team_id,
+        strategy_id: css_strategy_id
      }
 
     {:ok, the_internet_project = %Project{id: the_internet_project_id}} =
@@ -481,52 +482,11 @@ defmodule UserDocs.TestDataset do
 
     Users.update_team(userdocs_team, %{default_project_id: userdocs_project_id})
 
-    # Versions
-
-    version_0_0_1 = %{
-      name: "0.0.1",
-      order: 1,
-      project_id: the_internet_project_id,
-      strategy_id: css_strategy_id
-   }
-
-    version_0_0_2 = %{
-      name: "0.0.2",
-      order: 2,
-      project_id: userdocs_project_id,
-      strategy_id: css_strategy_id
-   }
-
-    version_1 = %{
-      name: "Version 1",
-      project_id: john_davenport_rocks_project_id,
-      strategy_id: css_strategy_id
-   }
-
-    {:ok, _version_0_0_1 = %Version{id: version_0_0_1_id}} =
-      %Version{}
-      |> Version.changeset(version_0_0_1)
-      |> Repo.insert()
-
-    {:ok, _version_0_0_2 = %Version{id: version_0_0_2_id}} =
-      %Version{}
-      |> Version.changeset(version_0_0_2)
-      |> Repo.insert()
-
-    {:ok, _version_1 = %Version{id: version_1_id}} =
-      %Version{}
-      |> Version.changeset(version_1)
-      |> Repo.insert()
-
-    Projects.update_project(the_internet_project, %{default_version_id: version_0_0_1_id})
-    Projects.update_project(userdocs_project, %{default_version_id: version_0_0_2_id})
-    Projects.update_project(john_davenport_rocks_project, %{default_version_id: version_1_id})
 
     {:ok, _user_1} = Users.update_user(user_1, %{
       current_password: default_password,
       selected_team_id: userdocs_team_id,
-      selected_project_id: userdocs_project_id,
-      selected_version_id: version_0_0_1_id
+      selected_project_id: userdocs_project_id
    })
 
     # Pages
@@ -535,35 +495,35 @@ defmodule UserDocs.TestDataset do
       name: "Add Remove Elements Page",
       order: 1,
       url: "https://the-internet.herokuapp.com/add_remove_elements/",
-      version_id: version_0_0_1_id
+      project_id: userdocs_project_id
    }
 
     login_page = %{
       name: "Login Page",
       order: 1,
       url: "https://the-internet.herokuapp.com/login",
-      version_id: version_0_0_1_id
+      project_id: userdocs_project_id
    }
 
     processes_page = %{
       name: "Login",
       order: 2,
       url: "https://app.user-docs.com/processes",
-      version_id: version_0_0_2_id
+      project_id: userdocs_project_id
    }
 
     secure_page = %{
       name: "Secure",
       order: 3,
       url: "https://the-internet.herokuapp.com/secure",
-      version_id: version_0_0_1_id
+      project_id: userdocs_project_id
    }
 
    failure_page = %{
      name: "Fail",
      order: 3,
      url: "https://asdf3e33fushdg)*!#&%)*&",
-     version_id: version_0_0_1_id
+     project_id: userdocs_project_id
   }
 
     {:ok, %Page{id: add_remove_page_id}} =
@@ -806,22 +766,22 @@ defmodule UserDocs.TestDataset do
       add_remove_process = %{
         name: "Add and Remove Elements",
         order: 1,
-        version_id: version_0_0_1_id
+        project_id: userdocs_project_id
      },
       add_process = %{
         name: "Add Process",
         order: 2,
-        version_id: version_0_0_2_id
+        project_id: userdocs_project_id
      },
       test_everything = %{
         name: "Test Everything",
         order: 3,
-        version_id: version_0_0_1_id
+        project_id: userdocs_project_id
      },
      failing_process = %{
        name: "Fail",
        order: 3,
-       version_id: version_0_0_1_id
+       project_id: userdocs_project_id
     }
     ]
 

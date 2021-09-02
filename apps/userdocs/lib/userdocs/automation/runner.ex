@@ -16,7 +16,6 @@ defmodule UserDocs.Automation.Runner do
   alias UserDocs.StepInstances.StepInstance
   alias UserDocs.ProcessInstances.ProcessInstance
   alias UserDocs.Jobs.JobInstance
-  alias UserDocs.Projects.Version
   alias UserDocs.Projects.Project
 
   def parse(process = %UserDocs.Automation.Process{}) do
@@ -32,7 +31,6 @@ defmodule UserDocs.Automation.Runner do
       page: &Page.safe/2,
       process: &Process.safe/2,
       screenshot: &Screenshot.safe/2,
-      version: &Version.safe/2,
       project: &Project.safe/2
     }
 
@@ -50,7 +48,6 @@ defmodule UserDocs.Automation.Runner do
       page: &Page.safe/2,
       process: &Process.safe/2,
       screenshot: &Screenshot.safe/2,
-      version: &Version.safe/2,
       project: &Project.safe/2
     }
 
@@ -73,7 +70,6 @@ defmodule UserDocs.Automation.Runner do
       screenshot: &Screenshot.safe/2,
       job_process: &JobProcess.Safe.apply/2,
       job_step: &JobStep.Safe.apply/2,
-      version: &Version.safe/2,
       project: &Project.safe/2
     }
 

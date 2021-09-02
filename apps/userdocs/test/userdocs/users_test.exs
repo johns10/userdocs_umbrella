@@ -106,18 +106,15 @@ defmodule UserDocs.UsersTest do
       assert project == result.teams |> Enum.at(0) |> Map.get(:projects) |> Enum.at(0)
     end
 
-    test "get_user/2 with preload teams, projects and versions and state returns preloaded user" do
+    test "get_user/2 with preload teams, projects and state returns preloaded user" do
       user = UsersFixtures.user()
       team = UsersFixtures.team()
       team_user = UsersFixtures.team_user(user.id, team.id)
       project = ProjectsFixtures.project(team.id)
-      version = ProjectsFixtures.version(project.id)
-      preloads = [teams: [:teams, [teams: :projects], [teams: [projects: :versions]]]]
-      state = %{teams: [team], users: [user], team_users: [team_user],
-        projects: [project], versions: [version]}
+      preloads = [teams: [:teams, [teams: :projects], [teams: :projects]]]
+      state = %{teams: [team], users: [user], team_users: [team_user], projects: [project]}
       result = Users.get_user!(user.id, preloads, [], state, @opts)
-      assert version == result.teams |> Enum.at(0) |> Map.get(:projects)
-      |> Enum.at(0) |> Map.get(:versions) |> Enum.at(0)
+      assert project == result.teams |> Enum.at(0) |> Map.get(:projects) |> Enum.at(0)
     end
 
     test "update_user/2 with valid project overrides updates the user" do
@@ -126,7 +123,6 @@ defmodule UserDocs.UsersTest do
       team = UsersFixtures.team()
       _team_user = UsersFixtures.team_user(user.id, team.id)
       project = ProjectsFixtures.project(team.id)
-      _version = ProjectsFixtures.version(project.id)
       overrides = [%{project_id: project.id, url: "https://www.google.com/"}]
       attrs = UsersFixtures.user_attrs(:valid)
       attrs = attrs |> Map.put(:overrides, overrides)

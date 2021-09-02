@@ -14,12 +14,14 @@ defmodule UserDocsWeb.ProcessLive.Index do
   alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.Defaults
   alias UserDocsWeb.Root
+  alias UserDocsWeb.ProcessLive.Status
+  alias UserDocsWeb.ProcessLive.Runner
+  alias UserDocsWeb.ProcessLive.Queuer
 
   def types() do
     [
       UserDocs.Automation.Process,
       UserDocs.ProcessInstances.ProcessInstance,
-      UserDocs.Projects.Version,
       UserDocs.Media.Screenshot,
     ]
   end
@@ -40,7 +42,6 @@ defmodule UserDocsWeb.ProcessLive.Index do
 
     socket
     |> load_processes(opts)
-    |> load_versions(opts)
     |> load_process_instances(opts)
     |> assign(:state_opts, opts)
   end
@@ -50,20 +51,9 @@ defmodule UserDocsWeb.ProcessLive.Index do
   def handle_params(_params, _url, %{assigns: %{auth_state: :not_logged_in}} = socket) do
     {:noreply, socket}
   end
-  def handle_params(%{"version_id" => version_id} = params, _url, socket) do
-    version = Projects.get_version!(version_id, %{strategy: true})
-    project = Projects.get_project!(version.project_id)
-    team = Users.get_team!(project.team_id, %{preloads: %{job: %{step_instances: true, process_instances: true}}})
-    socket
-    |> assign(:current_version, version)
-    |> assign(:current_project, project)
-    |> assign(:current_team, team)
-    |> prepare_processes(String.to_integer(version_id))
-    |> do_handle_params(params)
-  end
   def handle_params(params, _url, socket) do
     socket
-    |> prepare_processes(socket.assigns.current_version.id)
+    |> prepare_processes(socket.assigns.current_project.id)
     |> do_handle_params(params)
   end
 
@@ -79,14 +69,14 @@ defmodule UserDocsWeb.ProcessLive.Index do
     socket
     |> assign(:page_title, "Edit Process")
     |> assign(:process, Automation.get_process!(String.to_integer(id), socket, socket.assigns.state_opts))
-    |> assign(:select_lists, select_lists(socket))
+    |> assign(:select_lists, select_lists(socket.assigns.current_team.id))
   end
 
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Process")
     |> assign(:process, %Process{})
-    |> assign(:select_lists, select_lists(socket))
+    |> assign(:select_lists, select_lists(socket.assigns.current_team.id))
   end
 
   defp apply_action(socket, :index, _params) do
@@ -96,9 +86,9 @@ defmodule UserDocsWeb.ProcessLive.Index do
   end
 
   @impl true
-  def handle_event("select-version" = n, p, s) do
+  def handle_event("select-project" = n, p, s) do
     {:noreply, socket} = Root.handle_event(n, p, s)
-    {:noreply, prepare_processes(socket, socket.assigns.current_version.id)}
+    {:noreply, prepare_processes(socket, socket.assigns.current_project.id)}
   end
   def handle_event("delete", %{"id" => id}, socket) do
     process = Automation.get_process!(id)
@@ -107,7 +97,7 @@ defmodule UserDocsWeb.ProcessLive.Index do
       :noreply,
       socket
       |> load_processes(socket.assigns.state_opts)
-      |> prepare_processes(process.version_id)
+      |> prepare_processes(process.id)
     }
   end
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
@@ -116,22 +106,22 @@ defmodule UserDocsWeb.ProcessLive.Index do
   def handle_info(%{topic: _, event: _, payload: %ProcessInstance{}} = sub_data, socket) do
     Logger.debug("#{__MODULE__} Received a ProcessInstance broadcast")
     {:noreply, socket} = Root.handle_info(sub_data, socket)
-    {:noreply, prepare_processes(socket, socket.assigns.current_version.id)}
+    {:noreply, prepare_processes(socket, socket.assigns.current_project.id)}
   end
   def handle_info(p, s), do: Root.handle_info(p, s)
 
-  def select_lists(socket) do
+  def select_lists(team_id) do
     %{
-      versions:
-        Projects.list_versions(socket, socket.assigns.state_opts)
+      projects:
+        Projects.list_projects(%{}, %{team_id: team_id})
         |> Helpers.select_list(:name, false)
     }
   end
 
-  def prepare_processes(socket, version_id) do
+  def prepare_processes(socket, project_id) do
     opts =
       socket.assigns.state_opts
-      |> Keyword.put(:filter, {:version_id, version_id})
+      |> Keyword.put(:filter, {:project_id, project_id})
       |> Keyword.put(:preloads, [:process_instances])
       |> Keyword.put(:limit,  [process_instances: 5])
 
@@ -145,14 +135,6 @@ defmodule UserDocsWeb.ProcessLive.Index do
       |> Keyword.put(:filters, %{user_id: socket.assigns.current_user.id})
 
     Automation.load_processes(socket, opts)
-  end
-
-  def load_versions(socket, opts) do
-    opts =
-      opts
-      |> Keyword.put(:filters, %{user_id: socket.assigns.current_user.id})
-
-    Projects.load_versions(socket, opts)
   end
 
   def load_process_instances(socket, opts) do

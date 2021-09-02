@@ -12,7 +12,6 @@ defmodule UserDocs.Users.User do
   alias UserDocs.Users.Team
   alias UserDocs.Users.TeamUser
   alias UserDocs.Projects.Project
-  alias UserDocs.Projects.Version
   alias UserDocs.Users.Override
 
   @derive {Jason.Encoder, only: [:id, :email, :browser_session, :image_path, :user_data_dir_path, :default_team_id]}
@@ -30,8 +29,6 @@ defmodule UserDocs.Users.User do
     embeds_one :selected_team, Team
     field :selected_project_id, :integer
     embeds_one :selected_project, Project
-    field :selected_version_id, :integer
-    embeds_one :selected_version, Version
 
     embeds_many :overrides, Override, on_replace: :delete
 
@@ -50,7 +47,7 @@ defmodule UserDocs.Users.User do
     user
     |> pow_changeset(attrs)
     |> pow_extension_changeset(attrs)
-    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id])
+    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id])
   end
 
   def email_changeset(user, attrs) do
@@ -85,7 +82,7 @@ defmodule UserDocs.Users.User do
     user
     |> pow_changeset(attrs)
     |> pow_extension_changeset(attrs)
-    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id, :email_confirmed_at])
+    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :email_confirmed_at])
   end
 
   def signup_changeset(user, attrs) do
@@ -97,7 +94,7 @@ defmodule UserDocs.Users.User do
 
   def change_options(user, attrs) do
     user
-    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id, :image_path, :user_data_dir_path])
+    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :image_path, :user_data_dir_path])
     |> cast_assoc(:team_users)
     |> cast_embed(:overrides)
     |> ChangesetHelpers.check_only_one_default(:team_users)
@@ -105,7 +102,7 @@ defmodule UserDocs.Users.User do
 
   def change_selections(user, attrs) do
     user
-    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :selected_version_id])
+    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id])
   end
 
   def preload_teams(user = %UserDocs.Users.User{}, %{teams: teams, team_users: team_users}) do
@@ -130,18 +127,6 @@ defmodule UserDocs.Users.User do
       Enum.map(teams,
         fn(t) ->
           Map.put(t, :projects, Enum.filter(projects, fn(p) -> p.team_id == t.id end))
-        end)
-    Map.put(user, :teams, teams)
-  end
-
-  def preload_versions(user = %UserDocs.Users.User{teams: teams}, %{versions: versions}) do
-    teams =
-      Enum.map(teams,
-        fn(t) ->
-          Map.put(t, :projects, Enum.map(t.projects,
-            fn(p) ->
-              Map.put(p, :versions, Enum.filter(versions, fn(v) -> v.project_id == p.id end))
-            end))
         end)
     Map.put(user, :teams, teams)
   end

@@ -37,7 +37,7 @@ defmodule UserDocs.Automation.StepForm do
       field :name, :string
       field :url, :string
 
-      field :version_id, :integer
+
       field :project_id, :integer
     end
 

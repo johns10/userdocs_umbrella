@@ -8,10 +8,7 @@ defmodule UserDocs.StateFixtures do
   alias UserDocs.Users.TeamUser
   alias UserDocs.Users.Team
   alias UserDocs.Projects.Project
-  alias UserDocs.Projects.Version
 
-
-  alias UserDocs.DocumentVersionFixtures
   alias UserDocs.UsersFixtures
   alias UserDocs.MediaFixtures
   alias UserDocs.WebFixtures
@@ -21,13 +18,12 @@ defmodule UserDocs.StateFixtures do
   def base_state(state, opts) do
     opts =
       opts
-      |> Keyword.put(:types, [User, TeamUser, Team, Project, Version])
+      |> Keyword.put(:types, [User, TeamUser, Team, Project])
 
     user = UsersFixtures.user()
     team = UsersFixtures.team()
     team_user = UsersFixtures.team_user(user.id, team.id)
     project = ProjectsFixtures.project(team.id)
-    version = ProjectsFixtures.version(project.id)
 
     state
     |> StateHandlers.initialize(opts)
@@ -35,7 +31,6 @@ defmodule UserDocs.StateFixtures do
     |> StateHandlers.load([team], Team, opts)
     |> StateHandlers.load([team_user], TeamUser, opts)
     |> StateHandlers.load([project], Project, opts)
-    |> StateHandlers.load([version], Version, opts)
   end
 
   def base_state() do
@@ -43,18 +38,15 @@ defmodule UserDocs.StateFixtures do
     team = UsersFixtures.team()
     team_user = UsersFixtures.team_user(user.id, team.id)
     p = ProjectsFixtures.project(team.id)
-    v = ProjectsFixtures.version(p.id)
     %{
       user: user,
       team: team,
       team_user: team_user,
       project: p,
-      version: v,
       users: [user],
       teams: [team],
       team_users: [team_user],
-      projects: [p],
-      versions: [v]
+      projects: [p]
     }
   end
 

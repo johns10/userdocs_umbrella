@@ -4,7 +4,6 @@ defmodule UserDocsWeb.LiveHelpers do
   require Logger
 
   alias Phoenix.LiveView
-  alias UserDocsWeb.ModalMenus
 
   def underscored_map_keys(%Date{} = val), do: val
   def underscored_map_keys(%DateTime{} = val), do: val
@@ -42,16 +41,6 @@ defmodule UserDocsWeb.LiveHelpers do
     |> live_component(UserDocsWeb.ModalComponent, modal_opts)
   end
 
-  def live_modal_menus(socket, opts) do
-    picker_opts = [
-      id: Keyword.fetch!(opts, :id),
-      form_data: Keyword.fetch!(opts, :form_data),
-    ]
-
-    socket
-    |> live_component(ModalMenus, picker_opts)
-  end
-
   def live_form(socket, form, opts) do
     type = Keyword.fetch!(opts, :type)
     title = Keyword.fetch!(opts, :title)
@@ -74,12 +63,6 @@ defmodule UserDocsWeb.LiveHelpers do
       _ -> None
     end
 
-    current_version = try do
-      Keyword.fetch!(opts, :current_version)
-    rescue
-      _ -> None
-    end
-
     _log_string =
       "Creating live form of type " <> Atom.to_string(type) <> "\n"
       <> "  title: " <> title <> "\n"
@@ -98,7 +81,6 @@ defmodule UserDocsWeb.LiveHelpers do
       struct: struct,
       current_user: current_user,
       current_team: current_team,
-      current_version: current_version,
       opts: opts
     ]
     |> Keyword.put(type, maybe_object(action, object, struct))

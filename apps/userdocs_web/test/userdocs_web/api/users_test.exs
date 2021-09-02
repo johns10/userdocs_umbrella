@@ -36,17 +36,15 @@ defmodule UserDocsWeb.UserTest do
       team_user_3: UsersFixtures.team_user(user_3.id, team_2.id)
     }
   end
-  defp create_project(%{team_1: team}) do
-    attrs = ProjectsFixtures.project_attrs(:default, team.id)
+  defp create_project(%{team_1: team, strategy: strategy}) do
+    attrs = ProjectsFixtures.project_attrs(:default, team.id, strategy.id)
     {:ok, project} = UserDocs.Projects.create_project(attrs)
     %{project: project}
   end
-  defp create_version(%{project: project, strategy: strategy}), do: %{version: ProjectsFixtures.version(project.id, strategy.id)}
-  defp make_selections(%{user_1: user, team_1: team, project: project, version: version}) do
+  defp make_selections(%{user_1: user, team_1: team, project: project}) do
     {:ok, user} = UserDocs.Users.update_user_selections(user, %{
       selected_team_id: team.id,
-      selected_project_id: project.id,
-      selected_version_id: version.id
+      selected_project_id: project.id
    })
     %{user: user}
   end
@@ -60,7 +58,6 @@ defmodule UserDocsWeb.UserTest do
       :create_strategy,
       :create_team_users,
       :create_project,
-      :create_version,
       :make_selections
     ]
 

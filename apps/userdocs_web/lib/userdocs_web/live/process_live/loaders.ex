@@ -18,7 +18,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   def steps(socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version_id: socket.assigns.current_version.id})
+      |> Keyword.put(:filters, %{project_id: socket.assigns.current_project.id})
       |> Keyword.put(:params, %{})
 
     Automation.load_steps(socket, opts)
@@ -27,7 +27,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   def annotations(socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version_id: socket.assigns.current_version.id})
+      |> Keyword.put(:filters, %{project_id: socket.assigns.current_project.id})
       |> Keyword.put(:params, %{})
 
     Web.load_annotations(socket, opts)
@@ -36,7 +36,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   def elements(socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version_id: socket.assigns.current_version.id})
+      |> Keyword.put(:filters, %{project_id: socket.assigns.current_project.id})
       |> Keyword.put(:params, %{})
 
     Web.load_elements(socket, opts)
@@ -45,7 +45,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   def pages(socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version_id: socket.assigns.current_version.id})
+      |> Keyword.put(:filters, %{project_id: socket.assigns.current_project.id})
 
     Web.load_pages(socket, opts)
   end
@@ -53,14 +53,14 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   def screenshots(socket, opts) do
     opts =
       opts
-      |> Keyword.put(:filters, %{version_id: socket.assigns.current_version.id})
+      |> Keyword.put(:filters, %{project_id: socket.assigns.current_project.id})
 
     Screenshots.load_screenshots(socket, opts)
   end
 
   def step_instances(socket, opts) do
-    opts = Keyword.put(opts, :filters, %{version_id: socket.assigns.current_version.id })
-    StepInstances.load_version_step_instances(socket, opts)
+    opts = Keyword.put(opts, :filters, %{project_id: socket.assigns.current_project.id })
+    StepInstances.load_project_step_instances(socket, opts)
   end
 
   def projects(socket, opts) do
