@@ -34,8 +34,4 @@ defmodule UserDocs.StepInstances.StepInstance do
     |> cast_assoc(:step)
     |> validate_required([ :status, :step_id ])
   end
-
-  def safe(step_instance, handlers) do
-    UserDocs.StepInstances.StepInstance.Safe.apply(step_instance, handlers)
-  end
 end

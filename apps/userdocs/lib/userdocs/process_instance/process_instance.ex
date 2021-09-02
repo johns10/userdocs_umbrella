@@ -8,7 +8,6 @@ defmodule UserDocs.ProcessInstances.ProcessInstance do
   alias UserDocs.StepInstances.StepInstance
   alias UserDocs.Jobs.JobInstance
   alias UserDocs.Jobs.JobProcess
-  alias UserDocs.ProcessInstances.ProcessInstance.Safe
 
   @derive {Jason.Encoder, only: [:id, :uuid, :order, :status, :name, :type]}
   schema "process_instances" do
@@ -32,13 +31,9 @@ defmodule UserDocs.ProcessInstances.ProcessInstance do
 
   def changeset(process_instance, attrs) do
     process_instance
-    |> cast(attrs, [ :uuid, :order, :status, :name, :type, :errors, :warnings, :process_id, :expanded, :job_instance_id  ])
+    |> cast(attrs, [:uuid, :order, :status, :name, :type, :errors, :warnings, :process_id, :expanded, :job_instance_id])
     #|> put_assoc(:process, Map.get(attrs, :process, process_instance.process))
     |> cast_assoc(:step_instances)
-    |> validate_required([ :status, :name, :process_id ])
-  end
-
-  def safe(step_instance, handlers) do
-    Safe.apply(step_instance, handlers)
+    |> validate_required([:status, :name, :process_id])
   end
 end

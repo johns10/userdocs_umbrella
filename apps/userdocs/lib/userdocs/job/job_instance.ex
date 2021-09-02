@@ -14,8 +14,8 @@ defmodule UserDocs.Jobs.JobInstance do
     field :status, :string
     field :name, :string
     field :type, :string
-    field :errors, { :array, :map }
-    field :warnings, { :array, :map }
+    field :errors, {:array, :map}
+    field :warnings, {:array, :map}
     field :expanded, :boolean
 
     belongs_to :job, Job
@@ -25,13 +25,9 @@ defmodule UserDocs.Jobs.JobInstance do
 
   def changeset(process_instance, attrs) do
     process_instance
-    |> cast(attrs, [ :uuid, :order, :status, :name, :type, :errors, :warnings, :job_id  ])
+    |> cast(attrs, [:uuid, :order, :status, :name, :type, :errors, :warnings, :job_id])
     |> cast_assoc(:step_instances)
     |> cast_assoc(:process_instances)
-    |> validate_required([ :status ])
-  end
-
-  def safe(job_instance, handlers) do
-    UserDocs.JobInstances.JobInstance.Safe.apply(job_instance, handlers)
+    |> validate_required([:status])
   end
 end

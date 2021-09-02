@@ -38,8 +38,4 @@ defmodule UserDocs.Automation.Process do
     |> cast(attrs, [])
     |> cast_assoc(:last_process_instance)
   end
-
-  def safe(process, handlers) do
-    UserDocs.Automation.Process.Safe.apply(process, handlers)
-  end
 end

@@ -192,9 +192,6 @@ defmodule UserDocs.Jobs do
       )
    {:ok, Map.put(job, :job_processes, job_processes)}
   end
-  def export_job(%Job{} = job) do
-    UserDocs.Automation.Runner.parse(job)
-  end
 
   alias UserDocs.Jobs.JobProcess
   alias UserDocs.ProcessInstances.ProcessInstance

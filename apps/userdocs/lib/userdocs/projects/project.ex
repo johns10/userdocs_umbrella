@@ -44,19 +44,4 @@ defmodule UserDocs.Projects.Project do
     project
     |> cast(attrs, [:default])
   end
-
-  def safe(project, handlers \\ %{})
-  def safe(project = %UserDocs.Projects.Project{}, _handlers) do
-    base_safe(project)
-  end
-  def safe(nil, _), do: nil
-  def safe(project, _), do: raise(ArgumentError, "Web.Page.Safe failed because it got an invalid argument: #{inspect(project)}")
-
-  def base_safe(project = %UserDocs.Projects.Project{}) do
-    %{
-      id: project.id,
-      name: project.name,
-      base_url: project.base_url,
-    }
-  end
 end

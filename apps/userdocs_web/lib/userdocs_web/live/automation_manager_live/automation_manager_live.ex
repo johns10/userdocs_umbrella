@@ -222,7 +222,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
   def handle_event("execute-job", _payload, socket) do
     safe_job =
       socket.assigns.job
-      |> Automation.Runner.parse()
       |> UserDocsWeb.LiveHelpers.camel_cased_map_keys()
 
     {

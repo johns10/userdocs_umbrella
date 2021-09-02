@@ -173,32 +173,6 @@ defmodule UserDocs.JobsTest do
       {:ok, job} = Jobs.expand_job_process(job, process.id)
       assert job.job_processes |> Enum.at(0) |> Map.get(:collapsed) == true
     end
-    test "export_job/1 exports stuff in the right order", %{team: team, step: step, process: process} do
-      job = JobsFixtures.job(team.id)
-
-      {:ok, job_step1} = Jobs.create_job_step(job, step.id)
-      {:ok, job_process2} = Jobs.create_job_process(job, process.id)
-      {:ok, job_process3} = Jobs.create_job_process(job, process.id)
-      {:ok, job_step4} = Jobs.create_job_step(job, step.id)
-      {:ok, job_step5} = Jobs.create_job_step(job, step.id)
-
-      job = Jobs.get_job!(job.id, %{preloads: %{processes: true, steps: true}})
-
-      result = Jobs.export_job(job)
-      job_steps = Enum.map(result.job_steps, fn(job_step) -> %{id: job_step.id, order: job_step.order} end)
-      job_processes = Enum.map(result.job_processes, fn(job_process) -> %{id: job_process.id, order: job_process.order} end)
-
-      assert job_steps == [
-          %{id: job_step1.id, order: 1},
-          %{id: job_step4.id, order: 4},
-          %{id: job_step5.id, order: 5},
-        ]
-
-      assert job_processes == [
-        %{id: job_process2.id, order: 2},
-        %{id: job_process3.id, order: 3},
-      ]
-    end
 
     test "prepare_job_for_execution/2 attaches the instances correctly", %{page: page, project: project, team: team, step: step, process: process} do
       process_two = AutomationFixtures.process(project.id)

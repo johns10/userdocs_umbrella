@@ -87,10 +87,6 @@ defmodule UserDocs.Automation.Step do
     |> put_name()
   end
 
-  def safe(step, handlers) do
-    UserDocs.Automation.Step.Safe.apply(step, handlers)
-  end
-
   def put_annotation_name(%{data: %{annotation: %Ecto.Association.NotLoaded{}}} = changeset), do: changeset
   def put_annotation_name(%{data: %{element: %Ecto.Association.NotLoaded{}}} = changeset), do: changeset
   def put_annotation_name(changeset) do
