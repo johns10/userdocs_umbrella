@@ -18,7 +18,7 @@ defmodule UserDocsWeb.StepLive.Status do
 
   @impl true
   def handle_event("toggle_errors_modal", _, socket) do
-    { :noreply, socket |> assign(:display_errors_modal, not socket.assigns.display_errors_modal)}
+    {:noreply, socket |> assign(:display_errors_modal, not socket.assigns.display_errors_modal)}
   end
 
   def screenshot_status_element(socket, screenshot) do
@@ -29,7 +29,7 @@ defmodule UserDocsWeb.StepLive.Status do
     ]
 
     icon_kwargs =
-      [ aria_hidden: "true" ]
+      [aria_hidden: "true"]
       |> icon_kwargs(Screenshots.get_screenshot_status(screenshot))
 
     link(kwargs) do
@@ -48,13 +48,13 @@ defmodule UserDocsWeb.StepLive.Status do
       ]
 
     icon_kwargs =
-      [ aria_hidden: "true" ]
+      [aria_hidden: "true"]
       |> icon_kwargs(status)
 
-    content_tag(:div, [ class: "control" ]) do
-      content_tag(:div, [ class: "tags has-addons" ]) do
+    content_tag(:div, [class: "control"]) do
+      content_tag(:div, [class: "tags has-addons"]) do
         [
-          content_tag(:span, [ class: "tag"]) do
+          content_tag(:span, [class: "tag"]) do
             [
               StepInstances.count_status(step_instances, "complete") |> to_string(),
               "/",
@@ -69,12 +69,12 @@ defmodule UserDocsWeb.StepLive.Status do
     end
   end
 
-  def icon_kwargs(base, :none), do: base ++ [ class: "fa fa-check" ]
-  def icon_kwargs(base, :warn), do: base ++ [ class: "fas fa-exclamation-triangle" ]
-  def icon_kwargs(base, :ok), do: base ++ [ class: "fa fa-check" ]
-  def icon_kwargs(base, :fail), do: base ++ [ class: "fa fa-times" ]
-  def icon_kwargs(base, :started), do: base ++ [ class: "fa fa-spinner" ]
-  def icon_kwargs(base, :complete), do: base ++ [ class: "fa fa-check" ]
+  def icon_kwargs(base, :none), do: base ++ [class: "fa fa-check"]
+  def icon_kwargs(base, :warn), do: base ++ [class: "fas fa-exclamation-triangle"]
+  def icon_kwargs(base, :ok), do: base ++ [class: "fa fa-check"]
+  def icon_kwargs(base, :fail), do: base ++ [class: "fa fa-times"]
+  def icon_kwargs(base, :started), do: base ++ [class: "fa fa-spinner"]
+  def icon_kwargs(base, :complete), do: base ++ [class: "fa fa-check"]
 
   def tag_class(:none), do: "tag"
   def tag_class(:warn), do: "tag is-warning"
@@ -94,13 +94,13 @@ defmodule UserDocsWeb.StepLive.Status do
 
   def render_error(error) do
     Enum.reduce(error, "",
-      fn({ k, v }, acc ) ->
-        acc <> k <> ": " <> to_string(v) <> "\n"
+      fn({k, v}, acc ) ->
+        acc <> to_string(k) <> ": " <> to_string(v) <> "\n"
       end
     )
   end
 
-  def step_instances_status([ _ | _ ] = items) do
+  def step_instances_status([_ | _] = items) do
     Enum.reduce(items, nil, fn(step_instance, acc) ->
       case step_instance.status do
         "failed" -> :warn
