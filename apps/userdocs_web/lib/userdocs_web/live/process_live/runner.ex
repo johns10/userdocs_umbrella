@@ -4,27 +4,29 @@ defmodule UserDocsWeb.ProcessLive.Runner do
   @impl true
   def render(assigns) do
     ~L"""
-    <a id="<%= @id %>"
-      phx-click="execute-process"
-      phx-value-id="<%= @process.id %>"
-      phx-target="#automation-manager"
-      status="<%= @status %>"
-      class="<%= @class %>"
-    >
-      <span class="icon">
-        <%= case @status do
-          :ok -> content_tag(:i, "", [class: "fa fa-play-circle", aria_hidden: "true"])
-          :failed -> content_tag(:i, "", [class: "fa fa-times", aria_hidden: "true"])
-          :started -> content_tag(:i, "", [class: "fa fa-spinner", aria_hidden: "true"])
-          :complete -> content_tag(:i, "", [class: "fa fa-check", aria_hidden: "true"])
-        end %>
-      </span>
-    </a>
+    <%= if @display do %>
+      <a id="<%= @id %>"
+        phx-click="execute-process"
+        phx-value-id="<%= @process.id %>"
+        phx-target="#automation-manager"
+        status="<%= @status %>"
+        class="<%= @class %>"
+      >
+        <span class="icon">
+          <%= case @status do
+            :ok -> content_tag(:i, "", [class: "fa fa-play-circle", aria_hidden: "true"])
+            :failed -> content_tag(:i, "", [class: "fa fa-times", aria_hidden: "true"])
+            :started -> content_tag(:i, "", [class: "fa fa-spinner", aria_hidden: "true"])
+            :complete -> content_tag(:i, "", [class: "fa fa-check", aria_hidden: "true"])
+          end %>
+        </span>
+      </a>
+    <% end %>
     """
   end
 
   @impl true
-  def handle_event("update_process", %{ "status" => status } = payload, socket) do
+  def handle_event("update_process", %{"status" => status} = payload, socket) do
     {
       :noreply,
       socket

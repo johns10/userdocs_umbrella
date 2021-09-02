@@ -30,7 +30,8 @@ aside.menu
             = live_component(@socket, Runner, 
                 [ id: "process-" <> Integer.to_string(process.id),
                 app_name: @app_name,
-                process: process ])
+                process: process,
+                display: @browser_opened])
             = live_patch to: Routes.process_index_path(@socket, :edit,process.id), id: "edit-process-#{process.id}" do
               span
                 i.fa.fa-edit
