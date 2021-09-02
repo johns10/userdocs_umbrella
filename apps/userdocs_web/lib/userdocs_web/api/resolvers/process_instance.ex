@@ -27,7 +27,7 @@ defmodule UserDocsWeb.API.Resolvers.ProcessInstance do
       |> ProcessInstances.update_process_instance(args)
 
     channel =  "user:" <> to_string(current_user.id)
-    UserDocsWeb.Endpoint.broadcast(channel, "create", process_instance)
+    UserDocsWeb.Endpoint.broadcast(channel, "update", process_instance)
     {:ok, process_instance}
   end
 
