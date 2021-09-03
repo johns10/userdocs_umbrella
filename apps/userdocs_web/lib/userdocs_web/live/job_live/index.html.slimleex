@@ -1,0 +1,33 @@
+= UserDocsWeb.ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
+  %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name }],
+  last_item: %{ to: "#", name: "Jobs" } ])
+
+= if @live_action in [:new, :edit] do
+  = live_modal @socket, UserDocsWeb.JobLive.FormComponent,
+    id: @job.id || :new,
+    title: @page_title,
+    action: @live_action,
+    job: @job,
+    return_to: Routes.job_index_path(@socket, :index),
+    current_team: @current_team
+
+
+aside.menu.pb-4 
+  p.menu-label Jobs
+  ul.menu-list
+    = for job <- @jobs do
+      li
+        .is-flex
+          = link to: "#", class: "is-flex-grow-1" do
+            = job.name
+          .is-flex.is-flex-direction-row.is-flex-grow-0
+            = live_redirect to: Routes.job_show_path(@socket, :show, job) do
+              i.fa.fa-search
+            = live_patch to: Routes.job_index_path(@socket, :edit, job), id: "edit-job-#{job.id}" do
+              i.fa.fa-edit
+            = link to: "#", phx_click: "delete", phx_value_id: job.id, id: "delete-job-#{job.id}", data: [confirm: "Are you sure?"] do
+              i.fa.fa-trash
+
+= live_patch to: Routes.job_index_path(@socket, :new) do
+  button.button.is-primary New Job
+  

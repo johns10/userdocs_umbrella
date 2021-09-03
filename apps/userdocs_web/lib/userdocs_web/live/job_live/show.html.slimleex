@@ -1,0 +1,16 @@
+h1 Show Job
+
+= if @live_action in [:edit] do
+  = live_modal @socket, UserDocsWeb.JobLive.FormComponent,
+    id: @job.id,
+    title: @page_title,
+    action: @live_action,
+    job: @job,
+    return_to: Routes.job_show_path(@socket, :show, @job)
+
+<ul>
+
+</ul>
+
+span = live_patch "Edit", to: Routes.job_show_path(@socket, :edit, @job), class: "button" 
+span = live_redirect "Back", to: Routes.job_index_path(@socket, :index)

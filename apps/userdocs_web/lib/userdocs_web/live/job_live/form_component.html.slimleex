@@ -1,0 +1,14 @@
+h2.title = @title
+
+= f = form_for @changeset, "#",
+  id: "job-form",
+  phx_target: @myself,
+  phx_change: "validate",
+  phx_submit: "save"
+
+  = hidden_input f, :team_id, value: @current_team.id
+
+  = Layout.text_input f, :name, []
+
+  = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
+</form>
