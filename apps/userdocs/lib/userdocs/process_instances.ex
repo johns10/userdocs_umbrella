@@ -100,15 +100,6 @@ defmodule UserDocs.ProcessInstances do
   defp uuid_process_instance_query(uuid) do
     from(process_instances in ProcessInstance, where: process_instances.uuid == ^uuid)
   end
-
-  alias UserDocs.Automation.Process
-  alias UserDocs.Jobs.Job
-
-  def create_process_instance_from_process(process, order) do
-    base_process_instance_attrs(process, step_instance_attrs(process), order)
-    |> create_process_instance()
-  end
-
   def step_instance_attrs(process) do
     {step_instance_attrs, _max_order} =
       process.steps
@@ -133,6 +124,11 @@ defmodule UserDocs.ProcessInstances do
       warnings: [],
       type: "process_instance"
     }
+  end
+
+  def create_process_instance_from_process(process, order) do
+    base_process_instance_attrs(process, step_instance_attrs(process), order)
+    |> create_process_instance()
   end
 
   def create_process_instance(attrs) do
