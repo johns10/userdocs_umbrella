@@ -88,6 +88,13 @@ defmodule UserDocsWeb.API.Schema do
       resolve &Resolvers.StepInstance.update_step_instance/3
     end
 
+    @desc "Create a Job Instance"
+    field :create_job_instance, type: :job_instance do
+      arg :job_id, non_null(:id)
+      arg :status, non_null(:string)
+      resolve &Resolvers.JobInstance.create_job_instance/3
+    end
+
     @desc "Create a Screenshot"
     field :create_screenshot, type: :screenshot do
       arg :step_id, non_null(:id)
