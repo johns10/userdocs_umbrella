@@ -48,7 +48,7 @@ div
       = for step <- @steps do
         li class=""
           .is-flex
-            = link to: "", class: "is-flex-grow-1" do 
+            = link to: Routes.step_index_path(@socket, :edit, step.id), class: "is-flex-grow-1" do 
               = step.name
             .is-flex.is-flex-direction-row.is-flex-grow-0
               = live_component(@socket, StepLive.Status, 
