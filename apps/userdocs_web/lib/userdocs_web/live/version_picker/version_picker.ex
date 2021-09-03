@@ -63,8 +63,8 @@ defmodule UserDocsWeb.ProjectPicker do
   def update(assigns, socket) do
     current_project_name =
       case assigns.current_project do
-        %UserDocs.Projects.Project{ name: nil } = _project -> "None Selected"
-        %UserDocs.Projects.Project{ name: name } = _project -> name
+        %UserDocs.Projects.Project{name: nil} = _project -> "None Selected"
+        %UserDocs.Projects.Project{name: name} = _project -> name
         _ -> "None Selected"
       end
 
