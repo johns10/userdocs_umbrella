@@ -5,26 +5,19 @@ defmodule UserDocsWeb.ProcessLive.Index do
 
   require Logger
 
-  alias UserDocs.Users
   alias UserDocs.Helpers
   alias UserDocs.Projects
   alias UserDocs.Automation
   alias UserDocs.Automation.Process
+  alias UserDocs.Media.Screenshot
   alias UserDocs.ProcessInstances.ProcessInstance
-  alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.Defaults
   alias UserDocsWeb.Root
   alias UserDocsWeb.ProcessLive.Status
   alias UserDocsWeb.ProcessLive.Runner
   alias UserDocsWeb.ProcessLive.Queuer
 
-  def types() do
-    [
-      UserDocs.Automation.Process,
-      UserDocs.ProcessInstances.ProcessInstance,
-      UserDocs.Media.Screenshot,
-    ]
-  end
+  def types(), do: [Process, ProcessInstance, Screenshot]
 
   @impl true
   def mount(_params, session, socket) do
