@@ -40,7 +40,6 @@ defmodule UserDocsWeb.Root do
     socket
     |> validate_logged_in(session)
     |> put_app_name(session)
-    |> app_assigns()
   end
 
   def initialize(socket, opts)
@@ -161,9 +160,7 @@ defmodule UserDocsWeb.Root do
     |> assign(:app_name, app_name)
     |> assign(:uri, uri)
   end
-
-  def app_assigns(%{assigns: %{app_name: "electron"}} = socket), do: socket
-  def app_assigns(%{assigns: %{app_name: "web"}} = socket), do: socket
+  def put_app_name(socket, _), do: socket
 
   def handle_event("select-project", %{"project-id" => project_id, "team-id" => team_id} = _payload, socket) do
     changes = %{
