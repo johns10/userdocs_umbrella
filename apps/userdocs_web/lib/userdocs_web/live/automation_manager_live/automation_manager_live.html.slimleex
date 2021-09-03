@@ -11,9 +11,13 @@ css:
     transition: max-height .25s ease-in-out;
   }
 = content_tag(:div, [ id: @id ]) do 
+  = f = form_for :job, "#", [phx_submit: "submit", phx_change: "job-changed",  phx_target: @myself.cid, class: "pr-2 py-2"]
+    = select f, :job_id, @select_lists.jobs, class: "input", value: @job_id
+  </form>
+
   .field.has-addons   
     p.control 
-      = link to: "#", phx_click: "execute-job", phx_target: @myself.cid, class: "button", type: "button" do
+      = link to: "#", phx_click: "execute-job", phx_target: @myself.cid, phx_value_id: @job.id, class: "button", type: "button" do
         = content_tag(:i, "", [class: "fa fa-play-circle", aria_hidden: "true"])
     p.control 
       = link to: "#", phx_click: "reset-job",  phx_target: @myself.cid, class: "button", type: "button" do
