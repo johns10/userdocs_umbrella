@@ -164,21 +164,6 @@ defmodule UserDocs.Jobs do
   end
 
   alias UserDocs.Automation
-  def put_blank_job_process_step_instances(%Job{job_steps: job_steps, job_processes: job_processes} = job) do
-    job_steps = Enum.map(job_steps, fn(js) ->
-      Map.put(js, :step, Automation.put_blank_step_instance(js.step, nil))
-    end)
-    job_processes = Enum.map(job_processes, fn(jp) ->
-      Map.put(jp, :process, Automation.put_blank_process_and_step_instances(jp.process))
-    end)
-    job_instance_attrs = %{status: "not_started", job_id: job.id, name: job.name, order: job.order}
-   {:ok, job_instance} = UserDocs.JobInstances.create_job_instance(job_instance_attrs)
-
-    job
-    |> Map.put(:job_steps, job_steps)
-    |> Map.put(:job_processes, job_processes)
-    |> Map.put(:last_job_instance, job_instance)
-  end
   def expand_job_process(%Job{} = job, id) when is_integer(id) do
     job_processes =
       Enum.map(job.job_processes,
