@@ -15,11 +15,18 @@ defmodule UserDocs.Jobs do
   alias UserDocs.Jobs.JobStep
 
   def list_jobs(params \\ %{}) do
+    filters = Map.get(params, :filters, [])
     _preloads = Map.get(params, :preloads, [])
     base_jobs_query()
     #|> maybe_preload_step_instances(preloads[:step_instances])
     #|> maybe_preload_process_instances(preloads[:process_instances])
+    |> maybe_filter_by_team_id(filters[:team_id])
     |> Repo.all()
+  end
+
+  defp maybe_filter_by_team_id(query, nil), do: query
+  defp maybe_filter_by_team_id(query, team_id) do
+    from(job in query, where: job.team_id == ^team_id)
   end
 
   defp maybe_preload_steps(query, nil), do: query
