@@ -80,6 +80,17 @@ defmodule UserDocs.JobInstancesTest do
       assert job_instance.name == attrs.name
     end
 
+    test "create_job_instance!/2 with preloads returns everything preloaded", %{job: job, process: process, step: step} do
+      job = Jobs.get_job!(job.id)
+      {:ok, _jp} = Jobs.create_job_process(job, process.id)
+      {:ok, _js} = Jobs.create_job_step(job, step.id)
+      job = Jobs.get_job!(job.id, %{preloads: [steps: true, processes: true, last_job_instance: true]})
+      {:ok, job_instance} = JobInstances.create_job_instance(job)
+      assert job_instance.step_instances |> Enum.at(0) |> Map.get(:step) |> Map.get(:id) == step.id
+      assert job_instance.process_instances |> Enum.at(0) |> Map.get(:process) |> Map.get(:id) == process.id
+      assert job_instance.process_instances |> Enum.at(0) |> Map.get(:step_instances) |> Enum.at(0) |> Map.get(:step) |> Map.get(:id) == step.id
+    end
+
     test "create_job_instance/1 with a job prototypes a job instance", %{step: step, process: process, job: job} do
       {:ok, _job_process} = Jobs.create_job_process(job, process.id)
       {:ok, _job_step} = Jobs.create_job_step(job, step.id)
@@ -120,6 +131,5 @@ defmodule UserDocs.JobInstancesTest do
       assert {:ok, %JobInstance{}} = JobInstances.delete_job_instance(job_instance)
       assert_raise Ecto.NoResultsError, fn -> JobInstances.get_job_instance!(job_instance.id) end
     end
-
   end
 end
