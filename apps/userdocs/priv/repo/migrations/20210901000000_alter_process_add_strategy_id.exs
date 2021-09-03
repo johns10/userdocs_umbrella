@@ -1,4 +1,4 @@
-defmodule UserDocs.Repo.Migrations.AlterProcess do
+defmodule UserDocs.Repo.Migrations.AlterProcessAddStrategyId do
   use Ecto.Migration
   require Ecto.Query
 
@@ -7,7 +7,7 @@ defmodule UserDocs.Repo.Migrations.AlterProcess do
       add :strategy_id, references(:strategies, on_delete: :nothing)
     end
     flush()
-    Ecto.Query.from(version in UserDocs.Projects.Version)
+    Ecto.Query.from(version in "versions", select: version.strategy_id)
     |> UserDocs.Repo.all()
     |> Enum.map(fn(version) ->
       strategy_id = version.strategy_id

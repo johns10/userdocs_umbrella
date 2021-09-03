@@ -1,4 +1,4 @@
-defmodule UserDocs.Repo.Migrations.AlterProcess do
+defmodule UserDocs.Repo.Migrations.AlterProcessAddProjectId do
   use Ecto.Migration
   require Ecto.Query
 
