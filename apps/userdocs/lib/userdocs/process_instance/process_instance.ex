@@ -32,8 +32,13 @@ defmodule UserDocs.ProcessInstances.ProcessInstance do
   def changeset(process_instance, attrs) do
     process_instance
     |> cast(attrs, [:uuid, :order, :status, :name, :type, :errors, :warnings, :process_id, :expanded, :job_instance_id])
-    #|> put_assoc(:process, Map.get(attrs, :process, process_instance.process))
     |> cast_assoc(:step_instances)
+    |> validate_required([:status, :name, :process_id])
+  end
+
+  def fields_changeset(process_instance, attrs) do
+    process_instance
+    |> cast(attrs, [:uuid, :order, :status, :name, :type, :errors, :warnings, :process_id, :expanded, :job_instance_id])
     |> validate_required([:status, :name, :process_id])
   end
 end
