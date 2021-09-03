@@ -125,6 +125,13 @@ defmodule UserDocsWeb.Router do
     live "/steps/:id/edit", StepLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/steps/:id/screenshot", StepLive.Index, :screenshot_workflow, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
+    live "/jobs", JobLive.Index, :index
+    live "/jobs/new", JobLive.Index, :new
+    live "/jobs/:id/edit", JobLive.Index, :edit
+    live "/jobs/:id", JobLive.Show, :show
+    live "/jobs/:id/show/edit", JobLive.Show, :edit
+
+
     post "/registration/send-confirmation-email", RegistrationController, :resend_confirmation_email
   end
 
