@@ -53,13 +53,15 @@ defmodule UserDocsWeb.Plug.Integration do
     steps = UserDocs.Automation.list_steps()
     step_types = UserDocs.Automation.list_step_types()
     screenshot_step_type_id = step_types |> Enum.filter(fn(st) -> st.name == "Full Screen Screenshot" end) |> Enum.at(0) |> Map.get(:id)
+    jobs = UserDocs.Jobs.list_jobs()
     response = %{
       user: user,
       step: steps |> Enum.at(0),
       full_screen_screenshot_step: steps |> Enum.filter(fn(s) -> s.step_type_id == screenshot_step_type_id end) |> Enum.at(0),
       failing_step: steps |> Enum.filter(fn(s) -> s.name == "Failure" end) |> Enum.at(0),
       process: process,
-      failing_process: processes |> Enum.filter(fn(p) -> p.name == "Fail" end) |> Enum.at(0)
+      failing_process: processes |> Enum.filter(fn(p) -> p.name == "Fail" end) |> Enum.at(0),
+      job: jobs |> Enum.at(0)
     }
     send_resp(conn, 200, Jason.encode!(response))
   end
