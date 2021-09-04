@@ -248,19 +248,12 @@ defmodule UserDocs.Jobs do
 
   alias UserDocs.Jobs.JobProcess
   def get_executable_items(nil), do: []
-  def get_executable_items(%Job{job_steps: %Ecto.Association.NotLoaded{}} = job) do
-    get_job!(job.id, %{preloads: %{processes: true, steps: true}})
-    |> get_executable_items()
-  end
-  def get_executable_items(%Job{job_processes: %Ecto.Association.NotLoaded{}} = job) do
-    get_job!(job.id, %{preloads: %{processes: true, steps: true}})
-    |> get_executable_items()
-  end
   def get_executable_items(%Job{job_steps: job_steps, job_processes: job_processes}) do
     job_steps
     ++ job_processes
     |> Enum.sort(fn(o1, o2) -> o1.order < o2.order end)
   end
+
   def max_order(%Job{} = job) do
     get_executable_items(job)
     |> max_order()
