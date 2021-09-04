@@ -1,15 +1,18 @@
 defmodule UserDocsWeb.API.Resolvers.StepInstance do
   @moduledoc false
-  alias UserDocs.StepInstances
-  alias UserDocs.ProcessInstances.ProcessInstance
-  alias UserDocs.Jobs.JobStep
   alias UserDocs.Automation.Step
+  alias UserDocs.Jobs.JobStep
+  alias UserDocs.Jobs.JobInstance
+  alias UserDocs.ProcessInstances.ProcessInstance
+  alias UserDocs.StepInstances
 
+
+  def list_step_instances(%JobInstance{step_instances: step_instances}, _args, _resolution)  do
+    {:ok, step_instances}
+  end
   def list_step_instances(%ProcessInstance{step_instances: step_instances}, _args, _resolution) when is_list(step_instances) do
     {:ok, step_instances}
   end
-
-
   def list_step_instances(%JobStep{step_instance: step_instance}, _args, _resolution)  do
     {:ok, step_instance}
   end
