@@ -9,6 +9,7 @@ defmodule UserDocs.Users.User do
     extensions: [PowResetPassword, PowEmailConfirmation, PowInvitation]
 
   alias UserDocs.ChangesetHelpers
+  alias UserDocs.Jobs.Job
   alias UserDocs.Users.Team
   alias UserDocs.Users.TeamUser
   alias UserDocs.Projects.Project
@@ -24,7 +25,6 @@ defmodule UserDocs.Users.User do
 
     field :default_team_id, :integer
     embeds_one :default_team, Team
-
     field :selected_team_id, :integer
     embeds_one :selected_team, Team
     field :selected_project_id, :integer
@@ -33,6 +33,8 @@ defmodule UserDocs.Users.User do
     embeds_many :overrides, Override, on_replace: :delete
 
     has_many :team_users, TeamUser
+
+    belongs_to :job, Job
 
     many_to_many :teams,
       Team,
@@ -47,7 +49,7 @@ defmodule UserDocs.Users.User do
     user
     |> pow_changeset(attrs)
     |> pow_extension_changeset(attrs)
-    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id])
+    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :job_id])
   end
 
   def email_changeset(user, attrs) do
@@ -82,7 +84,7 @@ defmodule UserDocs.Users.User do
     user
     |> pow_changeset(attrs)
     |> pow_extension_changeset(attrs)
-    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :email_confirmed_at])
+    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :email_confirmed_at, :job_id])
   end
 
   def signup_changeset(user, attrs) do
@@ -94,7 +96,7 @@ defmodule UserDocs.Users.User do
 
   def change_options(user, attrs) do
     user
-    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :image_path, :user_data_dir_path])
+    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :job_id, :image_path, :user_data_dir_path])
     |> cast_assoc(:team_users)
     |> cast_embed(:overrides)
     |> ChangesetHelpers.check_only_one_default(:team_users)
@@ -102,7 +104,7 @@ defmodule UserDocs.Users.User do
 
   def change_selections(user, attrs) do
     user
-    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id])
+    |> cast(attrs, [:default_team_id, :selected_team_id, :selected_project_id, :job_id])
   end
 
   def preload_teams(user = %UserDocs.Users.User{}, %{teams: teams, team_users: team_users}) do
