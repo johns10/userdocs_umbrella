@@ -1,5 +1,7 @@
 defmodule UserDocs.TestDataset do
 
+  alias UserDocs.Jobs
+
   alias UserDocs.Users
   alias UserDocs.Users.User
   alias UserDocs.Users.Team
@@ -1090,12 +1092,22 @@ defmodule UserDocs.TestDataset do
      }
     ]
 
-    Enum.each(steps,
-      fn(s) ->
-        %Step{}
-        |> Step.changeset(s)
-        |> Repo.insert()
-      end
-    )
+    {:ok, job} = Jobs.create_job(%{name: "Test Job"})
+
+    Enum.map(steps, fn(s) ->
+        {:ok, step} =
+          %Step{}
+          |> Step.changeset(s)
+          |> Repo.insert()
+
+        step
+      end)
+    |> Enum.take(9)
+    |> Enum.map(fn(s) ->
+      {:ok, js} = Jobs.create_job_step(job, s.id)
+      js
+    end)
+
+    {:ok, _job_process} = Jobs.create_job_process(job, add_remove_process_id)
   end
 end
