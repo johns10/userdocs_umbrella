@@ -8,6 +8,7 @@ defmodule UserDocs.Jobs.JobInstance do
   alias UserDocs.ProcessInstances.ProcessInstance
   alias UserDocs.Jobs.Job
 
+  @derive {Jason.Encoder, only: [:id, :uuid, :order, :status, :name, :type]}
   schema "job_instances" do
     field :uuid, :binary_id
     field :order, :integer
