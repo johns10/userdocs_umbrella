@@ -22,6 +22,12 @@ css:
       = link to: Routes.page_path(@socket, :index), class: "navbar-item" do
         = img_tag Routes.static_path(@socket, "/images/logo.png"), height: 28
 
+      = if is_struct(@current_project, UserDocs.Projects.Project) do
+        = live_patch "Processes", class: "navbar-item", to: Routes.process_index_path(@socket, :index)
+
+      = if is_struct(@current_project, UserDocs.Projects.Project) do
+        = live_patch "Jobs", class: "navbar-item", to: Routes.job_index_path(@socket, :index)
+
       = link to: "#", class: "navbar-burger burger", aria_label: "menu", aria_expanded: "false", data_target: "navbarBasicExample" do
         span aria-hidden="true"
         span aria-hidden="true"
@@ -29,13 +35,11 @@ css:
 
     .navbar-menu#navbar
       .navbar-start
-        = link "Home", to: "#", class: "navbar-item" 
         = live_patch "Teams", class: "navbar-item", to: Routes.team_index_path(@socket, :index)
         = live_patch "Projects", class: "navbar-item", to: Routes.project_index_path(@socket, :index)
-        = if is_struct(@current_project, UserDocs.Projects.Project) do
-          = live_patch "Processes", class: "navbar-item", to: Routes.process_index_path(@socket, :index)
         = live_component(@socket, UserDocsWeb.ProjectPicker, 
-        [ current_user: @current_user, current_project: @current_project])
+          [ current_user: @current_user, current_project: @current_project])
+        
 
       .navbar-end
         .navbar-item
