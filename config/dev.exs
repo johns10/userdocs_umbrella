@@ -73,7 +73,7 @@ config :userdocs_web, UserDocsWeb.Endpoint,
     patterns: [
       # ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/userdocs_web/(live|views)/.*(ex)$",
+      ~r"lib/userdocs_web/(api|channels|controllers|live|plug|templates|views)/.*(ex)$",
       ~r"lib/userdocs_web/templates/.*(eex|slim|slime|slimleex)$"
     ]
   ]
