@@ -48,12 +48,20 @@ defmodule UserDocsWeb.API.Schema do
 
   mutation do
 
-    @desc "Update a Job"
-    field :update_job, type: :job do
+    @desc "Create a Job Instance"
+    field :create_job_instance, type: :job_instance do
+      arg :job_id, non_null(:id)
+      arg :status, non_null(:string)
+      resolve &Resolvers.JobInstance.create_job_instance/3
+    end
+
+    @desc "Update a Job Instance"
+    field :update_job_instance, type: :job_instance do
       arg :id, non_null(:id)
-      arg :last_job_instance, :job_instance_input
-      arg :job_processes, list_of(:job_process_input)
-      resolve &Resolvers.Job.update_job/3
+      arg :status, non_null(:string)
+      arg :errors, list_of(:error_input)
+      arg :warnings, list_of(:warning_input)
+      resolve &Resolvers.JobInstance.update_job_instance/3
     end
 
     @desc "Create a Process Instance"
@@ -68,6 +76,8 @@ defmodule UserDocsWeb.API.Schema do
       arg :id, non_null(:id)
       arg :status, non_null(:string)
       arg :step_instances, list_of(:step_instance_input)
+      arg :errors, list_of(:error_input)
+      arg :warnings, list_of(:warning_input)
       resolve &Resolvers.ProcessInstance.update_process_instance/3
     end
 
@@ -82,17 +92,9 @@ defmodule UserDocsWeb.API.Schema do
     field :update_step_instance, type: :step_instance do
       arg :id, non_null(:id)
       arg :status, non_null(:string)
-      arg :step, :step_input
       arg :errors, list_of(:error_input)
       arg :warnings, list_of(:warning_input)
       resolve &Resolvers.StepInstance.update_step_instance/3
-    end
-
-    @desc "Create a Job Instance"
-    field :create_job_instance, type: :job_instance do
-      arg :job_id, non_null(:id)
-      arg :status, non_null(:string)
-      resolve &Resolvers.JobInstance.create_job_instance/3
     end
 
     @desc "Create a Screenshot"
@@ -119,6 +121,14 @@ defmodule UserDocsWeb.API.Schema do
   end
 
     """
+    @desc "Update a Job"
+    field :update_job, type: :job do
+      arg :id, non_null(:id)
+      arg :last_job_instance, :job_instance_input
+      arg :job_processes, list_of(:job_process_input)
+      resolve &Resolvers.Job.update_job/3
+    end
+
     @desc "Get process instances"
     field :process_instances, list_of(:process_instance) do
       resolve &Resolvers.ProcessInstance.list_process_instances/3
