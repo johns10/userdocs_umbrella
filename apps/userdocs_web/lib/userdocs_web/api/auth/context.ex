@@ -1,5 +1,6 @@
 defmodule UserDocsWeb.API.Auth.Context do
   @behaviour Plug
+  alias UserDocs.Users
 
   def init(opts), do: opts
 
@@ -9,6 +10,6 @@ defmodule UserDocsWeb.API.Auth.Context do
   end
 
   def build_context(%{assigns: %{current_user: current_user}}) do
-    %{current_user: UserDocs.Users.get_user!(current_user.id, %{team_users: true})}
+    %{current_user: Users.get_user!(current_user.id, %{team_users: true})}
   end
 end
