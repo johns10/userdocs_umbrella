@@ -125,7 +125,7 @@ defmodule UserDocs.JobInstances do
       end)
 
     process_instance_attrs =
-      UserDocs.ProcessInstances.base_process_instance_attrs(process, step_instance_attrs, nil)
+      UserDocs.ProcessInstances.base_process_instance_attrs(process, step_instance_attrs, job_process.order)
       |> Map.put(:job_instance_id, job_instance_id)
 
     {:ok, process_instance} =
