@@ -39,20 +39,22 @@ defmodule UserDocs.Jobs do
     |> join(:left, [js_steps: s], st in assoc(s, :step_type), as: :js_step_type)
     |> join(:left, [js_steps: s], a in assoc(s, :annotation), as: :js_annotation)
     |> join(:left, [js_steps: s], p in assoc(s, :page), as: :js_page)
+    |> join(:left, [js_page: p], project in assoc(p, :project), as: :js_project)
     |> join(:left, [js_steps: s], e in assoc(s, :element), as: :js_element)
     |> join(:left, [js_steps: s], pr in assoc(s, :screenshot), as: :js_screenshot)
     |> join(:left, [js_steps: s], pr in assoc(s, :process), as: :js_process)
     |> join(:left, [js_element: e], st in assoc(e, :strategy), as: :js_strategy)
     |> join(:left, [js_annotation: a], at in assoc(a, :annotation_type), as: :js_annotation_type)
     |> preload([job_steps: js, js_steps: s, js_step_type: st, js_element: e, js_strategy: strategy, js_annotation: a,
-        js_annotation_type: at, js_page: page, js_process: process, js_screenshot: screenshot, js_step_instances: si],
+        js_annotation_type: at, js_page: page, js_process: process, js_screenshot: screenshot, js_step_instances: si,
+        js_project: project],
       [job_steps: {js,
           step_instance: si,
           step: {s, [
             step_type: st,
             element: {e, strategy: strategy},
             annotation: {a, annotation_type: at},
-            page: page,
+            page: {page, project: project},
             process: process,
             screenshot: screenshot]}}])
   end
