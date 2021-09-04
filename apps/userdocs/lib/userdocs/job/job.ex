@@ -8,7 +8,7 @@ defmodule UserDocs.Jobs.Job do
   alias UserDocs.Jobs.JobInstance
   alias UserDocs.Users.Team
 
-
+  @derive {Jason.Encoder, only: [:id, :order, :name]}
   schema "jobs" do
     field :order, :integer
     field :status, :string
