@@ -98,7 +98,7 @@ defmodule UserDocs.JobInstances do
 
   def create_step_instance(%JobStep{step: step} = job_step, job_instance_id) do
     step_instance_attrs =
-      UserDocs.StepInstances.base_step_instance_attrs(step, nil)
+      UserDocs.StepInstances.base_step_instance_attrs(step, job_step.order)
       |> Map.put(:job_instance_id, job_instance_id)
 
     {:ok, step_instance} = UserDocs.StepInstances.create_step_instance(step_instance_attrs)
