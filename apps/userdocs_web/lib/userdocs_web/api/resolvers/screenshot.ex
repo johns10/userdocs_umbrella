@@ -36,6 +36,10 @@ defmodule UserDocsWeb.API.Resolvers.Screenshot do
       fn() ->
         case Screenshots.create_screenshot(map_base64(args)) do
           {:ok, initial_screenshot} -> {:ok, initial_screenshot}
+          {:error, %Ecto.Changeset{changes: %{step_id: step_id}, errors: [step_id: {"has already been taken", _}]}} ->
+            Screenshots.get_screenshot_by_step_id!(step_id)
+            |> Screenshots.update_screenshot(args)
+
           {:error, changeset} -> {:error, UserDocs.ChangesetHelpers.changeset_error_to_string(changeset)}
         end
       end
