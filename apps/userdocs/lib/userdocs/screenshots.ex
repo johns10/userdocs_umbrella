@@ -37,6 +37,10 @@ defmodule UserDocs.Screenshots do
   Gets a single screenshot.  Raises `Ecto.NoResultsError` if the Screenshot does not exist.
   """
   def get_screenshot!(id), do: Repo.get!(Screenshot, id)
+  def get_screenshot_by_step_id(step_id) do
+    from(screenshot in Screenshot, where: screenshot.step_id == ^step_id)
+    |> Enum.at(0)
+  end
 
   def get_screenshot_url(nil, _), do: {:no_screenshot, ""}
   def get_screenshot_url(%Ecto.Association.NotLoaded{}, _), do: {:not_loaded, ""}
