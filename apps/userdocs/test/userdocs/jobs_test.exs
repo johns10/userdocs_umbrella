@@ -65,7 +65,7 @@ defmodule UserDocs.JobsTest do
 
     test "list_job/0 returns all job instances", %{team: team} do
       job = JobsFixtures.job(team.id)
-      [ result_job ] = Jobs.list_jobs() # BULLSHIT, remove
+      [result_job] = Jobs.list_jobs() # BULLSHIT, remove
       assert job == result_job
     end
 
@@ -74,28 +74,26 @@ defmodule UserDocs.JobsTest do
       assert Jobs.get_job!(job.id) == job
     end
 
-    test "get_job!/1 returns the preloaded job with given id", %{process: process, team: team} do
+    test "get_job!/1 returns the preloaded job with given id", %{process: process, team: team, step: step} do
       job = JobsFixtures.job(team.id)
       process_instance_one = JobsFixtures.process_instance(process.id)
       process_instance_two = JobsFixtures.process_instance(process.id)
+      job = Jobs.get_job!(job.id, %{preloads: [processes: true, steps: true]})
 
       {:ok, _job_process_one} = Jobs.create_job_process(job, process.id, process_instance_one.id)
       {:ok, _job_process_two} = Jobs.create_job_process(job, process.id, process_instance_two.id)
 
-      job = Jobs.get_job!(job.id, %{preloads: [ steps: true, processes: true, last_job_instance: true ]})
+      job = Jobs.get_job!(job.id, %{preloads: [steps: true, processes: true, last_job_instance: true]})
 
       _job_instance = UserDocs.JobInstances.create_job_instance(job)
 
-      job =
-        Jobs.get_job!(job.id, %{preloads: [ steps: true, processes: true, last_job_instance: true ]})
-        |> Jobs.prepare_for_execution()
+      job = Jobs.get_job!(job.id, %{preloads: [steps: true, processes: true, last_job_instance: true]})
 
-      job.job_processes |> Enum.at(0) |> Map.get(:process) |> Map.get(:last_process_instance) |> Map.get(:id)
-      job.job_processes |> Enum.at(1) |> Map.get(:process) |> Map.get(:last_process_instance) |> Map.get(:id)
+      assert job.job_processes |> Enum.at(0) |> Map.get(:process) |> Map.get(:id) == process.id
+      assert job.job_processes |> Enum.at(1) |> Map.get(:process) |> Map.get(:id) == process.id
 
-      job.job_processes |> Enum.at(0) |> Map.get(:process) |> Map.get(:steps) |> Enum.at(0) |> Map.get(:last_step_instance) |> Map.get(:id)
-      job.job_processes |> Enum.at(1) |> Map.get(:process) |> Map.get(:steps) |> Enum.at(0) |> Map.get(:last_step_instance) |> Map.get(:id)
-
+      assert job.job_processes |> Enum.at(0) |> Map.get(:process) |> Map.get(:steps) |> Enum.at(0) |> Map.get(:id) == step.id
+      assert job.job_processes |> Enum.at(1) |> Map.get(:process) |> Map.get(:steps) |> Enum.at(0) |> Map.get(:id) == step.id
     end
 
     test "create_job/1 with valid data creates a job instance", %{team: team} do
@@ -136,38 +134,43 @@ defmodule UserDocs.JobsTest do
 
     test "create_job_step/2 adds a step to the job", %{team: team, step: step} do
       job = JobsFixtures.job(team.id)
+      job = Jobs.get_job!(job.id, %{preloads: [processes: true, steps: true]})
       {:ok, _job_step} = Jobs.create_job_step(job, step.id)
-      job = Jobs.get_job!(job.id, %{preloads: [ steps: true ]})
+      job = Jobs.get_job!(job.id, %{preloads: [steps: true]})
       assert job.job_steps |> Enum.at(0) |> Map.get(:step) |> Map.get(:id) == step.id
     end
 
     test "create_job_process/2 adds a process to the job", %{team: team, process: process} do
       job = JobsFixtures.job(team.id)
+      job = Jobs.get_job!(job.id, %{preloads: [processes: true, steps: true]})
       {:ok, _job_process} = Jobs.create_job_process(job, process.id)
-      job = Jobs.get_job!(job.id, %{preloads: [ processes: true ]})
+      job = Jobs.get_job!(job.id, %{preloads: [processes: true]})
       assert job.job_processes |> Enum.at(0) |> Map.get(:process) |> Map.get(:id) == process.id
     end
 
     test "delete_job_step/2 deletes a step from the job", %{team: team, step: step} do
       job = JobsFixtures.job(team.id)
+      job = Jobs.get_job!(job.id, %{preloads: [processes: true, steps: true]})
       {:ok, job_step} = Jobs.create_job_step(job, step.id)
       assert {:ok, %JobStep{}} = Jobs.delete_job_step(job_step)
       assert_raise Ecto.NoResultsError, fn -> Jobs.get_job_step!(job_step.id) end
-      job = Jobs.get_job!(job.id, %{preloads: [ steps: true ]})
+      job = Jobs.get_job!(job.id, %{preloads: [steps: true]})
       assert job.job_steps == []
     end
 
     test "delete_job_process/2 deletes a process from the job", %{team: team, process: process} do
       job = JobsFixtures.job(team.id)
+      job = Jobs.get_job!(job.id, %{preloads: [processes: true, steps: true]})
       {:ok, job_process} = Jobs.create_job_process(job, process.id)
       assert {:ok, %JobProcess{}} = Jobs.delete_job_process(job_process)
       assert_raise Ecto.NoResultsError, fn -> Jobs.get_job_process!(job_process.id) end
-      job = Jobs.get_job!(job.id, %{preloads: [ processes: true ]})
+      job = Jobs.get_job!(job.id, %{preloads: [processes: true]})
       assert job.job_processes == []
     end
 
     test "expand_job_process/2 expands the instance", %{team: team, process: process} do
       job = JobsFixtures.job(team.id)
+      job = Jobs.get_job!(job.id, %{preloads: [processes: true, steps: true]})
       {:ok, _job_process} = Jobs.create_job_process(job, process.id)
       job = Jobs.get_job!(job.id, %{preloads: %{processes: true}})
       {:ok, job} = Jobs.expand_job_process(job, process.id)
@@ -177,7 +180,7 @@ defmodule UserDocs.JobsTest do
     test "update_job_step_instance/2 updates the job", %{team: team, process: process} do
       job = JobsFixtures.job(team.id)
       process = UserDocs.AutomationManager.get_process!(process.id)
-      job = Jobs.get_job!(job.id, %{preloads: [ steps: true, processes: true, last_job_instance: true ]})
+      job = Jobs.get_job!(job.id, %{preloads: [steps: true, processes: true, last_job_instance: true]})
       _job_instance = UserDocs.JobInstances.create_job_instance(job)
       {:ok, process_instance} =
         UserDocs.ProcessInstances.create_process_instance_from_process(process, Jobs.max_order(job) + 1)
@@ -185,16 +188,14 @@ defmodule UserDocs.JobsTest do
       {:ok, _job_process} = Jobs.create_job_process(job, process.id, process_instance.id)
 
       job =
-        Jobs.get_job!(job.id, %{preloads: [ steps: true, processes: true, last_job_instance: true ]})
-        |> Jobs.prepare_for_execution()
+        Jobs.get_job!(job.id, %{preloads: [steps: true, processes: true, last_job_instance: true]})
 
       step_instance =
         job.job_processes
         |> Enum.at(0)
-        |> Map.get(:process)
-        |> Map.get(:steps)
+        |> Map.get(:process_instance)
+        |> Map.get(:step_instances)
         |> Enum.at(0)
-        |> Map.get(:last_step_instance)
         |> Map.put(:status, "complete")
 
       job = Jobs.update_job_step_instance(job, step_instance)
