@@ -195,6 +195,10 @@ defmodule UserDocs.Jobs do
 
   alias UserDocs.Jobs.JobProcess
   def get_executable_items(nil), do: []
+  def get_executable_items(%Job{job_steps: %Ecto.Association.NotLoaded{}}),
+    do: raise("Job Steps not loaded. Please preload your job steps and try again")
+  def get_executable_items(%Job{job_processes: %Ecto.Association.NotLoaded{}}),
+    do: raise("Job Processes not loaded. Please preload your job steps and try again")
   def get_executable_items(%Job{job_steps: job_steps, job_processes: job_processes}) do
     job_steps
     ++ job_processes
