@@ -1092,9 +1092,11 @@ defmodule UserDocs.TestDataset do
      }
     ]
 
-    {:ok, job} = Jobs.create_job(%{name: "Test Job"})
+    {:ok, %{id: job_id}} = Jobs.create_job(%{name: "Test Job"})
+    job = Jobs.get_job!(job_id, %{preloads: [steps: true, processes: true, last_job_instance: true]})
 
-    Enum.map(steps, fn(s) ->
+    Enum.map(steps,
+      fn(s) ->
         {:ok, step} =
           %Step{}
           |> Step.changeset(s)
