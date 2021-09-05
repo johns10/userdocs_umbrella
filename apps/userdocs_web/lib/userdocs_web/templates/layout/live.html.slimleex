@@ -68,13 +68,8 @@ css:
           div#content
             = @inner_content
           = if is_struct(@current_user, UserDocs.Users.User) and is_struct(@current_team, UserDocs.Users.Team) do
-            = live_component(@socket, UserDocsWeb.DrawerLive, 
-              [ id: "navigation-drawer", 
-              current_user: @current_user, 
-              current_team: @current_team,
-              browser_opened: @browser_opened,
-              user_opened_browser: @user_opened_browser,
-              closed: @navigation_drawer_closed  ])
+            = live_render @socket, UserDocsWeb.DrawerLive, id: "navigation-drawer", 
+              session: %{"user_id" => @current_user.id, "team_id" => @current_team.id}
               
 - else
   = @inner_content
