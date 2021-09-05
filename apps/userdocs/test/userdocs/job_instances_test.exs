@@ -66,7 +66,7 @@ defmodule UserDocs.JobInstancesTest do
 
     test "list_job_instances/0 returns all projects", %{job: job} do
       job_instance = JobFixtures.job_instance(job.id)
-      assert JobInstances.list_job_instances() == [ job_instance ]
+      assert JobInstances.list_job_instances() == [job_instance]
     end
 
     test "get_job_instance!/1 returns the job instance with given id", %{job: job} do
@@ -81,9 +81,9 @@ defmodule UserDocs.JobInstancesTest do
     end
 
     test "create_job_instance!/2 with preloads returns everything preloaded", %{job: job, process: process, step: step} do
-      job = Jobs.get_job!(job.id)
+      job = Jobs.get_job!(job.id, %{preloads: [steps: true, processes: true, last_job_instance: true]})
       {:ok, _jp} = Jobs.create_job_process(job, process.id)
-      {:ok, _js} = Jobs.create_job_step(job, step.id)
+      {:ok, js} = Jobs.create_job_step(job, step.id)
       job = Jobs.get_job!(job.id, %{preloads: [steps: true, processes: true, last_job_instance: true]})
       {:ok, job_instance} = JobInstances.create_job_instance(job)
       assert job_instance.step_instances |> Enum.at(0) |> Map.get(:step) |> Map.get(:id) == step.id
@@ -92,13 +92,14 @@ defmodule UserDocs.JobInstancesTest do
     end
 
     test "create_job_instance/1 with a job prototypes a job instance", %{step: step, process: process, job: job} do
+      job = Jobs.get_job!(job.id, %{preloads: [processes: true, steps: true]})
       {:ok, _job_process} = Jobs.create_job_process(job, process.id)
       {:ok, _job_step} = Jobs.create_job_step(job, step.id)
       {:ok, _job_step} = Jobs.create_job_step(job, step.id)
-      job = Jobs.get_job!(job.id, %{preloads: [ processes: true, steps: true ]})
+      job = Jobs.get_job!(job.id, %{preloads: [processes: true, steps: true]})
       {:ok, job_instance} = JobInstances.create_job_instance(job)
 
-      job_instance = JobInstances.get_job_instance!(job_instance.id, %{preloads: [ step_instances: true, process_instances: [ step_instances: true ] ]})
+      job_instance = JobInstances.get_job_instance!(job_instance.id, %{preloads: [step_instances: true, process_instances: [step_instances: true]]})
 
       assert job_instance.step_instances |> Enum.at(0) |> Map.get(:step_id) == step.id
       assert job_instance.step_instances |> Enum.at(0) |> Map.get(:job_instance_id) == job_instance.id
