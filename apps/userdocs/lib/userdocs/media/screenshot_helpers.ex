@@ -37,7 +37,7 @@ defmodule UserDocs.Media.ScreenshotHelpers do
   end
 
   # This is some bullshit I put in for the inconsistency after we get done.  Same deal as handle_file_disposition
-  def maybe_resize_image(state = {:ok, %Screenshot{}, filename}, "Element Screenshot", element = %{"size"=> _}) do
+  def maybe_resize_image({:ok, %Screenshot{}, filename} = state, "Element Screenshot", %{"size"=> _} = element) do
     geometry = "#{element["size"]["width"]}x#{element["size"]["height"]}+#{element["size"]["x"]}+#{element["size"]["y"]}"
 
     @path <> filename
