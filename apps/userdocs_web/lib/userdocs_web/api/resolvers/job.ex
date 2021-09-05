@@ -6,16 +6,15 @@ defmodule UserDocsWeb.API.Resolvers.Job do
     IO.puts("Get job call")
     {
       :ok,
-      Jobs.get_job!(id, %{ preloads: [ steps: true, processes: true, last_job_instance: true ]})
-      |> Jobs.prepare_for_execution()
+      Jobs.get_job!(id, %{preloads: [steps: true, processes: true, last_job_instance: true]})
     }
   end
 
   def update_job(_parent, args, _resolution) do
     IO.puts("Update Job Call")
     job =
-      Jobs.get_job!(args.id, %{ preloads: [ steps: true, processes: true, last_job_instance: true ]})
-      |> Jobs.prepare_for_execution()
+      Jobs.get_job!(args.id, %{preloads: [steps: true, processes: true, last_job_instance: true]})
+
     Jobs.update_job(job, args)
   end
 
