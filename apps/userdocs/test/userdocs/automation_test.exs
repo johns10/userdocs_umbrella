@@ -140,11 +140,11 @@ defmodule UserDocs.AutomationTest do
 
     test "runner_update_step/2 with valid data updates the step" do
       step = AutomationFixtures.step()
-      step_instance_attrs = %{ status: "not_started", step_id: step.id }
-      { :ok, step_instance } = UserDocs.StepInstances.create_step_instance(step_instance_attrs)
+      step_instance_attrs = %{status: "not_started", step_id: step.id}
+      {:ok, step_instance} = UserDocs.StepInstances.create_step_instance(step_instance_attrs)
       step = Map.put(step, :last_step_instance, step_instance)
-      step_attrs = %{ last_step_instance: %{ id: step_instance.id, status: "complete" }}
-      { :ok, step } = Automation.runner_update_step(step, step_attrs)
+      step_attrs = %{last_step_instance: %{id: step_instance.id, status: "complete"}}
+      {:ok, step} = Automation.runner_update_step(step, step_attrs)
       assert step.last_step_instance.status == "complete"
     end
 
@@ -179,48 +179,48 @@ defmodule UserDocs.AutomationTest do
       :create_project
     ]
 
-    test "list_processes/0 returns all processes", %{ project: project } do
+    test "list_processes/0 returns all processes", %{project: project} do
       process = AutomationFixtures.process(project.id)
-      assert Automation.list_processes() == [ process ]
+      assert Automation.list_processes() == [process]
     end
 
-    test "get_process!/1 returns the process with given id", %{ project: project } do
+    test "get_process!/1 returns the process with given id", %{project: project} do
       process = AutomationFixtures.process(project.id)
       assert Automation.get_process!(process.id) == process
     end
 
-    test "create_process/1 with valid data creates a process", %{ project: project } do
+    test "create_process/1 with valid data creates a process", %{project: project} do
       attrs = AutomationFixtures.process_attrs(:valid, project.id)
       assert {:ok, %Process{} = process} = Automation.create_process(attrs)
       assert process.name == attrs.name
     end
 
-    test "create_process/1 with invalid data returns error changeset", %{ project: project } do
+    test "create_process/1 with invalid data returns error changeset", %{project: project} do
       attrs = AutomationFixtures.process_attrs(:invalid, project.id)
       assert {:error, %Ecto.Changeset{}} = Automation.create_process(attrs)
     end
 
-    test "update_process/2 with valid data updates the process", %{ project: project } do
+    test "update_process/2 with valid data updates the process", %{project: project} do
       process = AutomationFixtures.process(project.id)
       attrs = AutomationFixtures.process_attrs(:valid, project.id)
       assert {:ok, %Process{} = process} = Automation.update_process(process, attrs)
       assert process.name == attrs.name
     end
 
-    test "update_process/2 with invalid data returns error changeset", %{ project: project } do
+    test "update_process/2 with invalid data returns error changeset", %{project: project} do
       process = AutomationFixtures.process(project.id)
       attrs = AutomationFixtures.process_attrs(:invalid, project.id)
       assert {:error, %Ecto.Changeset{}} = Automation.update_process(process, attrs)
       assert process == Automation.get_process!(process.id)
     end
 
-    test "delete_process/1 deletes the process", %{ project: project } do
+    test "delete_process/1 deletes the process", %{project: project} do
       process = AutomationFixtures.process(project.id)
       assert {:ok, %Process{}} = Automation.delete_process(process)
       assert_raise Ecto.NoResultsError, fn -> Automation.get_process!(process.id) end
     end
 
-    test "change_process/1 returns a process changeset", %{ project: project } do
+    test "change_process/1 returns a process changeset", %{project: project} do
       process = AutomationFixtures.process(project.id)
       assert %Ecto.Changeset{} = Automation.change_process(process)
     end
