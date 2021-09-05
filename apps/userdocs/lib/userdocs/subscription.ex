@@ -9,7 +9,7 @@ defmodule UserDocs.Subscription do
     actions = check_changes(changeset)
     queue = traverse_changes(object, actions)
     Enum.each(queue,
-      fn({ action, object }) ->
+      fn({action, object}) ->
         opts = Keyword.put(opts, :action, Atom.to_string(action))
         StateHandlers.broadcast(%{}, object, opts)
       end
@@ -18,7 +18,7 @@ defmodule UserDocs.Subscription do
 
   def traverse_changes(object, actions) do
     Enum.reduce(actions, [],
-      fn({ key, %{ action: action, changes: changes } }, acc) ->
+      fn({key, %{action: action, changes: changes}}, acc) ->
         queue_change(action, Map.get(object, key), changes, acc)
       end
     )
@@ -26,7 +26,7 @@ defmodule UserDocs.Subscription do
 
   def queue_change(_, object, _, acc) when object == %{}, do: acc
   def queue_change(action, object, changes, acc) do
-    traverse_changes(object, changes) ++ [ { action, object } | acc]
+    traverse_changes(object, changes) ++ [{action, object} | acc]
   end
 
   def check_changes(changeset) do
@@ -62,7 +62,7 @@ defmodule UserDocs.Subscription do
     Map.put(acc, field, attrs)
   end
 
-  def broadcast({ status, result }, type, operation) do
+  def broadcast({status, result}, type, operation) do
     Logger.debug("#{operation} broadcast triggered on #{type}")
     case status do
       :ok ->
@@ -71,12 +71,12 @@ defmodule UserDocs.Subscription do
         rescue
           UndefinedFunctionError ->
             Logger.debug("UndefinedFunctionError, Endpoint Unavailable.")
-            { status, result }
+            {status, result}
           e -> raise(e)
         end
-        { status, result }
+        {status, result}
       _ ->
-        { status, result }
+        {status, result}
     end
   end
 
