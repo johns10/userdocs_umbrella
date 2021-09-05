@@ -13,7 +13,7 @@ defmodule UserDocs.MediaFixtures do
   def add_screenshot_to_state(state, opts) do
     opts =
       opts
-      |> Keyword.put(:types, [ Screenshot ])
+      |> Keyword.put(:types, [Screenshot])
 
     s = Automation.list_steps(state, opts) |> Enum.at(0)
     screenshot = screenshot(s.id)
@@ -24,7 +24,7 @@ defmodule UserDocs.MediaFixtures do
   end
 
   def screenshot(step_id) do
-    { :ok, object } =
+    {:ok, object} =
       screenshot_attrs(:valid, step_id)
       |> Media.create_screenshot()
     object
