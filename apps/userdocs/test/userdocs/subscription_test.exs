@@ -54,7 +54,6 @@ defmodule UserDocs.SubscriptionTest do
       broadcast_actions = Subscription.check_changes(changeset)
       {:ok, updated_step} = Repo.update(changeset)
       result = Subscription.traverse_changes(updated_step, broadcast_actions)
-      IO.inspect(result)
       {first_action, first_object} = result |> Enum.at(0)
       assert first_action == :update
       assert first_object.__struct__ == UserDocs.Web.Annotation
