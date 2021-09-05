@@ -5,6 +5,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
   alias UserDocs.AutomationManager
   alias UserDocs.Helpers
   alias UserDocs.Jobs
+  alias UserDocs.Jobs.Job
   alias UserDocs.Jobs.JobProcess
   alias UserDocs.Jobs.JobStep
   alias UserDocs.ProcessInstances
@@ -26,54 +27,38 @@ defmodule UserDocsWeb.AutomationManagerLive do
   end
 
   @impl true
-  def update(assigns, socket) do
-    jobs_select_items =
-      Jobs.list_jobs(%{filters: [team_id: assigns.current_team.id]})
-      |> Helpers.select_list(:name, true)
-
-    if assigns.job_id do
-      job =
-        assigns.job_id
-        |> Jobs.get_job!(%{preloads: [steps: true, processes: true, last_job_instance: true]})
-        |> Jobs.prepare_for_execution()
-
-      {
-        :ok,
-        socket
-        |> assign(assigns)
-        |> assign(:select_lists, %{jobs: jobs_select_items})
-        |> assign(:job, job)
-     }
-    else
-      {:ok, assign(socket, assigns)}
-    end
+  def update(%{current_user: %{selected_team_id: team_id, job_id: nil}} = assigns, socket) do
+    {
+      :ok,
+      socket
+      |> assign(assigns)
+      |> assign(:job_id, nil)
+      |> assign(:job, %Job{job_steps: [], job_processes: []})
+      |> assign(:select_lists, %{jobs: jobs_select_list(team_id)})
+    }
   end
-
-  def inspect_job(%Jobs.Job{} = job, prefix \\ "") do
-    IO.puts("id: #{job.id}, status: #{job.status}, job_processes: ")
-    Enum.each(job.job_processes, fn(jp) -> inspect_job_process(jp, "  ") end)
-    job
+  def update(%{current_user: %{selected_team_id: team_id, job_id: job_id}} = assigns, socket) do
+    job = Jobs.get_job!(job_id, %{preloads: [steps: true, processes: true, last_job_instance: true]})
+    {
+      :ok,
+      socket
+      |> assign(assigns)
+      |> assign(:job_id, job_id)
+      |> assign(:select_lists, %{jobs: jobs_select_list(team_id)})
+      |> assign(:job, job)
+    }
   end
-
-  def inspect_job_process(%UserDocs.Jobs.JobProcess{} = job_process, prefix \\ "") do
-    IO.puts(prefix <> "id: #{job_process.id}, process_id: #{job_process.process_id}, process: ")
-    if job_process.process, do: inspect_process(job_process.process, prefix <> "  ")
-    IO.puts(prefix <> "process_instance_id: #{job_process.process_instance_id}, process_instance: ")
+  def update(%{event: "new-job-instance"} = assigns, socket) do
+    job = Jobs.get_job!(socket.assigns.job.id, %{preloads: [steps: true, processes: true, last_job_instance: true]})
+    {:ok, assign(socket, :job, job)}
   end
-
-  def inspect_process(%UserDocs.Automation.Process{} = process, prefix \\ "") do
-    IO.puts(prefix <> "id: #{process.id}, order: #{process.order}, name: #{process.name}, steps: ")
-    Enum.each(process.steps, fn(s) -> inspect_step(s, prefix <> "  ") end)
+  def update(%{event: "update-step-instance", step_instance: step_instance} = assigns, socket) do
+    job = UserDocs.Jobs.update_job_step_instance(socket.assigns.job, step_instance)
+    {:ok, assign(socket, :job, job)}
   end
-
-  def inspect_step(%UserDocs.Automation.Step{} = step, prefix \\ "") do
-    IO.puts(prefix <> "id: #{step.id}, order: #{step.order}, name: #{step.name}, last_step_instance: ")
-    inspect_step_instance(step.last_step_instance, prefix <> "  ")
-  end
-
-  def inspect_step_instance(%Ecto.Association.NotLoaded{} = step_instance, prefix), do: IO.puts(prefix <> "Not Loaded")
-  def inspect_step_instance(%UserDocs.StepInstances.StepInstance{} = step_instance, prefix \\ "") do
-    IO.puts(prefix <> "id: #{step_instance.id}, order: #{step_instance.order}, name: #{step_instance.name}")
+  def update(%{event: "update-process-instance", process_instance: process_instance} = assigns, socket) do
+    job = UserDocs.Jobs.update_job_process(socket.assigns.job, process_instance)
+    {:ok, assign(socket, :job, job)}
   end
 
   def render_job_item(object_instance, cid, interactive \\ true)
@@ -81,7 +66,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
     ~L"""
     li
       div.is-flex.is-flex-direction-row.is-flex-grow-0
-        = UserDocsWeb.StepLive.Instance.status(job_step.step.last_step_instance)
+        = UserDocsWeb.StepLive.Instance.status(job_step.step_instance)
         = link to: "#", phx_click: "delete-job-step", phx_value_id: job_step.id,phx_target: cid, class: "navbar-item py-0" do
           span.icon
             i.fa.fa-trash aria-hidden="true"
@@ -157,26 +142,13 @@ defmodule UserDocsWeb.AutomationManagerLive do
       |> assign(:job_id, job.id)
     }
   end
-  def handle_event("reset-job", _payload, socket) do
-    {:ok, _job_instance} = UserDocs.JobInstances.create_job_instance(socket.assigns.job)
-
-    {:noreply, assign_job(socket.assigns.job, socket)}
-  end
-  def handle_event("start-running", _payload, socket) do
-    {:noreply, push_event(socket, "start-running", %{})}
-  end
   def handle_event("expand-job-process", %{"id" => id}, socket) do
     {:ok, job} = Jobs.expand_job_process(socket.assigns.job, id |> String.to_integer())
     {:noreply, assign(socket, :job, job)}
   end
   def handle_event("create-job-step", %{"step-id" => step_id}, socket) do
     job = socket.assigns.job
-
-    {:ok, step_instance} =
-      AutomationManager.get_step!(step_id)
-      |> StepInstances.create_step_instance_from_step(Jobs.max_order(job) + 1)
-
-    case Jobs.create_job_step(job, String.to_integer(step_id), step_instance.id) do
+    case Jobs.create_job_step(job, String.to_integer(step_id)) do
       {:ok, _job_step} -> {:noreply, job |> assign_job(socket)}
       {:error, changeset} ->
         formatted_errors = format_changeset_errors(changeset)
@@ -192,12 +164,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
   end
   def handle_event("create-job-process", %{"id" => process_id, "name" => process_name}, socket) do
     job = socket.assigns.job
-
-    {:ok, process_instance} =
-      AutomationManager.get_process!(process_id)
-      |> ProcessInstances.create_process_instance_from_process(Jobs.max_order(job) + 1)
-
-    case Jobs.create_job_process(job, String.to_integer(process_id), process_instance.id) do
+    case Jobs.create_job_process(job, String.to_integer(process_id)) do
       {:ok, _job_process} -> {:noreply, job |> assign_job(socket)}
       {:error, changeset} ->
         formatted_errors = format_changeset_errors(changeset)
@@ -210,22 +177,6 @@ defmodule UserDocsWeb.AutomationManagerLive do
       {:error, changeset} ->
         {:noreply, Phoenix.LiveView.put_flash(socket, :error, "Failed to remove process from job")}
     end
-  end
-  def handle_event("delete-job", %{"id" => job_id}, socket) do
-    job = UserDocs.Jobs.get_job!(job_id)
-    {:ok, _job} = UserDocs.Jobs.delete_job(job)
-    {:noreply, assign(socket, :job, nil) |> assign(:job_id, nil)}
-  end
-  def handle_event("create-job", %{"team-id" => team_id}, socket) do
-    IO.puts("Create job for #{team_id}")
-    {:ok, job} = UserDocs.Jobs.create_job(%{team_id: team_id})
-    {:ok, _job_instance} =
-      job
-      |> Map.put(:job_steps, [])
-      |> Map.put(:job_processes, [])
-      |> UserDocs.JobInstances.create_job_instance()
-
-    {:noreply, job |> assign_job(socket) |> assign(:job_id, job.id)}
   end
   def handle_event("execute-job", %{"id" => job_id}, socket) do
     user_id = socket.assigns.current_user.id |> to_string
@@ -244,22 +195,14 @@ defmodule UserDocsWeb.AutomationManagerLive do
   end
 
   def assign_job(%Jobs.Job{id: id}, socket) do
-    job =
-      Jobs.get_job!(id, %{preloads: [steps: true, processes: true, last_job_instance: true]})
-      |> Jobs.prepare_for_execution()
-
+    job = Jobs.get_job!(id, %{preloads: [steps: true, processes: true, last_job_instance: true]})
     assign(socket, :job, job)
   end
 
-  def maybe_update_screenshot(%{"id" => id, "base64" => _} = attrs, team) do
-    UserDocs.Screenshots.get_screenshot!(id)
-    |> UserDocs.Screenshots.update_screenshot(attrs, team)
+  def jobs_select_list(team_id) do
+    Jobs.list_jobs(%{filters: [team_id: team_id]})
+    |> Helpers.select_list(:name, true)
   end
-  def maybe_update_screenshot(%{"base64" => _} = attrs, team) do
-    {:ok, screenshot} = UserDocs.Screenshots.create_screenshot(attrs)
-    UserDocs.Screenshots.update_screenshot(screenshot, attrs, team)
-  end
-  def maybe_update_screenshot(attrs, _team), do: {:ok, attrs}
 
   def format_changeset_errors(changeset) do
     errors = Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->

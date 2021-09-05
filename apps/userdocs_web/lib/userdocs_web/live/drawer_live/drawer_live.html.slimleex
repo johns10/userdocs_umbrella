@@ -29,15 +29,16 @@ css:
     transition: flex-basis 250ms ease-in-out;
   }
 
-input id="collapsible" class="toggle" type="checkbox" checked=@closed
+input id="collapsible" class="toggle" type="checkbox" checked=@navigation_drawer_closed
 div#sidebar.is-flex.is-flex-direction-column
   .box.is-flex.is-flex-direction-row.is-justify-content-space-between.py-3.px-4.has-background-primary.has-text-primary-light.is-shadowless.mb-0
     h2.text Automation Manager
-    span#sidebar-toggle phx-click="toggle-sidebar" phx-target="<%= @myself.cid %>"
-      = if not @closed do
+    span#sidebar-toggle phx-click="toggle-sidebar"
+      = if not @navigation_drawer_closed do
         i.fa.fa-minus-square.py-1
       - else 
         i.fa.fa-plus-square.py-1
+
   .box.pl-4.pt-4.pr-0.sidebar-content
     = live_component @socket,
       UserDocsWeb.AutomationBrowserHandlerLive, 
@@ -48,7 +49,5 @@ div#sidebar.is-flex.is-flex-direction-column
   
     = live_component @socket,
         UserDocsWeb.AutomationManagerLive,
-        [ id: "automation-manager", 
-        current_team: @current_team,
-        current_user: @current_user,
-        job_id: ( ( @current_team |> Map.get(:job) ) || %{ id: nil } ) |> Map.get(:id) ]
+        id: "automation-manager", 
+        current_user: @current_user

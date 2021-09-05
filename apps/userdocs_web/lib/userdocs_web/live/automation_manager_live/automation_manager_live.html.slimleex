@@ -12,26 +12,17 @@ css:
   }
 = content_tag(:div, [ id: @id ]) do 
   = f = form_for :job, "#", [phx_submit: "submit", phx_change: "job-changed",  phx_target: @myself.cid, class: "pr-2 py-2"]
-    = select f, :job_id, @select_lists.jobs, class: "input", value: @job_id
+    = select f, :job_id, jobs_select_list(@current_user.selected_team_id), class: "input", value: @job_id
   </form>
 
   .field.has-addons   
     p.control 
       = link to: "#", phx_click: "execute-job", phx_target: @myself.cid, phx_value_id: @job.id, class: "button", type: "button" do
         = content_tag(:i, "", [class: "fa fa-play-circle", aria_hidden: "true"])
-    p.control 
-      = link to: "#", phx_click: "reset-job",  phx_target: @myself.cid, class: "button", type: "button" do
-        = content_tag(:i, "", [class: "fa fa-refresh", aria_hidden: "true"])
 
-  = if @job_id != nil do
-    aside.menu
-      ul.menu-list
-        p 
-          = "Job ID: " <> to_string(@job_id)
-        = for item <- Jobs.get_executable_items(@job) do 
-          = render_job_item(item, @myself.cid)
-
-    = link "Delete Job", to: "#", phx_click: "delete-job", phx_value_id: @job_id, phx_target: @myself.cid, class: "button"
-  - else 
-    = link "Create Job", to: "#", phx_click: "create-job", phx_value_team_id: @current_team.id, phx_target: @myself.cid, class: "button"
-  
+  aside.menu
+    ul.menu-list
+      p 
+        = "Job ID: " <> to_string(@job_id)
+      = for item <- Jobs.get_executable_items(@job) do 
+        = render_job_item(item, @myself.cid)
