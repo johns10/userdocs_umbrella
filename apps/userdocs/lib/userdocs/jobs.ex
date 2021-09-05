@@ -193,59 +193,6 @@ defmodule UserDocs.Jobs do
   alias UserDocs.Automation.Step
   alias UserDocs.Automation.Process
 
-  def prepare_for_execution(%Job{job_processes: job_processes, job_steps: job_steps} = job) do
-    job_processes = Enum.map(job_processes, &prepare_job_process_for_execution/1)
-
-    job_steps = Enum.map(job_steps, &prepare_job_step_for_execution/1)
-
-    job
-    |> Map.put(:job_processes, job_processes)
-    |> Map.put(:job_steps, job_steps)
-  end
-
-  def prepare_job_process_for_execution(%JobProcess{
-    process_instance: %ProcessInstance{step_instances: step_instances} = process_instance,
-    process: %Process{steps: steps} = process
-  } = job_process) when is_list(step_instances) and is_list(steps) do
-    _log_string = "Fixing to zip step instances {id, order, step_id}: #{inspect(Enum.map(step_instances, fn(si) ->{si.id, si.order, si.step_id} end))} and steps: #{inspect(Enum.map(steps, fn(s) ->{s.order, s.id} end))}"
-    steps = assign_instances(step_instances, steps, process_instance.id)
-    process =
-      process
-      |> Map.put(:steps, steps)
-      |> Map.put(:last_process_instance, process_instance)
-
-    Map.put(job_process, :process, process)
-  end
-
-  defp prepare_job_step_for_execution(%JobStep{
-    step_instance: %StepInstance{} = step_instance,
-    step: %Step{} = step
-  } = job_step) do
-    step = Map.put(step, :last_step_instance, step_instance)
-    Map.put(job_step, :step, step)
-  end
-
-  def assign_instances(
-    [%StepInstance{} | _si_tail] = step_instances,
-    [%Step{} = step | s_tail] = _steps,
-    process_instance_id
-  ) do
-    step_instance_step_ids = Enum.map(step_instances, fn(si) -> si.step_id end)
-    if step.id in step_instance_step_ids do
-      step_instance =
-        step_instances
-        |> Enum.filter(fn(si) -> si.step_id == step.id end)
-        |> Enum.at(0)
-
-      [Map.put(step, :last_step_instance, step_instance) | assign_instances(step_instances, s_tail, process_instance_id)]
-    else
-     {:ok, step_instance} = StepInstances.create_step_instance_from_step(step, nil, process_instance_id)
-      [Map.put(step, :last_step_instance, step_instance) | assign_instances(step_instances, s_tail, process_instance_id)]
-    end
-  end
-  def assign_instances(_step_instances, [], _), do: []
-  def assign_instances([], steps, _), do: steps
-
   alias UserDocs.Jobs.JobProcess
   def get_executable_items(nil), do: []
   def get_executable_items(%Job{job_steps: job_steps, job_processes: job_processes}) do
@@ -295,6 +242,20 @@ defmodule UserDocs.Jobs do
     |> Repo.update()
   end
 
+  def update_job_process(%Job{job_processes: job_processes} = job, %ProcessInstance{id: id} = process_instance) do
+    updated_job_processes =
+      Enum.map(job_processes,
+        fn(jp) ->
+          case jp.process_instance_id == id do
+            true ->
+              Map.put(jp, :process_instance, process_instance)
+            false -> jp
+          end
+        end)
+
+    Map.put(job, :job_processes, updated_job_processes)
+  end
+
   def update_job_step_instance(%Job{} = job, %StepInstance{id: _id} = step_instance) do
     job
     |> update_job_direct_step_instance(step_instance)
@@ -302,61 +263,49 @@ defmodule UserDocs.Jobs do
   end
 
   def update_job_direct_step_instance(%Job{job_steps: []} = job, %StepInstance{}), do: job
-  def update_job_direct_step_instance(
-    %Job{job_steps: job_steps} = job,
-    %StepInstance{id: _id} = step_instance
-  ) do
+  def update_job_direct_step_instance(%Job{job_steps: job_steps} = job, %StepInstance{id: id} = step_instance) do
     job_steps =
       Enum.map(job_steps,
         fn(job_step) ->
-          if job_step.step_instance_id == step_instance.id do
-            IO.puts("Match")
-            updated_step_instance = Map.put(job_step.step.last_step_instance, :status, step_instance.status)
-            step = Map.put(job_step.step, :last_step_instance, updated_step_instance)
-
-            job_step
-            |> Map.put(:step_instance, step_instance)
-            |> Map.put(:step, step)
-          else
-            IO.puts("noMatch")
-            job_step
+          case job_step.step_instance_id == id do
+            true -> Map.put(job_step, :step_instance, step_instance)
+            false -> job_step
           end
         end)
 
     Map.put(job, :job_steps, job_steps)
   end
 
+
   def update_job_process_instance_step_instance(%Job{job_processes: []} = job, %StepInstance{}), do: job
   def update_job_process_instance_step_instance(
     %Job{job_processes: job_processes} = job,
-    %StepInstance{id: id, process_instance_id: process_instance_id} = step_instance
+    %StepInstance{id: id, process_instance_id: process_instance_id, step_id: _} = step_instance
   ) do
     _log_string = "updating job step instance #{step_instance.id} inside process instance with id #{process_instance_id}"
     job_processes =
       Enum.map(job_processes,
         fn(job_process) ->
-          if job_process.process_instance_id == process_instance_id do
-            _log_string = "Matched Process Instance #{job_process.process_instance_id}"
-            steps =
-              Enum.map(job_process.process.steps,
-                fn(inner_step) ->
-                  if inner_step.last_step_instance.id == id do
-                    _log_string = "Matched Step Instance #{inner_step.last_step_instance.id}.  Updating it's status to #{step_instance.status}"
-                    step_instance = Map.put(inner_step.last_step_instance, :status, step_instance.status)
-                    Map.put(inner_step, :last_step_instance, step_instance)
-                  else
-                    inner_step
-                  end
-                end)
-
-            process = Map.put(job_process.process, :steps, steps)
-            Map.put(job_process, :process, process)
-          else
-            job_process
+          case job_process.process_instance_id == process_instance_id do
+            true ->
+              steps = replace_matching_step_instance(job_process.process.steps, step_instance)
+              process = Map.put(job_process.process, :steps, steps)
+              Map.put(job_process, :process, process)
+            false -> job_process
           end
         end)
 
     Map.put(job, :job_processes, job_processes)
+  end
+
+  def replace_matching_step_instance(steps, step_instance) do
+    Enum.map(steps,
+      fn(step) ->
+        case step.id == step_instance.step_id do
+          true -> Map.put(step, :last_step_instance, step_instance)
+          false -> step
+        end
+      end)
   end
 
   def delete_job_step(%JobStep{} = job_step) do
