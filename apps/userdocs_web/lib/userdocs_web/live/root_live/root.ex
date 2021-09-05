@@ -218,48 +218,21 @@ defmodule UserDocsWeb.Root do
   end
   def handle_info({:broadcast, action, data}, socket) do
     Logger.debug("Handling #{data.__meta__.schema} Broadcast")
-    opts =
-      socket.assigns.state_opts
-      |> Keyword.put(:action, action)
+    broadcast(socket, data, action)
+    {:noreply, socket}
+  end
+  def handle_info({:update_session, params}, socket),
+    do: {:noreply, UserDocsWeb.Root.LiveSession.update_session(socket, params)}
+  def handle_info({:live_session_updated, params}, socket),
+    do: {:noreply, UserDocsWeb.Root.LiveSession.live_session_updated(socket, params)}
 
-    StateHandlers.broadcast(socket, data, opts)
-    {:noreply, socket}
-  end
-  def handle_info({:update_session, params}, socket) do
-    socket =
-      Enum.reduce(params, socket,
-        fn({k, v}, inner_socket) ->
-          PhoenixLiveSession.put_session(inner_socket, k, v)
-        end
-      )
-    {:noreply, socket}
-  end
-  def handle_info({:live_session_updated, params}, socket) do
-  {
-    :noreply,
-    socket
-    |> maybe_update_user_opened_browser(params["user_opened_browser"])
-    |> maybe_update_browser_opened(params["browser_opened"])
-    |> maybe_update_navigation_drawer_closed(params["navigation_drawer_closed"])
-  }
-  end
   def handle_info(name, _socket) do
     raise(FunctionClauseError, message: "Subscription #{inspect(name)} not implemented by Root")
   end
 
-  defp maybe_update_user_opened_browser(socket, nil), do: socket
-  defp maybe_update_user_opened_browser(socket, user_opened_browser) do
-    assign(socket, :user_opened_browser, user_opened_browser)
-  end
-
-  defp maybe_update_browser_opened(socket, nil), do: socket
-  defp maybe_update_browser_opened(socket, browser_opened) do
-    assign(socket, :browser_opened, browser_opened)
-  end
-
-  defp maybe_update_navigation_drawer_closed(socket, nil), do: socket
-  defp maybe_update_navigation_drawer_closed(socket, navigation_drawer_closed) do
-    assign(socket, :navigation_drawer_closed, navigation_drawer_closed)
+  def broadcast(socket, data, action) do
+    opts =Keyword.put(socket.assigns.state_opts, :action, action)
+    StateHandlers.broadcast(socket, data, opts)
   end
 
   def live_session_status(socket) do
