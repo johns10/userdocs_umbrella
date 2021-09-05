@@ -216,6 +216,12 @@ defmodule UserDocsWeb.Root do
   def handle_info({:update_form_data, form_data}, socket) do
     {:noreply, assign(socket, :form_data, form_data )}
   end
+  def handle_info({:broadcast, "update", %User{} = user}, socket) do
+    user_id = socket.assigns.current_user.id |> to_string
+    UserDocsWeb.Endpoint.broadcast("user:" <> user_id, "update", user)
+    broadcast(socket, user, "update")
+    {:noreply, socket}
+  end
   def handle_info({:broadcast, action, data}, socket) do
     Logger.debug("Handling #{data.__meta__.schema} Broadcast")
     opts =
