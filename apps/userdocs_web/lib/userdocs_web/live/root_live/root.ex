@@ -165,33 +165,27 @@ defmodule UserDocsWeb.Root do
   def handle_event("select-project", %{"project-id" => project_id, "team-id" => team_id} = _payload, socket) do
     changes = %{
       selected_team_id: String.to_integer(team_id),
-      selected_project_id: String.to_integer(project_id)
+      selected_project_id: String.to_integer(project_id),
+      job_id: nil
     }
-
-    {:ok, user} =
-      Users.update_user_selections(socket.assigns.current_user, changes)
-
+    {:ok, user} = Users.update_user_selections(socket.assigns.current_user, changes)
     send(self(), {:broadcast, "update", user})
-
     {
       :noreply,
       socket
       |> prepare_user()
       |> assign_current()
     }
-
   end
   def handle_event(name, _payload, _socket) do
     raise(FunctionClauseError, message: "Event #{inspect(name)} not implemented by Root")
   end
-
   def handle_info(%{topic: "user:" <> user_id} = sub_info, %{assigns: %{current_user: user}} = socket) do
     case UserDocsWeb.UserChannelHandlers.precheck(socket, String.to_integer(user_id), user.id) do
       :ok -> {:noreply, UserDocsWeb.UserChannelHandlers.apply(socket, sub_info)}
       :error -> {:noreply, socket}
     end
   end
-
   def handle_info(%{topic: topic, event: event, payload: payload}, socket) do
     schema = case payload do
       %{objects: [object | _ ]} -> object.__meta__.schema
