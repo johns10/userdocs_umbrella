@@ -19,10 +19,10 @@ defmodule UserDocs.Automation.Step.Name do
     #Logger.debug("Generating an automatic name: #{step_type.name}")
     generate(step_type.name, step_changeset)
   end
-  def execute(%{ step_type: %{ name: name }} = step) when is_bitstring(name) do
+  def execute(%{step_type: %{name: name}} = step) when is_bitstring(name) do
     generate(name, step)
   end
-  def execute(%{ step_type: %Ecto.Association.NotLoaded{}, name: name}) do
+  def execute(%{step_type: %Ecto.Association.NotLoaded{}, name: name}) do
     Logger.warn("Step.Name failed because the association wasn't loaded.  Returning current name.")
     name
   end
@@ -40,7 +40,6 @@ defmodule UserDocs.Automation.Step.Name do
   def generate("Apply Annotation" = name, %Step{} = step) do
     Logger.debug("Automatic name generation: #{name}")
     ""
-    |> maybe_field(step, :order, ". ")
     |> maybe_field(step, [:step_type, :name], " ")
     |> maybe_field(step, [:annotation, :name], "")
   end
@@ -56,7 +55,6 @@ defmodule UserDocs.Automation.Step.Name do
   def generate("Navigate" = name, %Step{} = step) do
     Logger.debug("Automatic name generation: #{name}")
     ""
-    |> maybe_field(step, :order, ". ")
     |> field(name, " to ")
     |> maybe_field(step, [:page, :name], "")
   end
@@ -80,7 +78,6 @@ defmodule UserDocs.Automation.Step.Name do
   def generate("Set Size Explicit" = name, %Step{} = step) do
     Logger.debug("Automatic name generation: #{name}")
     ""
-    |> maybe_field(step, :order, ". ")
     |> maybe_field(step, [:step_type, :name], " ")
     |> maybe_field(step, :width, "X")
     |> maybe_field(step, :height, "")
@@ -95,7 +92,6 @@ defmodule UserDocs.Automation.Step.Name do
   def generate("Element Screenshot" = name, %Step{} = step) do
     Logger.debug("Automatic name generation: #{name}")
     ""
-    |> maybe_field(step, :order, ". ")
     |> field(name, " ")
     |> maybe_field(step, [:element, :name], "")
   end
@@ -106,20 +102,18 @@ defmodule UserDocs.Automation.Step.Name do
   def generate("Clear Annotations" = name, %Step{} = step) do
     Logger.debug("Automatic name generation: #{name}")
     ""
-    |> maybe_field(step, :order, ". ")
     |> field(name, " ")
   end
 
-  def generate("Wait", %Ecto.Changeset{} = step_changeset) do
+  def generate("Wait for Element", %Ecto.Changeset{} = step_changeset) do
     element = element_or_empty_element(step_changeset)
     order_name(step_changeset) <> " for "
 
     <> (element.name || "")
   end
-  def generate("Wait" = name, %Step{} = step) do
+  def generate("Wait for Element" = name, %Step{} = step) do
     Logger.debug("Automatic name generation: #{name}")
     ""
-    |> maybe_field(step, :order, ". ")
     |> field(name, " for ")
     |> maybe_field(step, [:element, :name], "")
   end
@@ -133,7 +127,6 @@ defmodule UserDocs.Automation.Step.Name do
   def generate("Click" = name, %Step{} = step) do
     Logger.debug("Automatic name generation: #{name}")
     ""
-    |> maybe_field(step, :order, ". ")
     |> field(name, " on ")
     |> maybe_field(step, [:element, :name], "")
   end
@@ -149,7 +142,6 @@ defmodule UserDocs.Automation.Step.Name do
   def generate("Fill Field" = name, %Step{} = step) do
     Logger.debug("Automatic name generation: #{name}")
     ""
-    |> maybe_field(step, :order, ". ")
     |> field(name, " ")
     |> maybe_field(step, [:element, :name], " with ")
     |> maybe_field(step, :text, ". ")
@@ -176,7 +168,6 @@ defmodule UserDocs.Automation.Step.Name do
   def order_name(nil, _), do: "0" <> ". "
   def order_name(order, step_type) when is_integer(order) do
     ""
-    <> Integer.to_string(order) <> ". "
     <> step_type.name <> " "
   end
 
