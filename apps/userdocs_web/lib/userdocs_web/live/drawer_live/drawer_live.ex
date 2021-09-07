@@ -44,7 +44,7 @@ defmodule UserDocsWeb.DrawerLive do
 
   @impl true
   # Handles Job Instance creation (sends to automation manager)
-  def handle_info(%{topic: "user:" <> user_id, event: "create", payload: %JobInstance{} = job_instance}, socket) do
+  def handle_info(%{topic: "user:" <> _user_id, event: "create", payload: %JobInstance{} = job_instance}, socket) do
     send_update(AutomationManagerLive, %{id: "automation-manager", event: "new-job-instance"})
     {:noreply, assign(socket, :job_instance, job_instance)}
   end
@@ -65,14 +65,14 @@ defmodule UserDocsWeb.DrawerLive do
   end
 
   # Handles user updates (assigns to socket)
-  def handle_info(%{topic: "user:" <> user_id, event: "update", payload: %User{} = user}, socket),
+  def handle_info(%{topic: "user:" <> _user_id, event: "update", payload: %User{} = user}, socket),
     do: {:noreply, assign(socket, :current_user, user)}
   def handle_info({:broadcast, "update", %User{} = user}, socket),
     do: {:noreply, assign(socket, :current_user, user)}
 
 
   # Delegates browser events to the user channel handlers, ignores commands
-  def handle_info(%{topic: "user:" <> user_id, event: "event:" <> _event_name, payload: _} = info, socket),
+  def handle_info(%{topic: "user:" <> _user_id, event: "event:" <> _event_name, payload: _} = info, socket),
     do: {:noreply, UserDocsWeb.UserChannelHandlers.apply(socket, info)}
   def handle_info(%{topic: "user:" <> _, event: _, payload: _}, s), do: {:noreply, s}
 
