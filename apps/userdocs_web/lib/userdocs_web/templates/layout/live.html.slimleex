@@ -47,14 +47,6 @@ css:
             = link "User", to: Routes.user_show_path(@socket, :show, @current_user.id), class: "button"
             = link "Sign out", to: Routes.pow_session_path(@socket, :delete), method: :delete, class: "button is-light", id: "signout-button"
 
-  = live_component(@socket, UserDocsWeb.ScreenShotHandler, 
-    [ id: "screenshot-handler-component",
-    team: @current_team ])
-
-  div phx-hook="automationManager" id="automation-manager-hook"
-  div phx-hook="automatedBrowserCommands" id="automated-browser-commands"
-  div phx-hook="testSelector" id="selector-tester"
-
   section.section
     main.container role="main"
       p.alert.alert-info role="alert" phx-click="lv:clear-flash" phx-value-key="info"

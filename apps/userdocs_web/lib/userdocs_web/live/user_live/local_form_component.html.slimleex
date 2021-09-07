@@ -76,6 +76,3 @@ div id=@id
       = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
 
     </form>
-
-
-div phx-hook="configurationV2" id="configuration-v2-hook"
