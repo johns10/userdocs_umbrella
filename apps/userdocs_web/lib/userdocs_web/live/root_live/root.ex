@@ -217,7 +217,7 @@ defmodule UserDocsWeb.Root do
     {:noreply, socket}
   end
   def handle_info({:broadcast, action, data}, socket) do
-    Logger.debug("Handling #{data.__meta__.schema} Broadcast")
+    #Logger.debug("Handling #{data.__meta__.schema} Broadcast")
     broadcast(socket, data, action)
     {:noreply, socket}
   end
