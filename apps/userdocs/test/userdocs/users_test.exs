@@ -2,7 +2,6 @@ defmodule UserDocs.UsersTest do
   use UserDocs.DataCase
 
   alias UserDocs.Users
-  alias UserDocs.Users.TeamUser
   alias UserDocs.UsersFixtures
 
   @opts [data_type: :list, strategy: :by_type, loader: &Phoenix.LiveView.assign/3]

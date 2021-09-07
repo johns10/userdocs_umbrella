@@ -44,7 +44,7 @@ defmodule UserDocs.SubscriptionTest do
       step = step_fixture()
       attrs = step_attrs(step.id, step.annotation.id)
       changeset = Automation.change_step(step, attrs)
-      result = Subscription.check_changes(changeset)
+      Subscription.check_changes(changeset)
     end
 
     test "traverse_changes" do
