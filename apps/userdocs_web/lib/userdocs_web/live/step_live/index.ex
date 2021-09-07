@@ -108,12 +108,49 @@ defmodule UserDocsWeb.StepLive.Index do
     send(self(), {:broadcast, "delete", deleted_step})
     {:noreply, socket}
   end
-  @impl true
   def handle_event("select-project" = n, p, s) do
     {:noreply, socket} = Root.handle_event(n, p, s)
     {:noreply, redirect(socket, to: Routes.process_index_path(socket, :index))}
   end
+  def handle_event("fix_order", _, socket) do
+    #IO.puts("Fixing order")
+    {steps, _} = Enum.map_reduce(socket.assigns.steps, 0, fn(step, acc) ->
+      {:ok, step} = Automation.update_step(step, %{order: acc})
+      {step, acc + 1}
+    end)
+    {:noreply, assign(socket, :steps, steps)}
+  end
+  def handle_event("reorder_start", %{"id" => step_id}, socket) do
+    #IO.puts("Starting Drag")
+    step = Automation.get_step!(String.to_integer(step_id), socket, get_step_opts(socket))
+    {:noreply, socket |> assign(:drag, step) |> assign(:items, socket.assigns.steps)}
+  end
+  def handle_event("reorder_dragenter", %{"step-id" => ""}, socket) do
+    {:noreply, socket}
+  end
+  def handle_event("reorder_dragenter", %{"order" => to_order}, socket) do
+    drag = socket.assigns.drag
+    Logger.debug("Reordering #{drag.name} from #{drag.order} to #{to_order}, #{drag.id}")
+    steps = move(socket.assigns.items, drag, String.to_integer(to_order)) |> Enum.sort(&(&1.order < &2.order))
+    {:noreply, assign(socket, :steps, steps)}
+  end
+  def handle_event("reorder_dragenter", _, socket), do: {:noreply, socket}
+  def handle_event("reorder_end", _, socket) do
+    Logger.debug("Reordering steps")
+    steps = Enum.map(socket.assigns.steps, fn(updated_step) ->
+      original_step = Automation.get_step!(updated_step.id, socket.assigns, socket.assigns.state_opts)
+      {:ok, step} = Automation.update_step(original_step, %{order: updated_step.order})
+      step
+    end)
+    send(self(), {:broadcast, "update", %{objects: steps}})
+    {:noreply, socket |> assign(:drag, nil) |> assign(:items, nil)}
+  end
+  def handle_event("reorder_dragend", _, %{assigns: %{drag: nil}} = socket),
+    do: {:noreply, socket}
+  def handle_event("reorder_dragend", _, %{assigns: %{drag: _, items: items}} = socket),
+    do: {:noreply, socket |> assign(:drag, nil) |> assign(:steps, items)}
 
+  @impl true
   def handle_info(%{topic: "user:" <> user_id, event: "event:browser_event", payload: payload} = sub_info, socket) do
     payload = UserDocsWeb.LiveHelpers.underscored_map_keys(payload)
     state = %{payload: payload, page_id: recent_navigated_page_id(socket)}
@@ -130,6 +167,51 @@ defmodule UserDocsWeb.StepLive.Index do
         send_update(UserDocsWeb.StepLive.FormComponent, %{id: "step-form", step_params: step_params})
         {:noreply, socket}
     end
+  end
+
+  def move(items, %{order: from_order}, to_order) when from_order == to_order do
+    IO.puts("Same")
+    items
+  end
+  def move(items, %{order: from_order}, to_order) when Kernel.abs(from_order - to_order) == 1 do
+    Logger.debug("Moving to an adjacent item")
+    Enum.map(items, fn(item) ->
+      case item.order do
+        order when order == from_order -> Map.put(item, :order, to_order)
+        order when order == to_order -> Map.put(item, :order, from_order)
+        _ -> item
+      end
+    end)
+  end
+  def move(items, %{order: from_order}, to_order) when Kernel.abs(from_order - to_order) > 1 do
+    Logger.debug("Moving to a non adjacent item")
+    args = order_args(from_order, to_order)
+    Enum.map(items, fn(item) ->
+      case item.order do
+        order when order <= args.max and order >= args.min -> Map.put(item, :order, item.order + args.adjustment)
+        order when order == from_order -> Map.put(item, :order, to_order)
+        _ -> item
+      end
+    end)
+
+  end
+
+  def order_args(source_order, target_order)
+  when source_order < target_order == true do
+    %{
+      min: source_order + 1,
+      max: target_order,
+      adjustment: -1
+    }
+  end
+
+  def order_args(source_order, target_order)
+  when source_order < target_order == false do
+    %{
+      min: target_order,
+      max: source_order - 1,
+      adjustment: 1
+    }
   end
 
   defp recent_navigated_page_id(socket) do
@@ -317,7 +399,7 @@ defmodule UserDocsWeb.StepLive.Index do
     assign(socket, :strategy_id, project.strategy_id)
   end
 
-  def prepare_step(socket, id) do
+  def get_step_opts(socket) do
     preloads =
       [
         :step_type,
@@ -332,16 +414,17 @@ defmodule UserDocsWeb.StepLive.Index do
         [element: :strategy],
      ]
 
-    order = [%{field: :order, order: :asc}, step_instances: %{field: :id, order: :desc}]
-    limit = [step_instances: 5]
+     order = [%{field: :order, order: :asc}, step_instances: %{field: :id, order: :desc}]
+     limit = [step_instances: 5]
 
-    opts =
-      socket.assigns.state_opts
-      |> Keyword.put(:preloads, preloads)
-      |> Keyword.put(:order, order)
-      |> Keyword.put(:limit, limit)
+    socket.assigns.state_opts
+    |> Keyword.put(:preloads, preloads)
+    |> Keyword.put(:order, order)
+    |> Keyword.put(:limit, limit)
+end
 
-    step = Automation.get_step!(id, socket, opts)
+  def prepare_step(socket, id) do
+    step = Automation.get_step!(id, socket, get_step_opts(socket))
 
     annotation_form =
       if step.annotation do
