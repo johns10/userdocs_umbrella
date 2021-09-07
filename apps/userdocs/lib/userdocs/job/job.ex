@@ -29,11 +29,12 @@ defmodule UserDocs.Jobs.Job do
 
   def changeset(job, attrs) do
     job
-    |> cast(attrs, [ :team_id, :order, :status, :name, :errors, :warnings  ])
+    |> cast(attrs, [:team_id, :order, :status, :name, :errors, :warnings])
     |> cast_assoc(:last_job_instance)
     |> cast_assoc(:job_steps)
     |> cast_assoc(:job_processes)
     #|> put_assoc(:step_instances, Map.get(attrs, :step_instances, job.step_instances))
     #|> put_assoc(:process_instances, Map.get(attrs, :process_instances, job.process_instances))s
+    |> validate_required([:name])
   end
 end
