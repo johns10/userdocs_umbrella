@@ -12,5 +12,3 @@
           user: @user,
           trigger_submit: false,
           signin_failed: false
-
-div phx-hook="authenticationEvents" id="authentication-events-hook"
