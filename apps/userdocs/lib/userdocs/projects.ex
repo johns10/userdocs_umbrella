@@ -113,7 +113,7 @@ defmodule UserDocs.Projects do
     %Project{}
     |> Project.create_changeset(attrs)
     |> Repo.insert()
-    |> Subscription.broadcast("project", "create")
+    #|> Subscription.broadcast("project", "create")
   end
 
   @doc """
@@ -132,7 +132,7 @@ defmodule UserDocs.Projects do
     project
     |> Project.changeset(attrs)
     |> Repo.update()
-    |> Subscription.broadcast("project", "update")
+    #|> Subscription.broadcast("project", "update")
   end
 
   @doc """
