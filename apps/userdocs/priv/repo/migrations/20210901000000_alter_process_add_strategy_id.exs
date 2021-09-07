@@ -10,7 +10,7 @@ defmodule UserDocs.Repo.Migrations.AlterProcessAddStrategyId do
     Ecto.Query.from(version in "versions", select: version.strategy_id)
     |> UserDocs.Repo.all()
     |> Enum.map(fn(version) ->
-      strategy_id = version.strategy_id
+      strategy_id = strategy_id
       attrs = %{strategy_id: strategy_id}
       {:ok, process} = UserDocs.Automation.update_process(version.process, attrs)
       process
