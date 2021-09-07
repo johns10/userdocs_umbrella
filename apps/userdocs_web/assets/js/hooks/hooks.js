@@ -45,6 +45,9 @@ Hooks.dragDropReorder = {
       var id = element.getAttribute('step-id');
       this.pushEvent("reorder_start", {"id": id})
     })
+    this.el.addEventListener("dragend", e => {
+      this.pushEvent("reorder_dragend")
+    })
   }
 }
 
