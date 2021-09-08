@@ -371,50 +371,31 @@ defmodule UserDocs.Automation do
   def clear_last_step_instance(%Step{} = step) do
     Map.put(step, :last_step_instance, nil)
   end
-"""
-  def new_step_element(step, changeset) do
-    new_step_nested_object(step, changeset, :element_id, :element, %Element{})
-  end
 
-  def new_step_page(step, changeset) do
-    new_step_nested_object(step, changeset, :page_id, :page, %Page{})
-  end
-
-  def new_step_annotation(step, changeset) do
-    new_step_nested_object(step, changeset, :annotation_id, :annotation, %Annotation{})
-  end
-
-  def new_step_nested_object(step, changeset, foreign_key, object_key, struct) do
-    step = clear_association(step, foreign_key, object_key)
-    changeset
-    |> put_nested_struct_in_changes(step, object_key, struct)
-    |> Ecto.Changeset.put_change(foreign_key, nil)
-  end
-
-  def clear_association(%Step{id: nil} = step, _, _), do: step
-  def clear_association(%Step{} = step, foreign_key, key) do
-    {:ok, new_step} =
-      step
-      |> Step.changeset(%{foreign_key => nil})
-      |> Repo.update()
-
-    Map.put(new_step, key, nil)
-  end
-
-  def clear_nested_changes(changeset, keys) do
-    Enum.reduce(keys, changeset,
-      fn(change_key, changeset) ->
-        Ecto.Changeset.delete_change(changeset, change_key)
+  def next_order(steps) do
+    Enum.reduce(steps, 0, fn(step, acc) ->
+      case step.order > acc do
+        true -> step.order
+        false -> acc
       end
-    )
+    end)
+    |> Kernel.+(1)
   end
 
-  def put_nested_struct_in_changes(changeset, step, key, struct) do
-    step
-    |> Step.changeset(changeset.params)
-    |> Ecto.Changeset.put_change(key, struct)
+  def automatic_label(steps) do
+    Enum.reduce(steps, 1, fn(step, acc) ->
+      case step do
+        %Step{step_type: %{name: "Apply Annotation"}, annotation: %{annotation_type: %{name: "Badge"}, label: label}} ->
+          label |> String.to_integer() |> Kernel.+(1) |> to_string
+        %Step{step_type: %{name: "Apply Annotation"}, annotation: %{annotation_type: %{name: "Badge Outline"}, label: label}} ->
+          label |> String.to_integer() |> Kernel.+(1) |> to_string
+        %Step{step_type: %{name: "Clear Annotations"}} -> 1
+        %Step{step_type: %{name: "Navigate"}} -> 1
+        _ -> acc
+      end
+    end)
   end
-"""
+
   defp base_steps_query(), do: from(steps in Step)
 
   def action(:insert), do: "create"

@@ -29,6 +29,7 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
 
   def params(%{payload: %{"action" => "Navigate", "href" => href} = payload}) do
     %{
+      "action" => "navigate",
       "step_type_id" => step_type_id(payload),
       "page_reference" => "page",
       "page_id" => nil,
@@ -39,34 +40,41 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
   end
   def params(%{payload: %{"action" => "Click", "selector" => selector} = payload, page_id: page_id}) do
     %{
+      "action" => "click",
       "step_type_id" => step_type_id(payload),
       "page_id" => page_id,
       "element" => %{
         "page_id" => page_id,
         "strategy_id" => Web.css_strategy() |> Map.get(:id),
-        "selector" => selector
+        "selector" => selector,
+        "name" => payload["element_name"]
       }
     }
   end
   def params(%{payload: %{"action" => "Element Screenshot", "selector" => selector} = payload, page_id: page_id}) do
     %{
+      "action" => "element_screenshot",
       "step_type_id" => step_type_id(payload),
       "page_id" => page_id,
       "element" => %{
         "page_id" => page_id,
         "strategy_id" => Web.css_strategy() |> Map.get(:id),
-        "selector" => selector
+        "selector" => selector,
+        "name" => payload["element_name"]
       }
     }
   end
   def params(%{payload: %{"action" => "Apply Annotation", "selector" => selector} = payload, page_id: page_id}) do
+    IO.inspect(payload)
     %{
+      "action" => "apply_annotation",
       "step_type_id" => step_type_id(payload),
       "page_id" => page_id,
       "element" => %{
         "page_id" => page_id,
         "strategy_id" => Web.css_strategy() |> Map.get(:id),
-        "selector" => selector
+        "selector" => selector,
+        "name" => payload["element_name"]
       },
       "annotation" => %{
         "page_id" => page_id,
@@ -76,12 +84,14 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
   end
   def params(%{payload: %{"action" => "ITEM_SELECTED", "selector" => selector} = payload, page_id: page_id}) do
     %{
+      "action" => "item_selected",
       "step_type_id" => "do_not_update",
       "page_id" => page_id,
-      "action" => "item_selected",
       "element" => %{
         "page_id" => page_id,
-        "selector" => selector
+        "strategy_id" => Web.css_strategy() |> Map.get(:id),
+        "selector" => selector,
+        "name" => payload["element_name"]
       }
     }
   end
