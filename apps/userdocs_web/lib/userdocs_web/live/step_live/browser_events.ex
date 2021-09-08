@@ -65,7 +65,6 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
     }
   end
   def params(%{payload: %{"action" => "Apply Annotation", "selector" => selector} = payload, page_id: page_id}) do
-    IO.inspect(payload)
     %{
       "action" => "apply_annotation",
       "step_type_id" => step_type_id(payload),
@@ -87,6 +86,20 @@ defmodule UserDocsWeb.StepLive.BrowserEvents do
       "action" => "item_selected",
       "step_type_id" => "do_not_update",
       "page_id" => page_id,
+      "element" => %{
+        "page_id" => page_id,
+        "strategy_id" => Web.css_strategy() |> Map.get(:id),
+        "selector" => selector,
+        "name" => payload["element_name"]
+      }
+    }
+  end
+  def params(%{payload: %{"action" => "Fill Field", "selector" => selector, "value" => value} = payload, page_id: page_id}) do
+    %{
+      "action" => "fill_field",
+      "step_type_id" => step_type_id(payload),
+      "page_id" => page_id,
+      "text" => value,
       "element" => %{
         "page_id" => page_id,
         "strategy_id" => Web.css_strategy() |> Map.get(:id),

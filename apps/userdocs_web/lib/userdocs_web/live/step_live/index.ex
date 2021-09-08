@@ -157,13 +157,13 @@ defmodule UserDocsWeb.StepLive.Index do
     step_params = BrowserEvents.params(state)
 
     # def guard_action_from_item_selected(live_action, event_action)
-    action =
+    form_action =
       case {socket.assigns.live_action, action} do
         {:index, "ITEM_SELECTED"} -> :new
         {action, _} -> action
       end
 
-    case action do
+    case form_action do
       :index ->
         route = Routes.step_index_path(socket, :new, socket.assigns.process, %{step_params: step_params})
         {:noreply, push_patch(socket, to: route)}
@@ -178,7 +178,6 @@ defmodule UserDocsWeb.StepLive.Index do
 
   # Had to use order ... using id's screws things up, because it's hard to get the orders and id's to sync
   def move(items, %{order: from_order}, to_order) when from_order == to_order do
-    IO.puts("Same")
     items
   end
   def move(items, %{order: from_order}, to_order) when Kernel.abs(from_order - to_order) == 1 do
@@ -232,7 +231,6 @@ defmodule UserDocsWeb.StepLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id, "step_params" => step_params}) when map_size(step_params) > 0 do
-
     updated_params = Map.merge(step_params, socket.assigns.changeset.params)
     changeset = Map.put(socket.assigns.changeset, :params, updated_params)
 
