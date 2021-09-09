@@ -29,8 +29,5 @@ Mnesia.nonode@nohost*
 
 # Ignore the files in tmp
 
-# Ignore any lockfiles
-mix.lock
-
 # elixirls
 /.elixir_ls/
