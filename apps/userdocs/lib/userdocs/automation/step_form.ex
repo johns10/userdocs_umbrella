@@ -4,10 +4,11 @@ defmodule UserDocs.Automation.StepForm do
 
   require Logger
 
+  alias UserDocs.Media.Screenshot
+  alias UserDocs.Projects.Project
+  alias UserDocs.Web.AnnotationForm
   alias UserDocs.Web.Element
   alias UserDocs.Web.Page
-  alias UserDocs.Web.AnnotationForm
-  alias UserDocs.Media.Screenshot
 
   schema "step_form" do
     field :order, :integer
@@ -37,8 +38,7 @@ defmodule UserDocs.Automation.StepForm do
       field :name, :string
       field :url, :string
 
-
-      field :project_id, :integer
+      belongs_to :project, Project
     end
 
     field :element_id_enabled, :boolean
