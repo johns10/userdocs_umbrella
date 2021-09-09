@@ -497,28 +497,28 @@ defmodule UserDocs.TestDataset do
       name: "Add Remove Elements Page",
       order: 1,
       url: "https://the-internet.herokuapp.com/add_remove_elements/",
-      project_id: userdocs_project_id
+      project_id: the_internet_project_id
    }
 
     login_page = %{
       name: "Login Page",
       order: 1,
       url: "https://the-internet.herokuapp.com/login",
-      project_id: userdocs_project_id
+      project_id: the_internet_project_id
    }
 
     processes_page = %{
       name: "Login",
       order: 2,
       url: "https://app.user-docs.com/processes",
-      project_id: userdocs_project_id
+      project_id: the_internet_project_id
    }
 
     secure_page = %{
       name: "Secure",
       order: 3,
       url: "https://the-internet.herokuapp.com/secure",
-      project_id: userdocs_project_id
+      project_id: the_internet_project_id
    }
 
    failure_page = %{
@@ -768,17 +768,17 @@ defmodule UserDocs.TestDataset do
       add_remove_process = %{
         name: "Add and Remove Elements",
         order: 1,
-        project_id: userdocs_project_id
+        project_id: the_internet_project_id
      },
       add_process = %{
         name: "Add Process",
         order: 2,
-        project_id: userdocs_project_id
+        project_id: the_internet_project_id
      },
       test_everything = %{
         name: "Test Everything",
         order: 3,
-        project_id: userdocs_project_id
+        project_id: the_internet_project_id
      },
      failing_process = %{
        name: "Fail",
