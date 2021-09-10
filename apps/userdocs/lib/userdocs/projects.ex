@@ -27,12 +27,18 @@ defmodule UserDocs.Projects do
   def list_projects(params \\ %{}, filters \\ %{})
   def list_projects(state, opts) when is_list(opts) do
     StateHandlers.list(state, Project, opts)
+    |> maybe_state_preload(opts[:preloads], state, opts)
   end
   def list_projects(params, filters) when is_map(params) and is_map(filters) do
     base_projects_query()
     |> maybe_filter_by_team(filters[:team_id])
     |> maybe_filter_projects_by_user(filters[:user_id])
     |> Repo.all()
+  end
+
+  defp maybe_state_preload(step, nil, _, _), do: step
+  defp maybe_state_preload(step, _preloads, state, opts) do
+    StateHandlers.preload(state, step, opts)
   end
 
   defp maybe_filter_by_team(query, nil), do: query
