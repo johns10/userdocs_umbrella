@@ -95,6 +95,7 @@ defmodule UserDocs.Projects do
   end
   def get_project!(id, state, opts) when is_list(opts) do
     StateHandlers.get(state, id, Project, opts)
+    |> maybe_state_preload(opts[:preloads], state, opts)
   end
   defp base_project_query(id) do
     from(project in Project, where: project.id == ^id)
@@ -170,4 +171,12 @@ defmodule UserDocs.Projects do
     Project.changeset(project, attrs)
   end
 
+  def override_base_url(%Project{id: id, base_url: _url} = project, overrides) do
+    overrides
+    |> Enum.filter(fn(o) -> o.project_id == id end)
+    |> case do
+      overrides when overrides == [] -> project
+      [%{url: url}] -> Map.put(project, :base_url, url)
+    end
+  end
 end
