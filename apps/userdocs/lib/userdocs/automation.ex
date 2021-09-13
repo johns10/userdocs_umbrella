@@ -313,7 +313,7 @@ defmodule UserDocs.Automation do
     |> Repo.insert()
   end
 
-  def create_nested_step(attrs) do
+  def create_base_step(attrs) do
     {:ok, step} =
       %Step{}
       |> Step.fields_changeset(attrs)
@@ -329,14 +329,19 @@ defmodule UserDocs.Automation do
       %Step{element_id: element_id} -> UserDocs.Web.get_element!(element_id)
     end
 
-    step
-    |> Map.put(:element, element)
-    |> Map.put(:annotation, nil)
-    |> Map.put(:page, page)
-    |> Map.put(:screenshot, nil)
-    |> Ecto.Changeset.cast(attrs, [])
-    |> Step.assoc_changeset()
-    |> Repo.update()
+    annotation = case step do
+      %Step{annotation_id: nil} -> nil
+      %Step{annotation_id: annotation_id} -> UserDocs.Web.get_annotation!(annotation_id)
+    end
+
+    {
+      :ok,
+      step
+      |> Map.put(:element, element)
+      |> Map.put(:annotation, annotation)
+      |> Map.put(:page, page)
+      |> Map.put(:screenshot, nil)
+    }
   end
 
   @doc """

@@ -7,13 +7,13 @@ div
       last_item: %{ to: "", name: @process.name } ])
     = if @live_action in [:edit, :new] do
       = live_modal @socket, UserDocsWeb.StepLive.FormComponent,
+        id: "step-form",
         action: @live_action,
         app_name: @app_name,
         current_project: @current_project,
         current_team: @current_team,
         current_user: @current_user,
         data: @data,
-        id: "step-form",
         new_element: false,
         new_annotation: false,
         new_page: false,
@@ -26,7 +26,8 @@ div
         step_form: @step_form,
         step_params: @step_params,
         title: @page_title,
-        type: Step
+        type: Step,
+        trigger_submit: false
 
     = if @live_action in [:screenshot_workflow] do 
       = live_component @socket, Approve, 
@@ -49,7 +50,7 @@ div
       = for step <- @steps do
         li class=""
           .is-flex
-            = link to_string(step.order) <> ". " <> step.name, to: Routes.step_index_path(@socket, :edit, step.id), class: "is-flex-grow-1", phx_hook: "dragDropReorder", step_id: step.id, order: step.order, id: "step-#{step.id}-drag-handle"
+            = link step.name, to: Routes.step_index_path(@socket, :edit, step.id), class: "is-flex-grow-1", phx_hook: "dragDropReorder", step_id: step.id, order: step.order, id: "step-#{step.id}-drag-handle"
             .is-flex.is-flex-direction-row.is-flex-grow-0
               = live_component(@socket, StepLive.Status, 
                 [ id: "step-" <> Integer.to_string(step.id) <> "-status", step: step ])

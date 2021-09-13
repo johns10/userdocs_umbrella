@@ -15,21 +15,23 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
 
   alias UserDocsWeb.StepLive.FormComponent.Helpers
 
-  def cast(%{"action" => "Navigate", "href" => href, "page_title" => page_name} = payload) do
+  def cast(%{"action" => "Navigate", "href" => href, "page_title" => page_title, "order" => order} = payload) do
     %{
       "action" => "navigate",
+      "order" => order,
       "step_type_id" => step_type_id(payload),
       "page_reference" => "page",
       "page_id" => nil,
       "page" => %{
         "url" => href,
-        "name" => page_name
+        "name" => page_title
       }
     }
   end
-  def cast(%{"action" => "Click", "href" => href, "selector" => selector, "element_name" => element_name} = payload) do
+  def cast(%{"action" => "Click", "href" => href, "selector" => selector, "element_name" => element_name, "order" => order} = payload) do
     %{
       "action" => "click",
+      "order" => order,
       "step_type_id" => step_type_id(payload),
       "element" => %{
         "strategy_id" => Web.css_strategy() |> Map.get(:id),
@@ -41,9 +43,10 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
       }
     }
   end
-  def cast(%{"action" => "Element Screenshot", "href" => href, "selector" => selector, "element_name" => element_name} = payload) do
+  def cast(%{"action" => "Element Screenshot", "href" => href, "selector" => selector, "element_name" => element_name, "order" => order} = payload) do
     %{
       "action" => "element_screenshot",
+      "order" => order,
       "step_type_id" => step_type_id(payload),
       "element" => %{
         "strategy_id" => Web.css_strategy() |> Map.get(:id),
@@ -55,18 +58,20 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
       }
     }
   end
-  def cast(%{"action" => "Full Screen Screenshot", "href" => href, "selector" => selector} = payload) do
+  def cast(%{"action" => "Full Screen Screenshot", "href" => href, "order" => order} = payload) do
     %{
       "action" => "full_screen_screenshot",
+      "order" => order,
       "step_type_id" => step_type_id(payload),
       "page" => %{
         "url" => href
       }
     }
   end
-  def cast(%{"action" => "Apply Annotation", "href" => href, "selector" => selector, "element_name" => element_name} = payload) do
+  def cast(%{"action" => "Apply Annotation", "href" => href, "selector" => selector, "element_name" => element_name, "order" => order, "label" => label} = payload) do
     %{
       "action" => "apply_annotation",
+      "order" => order,
       "step_type_id" => step_type_id(payload),
       "element" => %{
         "strategy_id" => Web.css_strategy() |> Map.get(:id),
@@ -74,16 +79,18 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
         "name" => element_name
       },
       "annotation" => %{
-        "annotation_type_id" => annotation_type_id(payload)
+        "annotation_type_id" => annotation_type_id(payload),
+        "label" => label
       },
       "page" => %{
         "url" => href
       }
     }
   end
-  def cast(%{"action" => "ITEM_SELECTED", "href" => href, "selector" => selector, "element_name" => element_name}) do
+  def cast(%{"action" => "ITEM_SELECTED", "href" => href, "selector" => selector, "element_name" => element_name, "order" => order}) do
     %{
       "action" => "item_selected",
+      "order" => order,
       "element" => %{
         "strategy_id" => Web.css_strategy() |> Map.get(:id),
         "selector" => selector,
@@ -94,9 +101,10 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
       }
     }
   end
-  def cast(%{"action" => "Fill Field", "href" => href, "selector" => selector, "value" => value, "element_name" => element_name} = payload) do
+  def cast(%{"action" => "Fill Field", "href" => href, "selector" => selector, "value" => value, "element_name" => element_name, "order" => order} = payload) do
     %{
       "action" => "fill_field",
+      "order" => order,
       "step_type_id" => step_type_id(payload),
       "text" => value,
       "element" => %{
@@ -150,22 +158,21 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
     project_uri = URI.parse(project.base_url)
     case uri.host == project_uri.host do
       true ->
-        IO.puts("Project host matches current host")
+        #IO.puts("Project host matches current host")
         params = cast_url(params, :relative)
         case find_page(project.pages, url) do
           %Page{} = page ->
-            IO.puts("URL matches existing page")
+            #IO.puts("URL matches existing page")
             update_params_to_existing_page(params, page)
           nil ->
-            IO.puts("Not Found page")
+            #IO.puts("Not Found page")
             update_params_for_new_page(params)
         end
       false ->
-        IO.puts("Project host doesn't match current host")
+        #IO.puts("Project host doesn't match current host")
         params = cast_url(params, :full_uri)
     end
   end
-  def handle_page(params, _), do: IO.inspect(params)
 
   def cast_url(%{"action" => "navigate", "page" => %{"url" => url} = page_params} = params, :relative) do
     inner_page_params = Map.put(page_params, "url", URI.parse(url).path)
@@ -174,11 +181,12 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
   def cast_url(params, _), do: params
 
   def update_params_to_existing_page(params, page) do
-    IO.puts("update_params_to_existing_page")
+    #IO.puts("update_params_to_existing_page: #{page.id}")
     params
     |> Map.put("page_id", page.id)
     |> maybe_put_page_params(page)
     |> maybe_put_element_page_id(page)
+    |> maybe_put_annotation_page_id(page)
   end
 
   def maybe_put_page_params(%{"action" => "navigate"} = params, page),
@@ -189,6 +197,11 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
   def maybe_put_element_page_id(%{"element" => element_params} = params, page),
     do: Map.put(params, "element", Map.put(element_params, "page_id", page.id))
   def maybe_put_element_page_id(params, _), do: params
+
+
+  def maybe_put_annotation_page_id(%{"annotation" => annotation_params} = params, page),
+    do: Map.put(params, "annotation", Map.put(annotation_params, "page_id", page.id))
+  def maybe_put_annotation_page_id(params, _), do: params
 
   def update_params_for_new_page(%{"action" => "navigate"} = params), do: params
   def update_params_for_new_page(params), do: params |> Map.delete("page")
@@ -207,38 +220,6 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
     end
   end
   def handle_element(params, _), do: params
-
-  def maybe_replace_page_params(%{"action" => action, "page" => %{"url" => url} = page_params} = params, projects, steps) do
-    case find_project(projects, url) do
-      nil -> params
-      %Project{id: project_id, base_url: _, pages: pages} = project ->
-        uri = URI.parse(url)
-        case find_page(pages, url) do
-          %Page{} = page ->
-            IO.puts("Found page")
-            inner_page_params = get_params(page, Page)
-            params
-            |> Map.put("page_id", page.id)
-            |> Map.put("page", inner_page_params)
-          nil ->
-            IO.puts("Not Found page")
-            inner_page_params =
-              page_params
-              |> Map.put("url", url)
-              |> Map.put("project_id", project_id)
-
-            inner_page_params =
-              case action do
-                "navigate" -> Map.put(inner_page_params, "page_id", recent_navigated_page_id(steps))
-                _ -> inner_page_params
-              end
-
-            params
-            |> Map.put("page", inner_page_params)
-        end
-    end
-  end
-  def maybe_replace_page_params(params, _projects, _steps), do: params
 
   def get_params(struct, type) do
     Map.take(struct, type.__schema__(:fields))
@@ -270,8 +251,8 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
   def recent_navigated_page_id(steps) do
     Enum.reduce(steps, nil, fn(step, acc) ->
       case step do
-        %Step{step_type: %{name: "Navigate"}, page_id: page_id} = step -> page_id
-        %Step{step_type: %{name: _}} = step -> acc
+        %Step{step_type: %{name: "Navigate"}, page_id: page_id} -> page_id
+        %Step{step_type: %{name: _}} -> acc
       end
     end)
   end

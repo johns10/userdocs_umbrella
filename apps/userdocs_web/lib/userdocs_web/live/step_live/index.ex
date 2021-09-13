@@ -16,7 +16,7 @@ defmodule UserDocsWeb.StepLive.Index do
   alias UserDocs.Projects
   alias UserDocs.Web
 
-  alias UserDocsWeb.StepLive.BrowserEvents
+  alias UserDocs.Automation.Step.BrowserEvents
   alias UserDocsWeb.ComposableBreadCrumb
   alias UserDocsWeb.ProcessLive.Loaders
   alias UserDocsWeb.ProcessLive
@@ -136,7 +136,6 @@ defmodule UserDocsWeb.StepLive.Index do
   end
   def handle_event("reorder_dragenter", _, socket), do: {:noreply, socket}
   def handle_event("reorder_end", _, socket) do
-    Logger.debug("Reordering steps")
     steps = Enum.map(socket.assigns.steps, fn(updated_step) ->
       original_step = Automation.get_step!(updated_step.id, socket.assigns, socket.assigns.state_opts)
       {:ok, step} = Automation.update_step(original_step, %{order: updated_step.order})
@@ -153,27 +152,38 @@ defmodule UserDocsWeb.StepLive.Index do
   @impl true
   def handle_info(%{topic: "user:" <> user_id, event: "event:browser_event", payload: %{"action" => action} = payload}, socket) do
     payload = UserDocsWeb.LiveHelpers.underscored_map_keys(payload)
-    state = %{payload: payload, page_id: recent_navigated_page_id(socket)}
-    step_params = BrowserEvents.params(state)
+    recent_page_id = BrowserEvents.recent_navigated_page_id(socket.assigns.steps)
+    payload = payload
+    |> Map.put("page_id", recent_page_id)
+    |> Map.put("order", UserDocs.Automation.next_order(socket.assigns.steps))
+    |> Map.put("label", UserDocs.Automation.automatic_label(socket.assigns.steps))
 
-    # def guard_action_from_item_selected(live_action, event_action)
-    form_action =
-      case {socket.assigns.live_action, action} do
-        {:index, "ITEM_SELECTED"} -> :new
-        {action, _} -> action
-      end
+    form_action = BrowserEvents.action(socket.assigns.live_action, action)
+
+    IO.puts("Handling info for this action: #{form_action}")
 
     case form_action do
       :index ->
-        route = Routes.step_index_path(socket, :new, socket.assigns.process, %{step_params: step_params})
-        {:noreply, push_patch(socket, to: route)}
+        route = Routes.step_index_path(socket, :new, socket.assigns.process, %{step_params: payload})
+        {:noreply, socket |> push_patch(to: route)}
       :new ->
-        send_update(UserDocsWeb.StepLive.FormComponent, %{id: "step-form", step_params: step_params})
+        send_update(UserDocsWeb.StepLive.FormComponent, %{id: "step-form", step_params: payload})
         {:noreply, socket}
       :edit ->
-        send_update(UserDocsWeb.StepLive.FormComponent, %{id: "step-form", step_params: step_params})
+        send_update(UserDocsWeb.StepLive.FormComponent, %{id: "step-form", step_params: payload})
+        {:noreply, socket}
+      :save ->
+        send_update(UserDocsWeb.StepLive.FormComponent, %{id: "step-form", action: :save})
         {:noreply, socket}
     end
+  end
+  def handle_info(:save_step_complete, socket) do
+    {
+      :noreply,
+      socket
+      |> push_patch(to: Routes.step_index_path(socket, :index, socket.assigns.process.id))
+      |> put_flash(:info, "Step saved successfully")
+    }
   end
 
   # Had to use order ... using id's screws things up, because it's hard to get the orders and id's to sync
@@ -200,7 +210,6 @@ defmodule UserDocsWeb.StepLive.Index do
         _ -> item
       end
     end)
-
   end
 
   def order_args(source_order, target_order)
@@ -247,33 +256,27 @@ defmodule UserDocsWeb.StepLive.Index do
     |> assign_select_lists()
   end
   defp apply_action(socket, :new, %{"step_params" => step_params}) do
-    page_id = recent_navigated_page_id(socket)
-    annotation_type_id =
-      case step_params do
-        %{"annotation" => %{"annotation_type_id" => annotation_type_id}} -> annotation_type_id
-        _ -> nil
-      end
-
-    label = UserDocs.Automation.automatic_label(socket.assigns.steps)
+    IO.puts("applying action with step params")
 
     step_form =
       %UserDocs.Automation.StepForm{}
-      |> Automation.change_step_form(step_params)
-      |> Ecto.Changeset.apply_changes()
-      |> Map.put(:page_id, page_id)
-      |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{page_id: page_id, annotation_type_id: annotation_type_id, label: label})
       |> Map.put(:screenshot, %UserDocs.Media.Screenshot{})
-      |> Map.put(:order, UserDocs.Automation.next_order(socket.assigns.steps))
 
     step =
       %UserDocs.Automation.Step{}
       |> Map.put(:screenshot, %UserDocs.Media.Screenshot{})
+
+    current_project =
+      socket.assigns.current_project.id
+      |> Projects.get_project!(socket, Keyword.put(socket.assigns.state_opts, :preloads, [:pages]))
 
     socket
     |> assign(:page_title, "New Step")
     |> assign(:step, step)
     |> assign(:step_form, step_form)
     |> assign(:select_lists, select_lists(socket))
+    |> assign(:step_params, step_params)
+    |> assign(:current_project, current_project)
   end
   defp apply_action(socket, :new, _params) do
     page_id = recent_navigated_page_id(socket)
@@ -291,7 +294,6 @@ defmodule UserDocsWeb.StepLive.Index do
       |> Map.put(:page, page)
       |> Map.put(:element, %UserDocs.Web.Element{page_id: page_id})
       |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{page_id: page_id, label: label})
-      |> Map.put(:order, UserDocs.Automation.next_order(socket.assigns.steps))
 
     step =
       %UserDocs.Automation.Step{}
@@ -434,7 +436,7 @@ defmodule UserDocsWeb.StepLive.Index do
     |> Keyword.put(:preloads, preloads)
     |> Keyword.put(:order, order)
     |> Keyword.put(:limit, limit)
-end
+  end
 
   def prepare_step(socket, id) do
     step = Automation.get_step!(id, socket, get_step_opts(socket))
