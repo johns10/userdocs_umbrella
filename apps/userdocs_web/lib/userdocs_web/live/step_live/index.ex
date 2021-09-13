@@ -269,6 +269,7 @@ defmodule UserDocsWeb.StepLive.Index do
     current_project =
       socket.assigns.current_project.id
       |> Projects.get_project!(socket, Keyword.put(socket.assigns.state_opts, :preloads, [:pages]))
+      |> Projects.override_base_url(socket.assigns.current_user.overrides)
 
     socket
     |> assign(:page_title, "New Step")
