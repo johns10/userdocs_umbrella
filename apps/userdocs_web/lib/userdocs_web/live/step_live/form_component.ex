@@ -37,8 +37,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     |> BrowserEvents.
   end
   """
-  @spec update(any, any) :: {:error, Ecto.Changeset.t()} | {:ok, any}
-  def update(%{step_params: step_params} = assigns, %{assigns: %{current_project: current_project, last_step_form: _}} = socket) do
+  def update(%{id: id, step_params: step_params} = assigns, %{assigns: %{current_project: current_project, last_step_form: _}} = socket) do
     #IO.puts("Update for existing form")
     with params <- BrowserEvents.cast(step_params),
       last_change <- last_change(socket, params),
@@ -53,9 +52,10 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       {
         :ok,
         socket
-        |> assign(:last_step_form, last_step_form)
-        |> assign(:changeset, changeset)
+        |> assign(:id, id)
         |> assign(:step_params, nil)
+        |> assign(:changeset, changeset)
+        |> assign(:last_step_form, last_step_form)
       }
     end
   end
