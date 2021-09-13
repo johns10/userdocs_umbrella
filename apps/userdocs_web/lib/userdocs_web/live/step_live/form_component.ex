@@ -93,6 +93,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
         |> assign(:changeset, changeset)
         |> assign(:select_lists, update_select_lists(assigns, step_form.page_id))
      }
+    else
+      {:error, changeset} -> {:ok, assign(socket, :changeset, changeset)}
     end
   end
   def update(%{action: :save}, socket) do
