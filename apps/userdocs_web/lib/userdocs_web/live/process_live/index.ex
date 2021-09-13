@@ -72,6 +72,15 @@ defmodule UserDocsWeb.ProcessLive.Index do
     |> assign(:select_lists, select_lists(socket.assigns.current_team.id))
   end
 
+  defp apply_action(socket, :index, %{"project_id" => project_id}) do
+    project = Projects.get_project!(project_id, socket)
+    socket
+    |> assign(:page_title, "Listing Processes")
+    |> assign(:current_project, project)
+    |> prepare_processes(project.id)
+    |> assign(:select_lists, select_lists(socket.assigns.current_team.id))
+  end
+
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Listing Processes")

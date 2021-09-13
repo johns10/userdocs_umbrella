@@ -116,6 +116,7 @@ defmodule UserDocsWeb.Router do
     live "/projects/new", ProjectLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/projects/:id", ProjectLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
+    live "/processes/:project_id/projects", ProcessLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/processes", ProcessLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/processes/new", ProcessLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/processes/:id/edit", ProcessLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}

@@ -18,7 +18,7 @@ aside.menu
     = for project <- @projects do
       li class=""
         .is-flex
-          = link to: "#", class: "is-flex-grow-1" do
+          = link to: Routes.process_index_path(@socket, :index, project.id), class: "is-flex-grow-1" do
             = project.name
           .is-flex.is-flex-direction-row.is-flex-grow-0
             = live_redirect to: Routes.project_show_path(@socket, :show, project) do
