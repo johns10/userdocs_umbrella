@@ -11,7 +11,7 @@ defmodule UserDocsWeb.StepLive.FormComponent.Helpers do
     |> maybe_update_enabled_annotation_fields(state)
   end
 
-  def maybe_update_enabled_step_fields(%Ecto.Changeset{changes: %{step_type_id: step_type_id}} = changeset, state) do
+  def maybe_update_enabled_step_fields(%Ecto.Changeset{changes: %{step_type_id: step_type_id}} = changeset, state) when step_type_id do
     enabled_step_fields(changeset, state)
   end
   def maybe_update_enabled_step_fields(%Ecto.Changeset{} = changeset, _), do: changeset
@@ -22,7 +22,7 @@ defmodule UserDocsWeb.StepLive.FormComponent.Helpers do
   def maybe_update_enabled_annotation_fields(%Ecto.Changeset{} = changeset, _), do: changeset
 
   def enabled_step_fields(%Ecto.Changeset{} = changeset, state) do
-    step_type = Automation.get_step_type!(changeset.changes.step_type_id, state, state.state_opts)
+    step_type = Automation.get_step_type!(step_type_id, state, state.state_opts)
     enable_fields(changeset, StepForm.enabler_fields(), step_type.args)
   end
   def enabled_step_fields(%StepForm{step_type_id: nil} = step_form, _), do: step_form
