@@ -52,6 +52,7 @@ defmodule UserDocs.ProcessInstances do
     from(pi in ProcessInstance, as: :process_instance)
     |> where([process_instance: pi], pi.id == ^id)
     |> join(:left, [process_instance: pi], si in assoc(pi, :step_instances), as: :step_instances)
+    |> order_by([step_instances: si], asc: si.order)
     |> join(:left, [step_instances: si], s in assoc(si, :step), as: :step)
     |> join(:left, [step: s], st in assoc(s, :step_type), as: :step_type)
     |> join(:left, [step: s], a in assoc(s, :annotation), as: :annotation)
