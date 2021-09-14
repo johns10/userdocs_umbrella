@@ -52,6 +52,7 @@ defmodule UserDocsWeb.StepLive.Index do
     |> Loaders.elements(opts)
     |> Loaders.screenshots(opts)
     |> Loaders.projects(opts)
+    |> assign_current_project()
     |> turn_off_broadcast_associations()
   end
 
@@ -266,18 +267,13 @@ defmodule UserDocsWeb.StepLive.Index do
       %UserDocs.Automation.Step{}
       |> Map.put(:screenshot, %UserDocs.Media.Screenshot{})
 
-    current_project =
-      socket.assigns.current_project.id
-      |> Projects.get_project!(socket, Keyword.put(socket.assigns.state_opts, :preloads, [:pages]))
-      |> Projects.override_base_url(socket.assigns.current_user.overrides)
-
     socket
     |> assign(:page_title, "New Step")
     |> assign(:step, step)
     |> assign(:step_form, step_form)
     |> assign(:select_lists, select_lists(socket))
     |> assign(:step_params, step_params)
-    |> assign(:current_project, current_project)
+    |> assign(:current_project, socket.assigns.current_project)
   end
   defp apply_action(socket, :new, _params) do
     page_id = recent_navigated_page_id(socket)
@@ -413,6 +409,13 @@ defmodule UserDocsWeb.StepLive.Index do
 
   def assign_strategy_id(%{assigns: %{current_project: project}} = socket) do
     assign(socket, :strategy_id, project.strategy_id)
+  end
+
+  def assign_current_project(%{assigns: %{ current_project: current_project}} = socket) do
+    project = current_project.id
+    |> Projects.get_project!(socket, Keyword.put(socket.assigns.state_opts, :preloads, [:pages]))
+    |> Projects.override_base_url(socket.assigns.current_user.overrides)
+    assign(socket, :current_project, project)
   end
 
   def get_step_opts(socket) do
