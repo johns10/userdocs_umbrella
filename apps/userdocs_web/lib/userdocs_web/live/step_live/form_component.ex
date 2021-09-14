@@ -45,10 +45,10 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       last_change <- StepForm.changeset(last_step_form, params),
       last_change <- Helpers.handle_enabled_fields(last_change, socket.assigns),
       last_step_form <- Ecto.Changeset.apply_changes(last_change),
-      updated_params <- handle_param_updates(params, last_change, socket.assigns),
-      updated_params <- Map.merge(params, updated_params),
-      updated_params <- BrowserEvents.handle_page(updated_params, current_project),
-      updated_params <- BrowserEvents.handle_element(updated_params, socket.assigns.data.elements),
+      updated_params when is_map(updated_params) <- handle_param_updates(params, last_change, socket.assigns),
+      updated_params when is_map(updated_params) <- Map.merge(params, updated_params),
+      updated_params when is_map(updated_params) <- BrowserEvents.handle_page(updated_params, current_project),
+      updated_params when is_map(updated_params) <- BrowserEvents.handle_element(updated_params, socket.assigns.data.elements),
       changeset <- build_changeset(socket, updated_params)
     do
       {
@@ -59,6 +59,25 @@ defmodule UserDocsWeb.StepLive.FormComponent do
         |> assign(:changeset, changeset)
         |> assign(:last_step_form, last_step_form)
       }
+    else
+      {:error, changeset} ->
+        {
+          :ok,
+          socket
+          |> assign(:last_step_form, %StepForm{})
+          |> assign(:changeset, changeset)
+        }
+      {:new_page, params} ->
+        changeset = build_changeset(assigns, step_form, params)
+        {:ok, step_form} = Ecto.Changeset.apply_action(changeset, :insert)
+        {
+          :ok,
+          socket
+          |> assign(:last_step_form, last_step_form |> Map.put(:page_form_enabled, true))
+          |> assign(:changeset, changeset)
+          |> assign(:select_lists, update_select_lists(assigns, step_form.page_id))
+          |> put_flash(:info, "The page you're on doesn't exist. You must create it before you can create elements on it. Create your page, save, and re-open the form.")
+        }
     end
   end
   def update(%{id: id, step_form: step_form, step_params: nil} = assigns, socket) do
