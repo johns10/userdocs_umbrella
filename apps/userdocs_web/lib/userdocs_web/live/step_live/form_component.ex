@@ -68,7 +68,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
           |> assign(:changeset, changeset)
         }
       {:new_page, params} ->
-        changeset = build_changeset(assigns, step_form, params)
+        changeset = build_changeset(assigns, last_step_form, params)
         {:ok, step_form} = Ecto.Changeset.apply_action(changeset, :insert)
         {
           :ok,
