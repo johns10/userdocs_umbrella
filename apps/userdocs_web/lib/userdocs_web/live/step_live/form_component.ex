@@ -37,17 +37,17 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     |> BrowserEvents.
   end
   """
-  def update(%{id: id, step_params: step_params} = assigns, %{assigns: %{current_project: current_project, last_step_form: _}} = socket) do
+  def update(%{id: id, step_params: step_params} = assigns, %{assigns: %{current_project: current_project, last_step_form: last_step_form}} = socket) do
     #IO.puts("Update for existing form")
     with params <- BrowserEvents.cast(step_params),
-      last_change <- last_change(socket, params),
+      last_change <- StepForm.changeset(last_step_form, params),
+      last_change <- Helpers.handle_enabled_fields(last_change, socket.assigns),
       last_step_form <- Ecto.Changeset.apply_changes(last_change),
       updated_params <- handle_param_updates(params, last_change, socket.assigns),
       updated_params <- Map.merge(params, updated_params),
       updated_params <- BrowserEvents.handle_page(updated_params, current_project),
       updated_params <- BrowserEvents.handle_element(updated_params, socket.assigns.data.elements),
-      changeset <- build_changeset(socket, updated_params),
-      changeset <- Helpers.handle_enabled_fields(changeset, socket.assigns)
+      changeset <- build_changeset(socket, updated_params)
     do
       {
         :ok,
@@ -74,11 +74,11 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     }
   end
   # Here, we have to make some param updates, build a changeset, apply it, and put that form on the socket as last_
-  def update(%{step_form: step_form, current_project: current_project, step_params: step_params} = assigns, socket) do
+  def update(%{id: id, step_form: step_form, step_params: step_params, current_project: current_project} = assigns, socket) do
     #IO.puts("Update for new form with step params")
-    with params <- BrowserEvents.cast(step_params),
-      params <- BrowserEvents.handle_page(params, current_project),
-      params <- BrowserEvents.handle_element(params, assigns.data.elements),
+    with params when is_map(params) <- BrowserEvents.cast(step_params),
+      params when is_map(params) <- BrowserEvents.handle_page(params, current_project),
+      params when is_map(params) <- BrowserEvents.handle_element(params, assigns.data.elements),
       changeset <- build_changeset(assigns, step_form, params),
       {:ok, step_form} <- Ecto.Changeset.apply_action(changeset, :insert),
       step_form <- Helpers.enabled_step_fields(step_form, assigns),
@@ -120,7 +120,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     {:noreply, socket} = auto_save_step(socket, socket.assigns.action)
     {:ok, socket}
   end
-  def update(assigns, socket), do: {:ok, socket}
 
   @impl true
   def handle_event("validate", %{"step_form" => step_form_params}, socket) do
