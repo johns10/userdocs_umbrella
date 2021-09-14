@@ -37,7 +37,9 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     |> BrowserEvents.
   end
   """
-  def update(%{id: id, step_params: step_params} = assigns, %{assigns: %{current_project: current_project, last_step_form: last_step_form}} = socket) do
+  def update(%{id: id, step_params: step_params} = assigns,
+  %{assigns: %{current_project: current_project, last_step_form: last_step_form}} = socket)
+  when step_params != nil do
     #IO.puts("Update for existing form")
     with params <- BrowserEvents.cast(step_params),
       last_change <- StepForm.changeset(last_step_form, params),
@@ -59,11 +61,12 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       }
     end
   end
-  def update(%{step_form: step_form, step_params: nil} = assigns, socket) do
+  def update(%{id: id, step_form: step_form, step_params: nil} = assigns, socket) do
     #IO.puts("Update for new form with nil params")
     step_form = Helpers.enabled_step_fields(step_form, assigns)
     step_form = Helpers.enabled_annotation_fields(step_form, assigns)
     changeset = Automation.change_step_form(step_form)
+
     {
       :ok,
       socket
@@ -87,7 +90,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       {
         :ok,
         socket
-        |> assign(assigns)
+        |> assign(Map.put(assigns, :step_params, nil))
         |> assign(:state_opts, assigns.state_opts)
         |> assign(:last_step_form, step_form)
         |> assign(:changeset, changeset)
@@ -98,7 +101,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
         {
           :ok,
           socket
-          |> assign(assigns)
+          |> assign(Map.put(assigns, :step_params, nil))
           |> assign(:last_step_form, %StepForm{})
           |> assign(:changeset, changeset)
         }
@@ -108,7 +111,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
         {
           :ok,
           socket
-          |> assign(assigns)
+          |> assign(Map.put(assigns, :step_params, nil))
           |> assign(:last_step_form, step_form |> Map.put(:page_form_enabled, true))
           |> assign(:changeset, changeset)
           |> assign(:select_lists, update_select_lists(assigns, step_form.page_id))
