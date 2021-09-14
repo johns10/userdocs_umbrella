@@ -211,8 +211,9 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
     do: Map.put(params, "annotation", Map.put(annotation_params, "page_id", page.id))
   def maybe_put_annotation_page_id(params, _), do: params
 
-  def update_params_for_new_page(%{"action" => "navigate"} = params), do: params
-  def update_params_for_new_page(params), do: params |> Map.delete("page")
+  def update_params_for_new_page(params) do
+    {:new_page, params |> Map.put("page_form_enabled", "true") |> Map.delete("element") |> Map.delete("annotation")}
+  end
 
   def handle_element(%{"element" => %{"selector" => selector}, "page_id" => page_id} = params, elements) do
     result = Enum.filter(elements, fn(element) -> element.page_id == page_id && element.selector == selector end)
