@@ -68,7 +68,7 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
       }
     }
   end
-  def cast(%{"action" => "Apply Annotation", "href" => href, "selector" => selector, "element_name" => element_name, "order" => order, "label" => label} = payload) do
+  def cast(%{"action" => "Apply Annotation", "href" => href, "selector" => selector, "element_name" => element_name, "order" => order, "label" => label, "annotation_type" => annotation_type} = payload) do
     %{
       "action" => "apply_annotation",
       "order" => order,
@@ -79,7 +79,7 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
         "name" => element_name
       },
       "annotation" => %{
-        "annotation_type_id" => annotation_type_id(payload),
+        "annotation_type_id" => annotation_type_id(annotation_type),
         "label" => label
       },
       "page" => %{
@@ -129,14 +129,13 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
     |> Enum.at(0)
   end
 
-  def annotation_type_id(payload) do
-    annotation_type(payload)
-    |> Map.get(:id, nil)
-  end
-  def annotation_type(payload) do
+  def annotation_type_id(annotation_type) do
+    IO.inspect("AT: #{inspect(annotation_type)}")
     Web.list_annotation_types()
-    |> Enum.filter(fn(at) -> at.name == payload["annotation_type"] end)
+    |> Enum.filter(fn(at) -> at.name == annotation_type end)
+    |> IO.inspect()
     |> Enum.at(0)
+    |> Map.get(:id, nil)
   end
 
   def action(live_action, browser_action) do
@@ -177,7 +176,7 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
             update_params_to_existing_page(params, page)
           nil ->
             IO.puts("Not Found page")
-            params
+            update_params_for_new_page(params)
         end
     end
   end

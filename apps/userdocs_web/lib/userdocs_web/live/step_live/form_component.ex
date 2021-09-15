@@ -75,7 +75,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
           socket
           |> assign(:last_step_form, last_step_form |> Map.put(:page_form_enabled, true))
           |> assign(:changeset, changeset)
-          |> assign(:select_lists, update_select_lists(assigns, step_form.page_id))
+          |> assign(:select_lists, update_select_lists(socket, step_form.page_id))
           |> put_flash(:info, "The page you're on doesn't exist. You must create it before you can create elements on it. Create your page, save, and re-open the form.")
         }
     end
@@ -336,6 +336,8 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     end
   end
 
+  def update_select_lists(%{assigns: %{select_lists: select_lists} = assigns}, page_id),
+    do: update_select_lists(assigns, page_id)
   def update_select_lists(%{select_lists: select_lists} = assigns, page_id) do
     select_lists
     |> Map.put(:elements, elements_select(assigns, page_id))
@@ -347,10 +349,18 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     Web.list_elements(socket, opts)
     |> UserDocs.Helpers.select_list(:name, true)
   end
+  def elements_select(%{state_opts: state_opts} = socket, nil) do
+    Web.list_elements(socket, state_opts)
+    |> UserDocs.Helpers.select_list(:name, true)
+  end
 
   def annotations_select(%{state_opts: state_opts} = socket, page_id) do
     opts = Keyword.put(state_opts, :filter, {:page_id, page_id})
     Web.list_annotations(socket, opts)
+    |> UserDocs.Helpers.select_list(:name, true)
+  end
+  def elements_select(%{state_opts: state_opts} = socket, nil) do
+    Web.list_annotations(socket, state_opts)
     |> UserDocs.Helpers.select_list(:name, true)
   end
 
