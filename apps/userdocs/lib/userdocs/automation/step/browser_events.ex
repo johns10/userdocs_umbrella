@@ -137,10 +137,8 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
   end
 
   def annotation_type_id(annotation_type) do
-    IO.inspect("AT: #{inspect(annotation_type)}")
     Web.list_annotation_types()
     |> Enum.filter(fn(at) -> at.name == annotation_type end)
-    |> IO.inspect()
     |> Enum.at(0)
     |> Map.get(:id, nil)
   end
@@ -280,6 +278,7 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
       case step do
         %Step{step_type: %{name: "Navigate"}, page_id: page_id} -> page_id
         %Step{step_type: %{name: _}} -> acc
+        _ -> acc
       end
     end)
   end
