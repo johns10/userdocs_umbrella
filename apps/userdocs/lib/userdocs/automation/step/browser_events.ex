@@ -15,6 +15,13 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
 
   alias UserDocsWeb.StepLive.FormComponent.Helpers
 
+  def apply(params, project, elements) do
+    params
+    |> cast()
+    |> handle_page(project)
+    |> handle_element(elements)
+  end
+
   def cast(%{"action" => "Navigate", "href" => href, "page_title" => page_title, "order" => order} = payload) do
     %{
       "action" => "navigate",
