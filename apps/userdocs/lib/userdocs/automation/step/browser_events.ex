@@ -188,7 +188,7 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
     end
   end
 
-  def cast_url(%{"action" => "navigate", "page" => %{"url" => url} = page_params} = params, :relative) do
+  def cast_url(%{"page" => %{"url" => url} = page_params} = params, :relative) do
     inner_page_params = Map.put(page_params, "url", URI.parse(url).path)
     Map.put(params, "page", inner_page_params)
   end
