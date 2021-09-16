@@ -286,6 +286,7 @@ defmodule UserDocsWeb.StepLive.Index do
         page_id -> Web.get_page!(page_id, socket, socket.assigns.state_opts)
       end
 
+    order = UserDocs.Automation.next_order(socket.assigns.steps)
     label = UserDocs.Automation.automatic_label(socket.assigns.steps)
 
     step_form =
@@ -294,6 +295,7 @@ defmodule UserDocsWeb.StepLive.Index do
       |> Map.put(:page, page)
       |> Map.put(:element, %UserDocs.Web.Element{page_id: page_id})
       |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{page_id: page_id, label: label})
+      |> Map.put(:order, order)
 
     step =
       %UserDocs.Automation.Step{}
