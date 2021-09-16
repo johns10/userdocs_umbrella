@@ -35,7 +35,7 @@ defmodule UserDocsWeb.PageLive.FormComponent do
         ], "control") %>
         <%= Layout.text_input(form, [ field_name: :name ], "control is-expanded") %>
       </div>
-      <%= if String.at(form.data.url, 0) == "/" do %>
+      <%= if Ecto.Changeset.get_field(form.source, :url, "") |> String.at(0) == "/" do %>
         <div class="field">
           <%= label form, :url, class: "label" %>
           <p class="control is-expanded">
