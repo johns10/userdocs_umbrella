@@ -38,130 +38,73 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   end
   """
   def update(%{id: id, step_params: step_params} = assigns,
-  %{assigns: %{current_project: current_project, last_step_form: last_step_form}} = socket)
+  %{assigns: %{current_project: current_project, last_step_form: last_step_form, data: %{elements: elements}}} = socket)
   when step_params != nil do
-    #IO.puts("Update for existing form")
-    with params <- BrowserEvents.cast(step_params),
-      last_change <- StepForm.changeset(last_step_form, params),
-      last_change <- Helpers.handle_enabled_fields(last_change, socket.assigns),
-      last_step_form <- Ecto.Changeset.apply_changes(last_change),
-      updated_params when is_map(updated_params) <- handle_param_updates(params, last_change, socket.assigns),
-      updated_params when is_map(updated_params) <- Map.merge(params, updated_params),
-      updated_params when is_map(updated_params) <- BrowserEvents.handle_page(updated_params, current_project),
-      updated_params when is_map(updated_params) <- BrowserEvents.handle_element(updated_params, socket.assigns.data.elements),
-      changeset <- build_changeset(socket, updated_params)
-    do
-      {
-        :ok,
-        socket
-        |> assign(:id, id)
-        |> assign(:step_params, nil)
-        |> assign(:changeset, changeset)
-        |> assign(:last_step_form, last_step_form)
-      }
-    else
-      {:error, changeset} ->
-        {
-          :ok,
-          socket
-          |> assign(:last_step_form, %StepForm{})
-          |> assign(:changeset, changeset)
-        }
-      {:new_page, params} ->
-        changeset = build_changeset(assigns, last_step_form, params)
-        {:ok, step_form} = Ecto.Changeset.apply_action(changeset, :insert)
-        {
-          :ok,
-          socket
-          |> assign(:last_step_form, last_step_form |> Map.put(:page_form_enabled, true))
-          |> assign(:changeset, changeset)
-          |> assign(:select_lists, update_select_lists(socket, step_form.page_id))
-          |> put_flash(:info, "The page you're on doesn't exist. You must create it before you can create elements on it. Create your page, save, and re-open the form.")
-        }
-    end
+    IO.puts("Updating an existing form")
+    params = BrowserEvents.apply(step_params, current_project, elements)
+    {:ok, validate_params(socket, params)}
   end
   def update(%{id: id, step_form: step_form, step_params: nil} = assigns, socket) do
     #IO.puts("Update for new form with nil params")
-    step_form = Helpers.enabled_step_fields(step_form, assigns)
-    step_form = Helpers.enabled_annotation_fields(step_form, assigns)
-    changeset = Automation.change_step_form(step_form)
-
+    {:ok, build_new_form(socket, assigns)}
+  end
+  # Here, we have to make some param updates, build a changeset, apply it, and put that form on the socket as last_
+  def update(%{id: id, step_form: step_form, step_params: step_params, current_project: current_project, state_opts: state_opts} = assigns, socket) do
+    IO.puts("Update for new form with step params")
+    params = BrowserEvents.apply(step_params, current_project, assigns.data.elements)
     {
       :ok,
       socket
-      |> assign(assigns)
-      |> assign(:last_step_form, step_form)
-      |> assign(:changeset, changeset)
-      |> assign(:select_lists, update_select_lists(assigns, step_form.page_id))
+      |> build_new_form(assigns)
+      |> validate_params(params)
+      |> maybe_put_new_page_flash(assigns)
     }
-  end
-  # Here, we have to make some param updates, build a changeset, apply it, and put that form on the socket as last_
-  def update(%{id: id, step_form: step_form, step_params: step_params, current_project: current_project} = assigns, socket) do
-    #IO.puts("Update for new form with step params")
-    with params when is_map(params) <- BrowserEvents.cast(step_params),
-      params when is_map(params) <- BrowserEvents.handle_page(params, current_project),
-      params when is_map(params) <- BrowserEvents.handle_element(params, assigns.data.elements),
-      changeset <- build_changeset(assigns, step_form, params),
-      {:ok, step_form} <- Ecto.Changeset.apply_action(changeset, :insert),
-      step_form <- Helpers.enabled_step_fields(step_form, assigns),
-      step_form <- Helpers.enabled_annotation_fields(step_form, assigns)
-    do
-      {
-        :ok,
-        socket
-        |> assign(Map.put(assigns, :step_params, nil))
-        |> assign(:state_opts, assigns.state_opts)
-        |> assign(:last_step_form, step_form)
-        |> assign(:changeset, changeset)
-        |> assign(:select_lists, update_select_lists(assigns, step_form.page_id))
-     }
-    else
-      {:error, changeset} ->
-        {
-          :ok,
-          socket
-          |> assign(Map.put(assigns, :step_params, nil))
-          |> assign(:last_step_form, %StepForm{})
-          |> assign(:changeset, changeset)
-        }
-      {:new_page, params} ->
-        changeset = build_changeset(assigns, step_form, params)
-        {:ok, step_form} = Ecto.Changeset.apply_action(changeset, :insert)
-        {
-          :ok,
-          socket
-          |> assign(Map.put(assigns, :step_params, nil))
-          |> assign(:last_step_form, step_form |> Map.put(:page_form_enabled, true))
-          |> assign(:changeset, changeset)
-          |> assign(:select_lists, update_select_lists(assigns, step_form.page_id))
-          |> put_flash(:info, "The page you're on doesn't exist. You must create it before you can create elements on it. Create your page, save, and re-open the form.")
-        }
-    end
   end
   def update(%{action: :save}, socket) do
     {:noreply, socket} = auto_save_step(socket, socket.assigns.action)
     {:ok, socket}
   end
 
-  @impl true
-  def handle_event("validate", %{"step_form" => step_form_params}, socket) do
-    original_step_form = socket.assigns.step_form
-    last_step_form = socket.assigns.last_step_form
+  def build_new_form(socket, %{step_form: step_form} = assigns) do
+    IO.puts("Building new form")
+    step_form =
+      step_form
+      |> Helpers.enabled_step_fields(assigns)
+      |> Helpers.enabled_annotation_fields(assigns)
 
-    last_change = last_change(socket, step_form_params)
+    socket
+    |> assign(assigns)
+    |> assign(:step_params, nil)
+    |> assign(:last_step_form, step_form)
+    |> assign(:changeset, Automation.change_step_form(step_form))
+    |> assign(:select_lists, update_select_lists(assigns, step_form.page_id))
+  end
+
+  def validate_params(%{assigns: %{step_form: original_step_form, last_step_form: last_step_form} = assigns} = socket, params) do
+    IO.puts("Validating params")
+    last_change =
+      last_step_form
+      |> StepForm.changeset(params)
+      |> Helpers.handle_enabled_fields(socket.assigns)
+
     last_step_form = Ecto.Changeset.apply_changes(last_change)
-    updated_params = handle_param_updates(step_form_params, last_change, socket.assigns)
-
+    updated_params = handle_param_updates(params, last_change, assigns)
     changeset =
       StepForm.changeset(original_step_form, updated_params)
       |> Map.put(:action, :validate)
 
-      {
-        :noreply,
-        socket
-        |> assign(:last_step_form, last_step_form)
-        |> assign(:changeset, changeset)
-     }
+    socket
+    |> assign(:last_step_form, last_step_form)
+    |> assign(:changeset, changeset)
+  end
+
+  def maybe_put_new_page_flash(%{assigns: %{changeset: %Ecto.Changeset{changes: %{page: %Ecto.Changeset{action: :insert}}} = changeset}} = socket, assigns),
+    do: put_flash(socket, :info, "The page you're on doesn't exist on your project. Use this form to create it, and try to create your step again.")
+  def maybe_put_new_page_flash(socket, _assigns), do: socket
+
+  @impl true
+  def handle_event("validate", %{"step_form" => step_form_params}, socket) do
+    {:noreply, validate_params(socket, step_form_params)}
   end
 
   @impl true
@@ -362,12 +305,6 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   def elements_select(%{state_opts: state_opts} = socket, nil) do
     Web.list_annotations(socket, state_opts)
     |> UserDocs.Helpers.select_list(:name, true)
-  end
-
-  def last_change(%{assigns: %{last_step_form: last_step_form}} = socket, step_params) do
-    last_step_form
-    |> StepForm.changeset(step_params)
-    |> Helpers.handle_enabled_fields(socket.assigns)
   end
 
   def build_changeset(%{assigns: %{changeset: changeset, step_form: step_form}} = socket, params) do
