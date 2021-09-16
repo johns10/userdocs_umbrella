@@ -54,17 +54,18 @@ div
             .is-flex.is-flex-direction-row.is-flex-grow-0
               = live_component(@socket, StepLive.Status, 
                 [ id: "step-" <> Integer.to_string(step.id) <> "-status", step: step ])
-              = live_component(@socket, StepLive.Queuer, 
-                [ id: "step-" <> Integer.to_string(step.id) <> "-queuer",
-                step: step, 
-                step_type_name: step.step_type.name,
-                class: "navbar-item" ])
-              = live_component(@socket, StepLive.Runner, 
-                [ id: "step-" <> Integer.to_string(step.id),
-                step: step, 
-                current_user: @current_user,
-                step_type_name: step.step_type.name,
-                display: @browser_opened])
+              = if step.step_type do 
+                = live_component(@socket, StepLive.Queuer, 
+                  [ id: "step-" <> Integer.to_string(step.id) <> "-queuer",
+                  step: step, 
+                  step_type_name: step.step_type.name,
+                  class: "navbar-item" ])
+                = live_component(@socket, StepLive.Runner, 
+                  [ id: "step-" <> Integer.to_string(step.id),
+                  step: step, 
+                  current_user: @current_user,
+                  step_type_name: step.step_type.name,
+                  display: @browser_opened])
               = live_patch class: "navbar-item", to: Routes.step_index_path(@socket, :edit, step.id), id: "edit-step-#{step.id}" do
                 span
                   i.fa.fa-edit
