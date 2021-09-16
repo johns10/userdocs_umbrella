@@ -77,6 +77,8 @@ defmodule UserDocs.Automation.StepForm do
     step_form
     |> cast(attrs, [ :order, :name, :text, :width, :height ])
     |> cast(attrs, [ :process_id, :page_id, :element_id, :annotation_id, :step_type_id ])
+    |> cast(attrs, [ :page_form_enabled, :element_form_enabled, :annotation_form_enabled ])
+    |> cast(attrs, [ :page_id_enabled, :element_id_enabled, :annotation_id_enabled ])
     |> cast_embed(:element, with: &Element.fields_changeset/2)
     |> cast_embed(:annotation, with: &AnnotationForm.changeset/2)
     |> cast_embed(:page, with: &Page.fields_changeset/2)
