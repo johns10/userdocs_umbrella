@@ -262,6 +262,9 @@ defmodule UserDocsWeb.StepLive.Index do
     step_form =
       %UserDocs.Automation.StepForm{}
       |> Map.put(:screenshot, %UserDocs.Media.Screenshot{})
+      |> Map.put(:element, %UserDocs.Web.Element{})
+      |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{})
+      |> Map.put(:page, nil)
 
     step =
       %UserDocs.Automation.Step{}
