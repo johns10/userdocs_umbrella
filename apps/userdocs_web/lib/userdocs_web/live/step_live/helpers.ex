@@ -48,9 +48,15 @@ defmodule UserDocsWeb.StepLive.FormComponent.Helpers do
     Enum.reduce(fields, changeset,
       fn(enabler, inner_changeset) ->
         if String.replace(to_string(enabler), "_enabled", "") in fields_to_enable do
-          Ecto.Changeset.put_change(inner_changeset, enabler, true)
+          case Ecto.Changeset.get_change(inner_changeset, enabler, nil) do
+            nil -> Ecto.Changeset.put_change(inner_changeset, enabler, true)
+            _change -> inner_changeset
+          end
         else
-          Ecto.Changeset.put_change(inner_changeset, enabler, false)
+          case Ecto.Changeset.get_change(inner_changeset, enabler, nil) do
+            nil -> Ecto.Changeset.put_change(inner_changeset, enabler, false)
+            _change -> inner_changeset
+          end
         end
       end
     )
