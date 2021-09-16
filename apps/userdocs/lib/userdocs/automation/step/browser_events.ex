@@ -166,7 +166,7 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
       true ->
         IO.puts("Project host matches current host")
         params = cast_url(params, :relative)
-        case find_page(project.pages, url) do
+        case find_page(project.pages, url, :relative) do
           %Page{} = page ->
             IO.puts("URL matches existing page")
             update_params_to_existing_page(params, page)
@@ -177,7 +177,7 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
       false ->
         IO.puts("Project host doesn't match current host")
         params = cast_url(params, :full_uri)
-        case find_page(project.pages, url) do
+        case find_page(project.pages, url, :full_uri) do
           %Page{} = page ->
             IO.puts("URL matches existing page")
             update_params_to_existing_page(params, page)
@@ -242,12 +242,16 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
     |> Map.delete("inserted_at") |> Map.delete("updated_at")
   end
 
-  def find_page(pages, url) do
+  def find_page(%{"page" => %{"url" => url}}, pages, url_type), do: find_page(pages, url, url_type)
+  def find_page(pages, url, :relative) do
     uri = URI.parse(url)
     pages
-    |> Enum.filter(fn(page) ->
-      URI.parse(page.url).path == uri.path
-    end)
+    |> Enum.filter(fn(page) -> URI.parse(page.url).path == uri.path end)
+    |> Enum.at(0)
+  end
+  def find_page(pages, url, :full_uri) do
+    pages
+    |> Enum.filter(fn(page) -> page.url == url end)
     |> Enum.at(0)
   end
 
