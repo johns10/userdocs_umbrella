@@ -93,9 +93,12 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       StepForm.changeset(original_step_form, updated_params)
       |> Map.put(:action, :validate)
 
+    page_id = Ecto.Changeset.get_field(changeset, :page_id, nil)
+
     socket
     |> assign(:last_step_form, last_step_form)
     |> assign(:changeset, changeset)
+    |> assign(:select_lists, update_select_lists(assigns, page_id))
   end
 
   def maybe_put_new_page_flash(%{assigns: %{changeset: %Ecto.Changeset{changes: %{page: %Ecto.Changeset{action: :insert}}} = changeset}} = socket, assigns),
