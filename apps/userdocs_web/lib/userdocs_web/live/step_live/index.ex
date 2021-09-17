@@ -107,7 +107,7 @@ defmodule UserDocsWeb.StepLive.Index do
     step = Automation.get_step!(String.to_integer(id))
     {:ok, deleted_step} = Automation.delete_step(step)
     send(self(), {:broadcast, "delete", deleted_step})
-    {:noreply, socket}
+    {:noreply, prepare_steps(socket)}
   end
   def handle_event("select-project" = n, p, s) do
     {:noreply, socket} = Root.handle_event(n, p, s)
