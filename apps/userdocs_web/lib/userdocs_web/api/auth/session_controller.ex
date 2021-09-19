@@ -38,8 +38,12 @@ defmodule UserDocsWeb.API.SessionController do
         |> put_status(401)
         |> json(%{error: %{status: 401, message: "Invalid token"}})
 
-      {conn, _user} ->
-        json(conn, %{data: %{access_token: conn.private.api_access_token, renewal_token: conn.private.api_renewal_token}})
+      {conn, user} ->
+        json(conn, %{data: %{
+          access_token: conn.private.api_access_token,
+          renewal_token: conn.private.api_renewal_token,
+          user_id: user.id
+        }})
     end
   end
 
