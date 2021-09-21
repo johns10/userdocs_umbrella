@@ -13,7 +13,6 @@ use Mix.Config
 config :userdocs_web, UserDocsWeb.Endpoint,
   load_from_system_env: true,
   http: [port: {:system, "PORT"}], # Possibly not needed, but doesn't hurt
-  https: [port: 443],
   server: true,
   secret_key_base: "${SECRET_KEY_BASE}",
   url: [host: "${APP_NAME}.gigalixirapp.com", port: 443],
@@ -27,7 +26,7 @@ config :userdocs_web, UserDocsWeb.Repo,
   pool_size: 1 # Free tier db only allows 1 connection
 
 config :userdocs_web, UserDocsWeb.Endpoint,
-  url: [scheme: "https", host: "app.user-docs.com", port: 443],
+  url: [host: "app.user-docs.com", port: 80],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 config :logger, level: :info
