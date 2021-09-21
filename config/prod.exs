@@ -16,9 +16,9 @@ config :userdocs_web, UserDocsWeb.Endpoint,
   https: [port: 443],
   server: true,
   secret_key_base: "${SECRET_KEY_BASE}",
-  url: [scheme: :https, host: "app.user-docs.com", port: 443],
+  url: [scheme: "https", host: "app.user-docs.com", port: 443],
   cache_static_manifest: "priv/static/cache_manifest.json",
-  check_origin: {UserDocsWeb.OriginChecker, :check, [:prod]},
+  check_origin: {UserDocsWeb.OriginChecker, :check, [:prod]}
 
 config :userdocs_web, UserDocsWeb.Repo,
   adapter: Ecto.Adapters.Postgres,
