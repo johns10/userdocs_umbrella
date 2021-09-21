@@ -12,6 +12,7 @@ use Mix.Config
 
 config :userdocs_web, UserDocsWeb.Endpoint,
   http: [port: {:system, "PORT"}], # Possibly not needed, but doesn't hurt
+  https: [port: 443],
   url: [host: "app.user-docs.com", port: 443],
   check_origin: {UserDocsWeb.OriginChecker, :check, [:prod]},
   cache_static_manifest: "priv/static/cache_manifest.json",
