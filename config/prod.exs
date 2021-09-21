@@ -11,13 +11,14 @@ use Mix.Config
 # before starting your production server.
 
 config :userdocs_web, UserDocsWeb.Endpoint,
+  load_from_system_env: true,
   http: [port: {:system, "PORT"}], # Possibly not needed, but doesn't hurt
   https: [port: 443],
-  url: [host: "app.user-docs.com", port: 443],
-  check_origin: {UserDocsWeb.OriginChecker, :check, [:prod]},
+  server: true,
+  secret_key_base: "${SECRET_KEY_BASE}",
+  url: [scheme: "https", host: "app.user-docs.com", port: 443],
   cache_static_manifest: "priv/static/cache_manifest.json",
-  secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
-  server: true
+  check_origin: {UserDocsWeb.OriginChecker, :check, [:prod]},
 
 config :userdocs_web, UserDocsWeb.Repo,
   adapter: Ecto.Adapters.Postgres,
