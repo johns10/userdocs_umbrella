@@ -16,15 +16,19 @@ config :userdocs_web, UserDocsWeb.Endpoint,
   https: [port: 443],
   server: true,
   secret_key_base: "${SECRET_KEY_BASE}",
-  url: [scheme: "https", host: "app.user-docs.com", port: 443],
+  url: [host: "${APP_NAME}.gigalixirapp.com", port: 443],
   cache_static_manifest: "priv/static/cache_manifest.json",
   check_origin: {UserDocsWeb.OriginChecker, :check, [:prod]}
 
 config :userdocs_web, UserDocsWeb.Repo,
   adapter: Ecto.Adapters.Postgres,
-  url: System.get_env("DATABASE_URL"),
+  url: "${DATABASE_URL}",
   ssl: true,
   pool_size: 1 # Free tier db only allows 1 connection
+
+config :userdocs_web, UserDocsWeb.Endpoint,
+  url: [scheme: "https", host: "app.user-docs.com", port: 443],
+  cache_static_manifest: "priv/static/cache_manifest.json"
 
 config :logger, level: :info
 
