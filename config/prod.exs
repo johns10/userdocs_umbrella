@@ -11,17 +11,16 @@ use Mix.Config
 # before starting your production server.
 
 config :userdocs_web, UserDocsWeb.Endpoint,
-  load_from_system_env: true,
-  http: [port: {:system, "PORT"}], # Possibly not needed, but doesn't hurt],
-  server: true,
-  secret_key_base: "${SECRET_KEY_BASE}",
+  http: [port: {:system, "PORT"}], # Possibly not needed, but doesn't hurt
   url: [scheme: "https", host: "app.user-docs.com", port: 443],
+  check_origin: {UserDocsWeb.OriginChecker, :check, [:prod]},
   cache_static_manifest: "priv/static/cache_manifest.json",
-  check_origin: {UserDocsWeb.OriginChecker, :check, [:prod]}
+  secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
+  server: true
 
 config :userdocs_web, UserDocsWeb.Repo,
   adapter: Ecto.Adapters.Postgres,
-  url: "${DATABASE_URL}",
+  url: System.get_env("DATABASE_URL"),
   ssl: true,
   pool_size: 1 # Free tier db only allows 1 connection
 
