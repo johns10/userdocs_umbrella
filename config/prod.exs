@@ -15,7 +15,7 @@ config :userdocs_web, UserDocsWeb.Endpoint,
   http: [port: {:system, "PORT"}], # Possibly not needed, but doesn't hurt
   server: true,
   secret_key_base: "${SECRET_KEY_BASE}",
-  url: [host: "${APP_NAME}.gigalixirapp.com"],
+  url: [host: "app.user-docs.com"],
   cache_static_manifest: "priv/static/cache_manifest.json",
   check_origin: {UserDocsWeb.OriginChecker, :check, [:prod]}
 
@@ -24,10 +24,6 @@ config :userdocs_web, UserDocsWeb.Repo,
   url: "${DATABASE_URL}",
   ssl: true,
   pool_size: 1 # Free tier db only allows 1 connection
-
-config :userdocs_web, UserDocsWeb.Endpoint,
-  url: [host: "app.user-docs.com"],
-  cache_static_manifest: "priv/static/cache_manifest.json"
 
 config :logger, level: :info
 
