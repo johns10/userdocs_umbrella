@@ -26,7 +26,7 @@ config :userdocs_web, UserDocsWeb.Repo,
   pool_size: 1 # Free tier db only allows 1 connection
 
 config :userdocs_web, UserDocsWeb.Endpoint,
-  url: [host: "app.user-docs.com", port: 80],
+  url: [host: "app.user-docs.com"],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 config :logger, level: :info
