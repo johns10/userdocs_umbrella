@@ -244,7 +244,7 @@ defmodule UserDocs.TestDataset do
       name: "Set Size Explicit"
    },
     full_screen_screenshot = %{
-      args: [],
+      args: ["screenshot_form"],
       name: "Full Screen Screenshot"
    },
     clear_annotations = %{
@@ -252,7 +252,7 @@ defmodule UserDocs.TestDataset do
       name: "Clear Annotations"
    },
     element_screenshot = %{
-      args: ["element_id", "element_form"],
+      args: ["element_id", "element_form", "screenshot_form"],
       name: "Element Screenshot"
    },
     scroll_to_element = %{args: ["element_id", "element_form"], name: "Scroll to Element"},
