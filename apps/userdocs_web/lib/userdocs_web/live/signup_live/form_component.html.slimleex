@@ -1,4 +1,4 @@
-= f = form_for @changeset, Routes.pow_registration_path(@socket, :create),
+= f = form_for @changeset, Routes.registration_path(@socket, :create),
   id: "signup-form",
   phx_target: @myself.cid,
   phx_change: "validate",

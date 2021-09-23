@@ -5,7 +5,7 @@
         .columns.is-centered
           .column.is-10-tablet.is-8-desktop.is-6-widescreen
             .box
-              = live_component @socket, UserDocsWeb.SignupLive.FormComponent,
+              = live_component @socket, UserDocsWeb.RegistrationLive.FormComponent,
                 id: @user.id || :new,
                 title: @page_title,
                 action: @live_action,
@@ -18,7 +18,7 @@
     div.container
       div.flex.items-center.justify-center.h-screen
 	      div.bg-white.rounded-lg.border.shadow-lg.p-10.max-w-2xl
-          = live_component @socket, UserDocsWeb.SignupLive.SetupComponent,
+          = live_component @socket, UserDocsWeb.RegistrationLive.SetupComponent,
             id: "userdocs-setup",
             title: @page_title,
             user: @user,

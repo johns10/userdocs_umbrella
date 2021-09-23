@@ -1,4 +1,4 @@
-defmodule UserDocsWeb.SignupLiveTest do
+defmodule UserDocsWeb.RegistrationLiveTest do
   use UserDocsWeb.ConnCase
   import Phoenix.LiveViewTest
   alias UserDocs.UsersFixtures

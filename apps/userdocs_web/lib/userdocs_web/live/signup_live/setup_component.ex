@@ -1,4 +1,4 @@
-defmodule UserDocsWeb.SignupLive.SetupComponent do
+defmodule UserDocsWeb.RegistrationLive.SetupComponent do
   @moduledoc """
     Component that's displayed after signing up, used for setup instructions
   """

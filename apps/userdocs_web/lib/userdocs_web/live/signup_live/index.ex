@@ -1,4 +1,4 @@
-defmodule UserDocsWeb.SignupLive.Index do
+defmodule UserDocsWeb.RegistrationLive.Index do
   @moduledoc """
   Index for signups
   """

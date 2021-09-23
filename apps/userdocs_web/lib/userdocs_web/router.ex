@@ -89,7 +89,7 @@ defmodule UserDocsWeb.Router do
   scope "/", UserDocsWeb do
     pipe_through [:browser, :put_user_agent_data]
 
-    live "/setup/:id", SignupLive.Index, :edit
+    live "/setup/:id", RegistrationLive.Index, :edit
   end
 
   scope "/", UserDocsWeb do
@@ -138,14 +138,16 @@ defmodule UserDocsWeb.Router do
 
   scope "/" do
     pipe_through :browser
-    pow_routes()
+    pow_session_routes()
     pow_extension_routes()
   end
 
   scope "/", UserDocsWeb do
     pipe_through [:browser, :not_authenticated, :put_user_agent_data]
 
-    live "/signup", SignupLive.Index, :new
+    live "/registration", RegistrationLive.Index, :new, as: :registration
+    post "/registration", RegistrationController, :create
+    live "/registration/:id", RegistrationLive.Index, :edit, as: :registration
   end
 
   def put_user_agent_data(conn, _opts) do

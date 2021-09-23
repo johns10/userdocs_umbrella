@@ -29,12 +29,12 @@ defmodule UserDocsWeb.API.RegistrationController do
 
         conn
         |> put_flash(:info, "E-mail sent, please check your inbox.")
-        |> redirect(to: Routes.pow_registration_path(conn, :edit))
+        |> redirect(to: Routes.registration_path(conn, :edit))
 
       false ->
         conn
         |> put_flash(:info, "E-mail has already been confirmed.")
-        |> redirect(to: Routes.pow_registration_path(conn, :edit))
+        |> redirect(to: Routes.registration_path(conn, :edit))
     end
   end
 
