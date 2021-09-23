@@ -1,4 +1,4 @@
-defmodule UserDocsWeb.SignupLive.FormComponent do
+defmodule UserDocsWeb.RegistrationLive.FormComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocs.Users
@@ -40,37 +40,6 @@ defmodule UserDocsWeb.SignupLive.FormComponent do
 
       {:error, changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
-    end
-  end
-
-  defp save_user(socket, :edit, user_params) do
-    case Users.update_user(socket.assigns.user, user_params) do
-      {:ok, _user} ->
-        {
-          :noreply,
-          socket
-          |> put_flash(:info, "User updated successfully")
-          |> push_redirect(to: socket.assigns.return_to)
-        }
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :changeset, changeset)}
-    end
-  end
-
-  defp save_user(socket, :new, user_params) do
-    case Users.create_user(user_params) do
-      {:ok, user} ->
-        {
-          :noreply,
-          socket
-          |> put_flash(:info, "User created successfully")
-          |> assign(:user, user)
-          |> push_redirect(to: Routes.signup_index_path(socket, :edit))
-        }
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, changeset: changeset)}
     end
   end
 end
