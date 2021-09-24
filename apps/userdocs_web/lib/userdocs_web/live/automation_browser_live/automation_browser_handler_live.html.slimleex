@@ -1,19 +1,33 @@
+css: 
+  input:checked ~ .dot {
+    transform: translateX(100%);
+    background-color: #48bb78;
+  }
+
 div id="<%= @id %>"
-= if not @user_opened_browser && not @browser_opened do 
-  = link to: "#", phx_click: "open-browser", phx_target: @myself.cid, class: "control" do
-    i.fa.fa-toggle-off.px-1
-= if @user_opened_browser and @browser_opened do
-  = link to: "#", phx_click: "close-browser", phx_target: @myself.cid, class: "control" do
-    i.fa.fa-toggle-on.px-1
-= if @user_opened_browser and not @browser_opened do
-    i.fas.fa-spinner.fa-spin.px-1
-= if not @user_opened_browser and @browser_opened do
-    i.fas.fa-spinner.fa-spin.px-1
-
-= if @browser_opened do 
-  i.fa.fa-chrome.pb-3.px-1.has-text-success
-- else
-  i.fa.fa-chrome.pb-3.px-1 style="color:grey;"
-
-= link to: "#", phx_click: "clear-browser", phx_target: @myself.cid, class: "control" do
-  i.fas.fa-times-circle.px-1
+label.flex.items-center.cursor-pointer for="browserToggle"
+  div.relative
+    = if not @user_opened_browser && not @browser_opened do 
+      = link to: "#", phx_click: "open-browser", phx_target: @myself.cid, class: "control" do
+        input.sr-only id="browserToggle" type="checkbox"
+        div.w-10.h-4.bg-gray-400.rounded-full.shadow-inner
+        div class="dot absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition"
+    = if @user_opened_browser and @browser_opened do
+      = link to: "#", phx_click: "close-browser", phx_target: @myself.cid, class: "control" do
+        input.sr-only id="browserToggle" type="checkbox" checked="checked"
+        div.w-10.h-4.bg-gray-400.rounded-full.shadow-inner
+        div class="dot absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition"
+    = if @user_opened_browser and not @browser_opened do
+      = link to: "#", phx_click: "clear-browser", phx_target: @myself.cid, class: "control" do
+        input.sr-only id="browserToggle" type="checkbox"
+        div.w-10.h-4.bg-gray-400.rounded-full.shadow-inner
+        div class="dot absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition"
+          i.fas.fa-spinner.fa-spin.px-1
+    = if not @user_opened_browser and @browser_opened do
+      = link to: "#", phx_click: "clear-browser", phx_target: @myself.cid, class: "control" do
+        input.sr-only id="browserToggle" type="checkbox" checked="checked"
+        div.w-10.h-4.bg-gray-400.rounded-full.shadow-inner
+        div class="dot absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition"
+          i.fas.fa-spinner.fa-spin.px-1
+  div.ml-3.text-gray-700.font-medium 
+    span Chrome
