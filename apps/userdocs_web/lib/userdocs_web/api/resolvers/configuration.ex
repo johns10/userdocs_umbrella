@@ -9,6 +9,6 @@ defmodule UserDocsWeb.API.Resolvers.Configuration do
     team = Users.get_team!(team_id)
     project = Projects.get_project!(project_id, %{preloads: [strategy: true]})
     strategy = project.strategy || %{name: "css"}
-    {:ok, %{css: team.css, overrides: overrides, strategy: project.strategy.name}}
+    {:ok, %{css: team.css, overrides: overrides, strategy: strategy.name}}
   end
 end
