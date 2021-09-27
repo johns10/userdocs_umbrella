@@ -51,28 +51,6 @@ div id=@id
           .control
             =< link "Find Chrome", to: "#", class: "button is-info", phx_click: "find-chrome", phx_target: @myself.cid
 
-      .field.is-horizontal
-        .field-label.is-normal
-          = label f, :css, class: "label"
-        .field-body
-          .control.is-expanded
-            = textarea f, :css, [ class: "input", type: "text", disabled: true ]
-            p.help 
-              | CSS must be changed on the 
-              =< link "team form", to: Routes.team_index_path(@socket, :edit, @current_team)
-
-      .field
-        .label
-          = label f, :overrides, class: "label"
-        = inputs_for f, :overrides, fn puof ->
-          .field-body.pb-4
-            .field
-              .control
-                = text_input puof, :project_id, class: "input", type: "text", disabled: true
-            .field
-              .control
-                = text_input puof, :url, class: "input", type: "text", disabled: true
-
       = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
 
     </form>

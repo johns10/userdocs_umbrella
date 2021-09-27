@@ -204,8 +204,6 @@ defmodule UserDocsWeb.UserLive.FormComponent do
           user.overrides
           |> Enum.map(fn(o) -> Map.take(o, [:url, :project_id]) end)
 
-        UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "command:put_configuration", %{"overrides" => overrides})
-
         {
           :noreply,
           socket

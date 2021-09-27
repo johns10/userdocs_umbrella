@@ -12,14 +12,11 @@ defmodule UserDocs.Users.LocalOptions do
     field :browser_timeout, :integer
     field :user_data_dir_path, :string
     field :chrome_path, :string
-    field :css, :string
-    embeds_many :overrides, Override, on_replace: :raise
   end
 
   @doc false
   def changeset(local_options, attrs) do
     local_options
-    |> cast(attrs, [:image_path, :max_retries, :user_data_dir_path, :css, :chrome_path, :browser_timeout])
-    |> cast_embed(:overrides)
+    |> cast(attrs, [:image_path, :max_retries, :user_data_dir_path, :chrome_path, :browser_timeout])
   end
 end

@@ -167,10 +167,7 @@ defmodule UserDocsWeb.TeamLive.FormComponent do
 
   defp save_team(socket, :edit, team_params) do
     case Users.update_team(socket.assigns.team, team_params) do
-      {:ok, team} ->
-        user = socket.assigns.current_user
-        UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "command:put_configuration", %{"css" => team.css})
-
+      {:ok, _team} ->
         {
           :noreply,
           socket
