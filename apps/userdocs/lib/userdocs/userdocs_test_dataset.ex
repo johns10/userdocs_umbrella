@@ -252,7 +252,7 @@ defmodule UserDocs.TestDataset do
       name: "Clear Annotations"
    },
     element_screenshot = %{
-      args: ["element_id", "element_form", "screenshot_form"],
+      args: ["element_id", "element_form", "screenshot_form", "margin_top", "margin_bottom", "margin_left", "margin_right", "margin_left"],
       name: "Element Screenshot"
    },
     scroll_to_element = %{args: ["element_id", "element_form"], name: "Scroll to Element"},

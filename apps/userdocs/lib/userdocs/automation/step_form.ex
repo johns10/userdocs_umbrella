@@ -70,15 +70,28 @@ defmodule UserDocs.Automation.StepForm do
 
       field :step_id, :integer
     end
+
+    field :margin_all_enabled, :boolean
+    field :margin_all, :integer, default: 0
+    field :margin_top_enabled, :boolean
+    field :margin_top, :integer, default: 0
+    field :margin_bottom_enabled, :boolean
+    field :margin_bottom, :integer, default: 0
+    field :margin_left_enabled, :boolean
+    field :margin_left, :integer, default: 0
+    field :margin_right_enabled, :boolean
+    field :margin_right, :integer, default: 0
   end
 
   @doc false
   def changeset(step_form, attrs) do
     step_form
-    |> cast(attrs, [ :order, :name, :text, :width, :height ])
-    |> cast(attrs, [ :process_id, :page_id, :element_id, :annotation_id, :step_type_id ])
-    |> cast(attrs, [ :page_form_enabled, :element_form_enabled, :annotation_form_enabled ])
-    |> cast(attrs, [ :page_id_enabled, :element_id_enabled, :annotation_id_enabled ])
+    |> cast(attrs, [:order, :name, :text, :width, :height])
+    |> cast(attrs, [:process_id, :page_id, :element_id, :annotation_id, :step_type_id])
+    |> cast(attrs, [:page_form_enabled, :element_form_enabled, :annotation_form_enabled])
+    |> cast(attrs, [:page_id_enabled, :element_id_enabled, :annotation_id_enabled])
+    |> cast(attrs, [:margin_all, :margin_top, :margin_bottom, :margin_left, :margin_right])
+    |> cast(attrs, [:margin_all_enabled, :margin_top_enabled, :margin_bottom_enabled, :margin_left_enabled, :margin_right_enabled])
     |> cast_embed(:element, with: &Element.fields_changeset/2)
     |> cast_embed(:annotation, with: &AnnotationForm.changeset/2)
     |> cast_embed(:page, with: &Page.fields_changeset/2)
@@ -98,7 +111,12 @@ defmodule UserDocs.Automation.StepForm do
       :element_form_enabled,
       :annotation_id_enabled,
       :annotation_form_enabled,
-      :screenshot_form_enabled
+      :screenshot_form_enabled,
+      :margin_all_enabled,
+      :margin_top_enabled,
+      :margin_left_enabled,
+      :margin_right_enabled,
+      :margin_bottom_enabled
     ]
   end
 end

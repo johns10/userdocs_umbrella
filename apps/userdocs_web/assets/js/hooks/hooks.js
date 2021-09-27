@@ -51,4 +51,20 @@ Hooks.dragDropReorder = {
   }
 }
 
+Hooks.marginFields = {
+  mounted() {
+    this.el.addEventListener("input", e => {
+      updateValue("margin-top-input", this.el.value)
+      updateValue("margin-bottom-input", this.el.value)
+      updateValue("margin-left-input", this.el.value)
+      updateValue("margin-right-input", this.el.value)
+    })
+  }
+}
+
+function updateValue(selector, value) {
+  const element = document.querySelector(`[data-userdocs = ${selector}`)
+  element.value = value
+}
+
 export {Hooks}

@@ -487,8 +487,13 @@ defmodule UserDocsWeb.StepLive.Index do
       annotation: annotation_form,
       screenshot: step.screenshot,
       step_type_id: step.step_type_id,
-      process_id: step.process_id
-   }
+      process_id: step.process_id,
+      margin_all: step.margin_all,
+      margin_top: step.margin_top,
+      margin_bottom: step.margin_bottom,
+      margin_left: step.margin_left,
+      margin_right: step.margin_right
+    }
 
     socket
     |> assign(:step_form, step_form)

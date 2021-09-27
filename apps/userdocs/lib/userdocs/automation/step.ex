@@ -25,6 +25,11 @@ defmodule UserDocs.Automation.Step do
     field :width, :integer
     field :height, :integer
     field :page_reference, :string
+    field :margin_all, :integer
+    field :margin_top, :integer
+    field :margin_bottom, :integer
+    field :margin_left, :integer
+    field :margin_right, :integer
 
     belongs_to :page, Page, on_replace: :update
     belongs_to :process, Process
@@ -65,6 +70,7 @@ defmodule UserDocs.Automation.Step do
   def fields_changeset(step, attrs) do
     step
     |> cast(attrs, [:order, :name, :url, :text, :width, :height, :page_reference])
+    |> cast(attrs, [:margin_all, :margin_top, :margin_bottom, :margin_left, :margin_right])
     |> cast(attrs, [:process_id, :page_id, :element_id, :annotation_id, :step_type_id])
     |> foreign_key_constraint(:process)
     |> foreign_key_constraint(:page)

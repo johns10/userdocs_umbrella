@@ -12,6 +12,11 @@ defmodule UserDocsWeb.API.Schema.Step do
     field :width, :integer
     field :height, :integer
     field :page_reference, :string
+    field :margin_all, :integer
+    field :margin_top, :integer
+    field :margin_bottom, :integer
+    field :margin_left, :integer
+    field :margin_right, :integer
 
     field :annotation, :annotation, resolve: &Resolvers.Annotation.get_annotation!/3
     field :page, :page, resolve: &Resolvers.Page.get_page!/3

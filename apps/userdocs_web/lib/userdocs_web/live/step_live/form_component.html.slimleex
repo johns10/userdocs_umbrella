@@ -138,6 +138,52 @@
         = live_component @socket, UserDocsWeb.ScreenshotLive.Preview, 
         [ id: "screenshot-preview", screenshot: f.data.screenshot, team: @current_team ]
 
+  = if @last_step_form.margin_all_enabled do
+    .field.is-horizontal
+      .field-label.is-normal
+        = label f, :margin_all, class: "label"
+      .field-body
+        .control
+          = number_input f, :margin_all, [class: "input", type: "text", data_userdocs: "margin-all-input", phx_hook: "marginFields"]
+          = error_tag(f, :margin_all)
+
+  = if @last_step_form.margin_top_enabled do
+    .field.is-horizontal
+      .field-label.is-normal
+        = label f, :margin_top, class: "label"
+      .field-body
+        .control
+          = number_input f, :margin_top, [class: "input", type: "text", data_userdocs: "margin-top-input"]
+          = error_tag(f, :margin_top)
+
+  = if @last_step_form.margin_bottom_enabled do
+    .field.is-horizontal
+      .field-label.is-normal
+        = label f, :margin_bottom, class: "label"
+      .field-body
+        .control
+          = number_input f, :margin_bottom, [class: "input", type: "text", data_userdocs: "margin-bottom-input"]
+          = error_tag(f, :margin_bottom)
+
+  = if @last_step_form.margin_left_enabled do
+    .field.is-horizontal
+      .field-label.is-normal
+        = label f, :margin_left, class: "label"
+      .field-body
+        .control
+          = number_input f, :margin_left, [class: "input", type: "text", data_userdocs: "margin-left-input"]
+          = error_tag(f, :margin_left)
+
+  = if @last_step_form.margin_right_enabled do
+    .field.is-horizontal
+      .field-label.is-normal
+        = label f, :margin_right, class: "label"
+      .field-body
+        .control
+          = number_input f, :margin_right, [class: "input", type: "text", data_userdocs: "margin-right-input"]
+          = error_tag(f, :margin_right)
+
+
   .buttons
     = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
       = if @action == :edit do
