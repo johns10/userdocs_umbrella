@@ -124,6 +124,7 @@ defmodule UserDocsWeb.ProcessLive.Index do
     opts =
       socket.assigns.state_opts
       |> Keyword.put(:filter, {:project_id, project_id})
+      |> Keyword.put(:order, [%{field: :name, order: :asc}])
       |> Keyword.put(:preloads, [:process_instances])
       |> Keyword.put(:limit,  [process_instances: 5])
 
