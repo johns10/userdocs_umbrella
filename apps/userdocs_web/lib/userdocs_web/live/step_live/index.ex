@@ -98,6 +98,7 @@ defmodule UserDocsWeb.StepLive.Index do
       :noreply,
       socket
       |> prepare_step(String.to_integer(id))
+      |> assign(:step_params, nil)
       |> apply_action(socket.assigns.live_action, params)
    }
   end
