@@ -96,7 +96,7 @@ defmodule UserDocs.Automation.StepForm do
     |> cast_embed(:annotation, with: &AnnotationForm.changeset/2)
     |> cast_embed(:page, with: &Page.fields_changeset/2)
     |> cast_embed(:screenshot, with: &Screenshot.fields_changeset/2)
-    |> validate_required([:order])
+    |> validate_required([:step_type_id, :order])
   end
 
   def enabler_fields do
