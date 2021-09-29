@@ -40,12 +40,16 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   def update(%{id: id, step_params: step_params} = assigns,
   %{assigns: %{current_project: current_project, last_step_form: last_step_form, data: %{elements: elements}}} = socket)
   when step_params != nil do
-    IO.puts("Updating an existing form")
+    IO.puts("This is when we get a browser event?")
     params = BrowserEvents.apply(step_params, current_project, elements)
-    {:ok, validate_params(socket, params)}
+    {
+      :ok,
+      validate_params(socket, params)
+      |> assign(:step_params, nil)
+    }
   end
   def update(%{id: id, step_form: step_form, step_params: nil} = assigns, socket) do
-    #IO.puts("Update for new form with nil params")
+    IO.puts("Update for new form with nil params")
     {:ok, build_new_form(socket, assigns)}
   end
   # Here, we have to make some param updates, build a changeset, apply it, and put that form on the socket as last_
@@ -58,6 +62,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
       |> build_new_form(assigns)
       |> validate_params(params)
       |> maybe_put_new_page_flash(assigns)
+      |> assign(:step_params, nil)
     }
   end
   def update(%{action: :save}, socket) do
