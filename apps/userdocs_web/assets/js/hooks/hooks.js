@@ -6,19 +6,7 @@ let Hooks = {}
 Hooks.authenticationEvents = {
   mounted() {
     this.handleEvent("login-succeeded", (message) => {
-      const browserStatus = {server: "not_running", client: "not_running", runner: "not_running"}
-      if (!window.userdocs) this.pushEventTo('#services-status-hook', "put-services-status", browserStatus)
-      else {
-        window.userdocs.putTokens(message)
-          .then(result => {
-            if (result.status == "ok") {
-              window.userdocs.startServices()
-                .then(result => {
-                  this.pushEventTo('#services-status-hook', "put-services-status", result)
-                })
-            }
-          })
-      }
+      window.userdocs.putTokens(message)
     })
   }
 }
