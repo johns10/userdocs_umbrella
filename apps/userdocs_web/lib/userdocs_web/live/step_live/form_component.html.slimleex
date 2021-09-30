@@ -45,7 +45,7 @@
     .field-body
       .control
         = number_input f, :order, [ class: "input", type: "text" ]
-      = error_tag(f, :order)
+        = error_tag(f, :order)
 
   = if @last_step_form.width_enabled do
     .field.is-horizontal
@@ -54,7 +54,7 @@
       .field-body
         .control
           = number_input f, :width, [ class: "input", type: "text", id: "width-input" ]
-        = error_tag(f, :width)
+          = error_tag(f, :width)
 
   = if @last_step_form.width_enabled do
     .field.is-horizontal
@@ -63,7 +63,7 @@
       .field-body
         .control
           = number_input f, :height, [ class: "input", type: "text", id: "height-input" ]
-        = error_tag(f, :height)
+          = error_tag(f, :height)
 
   = if @last_step_form.text_enabled do
     .field.is-horizontal
@@ -72,7 +72,7 @@
       .field-body
         .control
           = text_input f, :text, [ class: "input", type: "text", id: "text-input" ]
-        = error_tag(f, :text)
+          = error_tag(f, :text)
 
   = if @last_step_form.page_form_enabled do
     .field id="page-subform"
@@ -144,7 +144,7 @@
       .field-body
         .control
           = number_input f, :margin_all, [class: "input", type: "text", data_userdocs: "margin-all-input", phx_hook: "marginFields"]
-        = error_tag(f, :margin_all)
+          = error_tag(f, :margin_all)
 
   = if @last_step_form.margin_top_enabled do
     .field.is-horizontal
@@ -153,7 +153,7 @@
       .field-body
         .control
           = number_input f, :margin_top, [class: "input", type: "text", data_userdocs: "margin-top-input"]
-        = error_tag(f, :margin_top)
+          = error_tag(f, :margin_top)
 
   = if @last_step_form.margin_bottom_enabled do
     .field.is-horizontal
@@ -162,7 +162,7 @@
       .field-body
         .control
           = number_input f, :margin_bottom, [class: "input", type: "text", data_userdocs: "margin-bottom-input"]
-        = error_tag(f, :margin_bottom)
+          = error_tag(f, :margin_bottom)
 
   = if @last_step_form.margin_left_enabled do
     .field.is-horizontal
@@ -171,7 +171,7 @@
       .field-body
         .control
           = number_input f, :margin_left, [class: "input", type: "text", data_userdocs: "margin-left-input"]
-        = error_tag(f, :margin_left)
+          = error_tag(f, :margin_left)
 
   = if @last_step_form.margin_right_enabled do
     .field.is-horizontal
@@ -180,7 +180,7 @@
       .field-body
         .control
           = number_input f, :margin_right, [class: "input", type: "text", data_userdocs: "margin-right-input"]
-        = error_tag(f, :margin_right)
+          = error_tag(f, :margin_right)
 
 
   .buttons
