@@ -14,29 +14,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   alias UserDocs.Automation.StepForm
   alias UserDocs.Web
   alias UserDocs.Web.Page
-"""
-  def preserve_existing_params(params, changeset) do
-    params
-    |> preserve_order(changeset)
-    |> maybe_preserve_step_type_id(changeset)
-  end
 
-  def preserve_order(params, changeset) do
-    order = Ecto.Changeset.get_field(changeset, :order)
-    Map.put(params, "order", order)
-  end
-
-  def maybe_preserve_step_type_id(%{"step_type_id" => "do_not_update"} = params, changeset) do
-    step_type_id = Ecto.Changeset.get_field(changeset, :step_type_id)
-    Map.put(params, "step_type_id", step_type_id)
-  end
-  def maybe_preserve_step_type_id(params, _changeset), do: params
-
-  def update(%{step_params: step_params}, socket) when step_params != nil do
-    {socket, step_params}
-    |> BrowserEvents.
-  end
-  """
   def update(%{id: id, step_params: step_params} = assigns,
   %{assigns: %{current_project: current_project, last_step_form: last_step_form, data: %{elements: elements}}} = socket)
   when step_params != nil do
@@ -85,8 +63,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     |> assign(:select_lists, update_select_lists(assigns, step_form.page_id))
   end
 
-  def validate_params(%{assigns: %{step_form: original_step_form, last_step_form: last_step_form} = assigns} = socket, params) do
-    IO.puts("Validating params")
+  def validate_params(%{assigns: %{step_form: original_step_form, last_step_form: last_step_form, changeset: original_changeset} = assigns} = socket, params) do
     last_change =
       last_step_form
       |> StepForm.changeset(params)
@@ -94,9 +71,11 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
     last_step_form = Ecto.Changeset.apply_changes(last_change)
     updated_params = handle_param_updates(params, last_change, assigns)
+    final_params = preserve_existing_params(updated_params, original_changeset)
     changeset =
-      StepForm.changeset(original_step_form, updated_params)
+      StepForm.changeset(original_step_form, final_params)
       |> Map.put(:action, :validate)
+
 
     page_id = Ecto.Changeset.get_field(changeset, :page_id, nil)
 
@@ -105,6 +84,32 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     |> assign(:changeset, changeset)
     |> assign(:select_lists, update_select_lists(assigns, page_id))
   end
+
+  def preserve_existing_params(params, changeset) do
+    params
+    |> preserve_order(changeset)
+    |> maybe_preserve_step_type_id(changeset)
+  end
+
+  def preserve_order(params, changeset) do
+    order_param = string_to_integer(params["order"])
+    order = Ecto.Changeset.get_field(changeset, :order) || order_param
+    Map.put(params, "order", order)
+  end
+
+  def string_to_integer(arg) do
+    try do
+      String.to_integer(arg)
+    rescue
+      _ -> arg
+    end
+  end
+
+  def maybe_preserve_step_type_id(%{"step_type_id" => "do_not_update"} = params, changeset) do
+    step_type_id = Ecto.Changeset.get_field(changeset, :step_type_id)
+    Map.put(params, "step_type_id", step_type_id)
+  end
+  def maybe_preserve_step_type_id(params, _changeset), do: params
 
   def maybe_put_new_page_flash(%{assigns: %{changeset: %Ecto.Changeset{changes: %{page: %Ecto.Changeset{action: :insert}}} = changeset}} = socket, assigns),
     do: put_flash(socket, :info, "The page you're on doesn't exist on your project. Use this form to create it, and try to create your step again.")
