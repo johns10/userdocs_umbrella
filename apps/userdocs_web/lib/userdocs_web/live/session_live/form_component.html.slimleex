@@ -24,7 +24,7 @@
     = absolute_error_tag f, :password
   .flex.items-center.justify-between
     .text-sm
-      a.font-medium.text-green-600.hover_text-green-400 href="#" 
+      /!a.font-medium.text-green-600.hover_text-green-400 href="#" 
         | Forgot your password?
   div
     = submit "Sign in", type: "submit", class: "group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-400 hover_bg-green-400 focus_outline-none focus_ring-2 focus_ring-offset-2 focus_ring-green-400"
