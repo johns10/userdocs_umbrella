@@ -71,7 +71,7 @@ defmodule UserDocs.WebFixtures do
 
   def page_attrs(:valid, project_id \\ nil) do
     %{
-      url: "some url",
+      url: "http://www.user-docs.com",
       name: UUID.uuid4(),
       project_id: project_id
     }

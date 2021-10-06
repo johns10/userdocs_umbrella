@@ -92,11 +92,11 @@ defmodule UserDocs.AutomationFixtures do
       element_id: element_id,
       annotation_id: annotation_id,
       step_type_id: step_type_id,
-      margin_all: 0,
-      margin_bottom: 0,
-      margin_left: 0,
-      margin_right: 0,
-      margin_top: 0
+      #margin_all: 0,
+      #margin_bottom: 0,
+      #margin_left: 0,
+      #margin_right: 0,
+      #margin_top: 0
 
     }
   end

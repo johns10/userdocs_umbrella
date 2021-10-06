@@ -8,14 +8,14 @@ defmodule UserDocsWeb.RegistrationLiveTest do
   describe "Signup" do
 
     test "signup form renders correctly", %{conn: conn} do
-      {:ok, index_live, html} = live(conn, Routes.signup_index_path(conn, :new))
+      {:ok, index_live, html} = live(conn, Routes.registration_path(conn, :new))
 
       assert html =~ "Sign Up"
       assert html =~ "Email"
     end
 
     test "creates new user", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, Routes.signup_index_path(conn, :new))
+      {:ok, index_live, _html} = live(conn, Routes.registration_path(conn, :new))
 
       invalid_attrs = %{email: "test@test.com", password: "asdf", password_confirmation: "asdf1234asdf"}
 
@@ -57,7 +57,7 @@ defmodule UserDocsWeb.RegistrationLiveTest do
 
       expected_email = UserDocs.Email.confirmation_email(email_attrs)
 
-      assert "/setup/" <> _user_id = redir_path = redirected_to(conn, 302)
+      assert "/registration/" <> _user_id = redir_path = redirected_to(conn, 302)
       conn = get(recycle(conn), redir_path)
     end
   end

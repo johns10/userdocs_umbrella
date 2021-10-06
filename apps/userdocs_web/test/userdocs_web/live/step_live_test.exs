@@ -9,11 +9,15 @@ defmodule UserDocsWeb.StepLiveTest do
   alias UserDocs.ProjectsFixtures
   alias UserDocs.WebFixtures
 
+  @chrome "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+  #|> open_browser(&(System.cmd(@chrome, [&1])))
+
   defp invalid_attrs(process_id) do
     %{
-      order: nil,
+      order: "",
+      step_type_id: nil,
       process_id: process_id
-}
+    }
   end
 
   defp valid_attrs(process_id, step_type_id) do
@@ -21,7 +25,7 @@ defmodule UserDocsWeb.StepLiveTest do
       order: 1,
       process_id: process_id,
       step_type_id: step_type_id
-}
+    }
   end
 
   defp create_password(_), do: %{password: UUID.uuid4()}
@@ -217,7 +221,6 @@ defmodule UserDocsWeb.StepLiveTest do
              |> follow_redirect(conn, Routes.step_index_path(conn, :index, process.id))
     end
 
-
     test "changing the annotation_id updates the form", %{authed_conn: conn, step: step, step_types: step_types, process: process, element: element, annotation: annotation, page: page} do
       aa_step_type = step_type_from_name(step_types, "Apply Annotation")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :edit, step))
@@ -332,7 +335,7 @@ defmodule UserDocsWeb.StepLiveTest do
       refute has_element?(index_live, "#delete-step-"<> Integer.to_string(step.id))
     end
 
-    test "click event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step: step, step_types: step_types, user: user} do
+    test "click event opens form, filling additional fields and saving works", %{authed_conn: conn, process: process, step: step, step_types: step_types, user: user, page: page} do
       step_type = step_type_from_name(step_types, "Click")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :index, process.id))
       attrs =
@@ -340,13 +343,21 @@ defmodule UserDocsWeb.StepLiveTest do
         |> Map.put(:page_id, first_page().id)
         |> Map.delete(:step_type_id)
 
-      event = %{action: "Click", selector: "test_selector"}
+      event = %{
+        "action" => "Click",
+        "selector" => "test_selector",
+        "href" => page.url,
+        "element_name" => "Hi",
+        "order" => "1"
+      }
 
       # Pass the click browser event
+      IO.puts("user:" <> to_string(user.id))
       UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
+      #send(index_live.pid, %{topic: "user:" <> to_string(user.id), event: "event:browser_event", payload: event})
       html = render(index_live)
       assert html =~ "Click"
-      assert html =~ event.selector
+      assert html =~ event["selector"]
 
       # Create and put the changes required to make the form valid (page will be passed in production)
       changes = %{
@@ -381,13 +392,18 @@ defmodule UserDocsWeb.StepLiveTest do
         valid_attrs(step.process_id, step_type.id)
         |> Map.delete(:step_type_id)
 
-      event = %{action: "Navigate", href: "https://www.google.com"}
+      event = %{
+        "action" => "Navigate",
+        "href" => "https://www.google.com",
+        "page_title" => "Page",
+        "order" => "5"
+      }
 
       # Pass the navigate browser event
       UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
       html = render(index_live)
       assert html =~ "Navigate"
-      assert html =~ event.href
+      assert html =~ event["href"]
 
       # Create and put the changes required to make the form valid
       changes = %{
@@ -413,7 +429,7 @@ defmodule UserDocsWeb.StepLiveTest do
       assert html =~ "Step created successfully"
     end
 
-    test "Click, then navigate does the expected thing", %{authed_conn: conn, process: process, step: step, step_types: step_types, user: user} do
+    test "Click, then navigate does the expected thing", %{authed_conn: conn, process: process, step: step, step_types: step_types, user: user, page: page} do
       step_type = step_type_from_name(step_types, "Click")
       {:ok, index_live, _html} = live(conn, Routes.step_index_path(conn, :index, process.id))
       attrs =
@@ -421,21 +437,32 @@ defmodule UserDocsWeb.StepLiveTest do
         |> Map.put(:page_id, first_page().id)
         |> Map.delete(:step_type_id)
 
-      event = %{action: "Click", selector: "test_selector"}
+      event = %{
+        "action" => "Click",
+        "selector" => "test_selector",
+        "href" => page.url,
+        "element_name" => "Hi",
+        "order" => "1"
+      }
 
       # Pass the click browser event
       UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
       html = render(index_live)
       assert html =~ "Click"
-      assert html =~ event.selector
+      assert html =~ event["selector"]
 
-      event = %{action: "Navigate", href: "https://www.google.com"}
+      event = %{
+        "action" => "Navigate",
+        "href" => "https://www.google.com",
+        "page_title" => "Page",
+        "order" => "5"
+      }
 
       # Pass the navigate browser event
       UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
       html = render(index_live)
       assert index_live |> element("#step-type-select") |> render()  =~ "Navigate"
-      assert index_live |> element("#page-url-input") |> render()  =~ event.href
+      assert index_live |> element("#page-url-input") |> render()  =~ event["href"]
 
       # Create and put the changes required to make the form valid
       changes = %{
@@ -472,13 +499,21 @@ defmodule UserDocsWeb.StepLiveTest do
         |> Map.delete(:element_id)
         |> Map.delete(:name)
 
-      event = %{action: "Apply Annotation", selector: "test_selector", annotation_type: "Badge"}
+      event = %{
+        "action" => "Apply Annotation",
+        "selector" => "test_selector",
+        "annotation_type" => "Badge",
+        "href" => page.url,
+        "element_name" => "Name",
+        "order" => "1",
+        "label" => "1"
+      }
 
       # Pass the navigate browser event
       UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
       html = render(index_live)
       assert html =~ "Apply Annotation"
-      assert html =~ event.selector
+      assert html =~ event["selector"]
     end
 
     test "index handles standard events", %{authed_conn: conn, project: project} do
@@ -504,14 +539,20 @@ defmodule UserDocsWeb.StepLiveTest do
       |> form("#step-form", step_form: attrs)
       |> render_change(%{"step" => changes})
 
-      event = %{action: "Click", selector: "test_selector"}
+      event = %{
+        "action" => "Click",
+        "selector" => "test_selector",
+        "href" => page.url,
+        "element_name" => "Hi",
+        "order" => "1"
+      }
 
       # Pass the click browser event
       UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
       :timer.sleep(10)
 
       assert index_live |> element("#step-type-select") |> render() =~ "selected=\"selected\">Click"
-      assert index_live |> element("#element-selector-input") |> render() =~ event.selector
+      assert index_live |> element("#element-selector-input") |> render() =~ event["selector"]
     end
 
   end
