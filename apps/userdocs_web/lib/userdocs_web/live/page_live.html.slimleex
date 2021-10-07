@@ -1,0 +1,31 @@
+div.container.mx-auto
+  div.text-center.px-3.lg_px-0
+    h1.my-4.text-2xl.md_text-3xl.lg_text-5xl.font-black.leading-tight Welcome to UserDocs!
+    p.leading-normal.text-gray-800.text-base.md_text-xl.lg_text-2xl.mb-8
+      | Getting Started
+
+
+div.container.max-w-5xl.mx-auto.m-8
+  .w-full.mb-4
+    .h-1.mx-auto.gradient.w-64.opacity-25.my-0.py-0.rounded-t
+  .flex.flex-wrap
+    div class="w-1/2 p-6"
+      h3.text-3xl.text-gray-800.font-bold.leading-none.mb-3 Automation Manager
+      p.text-gray-600.mb-8
+        | The green plus opens and closes the Automation Manager. Use this panel to open and close an automated copy of the Chrome browser, select and run jobs, and add processes and steps to jobs.
+      p.text-gray-600.mb-8
+        | Navigate to the Processes menu to add new Processes, add them to your job, and configure the processes steps.
+    div class="w-auto p-6" 
+      = img_tag Routes.static_path(@socket, "/images/userdocs_automation_manager_reference.png")
+  .flex.flex-wrap.flex-col-reverse.sm_flex-row
+    div class="w-full p-6 mt-6 sm:w-1/2" 
+      | p image
+    div class="w-auto p-6 mt-6 sm:w-1/2" 
+      .align-middle
+        h3.text-3xl.text-gray-800.font-bold.leading-none.mb-3 Lorem ipsum dolor sit amet
+        p.text-gray-600.mb-8
+          | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam at ipsum eu nunc commodo posuere et sit amet ligula.
+      
+
+
+div id="authenticationEvents-hook" phx-hook="authenticationEvents"
