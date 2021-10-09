@@ -31,12 +31,13 @@ defmodule UserDocsWeb.ScreenshotLive.Show do
   def initialize(socket), do: socket
 
   @impl true
-  def handle_params(%{ "id" => id }, _, socket) do
+  def handle_params(%{ "id" => id }, url, socket) do
     screenshot = Screenshots.get_screenshot!(id)
     socket =
       assign_url(socket, screenshot, :aws_screenshot, socket.assigns.current_team)
       |> assign_url(screenshot, :aws_provisional_screenshot, socket.assigns.current_team)
       |> assign_url(screenshot, :aws_diff_screenshot, socket.assigns.current_team)
+      |> assign(url: URI.parse(url))
 
     {
       :noreply,

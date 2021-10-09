@@ -63,41 +63,45 @@ defmodule UserDocsWeb.StepLive.Index do
 
   @impl true
   def handle_params(_, _, %{assigns: %{auth_state: :not_logged_in}} = socket), do: {:noreply, socket}
-  def handle_params(%{"process_id" => process_id, "step_params" => _} = params, _, socket) do
+  def handle_params(%{"process_id" => process_id, "step_params" => _} = params, url, socket) do
     process = Automation.get_process!(process_id)
     {
       :noreply,
       socket
       |> assign(:process, process)
+      |> assign(url: URI.parse(url))
       |> prepare_steps(String.to_integer(process_id))
       |> assign(:select_lists, %{})
       |> apply_action(socket.assigns.live_action, params)
    }
   end
-  def handle_params(%{"process_id" => process_id} = params, _, socket) do
+  def handle_params(%{"process_id" => process_id} = params, url, socket) do
     process = Automation.get_process!(process_id)
     {
       :noreply,
       socket
       |> assign(:process, process)
+      |> assign(url: URI.parse(url))
       |> prepare_steps(String.to_integer(process_id))
       |> assign(:select_lists, %{})
       |> apply_action(socket.assigns.live_action, params)
    }
   end
-  def handle_params(%{"id" => id, "step_params" => _} = params, _, socket) do
+  def handle_params(%{"id" => id, "step_params" => _} = params, url, socket) do
     {
       :noreply,
       socket
       |> prepare_step(String.to_integer(id))
+      |> assign(url: URI.parse(url))
       |> apply_action(socket.assigns.live_action, params)
    }
   end
-  def handle_params(%{"id" => id} = params, _, socket) do
+  def handle_params(%{"id" => id} = params, url, socket) do
     {
       :noreply,
       socket
       |> prepare_step(String.to_integer(id))
+      |> assign(url: URI.parse(url))
       |> assign(:step_params, nil)
       |> apply_action(socket.assigns.live_action, params)
    }

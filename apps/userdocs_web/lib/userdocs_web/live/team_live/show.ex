@@ -32,7 +32,7 @@ defmodule UserDocsWeb.TeamLive.Show do
   def initialize(socket), do: socket
 
   @impl true
-  def handle_params(%{"id" => id}, _, socket) do
+  def handle_params(%{"id" => id}, url, socket) do
     team = Users.get_team!(id, %{preloads: [projects: true, users: true]})
     default_project = Users.team_default_project(team)
 
@@ -40,6 +40,7 @@ defmodule UserDocsWeb.TeamLive.Show do
       :noreply,
       socket
       |> assign(:page_title, page_title(socket.assigns.live_action))
+      |> assign(url: URI.parse(url))
       |> assign(:team, Map.put(team, :default_project, default_project))
     }
   end

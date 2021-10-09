@@ -35,12 +35,13 @@ defmodule UserDocsWeb.ProjectLive.Show do
   def initialize(socket), do: socket
 
   @impl true
-  def handle_params(%{"id" => id}, _, socket) do
+  def handle_params(%{"id" => id}, url, socket) do
     project = Projects.get_project!(String.to_integer(id))
     {
       :noreply,
       socket
       |> assign(:page_title, page_title(socket.assigns.live_action))
+      |> assign(url: URI.parse(url))
       |> assign(:project, project)
     }
   end

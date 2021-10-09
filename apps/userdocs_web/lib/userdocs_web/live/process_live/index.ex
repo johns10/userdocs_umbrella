@@ -44,9 +44,10 @@ defmodule UserDocsWeb.ProcessLive.Index do
   def handle_params(_params, _url, %{assigns: %{auth_state: :not_logged_in}} = socket) do
     {:noreply, socket}
   end
-  def handle_params(params, _url, socket) do
+  def handle_params(params, url, socket) do
     socket
     |> prepare_processes(socket.assigns.current_project.id)
+    |> assign(url: URI.parse(url))
     |> do_handle_params(params)
   end
 

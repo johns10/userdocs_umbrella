@@ -38,8 +38,8 @@ defmodule UserDocsWeb.UserLive.Index do
   end
 
   @impl true
-  def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  def handle_params(params, url, socket) do
+    {:noreply, socket |> apply_action(socket.assigns.live_action, params) |> assign(url: URI.parse(url))}
   end
 
   defp apply_action(socket, :local_options, _) do

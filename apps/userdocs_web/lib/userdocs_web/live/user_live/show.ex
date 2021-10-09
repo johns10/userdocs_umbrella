@@ -24,7 +24,7 @@ defmodule UserDocsWeb.UserLive.Show do
   end
 
   @impl true
-  def handle_params(%{"id" => id}, _, %{assigns: %{current_user: current_user}} = socket) do
+  def handle_params(%{"id" => id}, url, %{assigns: %{current_user: current_user}} = socket) do
     case String.to_integer(id) == current_user.id do
       true ->
         user = Users.get_user!(id, %{team_users: true, teams: true})
@@ -35,6 +35,7 @@ defmodule UserDocsWeb.UserLive.Show do
         {
           :noreply,
           socket
+          |> assign(url: URI.parse(url))
           |> assign(:page_title, page_title(socket.assigns.live_action))
           |> assign(:user, user)
           |> assign(:select_lists, select_lists)

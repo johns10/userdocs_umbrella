@@ -36,11 +36,11 @@ defmodule UserDocsWeb.TeamLive.Index do
   def initialize(socket), do: socket
 
   @impl true
-  def handle_params(params, _url, %{assigns: %{auth_state: :not_logged_in}} = socket) do
+  def handle_params(params, url, %{assigns: %{auth_state: :not_logged_in}} = socket) do
     {:noreply, socket}
   end
-  def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  def handle_params(params, url, socket) do
+    {:noreply, socket |> assign(url: URI.parse(url)) |> apply_action(socket.assigns.live_action, params)}
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
