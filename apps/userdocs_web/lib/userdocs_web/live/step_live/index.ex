@@ -152,7 +152,7 @@ defmodule UserDocsWeb.StepLive.Index do
     do: {:noreply, socket |> assign(:drag, nil) |> assign(:steps, items)}
 
   @impl true
-  def handle_info(%{topic: "user:" <> user_id, event: "event:browser_event", payload: %{"action" => action} = payload}, socket) do
+  def handle_info(%{topic: "user:" <> _user_id, event: "event:browser_event", payload: %{"action" => action} = payload}, socket) do
     payload = UserDocsWeb.LiveHelpers.underscored_map_keys(payload)
     recent_page_id = BrowserEvents.recent_navigated_page_id(socket.assigns.steps)
     payload = payload
