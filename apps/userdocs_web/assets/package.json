@@ -13,6 +13,7 @@
   "dependencies": {
     "bulma": "^0.9.1",
     "bulma-switch": "^2.0.0",
+    "daisyui": "^1.14.2",
     "graphql": "^15.5.1",
     "graphql-request": "^3.4.0",
     "nprogress": "^0.2.0",
@@ -25,7 +26,7 @@
     "@babel/preset-env": "^7.10.4",
     "@creativebulma/bulma-tooltip": "^1.2.0",
     "autoprefixer": "^10.3.1",
-    "babel-loader": "^8.x",
+    "babel-loader": "^8.2.2",
     "copy-webpack-plugin": "^7.x",
     "css-loader": "^5.x",
     "css-minimizer-webpack-plugin": "^1.x",
