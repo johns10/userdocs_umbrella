@@ -1,5 +1,5 @@
 
-defmodule UserDocs.Repo.Migrations.AlterUserAddProjectOverrides do
+defmodule UserDocs.Repo.Migrations.AlterStepAddMarginFields do
   use Ecto.Migration
 
   def change do
