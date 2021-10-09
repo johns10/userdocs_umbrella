@@ -50,13 +50,9 @@ defmodule UserDocsWeb.UserLive.LocalFormComponent do
   defp save_user(%{assigns: %{current_user: user}} = socket, _, local_options_params) do
     case Users.update_local_options(socket.assigns.local_options, local_options_params) do
       {:ok, local_options} ->
-        overrides =
-          local_options.overrides
-          |> Enum.map(fn(o) -> Map.take(o, [:url, :project_id]) end)
 
         snake_cased_local_options =
           local_options
-          |> Map.put(:overrides, overrides)
           |> Map.take(LocalOptions.__schema__(:fields))
           |> LiveHelpers.camel_cased_map_keys()
 

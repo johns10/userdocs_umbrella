@@ -31,12 +31,28 @@ defmodule UserDocsWeb.UserChannelHandlers do
     IO.inspect("root:event:user_opened_browser")
     PhoenixLiveSession.put_session(socket, "user_opened_browser", false)
   end
-
   def apply(socket, %{topic: "user:" <> _user_id, event: "command:clear_browser"}) do
     IO.inspect("root:command:clear_browser")
     socket
     |> PhoenixLiveSession.put_session("user_opened_browser", false)
     |> PhoenixLiveSession.put_session("browser_opened", false)
+  end
+  def apply(socket, %{topic: "user:" <> _user_id, event: "event:configuration_fetched", payload: payload}) do
+    case socket.assigns.live_action do
+      :local_options ->
+        Phoenix.LiveView.send_update(UserDocsWeb.UserLive.LocalFormComponent, %{id: "local-options", params: payload})
+        socket
+      _ -> socket
+    end
+  end
+  def apply(socket, %{topic: "user:" <> _user_id, event: "event:configuration_saved"}) do
+    case socket.assigns.live_action do
+      :local_options ->
+        socket
+        |> Phoenix.LiveView.put_flash(:info, "Local Options updated successfully")
+        |> Phoenix.LiveView.push_redirect(to: socket.assigns.url.path)
+      _ -> socket
+    end
   end
   # These events are handled in the index/form, and can be "ignored" by the root
   def apply(socket, %{topic: "user:" <> _user_id, event: "event:browser_event"}), do: socket
@@ -48,7 +64,6 @@ defmodule UserDocsWeb.UserChannelHandlers do
     IO.puts("UserChannelHandlers received an unhandled event: #{event}")
     socket
   end
-
   def apply(socket, %{topic: "user:" <> _user_id, event: "presence_state", payload: payload}) do
     IO.inspect("Presence state")
     update_session_with_joins(socket, payload)

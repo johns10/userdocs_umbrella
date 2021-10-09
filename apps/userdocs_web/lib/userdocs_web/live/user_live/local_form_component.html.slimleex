@@ -9,48 +9,34 @@ div id=@id
       phx_change: "validate",
       phx_submit: "save"
 
-      .field.is-horizontal
-        .field-label.is-normal
-          = label f, :max_retries, class: "label"
-        .field-body
-          .control
-            = number_input f, :max_retries, [ class: "input", type: "text" ]
-            = error_tag(f, :max_retries)
+      .form-control
+        = label f, :max_retries, class: "label"
+        = number_input f, :max_retries, type: "text", class: "input input-bordered"
+        = error_tag f, :max_retries 
 
-      .field.is-horizontal
-        .field-label.is-normal
-          = label f, :image_path, class: "label"
-        .field-body
-          .control.is-expanded
-            = text_input f, :image_path, [ class: "input", type: "text" ]
-            = error_tag(f, :image_path)
+      .form-control
+        = label f, :image_path, class: "label"
+        = text_input f, :image_path, type: "text", class: "input input-bordered"
+        = error_tag f, :image_path 
 
-      .field.is-horizontal
-        .field-label.is-normal
-          = label f, :user_data_dir_path, class: "label"
-        .field-body
-          .control.is-expanded
-            = text_input f, :user_data_dir_path, [ class: "input", type: "text" ]
-            = error_tag(f, :user_data_dir_path)
+      .form-control
+        = label f, :user_data_dir_path, class: "label"
+        = text_input f, :user_data_dir_path, type: "text", class: "input input-bordered"
+        = error_tag f, :user_data_dir_path 
 
-      .field.is-horizontal
-        .field-label.is-normal
-          = label f, :browser_timeout, class: "label"
-        .field-body
-          .control.is-expanded
-            = number_input f, :browser_timeout, [ class: "input", type: "text" ]
-            = error_tag(f, :browser_timeout)
+      .form-control
+        = label f, :browser_timeout, class: "label"
+        = number_input f, :browser_timeout, type: "text", class: "input input-bordered"
+        = error_tag f, :browser_timeout 
 
-      .field.is-horizontal.has-addons
-        .field-label.is-normal
-          = label f, :chrome_path, class: "label"
-        .field-body
-          .control.is-expanded
-            = text_input f, :chrome_path, [ class: "input", type: "text" ]
-            = error_tag(f, :chrome_path)
-          .control
-            =< link "Find Chrome", to: "#", class: "button is-info", phx_click: "find-chrome", phx_target: @myself.cid
+      .form-control
+        = label f, :chrome_path, class: "label"
+        .flex.items-center
+          = number_input f, :chrome_path, type: "text", class: "input input-bordered rounded-l-lg rounded-r-none"
+          =< link "Find Chrome", to: "#", class: "btn btn-success rounded-r-lg rounded-l-none", phx_click: "find-chrome", phx_target: @myself.cid
+        = error_tag f, :chrome_path 
 
-      = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
+      .mt-4
+        = submit "Save", phx_disable_with: "Saving...", class: "btn btn-primary mr-2"
 
     </form>
