@@ -17,28 +17,48 @@ css:
   }
 
 = if @auth_state == :logged_in do
-  nav.navbar role="navigation" aria-label="main navigation"
-    .navbar-brand 
-      = link to: Routes.page_path(@socket, :index), class: "navbar-item" do
-        = img_tag Routes.static_path(@socket, "/images/logo.png"), height: 28
+  .navbar.mb-2.shadow-lg.bg-neutral.text-neutral-content.rounded-box
+    .flex-none.px-2.mx-2
+      = link to: Routes.page_path(@socket, :index), class: "flex" do
+        = img_tag Routes.static_path(@socket, "/images/logo.png"), style: "height: 28px;",  class: "flex"
+        span.text-lg.font-bold.pl-4.hover_text-white
+          | UserDocs
+    .flex-none.px-2.mx-2
+      .items-stretch.hidden.lg_flex
+        = if is_struct(@current_project, UserDocs.Projects.Project) do
+          button.btn.btn-ghost.btn-sm 
+            = live_patch "Processes", to: Routes.process_index_path(@socket, :index), class: "hover_text-white"
+        = if is_struct(@current_project, UserDocs.Projects.Project) do
+          button.btn.btn-ghost.btn-sm 
+            = live_patch "Jobs", to: Routes.job_index_path(@socket, :index), class: "hover_text-white"
+          button.btn.btn-ghost.btn-sm 
+            = live_patch "Teams", to: Routes.team_index_path(@socket, :index), class: "hover_text-white"
+          button.btn.btn-ghost.btn-sm 
+            = live_patch "Projects", to: Routes.project_index_path(@socket, :index), class: "hover_text-white"
+    .flex-1
+      = live_component(@socket, UserDocsWeb.ProjectPicker, 
+        [ current_user: @current_user, current_project: @current_project])
+    .flex-none.justify-end.flex-1.px-2
+        .dropdown.dropdown-left
+          button.m-1.btn.btn-square.btn-ghost tabindex="0"
+            svg.inline-block.w-6.h-6.stroke-current.hover_text-white fill="none" viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" 
+              path d="M496 384H160v-16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v16H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h80v16c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-16h336c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm0-160h-80v-16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v16H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h336v16c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-16h80c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm0-160H288V48c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v16H16C7.2 64 0 71.2 0 80v32c0 8.8 7.2 16 16 16h208v16c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-16h208c8.8 0 16-7.2 16-16V80c0-8.8-7.2-16-16-16z" fill="currentColor" 
+          ul.p-2.shadow.menu.dropdown-content.bg-base-100.rounded-box.w-52 tabindex="0" 
+            li.text-black
+              a phx-click="local-options" Local Options
+    .flex-none.justify-end.flex-1.px-2
+        .dropdown.dropdown-left
+          button.m-1.btn.btn-square.btn-ghost tabindex="0"
+            svg.inline-block.w-6.h-6.stroke-current.hover_text-white xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          ul.p-2.shadow.menu.dropdown-content.bg-base-100.rounded-box.w-52 tabindex="0" 
+            li.text-black
+              a phx-click="user-options" User Options
+            li.text-black
+              a phx-click="edit-credentials" Credentials
+            li.text-black
+              = link "Sign out", to: Routes.pow_session_path(@socket, :delete), method: :delete, id: "signout-button"
 
-      = if is_struct(@current_project, UserDocs.Projects.Project) do
-        = live_patch "Processes", class: "navbar-item", to: Routes.process_index_path(@socket, :index)
-
-      = if is_struct(@current_project, UserDocs.Projects.Project) do
-        = live_patch "Jobs", class: "navbar-item", to: Routes.job_index_path(@socket, :index)
-
-      = link to: "#", class: "navbar-burger burger", aria_label: "menu", aria_expanded: "false", data_target: "navbarBasicExample" do
-        span aria-hidden="true"
-        span aria-hidden="true"
-        span aria-hidden="true"
-
-    .navbar-menu#navbar
-      .navbar-start
-        = live_patch "Teams", class: "navbar-item", to: Routes.team_index_path(@socket, :index)
-        = live_patch "Projects", class: "navbar-item", to: Routes.project_index_path(@socket, :index)
-        = live_component(@socket, UserDocsWeb.ProjectPicker, 
-          [ current_user: @current_user, current_project: @current_project])
         
 
       .navbar-end
