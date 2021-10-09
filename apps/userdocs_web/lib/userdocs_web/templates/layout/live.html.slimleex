@@ -59,14 +59,34 @@ css:
             li.text-black
               = link "Sign out", to: Routes.pow_session_path(@socket, :delete), method: :delete, id: "signout-button"
 
-        
+= if @auth_state == :logged_in do
+  = if @live_action in [:local_options] do
+    = live_modal @socket, UserDocsWeb.UserLive.LocalFormComponent,
+      id: "local-options",
+      title: "Local Options",
+      action: @live_action,
+      current_team: @current_team,
+      current_user: @current_user,
+      return_to: @url.path
 
-      .navbar-end
-        .navbar-item
-          .buttons
-            = link "User", to: Routes.user_show_path(@socket, :show, @current_user.id), class: "button"
-            = link "Sign out", to: Routes.pow_session_path(@socket, :delete), method: :delete, class: "button is-light", id: "signout-button"
+  = if @live_action in [:edit_credentials] do 
+    = live_modal @socket, UserDocsWeb.UserLive.FormComponent,
+      id: @current_user.id,
+      title: "Update Credentials",
+      action: :edit,
+      user: @current_user,
+      select_lists: %{},
+      return_to: @url.path
 
+  = if @live_action in [:user_options] do 
+    = live_modal @socket, UserDocsWeb.UserLive.FormComponent,
+      id: @current_user.id,
+      title: "User Options",
+      action: :options,
+      user: @current_user,
+      select_lists: %{teams: UserDocs.Helpers.select_list(@current_user.teams, :name, true)},
+      return_to: @url.path
+      
   section.section
     main.container role="main"
       p.alert.alert-info role="alert" phx-click="lv:clear-flash" phx-value-key="info"
