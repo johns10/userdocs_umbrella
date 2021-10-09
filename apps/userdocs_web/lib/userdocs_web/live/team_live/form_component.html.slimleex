@@ -6,25 +6,40 @@ h2.title = @title
   phx_change: "validate",
   phx_submit: "save"
 
-  .field
-    = Layout.text_input form, :name, [], "control"
+  .form-control
+    = label form, :name, class: "label"
+    = text_input form, :name, type: "text", class: "input input-bordered" 
+    = error_tag form, :name 
 
-    = Layout.select_input(form, :aws_region, @aws_region_select_options, [], "control")
+  .form-control
+    = label form, :aws_region, class: "label"
+    = select form, :aws_region, @aws_region_select_options, class: "select select-bordered"
+    = error_tag form, :aws_region 
 
-    = Layout.text_input form, :aws_bucket, [], "control"
+  .form-control
+    = label form, :aws_bucket, class: "label"
+    = text_input form, :aws_bucket,type: "text", class: "input input-bordered" 
+    = error_tag form, :aws_bucket 
 
-    = Layout.text_input form, :aws_access_key_id, [], "control"
+  .form-control
+    = label form, :aws_access_key_id, class: "label"
+    = text_input form, :aws_access_key_id,type: "text", class: "input input-bordered" 
+    = error_tag form, :aws_access_key_id 
 
-    = Layout.text_input form, :aws_secret_access_key, [], "control"
+  .form-control
+    = label form, :aws_secret_access_key, class: "label"
+    = text_input form, :aws_secret_access_key,type: "text", class: "input input-bordered" 
+    = error_tag form, :aws_secret_access_key 
 
   = if form.data.id do
     h3.is-size-4 Default Project
     = inputs_for form, :projects, fn pf ->
       .field.is-grouped.pl-2
         = hidden_input pf, :team_id, value: form.data.id
-        label.checkbox
-          = checkbox(pf, :default)
-          =< pf.data.name
+        label.label
+          = checkbox pf, :default, class: "checkbox"
+          span.label-text.ml-2
+            =< pf.data.name
 
     = error_tag(form, :projects)
 
@@ -78,8 +93,7 @@ h2.title = @title
 
   div.field
     = label form, :css, class: "label"
-    div.control
-      = textarea(form, :css, class: "textarea")
+    = textarea(form, :css, class: "textarea h-24 textarea-bordered")
 
   .field 
     .control
