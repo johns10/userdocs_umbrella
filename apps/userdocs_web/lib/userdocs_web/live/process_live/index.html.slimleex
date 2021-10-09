@@ -39,9 +39,5 @@ aside.menu
               span 
                 i.fa.fa-trash
 
-= if @app_name == "web" do 
-  = live_patch to: Routes.process_index_path(@socket, :new) do
-    button.button.is-primary New Process
-- else
-  = link to: "#", phx_click: "new-process" do
-    button.button.is-primary New Process
+= live_patch to: Routes.process_index_path(@socket, :new) do
+  button.button.is-primary New Process
