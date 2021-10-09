@@ -51,27 +51,6 @@ defmodule UserDocsWeb.UserLive.Show do
   def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   @impl true
-  def handle_info(%{topic: "user:" <> _user_id, event: "event:configuration_fetched", payload: payload}, socket) do
-    IO.puts("#{__MODULE__} received broadcast")
-    case socket.assigns.live_action do
-      :local_options ->
-        send_update(UserDocsWeb.UserLive.LocalFormComponent, %{id: "local-options", params: payload})
-        {:noreply, socket}
-      _ -> {:noreply, socket}
-    end
-  end
-  def handle_info(%{topic: "user" <> _user_id, event: "event:configuration_saved"}, socket) do
-    case socket.assigns.live_action do
-      :local_options ->
-        {
-          :noreply,
-          socket
-          |> put_flash(:info, "Local Options updated successfully")
-          |> push_redirect(to: Routes.user_show_path(socket, :show, socket.assigns.current_user.id))
-        }
-      _ -> {:noreply, socket}
-    end
-  end
   def handle_info(%{topic: "user" <> _user_id, event: "event:chrome_found", payload: %{"path" => chrome_path}}, socket) do
     #IO.puts("Handle Info")
     #IO.inspect(chrome_path)
