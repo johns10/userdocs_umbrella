@@ -71,12 +71,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
           span.icon
             i.fa.fa-trash aria-hidden="true"
         = link to: "#", class: "py-0", style: "white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" do
-          =< to_string(job_step.order)
-          | :
           =< job_step.step.name
-          | (
-          = job_step.step.id
-          | )
     """
   end
   def render_job_item(%JobProcess{} = job_process, cid, interactive) do
@@ -93,9 +88,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
             span.icon
               i.fa.fa-trash aria-hidden="true"
           = link to: "", class: "is-flex-grow-1 py-0" do
-            = job_process.order || ""
-            | :
-            =< job_process.id
+            =< job_process.process.name
         ul.my-0.job-process-steps id="job-process-<%= job_process.id %>-steps"
           = for step <- job_process.process.steps do
             = render_job_item(step, cid, false)
@@ -111,12 +104,7 @@ defmodule UserDocsWeb.AutomationManagerLive do
             span.icon
               i.fa.fa-plus aria-hidden="true"
         = link to: "#", class: "py-0", style: "white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" do
-          =< to_string(step.order)
-          | :
           =< step.name
-          | (
-          = step.id
-          | )
     """
   end
 
