@@ -29,7 +29,7 @@ defmodule UserDocs.Projects.Project do
     project
     |> cast(attrs, [:name, :base_url, :team_id, :strategy_id, :default])
     |> foreign_key_constraint(:team_id)
-    |> validate_required([:name, :base_url])
+    |> validate_required([:name, :base_url, :strategy_id])
   end
 
   @doc false
@@ -37,7 +37,7 @@ defmodule UserDocs.Projects.Project do
     project
     |> cast(attrs, [:name, :base_url, :team_id, :strategy_id, :default])
     |> foreign_key_constraint(:team_id)
-    |> validate_required([:name, :base_url])
+    |> validate_required([:name, :base_url, :strategy_id])
   end
 
   def change_default_project(project, attrs) do
