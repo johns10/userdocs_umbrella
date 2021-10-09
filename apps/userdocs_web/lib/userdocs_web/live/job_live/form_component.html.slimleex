@@ -8,7 +8,10 @@ h2.title = @title
 
   = hidden_input f, :team_id, value: @current_team.id
 
-  = Layout.text_input f, :name, []
-
-  = submit "Save", phx_disable_with: "Saving...", class: "button is-link"
+  .form-control
+    = label f, :name, class: "label"
+    = text_input f, :name, phx_debounce: "blur", type: "text", class: "input input-bordered" 
+    = error_tag f, :name 
+  .mt-4
+    = submit "Save", phx_disable_with: "Saving...",  class: "btn btn-primary mr-2"
 </form>
