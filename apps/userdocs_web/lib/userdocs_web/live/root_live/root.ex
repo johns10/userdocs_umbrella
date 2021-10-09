@@ -162,6 +162,9 @@ defmodule UserDocsWeb.Root do
   end
   def put_app_name(socket, _), do: socket
 
+  def handle_event("local-options", _payload, socket), do: {:noreply, assign(socket, :live_action, :local_options)}
+  def handle_event("user-options", _payload, socket), do: {:noreply, assign(socket, :live_action, :user_options)}
+  def handle_event("edit-credentials", _payload, socket), do: {:noreply, assign(socket, :live_action, :edit_credentials)}
   def handle_event("select-project", %{"project-id" => project_id, "team-id" => team_id} = _payload, socket) do
     changes = %{
       selected_team_id: String.to_integer(team_id),
