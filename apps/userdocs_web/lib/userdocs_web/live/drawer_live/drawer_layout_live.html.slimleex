@@ -1,4 +1,4 @@
 .flex-1.mr-8
   = render_block(@inner_block)
-.flex-0 
+.flex-0.max-w-33
   = live_render @socket, @view, [id: "navigation_drawer"] ++ @session
