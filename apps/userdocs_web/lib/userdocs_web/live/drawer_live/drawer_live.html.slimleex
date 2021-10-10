@@ -1,53 +1,28 @@
 css: 
-  #collapsible {
-    display: none;
-  }
-  #collapsible:checked ~ #sidebar {
-    flex-basis: 0;
-    min-width: auto;
-  }
-  #collapsible:checked ~ div > div > .text {
-    width: 0px;
-    display: none;
-  }
-  #collapsible:checked ~ #sidebar > .sidebar-content {
-    flex-basis: 0;
-    display: none;
-  }
-  .sidebar-content {
-    transition: display 250ms ease-in-out;
-    white-space: nowrap;
-  }
-  .text {
-    white-space: nowrap;
-  }
-  #sidebar {
-    margin: calc(var(--s1) / 2);
-    flex-basis: 30%;
-    flex-grow: 1;
-    min-width: 30%;
-    transition: flex-basis 250ms ease-in-out;
-  }
+  #collapsible:checked ~ #sidebar {width: 0px}
 
-input id="collapsible" class="toggle" type="checkbox" checked=@navigation_drawer_closed
-div#sidebar.is-flex.is-flex-direction-column
-  .box.is-flex.is-flex-direction-row.is-justify-content-space-between.py-3.px-4.has-background-primary.has-text-primary-light.is-shadowless.mb-0
-    h2.text Automation Manager
-    span#sidebar-toggle phx-click="toggle-sidebar"
-      = if not @navigation_drawer_closed do
-        i.fa.fa-minus-square.py-1
-      - else 
-        i.fa.fa-plus-square.py-1
+input.toggle.hidden id="collapsible" class="toggle" type="checkbox" checked=@navigation_drawer_closed
+div#sidebar.is-flex.is-flex-direction-column.transition-width.duration-250.ease-in-out
+  .p-0.shadow.whitespace-nowrap
+    .flex.mt-0.relative
+      .btn.btn-primary.rounded-r-none.rounded-l-lg.absolute.-left-11 phx-click="toggle-sidebar"
+        = if not @navigation_drawer_closed do
+          i.fa.fa-minus-square.py-1
+        - else 
+          i.fa.fa-plus-square.py-1
+      .bg-primary.flex-1.flex.flex-col.justify-center
+        span.text-white.px-4.py-3.inline-block.align-middle Automation Manager
 
-  .box.pl-4.pt-4.pr-0.sidebar-content
-    = live_component @socket,
-      UserDocsWeb.AutomationBrowserHandlerLive, 
-      [ id: "automated-browser-controls",
-      current_user: @current_user,
-      browser_opened: @browser_opened,
-      user_opened_browser: @user_opened_browser ]
+    .px-4.pt-4.pb-2
+      = live_component @socket,
+        UserDocsWeb.AutomationBrowserHandlerLive, 
+        [ id: "automated-browser-controls",
+        current_user: @current_user,
+        browser_opened: @browser_opened,
+        user_opened_browser: @user_opened_browser ]
   
-    = live_component @socket,
-        UserDocsWeb.AutomationManagerLive,
-        id: "automation-manager", 
-        current_user: @current_user
+    .px-4.py-2
+      = live_component @socket,
+          UserDocsWeb.AutomationManagerLive,
+          id: "automation-manager", 
+          current_user: @current_user
