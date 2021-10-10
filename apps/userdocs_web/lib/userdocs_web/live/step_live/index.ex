@@ -166,7 +166,7 @@ defmodule UserDocsWeb.StepLive.Index do
 
     form_action = BrowserEvents.action(socket.assigns.live_action, action)
 
-    IO.puts("Handling info for this action: #{form_action}")
+    #IO.puts("Handling info for this action: #{form_action}")
 
     case form_action do
       :index ->
@@ -262,7 +262,7 @@ defmodule UserDocsWeb.StepLive.Index do
     |> assign_select_lists()
   end
   defp apply_action(socket, :new, %{"step_params" => step_params}) do
-    IO.puts("applying action with step params")
+    #IO.puts("applying action with step params")
 
     step_form =
       %UserDocs.Automation.StepForm{}

@@ -162,25 +162,25 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
     project_uri = URI.parse(project.base_url)
     case uri.host == project_uri.host do
       true ->
-        IO.puts("Project host matches current host")
+        #IO.puts("Project host matches current host")
         params = cast_url(params, :relative)
         case find_page(project.pages, url, :relative) do
           %Page{} = page ->
-            IO.puts("URL matches existing page")
+            #IO.puts("URL matches existing page")
             update_params_to_existing_page(params, page)
           nil ->
-            IO.puts("Not Found page")
+            #IO.puts("Not Found page")
             update_params_for_new_page(params)
         end
       false ->
-        IO.puts("Project host doesn't match current host")
+        #IO.puts("Project host doesn't match current host")
         params = cast_url(params, :full_uri)
         case find_page(project.pages, url, :full_uri) do
           %Page{} = page ->
-            IO.puts("URL matches existing page")
+            #IO.puts("URL matches existing page")
             update_params_to_existing_page(params, page)
           nil ->
-            IO.puts("Not Found page")
+            #IO.puts("Not Found page")
             update_params_for_new_page(params)
         end
     end
