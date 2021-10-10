@@ -9,5 +9,18 @@ module.exports = {
   plugins: [
     require('daisyui')
   ],
-  separator: "_"
+  separator: "_",
+  theme: {
+    maxWidth: {
+      '25': '25%',
+      '33': '33%',
+      '50': '50%',
+      '75': '75%'
+    },
+    extend: {
+      transitionProperty: {
+        'width': 'width'
+      }
+    }
+  }
 }
