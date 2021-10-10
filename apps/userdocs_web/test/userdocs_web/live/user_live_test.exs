@@ -11,8 +11,8 @@ defmodule UserDocsWeb.UserLiveTest do
   defp create_team(_), do: %{team: UsersFixtures.team()}
   defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
-  defp create_project(%{team: team}) do
-    attrs = ProjectsFixtures.project_attrs(:default, team.id)
+  defp create_project(%{team: team, strategy: strategy}) do
+    attrs = ProjectsFixtures.project_attrs(:default, team.id, strategy.id)
     {:ok, project} = UserDocs.Projects.create_project(attrs)
     %{project: project}
   end

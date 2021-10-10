@@ -13,7 +13,7 @@ defmodule UserDocsWeb.ProjectLiveTest do
   defp create_user(%{password: password}), do: %{user: UsersFixtures.confirmed_user(password)}
   defp create_team(_), do: %{team: UsersFixtures.team()}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
-  defp create_project(%{team: team}), do: %{project: ProjectsFixtures.project(team.id)}
+  defp create_project(%{team: team, strategy: strategy}), do: %{project: ProjectsFixtures.project(team.id, strategy.id)}
   defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
   defp grevious_workaround(%{conn: conn, user: user, password: password}) do
     conn = post(conn, "session", %{user: %{email: user.email, password: password}})
@@ -47,7 +47,7 @@ defmodule UserDocsWeb.ProjectLiveTest do
       assert html =~ project.name
     end
 
-    test "saves new project", %{authed_conn: conn, team: team} do
+    test "saves new project", %{authed_conn: conn, team: team, strategy: strategy} do
       {:ok, index_live, _html} = live(conn, Routes.project_index_path(conn, :index))
 
       assert index_live |> element("a", "New Project") |> render_click() =~ "New Project"
@@ -58,7 +58,7 @@ defmodule UserDocsWeb.ProjectLiveTest do
              |> form("#project-form", project: ProjectsFixtures.project_attrs(:invalid, team.id))
              |> render_change() =~ "can&#39;t be blank"
 
-      valid_attrs = ProjectsFixtures.project_attrs(:valid, team.id)
+      valid_attrs = ProjectsFixtures.project_attrs(:valid, team.id, strategy.id)
 
       {:ok, _, html} =
         index_live
@@ -70,7 +70,7 @@ defmodule UserDocsWeb.ProjectLiveTest do
       assert html =~ valid_attrs.name
     end
 
-    test "updates project in listing", %{authed_conn: conn, project: project, team: team} do
+    test "updates project in listing", %{authed_conn: conn, project: project, team: team, strategy: strategy} do
       {:ok, index_live, _html} = live(conn, Routes.project_index_path(conn, :index))
 
       assert index_live |> element("#edit-project-" <> to_string(project.id)) |> render_click() =~
@@ -82,7 +82,7 @@ defmodule UserDocsWeb.ProjectLiveTest do
              |> form("#project-form", project: ProjectsFixtures.project_attrs(:invalid, team.id))
              |> render_change() =~ "can&#39;t be blank"
 
-      valid_attrs = ProjectsFixtures.project_attrs(:valid, team.id)
+      valid_attrs = ProjectsFixtures.project_attrs(:valid, team.id, strategy.id)
 
       {:ok, _, html} =
         index_live

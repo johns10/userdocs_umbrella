@@ -4,9 +4,9 @@ defmodule UserDocs.BrowserEventsTest do
   alias UserDocs.ProjectsFixtures
   alias UserDocs.WebFixtures
 
-  defp fixture(:project, team_id, url) do
+  defp fixture(:project, team_id, strategy_id, url) do
     {:ok, project} =
-      ProjectsFixtures.project_attrs(:valid, team_id)
+      ProjectsFixtures.project_attrs(:valid, team_id, strategy_id)
       |> Map.put(:base_url, url)
       |> UserDocs.Projects.create_project()
     project
@@ -20,10 +20,13 @@ defmodule UserDocs.BrowserEventsTest do
     page
   end
 
+  defp fixture(:strategy), do: WebFixtures.strategy()
+
+  defp create_strategy(_), do: %{strategy: fixture(:strategy)}
   defp create_user(_), do: %{user: UsersFixtures.user()}
   defp create_team(_), do: %{team: UsersFixtures.team()}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
-  defp create_projects(%{team: team}), do: %{projects: [fixture(:project, team.id, "https://app.user-docs.com"), fixture(:project, team.id, "https://app.user-videos.com")]}
+  defp create_projects(%{team: team, strategy: strategy}), do: %{projects: [fixture(:project, team.id, strategy.id, "https://app.user-docs.com"), fixture(:project, team.id, strategy.id, "https://app.user-videos.com")]}
   defp create_pages(%{projects: [project | _]}), do: %{pages: [fixture(:page, project.id, "/projects")]}
 
   describe "browser_events" do
@@ -34,6 +37,7 @@ defmodule UserDocs.BrowserEventsTest do
     alias UserDocs.Users.Override
 
     setup [
+      :create_strategy,
       :create_user,
       :create_team,
       :create_team_user,

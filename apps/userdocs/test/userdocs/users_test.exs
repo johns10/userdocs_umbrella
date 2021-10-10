@@ -9,6 +9,7 @@ defmodule UserDocs.UsersTest do
     alias UserDocs.Users.User
     alias UserDocs.UsersFixtures
     alias UserDocs.ProjectsFixtures
+    alias UserDocs.WebFixtures
 
 
     test "list_users/0 returns all teams" do
@@ -98,7 +99,8 @@ defmodule UserDocs.UsersTest do
       user = UsersFixtures.user()
       team = UsersFixtures.team()
       team_user = UsersFixtures.team_user(user.id, team.id)
-      project = ProjectsFixtures.project(team.id)
+      strategy = WebFixtures.strategy()
+      project = ProjectsFixtures.project(team.id, strategy.id)
       preloads = [teams: [:teams, [teams: :projects]]]
       state = %{teams: [team], users: [user], team_users: [team_user], projects: [project]}
       result = Users.get_user!(user.id, preloads, [], state, @opts)
@@ -109,7 +111,8 @@ defmodule UserDocs.UsersTest do
       user = UsersFixtures.user()
       team = UsersFixtures.team()
       team_user = UsersFixtures.team_user(user.id, team.id)
-      project = ProjectsFixtures.project(team.id)
+      strategy = WebFixtures.strategy()
+      project = ProjectsFixtures.project(team.id, strategy.id)
       preloads = [teams: [:teams, [teams: :projects], [teams: :projects]]]
       state = %{teams: [team], users: [user], team_users: [team_user], projects: [project]}
       result = Users.get_user!(user.id, preloads, [], state, @opts)
@@ -121,7 +124,8 @@ defmodule UserDocs.UsersTest do
       user = UsersFixtures.user(password)
       team = UsersFixtures.team()
       _team_user = UsersFixtures.team_user(user.id, team.id)
-      project = ProjectsFixtures.project(team.id)
+      strategy = WebFixtures.strategy()
+      project = ProjectsFixtures.project(team.id, strategy.id)
       overrides = [%{project_id: project.id, url: "https://www.google.com/"}]
       attrs = UsersFixtures.user_attrs(:valid)
       attrs = attrs |> Map.put(:overrides, overrides)

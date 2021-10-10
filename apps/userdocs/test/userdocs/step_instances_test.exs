@@ -12,7 +12,7 @@ defmodule UserDocs.StepInstancesTest do
   defp fixture(:strategy), do: WebFixtures.strategy()
   defp fixture(:step_types), do: AutomationFixtures.all_valid_step_types()
 
-  defp fixture(:project, team_id), do: ProjectsFixtures.project(team_id)
+  defp fixture(:project, team_id, strategy_id), do: ProjectsFixtures.project(team_id, strategy_id)
   defp fixture(:process, project_id), do: AutomationFixtures.process(project_id)
   defp fixture(:page, project_id), do: WebFixtures.page(project_id)
   defp fixture(:annotation, page_id), do: WebFixtures.annotation(page_id)
@@ -28,7 +28,7 @@ defmodule UserDocs.StepInstancesTest do
   defp create_user(_), do: %{user: fixture(:user)}
   defp create_team(_), do: %{team: fixture(:team)}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: fixture(:team_user, user.id, team.id)}
-  defp create_project(%{team: team}), do: %{project: fixture(:project, team.id)}
+  defp create_project(%{team: team, strategy: strategy}), do: %{project: fixture(:project, team.id, strategy.id)}
   defp create_process(%{project: project}), do: %{process: fixture(:process, project.id)}
   defp create_page(%{project: project}), do: %{page: fixture(:page, project.id)}
   defp create_strategy(_), do: %{strategy: fixture(:strategy)}
@@ -45,12 +45,12 @@ defmodule UserDocs.StepInstancesTest do
 
     setup [
       :create_user,
+      :create_strategy,
       :create_team,
       :create_team_user,
       :create_project,
       :create_process,
       :create_page,
-      :create_strategy,
       :create_element,
       :create_annotation,
       :create_step_types,

@@ -9,8 +9,8 @@ defmodule UserDocsWeb.StepLiveTest do
   alias UserDocs.ProjectsFixtures
   alias UserDocs.WebFixtures
 
-  @chrome "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
-  #|> open_browser(&(System.cmd(@chrome, [&1])))
+  #@chrome "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+  #|> open_browser(&(System.cmd("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe", [&1])))
 
   defp invalid_attrs(process_id) do
     %{
@@ -33,7 +33,7 @@ defmodule UserDocsWeb.StepLiveTest do
   defp create_team(_), do: %{team: UsersFixtures.team()}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
   defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
-  defp create_project(%{team: team}), do: %{project: ProjectsFixtures.project(team.id)}
+  defp create_project(%{team: team, strategy: strategy}), do: %{project: ProjectsFixtures.project(team.id, strategy.id)}
   defp create_process(%{project: project}), do: %{process: AutomationFixtures.process(project.id)}
   defp create_page(%{project: project}), do: %{page: WebFixtures.page(project.id)}
   defp create_element(%{page: page, strategy: strategy}), do: %{element: WebFixtures.element(page.id, strategy.id)}
@@ -352,7 +352,6 @@ defmodule UserDocsWeb.StepLiveTest do
       }
 
       # Pass the click browser event
-      IO.puts("user:" <> to_string(user.id))
       UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
       #send(index_live.pid, %{topic: "user:" <> to_string(user.id), event: "event:browser_event", payload: event})
       html = render(index_live)

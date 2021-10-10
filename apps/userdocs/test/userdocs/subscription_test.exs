@@ -23,7 +23,7 @@ defmodule UserDocs.SubscriptionTest do
       strategy = UserDocs.WebFixtures.strategy()
       step_type = UserDocs.AutomationFixtures.step_type()
       team = UserDocs.UsersFixtures.team()
-      project = UserDocs.ProjectsFixtures.project(team.id)
+      project = UserDocs.ProjectsFixtures.project(team.id, strategy.id)
       page = UserDocs.WebFixtures.page(project.id)
       element = UserDocs.WebFixtures.element(page, strategy)
       |> Map.put(:page, page)

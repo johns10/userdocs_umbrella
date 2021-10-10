@@ -18,6 +18,7 @@ defmodule UserDocsWeb.RegistrationLiveTest do
       {:ok, index_live, _html} = live(conn, Routes.registration_path(conn, :new))
 
       invalid_attrs = %{email: "test@test.com", password: "asdf", password_confirmation: "asdf1234asdf"}
+      {:ok, strategy} = UserDocs.Web.create_strategy(%{name: "css"})
 
       assert index_live
       |> form("#signup-form", user: %{email: nil})

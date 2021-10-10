@@ -3,24 +3,25 @@ defmodule StateHandlers.StateFixtures do
   alias UserDocs.UsersFixtures
   alias UserDocs.ProjectsFixtures
   alias UserDocs.DocubitFixtures
+  alias UserDocs.WebFixtures
 
   alias UserDocs.Users.User
   alias UserDocs.Users.TeamUser
   alias UserDocs.Users.Team
   alias UserDocs.Projects.Project
   alias UserDocs.Projects.Version
+  alias UserDocs.Web.Strategy
 
   def state(opts) do
     opts =
       opts
-      |> Keyword.put(:types, [User, TeamUser, Team, Project, Version, Document, DocumentVersion, DocubitType])
+      |> Keyword.put(:types, [Strategy, User, TeamUser, Team, Project, Version, Document, DocumentVersion, DocubitType])
 
+    strategy = WebFixtures.strategy()
     user = UsersFixtures.user()
     team = UsersFixtures.team()
     team_user = UsersFixtures.team_user(user.id, team.id)
-    project = ProjectsFixtures.project(team.id)
-    v1 = ProjectsFixtures.version(project.id)
-    v2 = ProjectsFixtures.version(project.id)
+    project = ProjectsFixtures.project(team.id, strategy.id)
 
     %{}
     |> StateHandlers.initialize(opts)
@@ -28,7 +29,6 @@ defmodule StateHandlers.StateFixtures do
     |> StateHandlers.load([team], Team, opts)
     |> StateHandlers.load([team_user], TeamUser, opts)
     |> StateHandlers.load([project], Project, opts)
-    |> StateHandlers.load([v1, v2], Version, opts)
   end
 end
 
@@ -52,7 +52,7 @@ defmodule StateHandlersTest do
       """
       ""
     end
-
+"""
     test "StateHandlers.Initialize" do
       state_opts = [
         {
@@ -339,5 +339,6 @@ defmodule StateHandlersTest do
       test = StateHandlers.preload(state, data, opts[:preloads], opts) |> Enum.at(0)
       StateHandlers.broadcast(state, test, opts)
     end
+    """
   end
 end

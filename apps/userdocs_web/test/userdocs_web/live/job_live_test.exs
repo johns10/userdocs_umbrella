@@ -20,7 +20,7 @@ defmodule UserDocsWeb.JobLiveTest do
   defp create_job(%{team: team}), do: %{job: JobsFixtures.job(team.id)}
   defp create_strategy(_), do: %{strategy: WebFixtures.strategy()}
   defp create_team_user(%{user: user, team: team}), do: %{team_user: UsersFixtures.team_user(user.id, team.id)}
-  defp create_project(%{team: team}), do: %{project: ProjectsFixtures.project(team.id)}
+  defp create_project(%{team: team, strategy: strategy}), do: %{project: ProjectsFixtures.project(team.id, strategy.id)}
   defp grevious_workaround(%{conn: conn, user: user, password: password}) do
     conn = post(conn, "session", %{user: %{email: user.email, password: password}})
     :timer.sleep(100)

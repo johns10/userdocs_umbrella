@@ -2,9 +2,9 @@ defmodule UserDocs.ProjectsFixtures do
 
   alias UserDocs.Projects
 
-  def project(team_id) do
+  def project(team_id \\ nil, strategy_id \\ nil) do
     {:ok, project } =
-      project_attrs(:valid, team_id)
+      project_attrs(:valid, team_id, strategy_id)
       |> Projects.create_project()
       project
   end

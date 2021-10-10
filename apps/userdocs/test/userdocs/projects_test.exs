@@ -11,9 +11,13 @@ defmodule UserDocs.ProjectsTest do
     @invalid_attrs %{base_url: nil, name: nil}
 
     def project_fixture(attrs \\ %{}) do
+      strategy = UserDocs.WebFixtures.strategy()
+      team = UserDocs.UsersFixtures.team()
       {:ok, project} =
         attrs
         |> Enum.into(@valid_attrs)
+        |> Map.put(:strategy_id, strategy.id)
+        |> Map.put(:team_id, team.id)
         |> Projects.create_project()
 
       project
@@ -30,7 +34,10 @@ defmodule UserDocs.ProjectsTest do
     end
 
     test "create_project/1 with valid data creates a project" do
-      assert {:ok, %Project{} = project} = Projects.create_project(@valid_attrs)
+      strategy = UserDocs.WebFixtures.strategy()
+      team = UserDocs.UsersFixtures.team()
+      attrs = @valid_attrs |> Map.put(:strategy_id, strategy.id) |> Map.put(:team_id, team.id)
+      assert {:ok, %Project{} = project} = Projects.create_project(attrs)
       assert project.base_url == "some base_url"
       assert project.name == "some name"
     end
