@@ -1,34 +1,35 @@
-= ComposableBreadCrumb.render([ items: [], 
-  last_item: %{ to: Routes.team_index_path(@socket, :index), name: "Teams"} ])
+.mx-8
+  = ComposableBreadCrumb.render([ items: [], 
+    last_item: %{ to: Routes.team_index_path(@socket, :index), name: "Teams"} ])
 
-= if @live_action in [:edit, :new] do
-  = live_modal @socket, UserDocsWeb.TeamLive.FormComponent,
-    id: @team.id || :new,
-    current_user: @current_user,
-    title: @page_title,
-    action: @live_action,
-    team: @team,
-    state_opts: @state_opts,
-    projects_select_options: @projects_select_options,
-    data: %{ users: @data.users },
-    return_to: Routes.team_index_path(@socket, :index)
+  = if @live_action in [:edit, :new] do
+    = live_modal @socket, UserDocsWeb.TeamLive.FormComponent,
+      id: @team.id || :new,
+      current_user: @current_user,
+      title: @page_title,
+      action: @live_action,
+      team: @team,
+      state_opts: @state_opts,
+      projects_select_options: @projects_select_options,
+      data: %{ users: @data.users },
+      return_to: Routes.team_index_path(@socket, :index)
 
-aside.menu
-  p.menu-label Teams
-  ul.menu-list
-    = for team <- @teams do
-      li class=""
-        .is-flex
-          = link to: Routes.project_index_path(@socket, :index, team.id), class: "is-flex-grow-1" do
-            = team.name
-          .is-flex.is-flex-direction-row.is-flex-grow-0
-            = live_redirect to: Routes.team_show_path(@socket, :show, team) do
-              i.fa.fa-search
-            = live_patch to: Routes.team_index_path(@socket, :edit, team), id: "edit-team-#{team.id}" do
-              i.fa.fa-edit
-            = link to: "#", phx_click: "delete", phx_value_id: team.id, id: "delete-team-#{team.id}", data: [confirm: "Are you sure?"] do
-              i.fa.fa-trash
+  aside.menu
+    p.menu-label Teams
+    ul.menu-list
+      = for team <- @teams do
+        li class=""
+          .is-flex
+            = link to: Routes.project_index_path(@socket, :index, team.id), class: "is-flex-grow-1" do
+              = team.name
+            .is-flex.is-flex-direction-row.is-flex-grow-0
+              = live_redirect to: Routes.team_show_path(@socket, :show, team) do
+                i.fa.fa-search
+              = live_patch to: Routes.team_index_path(@socket, :edit, team), id: "edit-team-#{team.id}" do
+                i.fa.fa-edit
+              = link to: "#", phx_click: "delete", phx_value_id: team.id, id: "delete-team-#{team.id}", data: [confirm: "Are you sure?"] do
+                i.fa.fa-trash
 
-= if @current_user.email == "johns10davenport@gmail.com" or Mix.env() in [ :dev, :test ] do 
-  = live_patch to: Routes.team_index_path(@socket, :new) do
-      button.button.is-primary New Team
+  = if @current_user.email == "johns10davenport@gmail.com" or Mix.env() in [ :dev, :test ] do 
+    = live_patch to: Routes.team_index_path(@socket, :new) do
+        button.button.is-primary New Team

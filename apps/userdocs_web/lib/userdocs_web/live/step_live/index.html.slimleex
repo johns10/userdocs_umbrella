@@ -1,81 +1,84 @@
+.flex.ml-8
+  = live_component UserDocsWeb.DrawerLayoutLive, 
+    view: UserDocsWeb.DrawerLive, 
+    session: [id: "navigation-drawer", session: %{"user_id" => @current_user.id, "team_id" => @current_team.id}] do 
+    div
+      .is-flex.is-flex-direction-row.is-justify-content-space-between
+        = ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
+          %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name },
+          %{ to: Routes.process_index_path(@socket, :index), name: @current_project.name }],
+          last_item: %{ to: "", name: @process.name } ])
+        = if @live_action in [:edit, :new] do
+          = live_modal @socket, UserDocsWeb.StepLive.FormComponent,
+            id: "step-form",
+            action: @live_action,
+            app_name: @app_name,
+            current_project: @current_project,
+            current_team: @current_team,
+            current_user: @current_user,
+            data: @data,
+            new_element: false,
+            new_annotation: false,
+            new_page: false,
+            parent: @process,
+            parent_id: @process.id,
+            return_to: Routes.step_index_path(@socket, :index, @process.id),
+            select_lists: @select_lists,
+            state_opts: @state_opts,
+            step: @step,
+            step_form: @step_form,
+            step_params: @step_params,
+            title: @page_title,
+            type: Step,
+            trigger_submit: false
 
-div
-  .is-flex.is-flex-direction-row.is-justify-content-space-between
-    = ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
-      %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name },
-      %{ to: Routes.process_index_path(@socket, :index), name: @current_project.name }],
-      last_item: %{ to: "", name: @process.name } ])
-    = if @live_action in [:edit, :new] do
-      = live_modal @socket, UserDocsWeb.StepLive.FormComponent,
-        id: "step-form",
-        action: @live_action,
-        app_name: @app_name,
-        current_project: @current_project,
-        current_team: @current_team,
-        current_user: @current_user,
-        data: @data,
-        new_element: false,
-        new_annotation: false,
-        new_page: false,
-        parent: @process,
-        parent_id: @process.id,
-        return_to: Routes.step_index_path(@socket, :index, @process.id),
-        select_lists: @select_lists,
-        state_opts: @state_opts,
-        step: @step,
-        step_form: @step_form,
-        step_params: @step_params,
-        title: @page_title,
-        type: Step,
-        trigger_submit: false
+        = if @live_action in [:screenshot_workflow] do 
+          = live_component @socket, Approve, 
+            [ id: "screenshot-approval-modal", step: @step, team: @current_team ]
 
-    = if @live_action in [:screenshot_workflow] do 
-      = live_component @socket, Approve, 
-        [ id: "screenshot-approval-modal", step: @step, team: @current_team ]
+      .is-flex.is-justify-content-space-between
+        p.title = @process.name
+        .field.mr-2.is-flex 
+          p.control.mr-2
+            = link to: "#", phx_click: "fix_order", class: "button" do
+              span
+                i.fas.fa-list-ol
+          p.control.mr-2
+            = live_component(@socket, ProcessLive.Runner, 
+              [ id: "process-" <> Integer.to_string(@process.id), process: @process, class: "button", display: @browser_opened])
+          p.control.mr-2
+            = live_component(@socket, ProcessLive.Queuer, 
+              [ id: "process-" <> Integer.to_string(@process.id) <> "-queuer", process: @process, class: "button" ])
 
-  .is-flex.is-justify-content-space-between
-    p.title = @process.name
-    .field.mr-2.is-flex 
-      p.control.mr-2
-        = link to: "#", phx_click: "fix_order", class: "button" do
-          span
-            i.fas.fa-list-ol
-      p.control.mr-2
-        = live_component(@socket, ProcessLive.Runner, 
-          [ id: "process-" <> Integer.to_string(@process.id), process: @process, class: "button", display: @browser_opened])
-      p.control.mr-2
-        = live_component(@socket, ProcessLive.Queuer, 
-          [ id: "process-" <> Integer.to_string(@process.id) <> "-queuer", process: @process, class: "button" ])
-
-  aside.menu 
-    p.menu-label Steps
-    ul.menu-list
-      = for step <- @steps do
-        li class=""
-          .is-flex
-            = link step.name, to: Routes.step_index_path(@socket, :edit, step.id), class: "is-flex-grow-1", phx_hook: "dragDropReorder", step_id: step.id, order: step.order, id: "step-#{step.id}-drag-handle"
-            .is-flex.is-flex-direction-row.is-flex-grow-0
-              = live_component(@socket, StepLive.Status, 
-                [ id: "step-" <> Integer.to_string(step.id) <> "-status", step: step ])
-              = if step.step_type do 
-                = live_component(@socket, StepLive.Queuer, 
-                  [ id: "step-" <> Integer.to_string(step.id) <> "-queuer",
-                  step: step, 
-                  step_type_name: step.step_type.name,
-                  class: "navbar-item" ])
-                = live_component(@socket, StepLive.Runner, 
-                  [ id: "step-" <> Integer.to_string(step.id),
-                  step: step, 
-                  current_user: @current_user,
-                  step_type_name: step.step_type.name,
-                  display: @browser_opened])
-              = live_patch class: "navbar-item", to: Routes.step_index_path(@socket, :edit, step.id), id: "edit-step-#{step.id}" do
-                span
-                  i.fa.fa-edit
-              = link to: "#", class: "navbar-item", phx_click: "delete", phx_value_id: step.id, id: "delete-step-#{step.id}" do
-                span
-                  i.fa.fa-trash
+      aside.menu 
+        p.menu-label Steps
+        ul.menu-list
+          = for step <- @steps do
+            li class=""
+              .is-flex
+                = link step.name, to: Routes.step_index_path(@socket, :edit, step.id), class: "is-flex-grow-1", phx_hook: "dragDropReorder", step_id: step.id, order: step.order, id: "step-#{step.id}-drag-handle"
+                .is-flex.is-flex-direction-row.is-flex-grow-0
+                  = live_component(@socket, StepLive.Status, 
+                    [ id: "step-" <> Integer.to_string(step.id) <> "-status", step: step ])
+                  = if step.step_type do 
+                    = live_component(@socket, StepLive.Queuer, 
+                      [ id: "step-" <> Integer.to_string(step.id) <> "-queuer",
+                      step: step, 
+                      step_type_name: step.step_type.name,
+                      class: "navbar-item" ])
+                    = live_component(@socket, StepLive.Runner, 
+                      [ id: "step-" <> Integer.to_string(step.id),
+                      step: step, 
+                      current_user: @current_user,
+                      step_type_name: step.step_type.name,
+                      display: @browser_opened])
+                  = live_patch class: "navbar-item", to: Routes.step_index_path(@socket, :edit, step.id), id: "edit-step-#{step.id}" do
+                    span
+                      i.fa.fa-edit
+                  = link to: "#", class: "navbar-item", phx_click: "delete", phx_value_id: step.id, id: "delete-step-#{step.id}" do
+                    span
+                      i.fa.fa-trash
 
 
-  = live_patch to: Routes.step_index_path(@socket, :new, @process.id) do
-    button.button.is-primary New Step 
+      = live_patch to: Routes.step_index_path(@socket, :new, @process.id) do
+        button.btn.btn-primary.mt-4 New Step 

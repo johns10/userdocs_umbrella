@@ -1,43 +1,47 @@
-= UserDocsWeb.ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
-  %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name }],
-  last_item: %{ to: Routes.process_index_path(@socket, :index), name: @current_project.name } ])
+.flex.ml-8
+  = live_component UserDocsWeb.DrawerLayoutLive, 
+    view: UserDocsWeb.DrawerLive, 
+    session: [id: "navigation-drawer", session: %{"user_id" => @current_user.id, "team_id" => @current_team.id}] do 
+    = UserDocsWeb.ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"},
+      %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name }],
+      last_item: %{ to: Routes.process_index_path(@socket, :index), name: @current_project.name } ])
 
-= if @live_action in [:edit, :new] do
-  = live_modal @socket, UserDocsWeb.ProcessLive.FormComponent,
-    id: "process-form",
-    parent_id: @current_project.id,
-    title: @page_title,
-    action: @live_action,
-    process: @process,
-    state_opts: @state_opts,
-    select_lists: @select_lists,
-    app_name: @app_name,
-    return_to: Routes.process_index_path(@socket, :index)
-    
-aside.menu
-  p.menu-label Processes
-  ul.menu-list
-    = for process <- @processes do
-      li class=""
-        .is-flex
-          = link to: Routes.step_index_path(@socket, :index, process.id), class: "is-flex-grow-1" do
-            = process.name
-          .is-flex.is-flex-direction-row.is-flex-grow-0
-            = live_component(@socket, Status, 
-              [ id: "process-" <> Integer.to_string(process.id) <> "-status", process: process ])
-            = live_component(@socket, Queuer, 
-              [ id: "process-" <> Integer.to_string(process.id) <> "-queuer", process: process ])
-            = live_component(@socket, Runner, 
-                [ id: "process-" <> Integer.to_string(process.id),
-                app_name: @app_name,
-                process: process,
-                display: @browser_opened])
-            = live_patch to: Routes.process_index_path(@socket, :edit,process.id), id: "edit-process-#{process.id}" do
-              span
-                i.fa.fa-edit
-            = link to: "#", phx_click: "delete", phx_value_id: process.id, id: "delete-process-#{process.id}", data: [confirm: "Are you sure?"] do
-              span 
-                i.fa.fa-trash
+    = if @live_action in [:edit, :new] do
+      = live_modal @socket, UserDocsWeb.ProcessLive.FormComponent,
+        id: "process-form",
+        parent_id: @current_project.id,
+        title: @page_title,
+        action: @live_action,
+        process: @process,
+        state_opts: @state_opts,
+        select_lists: @select_lists,
+        app_name: @app_name,
+        return_to: Routes.process_index_path(@socket, :index)
+        
+    aside.menu
+      p.menu-label Processes
+      ul.menu-list
+        = for process <- @processes do
+          li class=""
+            .is-flex
+              = link to: Routes.step_index_path(@socket, :index, process.id), class: "is-flex-grow-1" do
+                = process.name
+              .is-flex.is-flex-direction-row.is-flex-grow-0
+                = live_component(@socket, Status, 
+                  [ id: "process-" <> Integer.to_string(process.id) <> "-status", process: process ])
+                = live_component(@socket, Queuer, 
+                  [ id: "process-" <> Integer.to_string(process.id) <> "-queuer", process: process ])
+                = live_component(@socket, Runner, 
+                    [ id: "process-" <> Integer.to_string(process.id),
+                    app_name: @app_name,
+                    process: process,
+                    display: @browser_opened])
+                = live_patch to: Routes.process_index_path(@socket, :edit,process.id), id: "edit-process-#{process.id}" do
+                  span
+                    i.fa.fa-edit
+                = link to: "#", phx_click: "delete", phx_value_id: process.id, id: "delete-process-#{process.id}", data: [confirm: "Are you sure?"] do
+                  span 
+                    i.fa.fa-trash
 
-= live_patch to: Routes.process_index_path(@socket, :new) do
-  button.button.is-primary New Process
+    = live_patch to: Routes.process_index_path(@socket, :new) do
+      button.btn.btn-primary.mt-4 New Process

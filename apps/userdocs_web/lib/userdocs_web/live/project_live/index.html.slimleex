@@ -1,33 +1,34 @@
-= ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"}], 
-  last_item: %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name } ])
-  
-= if @live_action in [:edit, :new] do
-  = live_modal @socket, UserDocsWeb.ProjectLive.FormComponent,
-    id: @project.id || :new,
-    parent_id: @current_team.id,
-    title: @page_title,
-    action: @live_action,
-    project: @project,
-    select_lists: %{ teams: @teams_select_options, strategies: @strategies_select_options },
-    state_opts: @state_opts,
-    return_to: Routes.project_index_path(@socket, :index, @current_team.id)
+.mx-8
+  = ComposableBreadCrumb.render([ items: [%{ to: Routes.team_index_path(@socket, :index), name: "Teams"}], 
+    last_item: %{ to: Routes.project_index_path(@socket, :index), name: @current_team.name } ])
+    
+  = if @live_action in [:edit, :new] do
+    = live_modal @socket, UserDocsWeb.ProjectLive.FormComponent,
+      id: @project.id || :new,
+      parent_id: @current_team.id,
+      title: @page_title,
+      action: @live_action,
+      project: @project,
+      select_lists: %{ teams: @teams_select_options, strategies: @strategies_select_options },
+      state_opts: @state_opts,
+      return_to: Routes.project_index_path(@socket, :index, @current_team.id)
 
-aside.menu
-  p.menu-label Projects
-  ul.menu-list
-    = for project <- @projects do
-      li class=""
-        .is-flex
-          = link to: Routes.process_index_path(@socket, :index, project.id), class: "is-flex-grow-1" do
-            = project.name
-          .is-flex.is-flex-direction-row.is-flex-grow-0
-            = live_redirect to: Routes.project_show_path(@socket, :show, project) do
-              i.fa.fa-search
-            = live_patch to: Routes.project_index_path(@socket, :edit, project), id: "edit-project-#{project.id}" do
-              i.fa.fa-edit
-            = link to: "#", phx_click: "delete", phx_value_id: project.id, id: "delete-project-#{project.id}", data: [confirm: "Are you sure? Deleting this project will also delete any versions that depend on it, leading to irrecoverable data loss."] do
-              i.fa.fa-trash
+  aside.menu
+    p.menu-label Projects
+    ul.menu-list
+      = for project <- @projects do
+        li class=""
+          .is-flex
+            = link to: Routes.process_index_path(@socket, :index, project.id), class: "is-flex-grow-1" do
+              = project.name
+            .is-flex.is-flex-direction-row.is-flex-grow-0
+              = live_redirect to: Routes.project_show_path(@socket, :show, project) do
+                i.fa.fa-search
+              = live_patch to: Routes.project_index_path(@socket, :edit, project), id: "edit-project-#{project.id}" do
+                i.fa.fa-edit
+              = link to: "#", phx_click: "delete", phx_value_id: project.id, id: "delete-project-#{project.id}", data: [confirm: "Are you sure? Deleting this project will also delete any versions that depend on it, leading to irrecoverable data loss."] do
+                i.fa.fa-trash
 
 
-= live_patch to: Routes.project_index_path(@socket, :new) do
-  button.button.is-primary New Project
+  = live_patch to: Routes.project_index_path(@socket, :new) do
+    button.button.is-primary New Project

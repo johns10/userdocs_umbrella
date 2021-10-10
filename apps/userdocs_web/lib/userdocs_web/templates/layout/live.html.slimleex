@@ -87,21 +87,14 @@ css:
       select_lists: %{teams: UserDocs.Helpers.select_list(@current_user.teams, :name, true)},
       return_to: @url.path
       
-  section.section
-    main.container role="main"
-      p.alert.alert-info role="alert" phx-click="lv:clear-flash" phx-value-key="info"
-        = live_flash(@flash, :info)
+  main.container role="main"
+    p.alert.alert-info role="alert" phx-click="lv:clear-flash" phx-value-key="info"
+      = live_flash(@flash, :info)
 
-      p class="alert alert-danger" role="alert" phx-click="lv:clear-flash" phx-value-key="error"
-        = live_flash(@flash, :error)
-        
-      div.with-sidebar
-        div 
-          div#content
-            = @inner_content
-          = if is_struct(@current_user, UserDocs.Users.User) and is_struct(@current_team, UserDocs.Users.Team) do
-            = live_render @socket, UserDocsWeb.DrawerLive, id: "navigation-drawer", 
-              session: %{"user_id" => @current_user.id, "team_id" => @current_team.id}
-              
+    p class="alert alert-danger" role="alert" phx-click="lv:clear-flash" phx-value-key="error"
+      = live_flash(@flash, :error)
+      
+  = @inner_content
+         
 - else
   = @inner_content
