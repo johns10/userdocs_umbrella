@@ -23,13 +23,13 @@ defmodule UserDocsWeb.ProcessLive.Instance do
   end
 
   def icon_kwargs(process_instance) do
-    [ aria_hidden: "true" ]
+    [ aria_hidden: "true", has_tooltip_right: "true" ]
     |> icon_class(process_instance.status)
   end
 
   def span_kwargs(process_instance) do
     []
-    |> tooltip(process_instance)
+    #|> tooltip(process_instance)
   end
 
   def icon_class(base, "none"), do: base ++ [ class: "fa fa-ban" ]

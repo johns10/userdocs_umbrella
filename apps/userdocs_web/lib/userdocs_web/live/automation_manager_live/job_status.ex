@@ -47,7 +47,7 @@ defmodule UserDocsWeb.AutomationManager.JobStatus do
 
   def tooltip(base, %{ status: "warn" }), do: base ++ [ data_tooltip: "fa fa-check" ]
   def tooltip(base, %{ status: "not_started", id: id }), do: base ++ [ data_tooltip: "Process Instance #{id} hasn't started running yet.  Start your job." ]
-  def tooltip(base, %{ status: "none", id: id, step_id: step_id }), do: base ++ [ data_tooltip: "There's no status element for this process. Reinitialize this job." ]
+  def tooltip(base, %{ status: "none", id: _id, step_id: step_id }), do: base ++ [ data_tooltip: "There's no status element for this process. Reinitialize this job." ]
   def tooltip(base, _), do: base
 
   def render_errors(nil), do: ""

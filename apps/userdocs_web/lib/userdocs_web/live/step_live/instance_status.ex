@@ -29,7 +29,7 @@ defmodule UserDocsWeb.StepLive.Instance do
 
   def span_kwargs(step_instance) do
     []
-    |> tooltip(step_instance.status, step_instance.id, step_instance.step_id)
+    #|> tooltip(step_instance.status, step_instance.id, step_instance.step_id)
   end
 
   def icon_class(base, "none"), do: base ++ [ class: "fa fa-ban" ]
