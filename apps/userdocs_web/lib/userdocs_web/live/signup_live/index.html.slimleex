@@ -9,7 +9,7 @@
             action: @live_action,
             user: @user,
             trigger_submit: false
-= if @live_action in [:edit] do
+= if @live_action in [:edit, :index] do
   css:
     body { overflow: hidden; }
   section.h-screen.bg-green-400
