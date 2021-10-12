@@ -229,6 +229,11 @@ defmodule UserDocsWeb.StepLiveTest do
         |> Map.delete(:annotation_id)
         |> Map.delete(:element_id)
         |> Map.delete(:name)
+        |> Map.delete(:margin_all)
+        |> Map.delete(:margin_top)
+        |> Map.delete(:margin_left)
+        |> Map.delete(:margin_right)
+        |> Map.delete(:margin_bottom)
 
       changes = %{"step_type_id" => aa_step_type.id |> to_string()}
 
@@ -460,8 +465,8 @@ defmodule UserDocsWeb.StepLiveTest do
       # Pass the navigate browser event
       UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
       html = render(index_live)
-      assert index_live |> element("#step-type-select") |> render()  =~ "Navigate"
-      assert index_live |> element("#page-url-input") |> render()  =~ event["href"]
+      assert index_live |> element("#step-form_step_type_id") |> render()  =~ "Navigate"
+      assert index_live |> element("#step-form_page_url") |> render()  =~ event["href"]
 
       # Create and put the changes required to make the form valid
       changes = %{
@@ -531,6 +536,11 @@ defmodule UserDocsWeb.StepLiveTest do
         |> Map.delete(:annotation_id)
         |> Map.delete(:element_id)
         |> Map.delete(:name)
+        |> Map.delete(:margin_all)
+        |> Map.delete(:margin_top)
+        |> Map.delete(:margin_left)
+        |> Map.delete(:margin_right)
+        |> Map.delete(:margin_bottom)
 
       changes = %{"step_type_id" => aa_step_type.id |> to_string()}
 
@@ -548,10 +558,10 @@ defmodule UserDocsWeb.StepLiveTest do
 
       # Pass the click browser event
       UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "event:browser_event", event)
-      :timer.sleep(10)
+      :timer.sleep(100)
 
-      assert index_live |> element("#step-type-select") |> render() =~ "selected=\"selected\">Click"
-      assert index_live |> element("#element-selector-input") |> render() =~ event["selector"]
+      assert index_live |> element("#step-form_step_type_id") |> render() =~ "selected=\"selected\">Click"
+      assert index_live |> element("#step-form_element_selector") |> render() =~ event["selector"]
     end
 
   end
