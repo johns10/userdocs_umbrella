@@ -27,40 +27,39 @@ defmodule UserDocsWeb.PageLive.FormComponent do
     """
   end
 
-  def render_fields(assigns, form, opts \\ []) do
+  def render_fields(assigns, form, _opts \\ []) do
     ~L"""
-      <div class="field is-grouped">
-        <%= Layout.select_input(form, :project_id, @select_lists.projects, [
-          selected: @current_project.id || ""
-        ], "control") %>
-        <%= Layout.text_input(form, [ field_name: :name ], "control is-expanded") %>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="form-control">
+          <%= label form, :project_id, class: "label" %>
+          <%= select form, :project_id, @select_lists.projects,
+            class: "select select-sm select-bordered",
+            selected: @current_project.id || "" %>
+          <%= error_tag form, :project_id %>
+        </div>
+        <div class="form-control col-span-2">
+          <%= label form, :name, class: "label" %>
+          <%= text_input form, :name, type: "text", class: "input input-sm input-bordered" %>
+          <%= error_tag form, :name %>
+        </div>
       </div>
-      <%= if Ecto.Changeset.get_field(form.source, :url, "") |> String.at(0) == "/" do %>
-        <div class="field">
+      <%= if form_url_starts_with_slash(form) do %>
+        <div class="form-control">
           <%= label form, :url, class: "label" %>
-          <p class="control is-expanded">
-            <div class="field has-addons">
-              <p class="control">
-                <a class="button is-static">
-                  <%= if Kernel.is_struct(form.data.project, Project) do %>
-                    <%= if form.data.project.id in Enum.map(@current_user.overrides, fn(o) -> o.project_id end) do %>
-                      <%= Enum.filter(@current_user.overrides, fn(o) -> o.project_id == form.data.project.id end) |> Enum.at(0) |> Map.get(:url) %>
-                    <% else %>
-                      <%= form.data.project.base_url %>
-                    <% end %>
-                  <% end %>
-                </a>
-              </p>
-              <%= text_input form, :url, [ class: "input", type: "text" ] %>
+          <div class="flex">
+            <div class="rounded-r-none rounded-l-lg flex-shrink bg-grey bg-base-300 px-2 py-1">
+              <%= url_prefix(form.data.project, @current_user) %>
             </div>
-            <%= error_tag form, :selector %>
-          </p>
+            <%= text_input form, :url, type: "text", class: "input input-sm input-bordered rounded-l-none flex-grow" %>
+          </div>
+          <%= error_tag form, :url %>
         </div>
       <% else %>
-        <%= Layout.text_input(form, [
-          field_name: :url,
-          id: opts[:prefix] <> "url-input"
-        ], "control is-expanded") %>
+      <div class="form-control">
+        <%= label form, :url, class: "label" %>
+        <%= text_input form, :url, type: "text", class: "input input-sm input-bordered flex-grow" %>
+        <%= error_tag form, :url %>
+      </div>
       <% end %>
     """
   end
@@ -128,5 +127,24 @@ defmodule UserDocsWeb.PageLive.FormComponent do
     |> Map.put(:order, "")
     |> Map.put(:name, "")
     |> Map.put(:url, "")
+  end
+
+  def form_url_starts_with_slash(%{source: source}) do
+    case Ecto.Changeset.get_field(source, :url, "") do
+      nil -> false
+      url -> String.at(url, 0) == "/"
+    end
+  end
+
+  def url_prefix(project, user) do
+    if Kernel.is_struct(project, Project) do
+      if project.id in Enum.map(user.overrides, fn(o) -> o.project_id end) do
+        Enum.filter(user.overrides, fn(o) -> o.project_id == project.id end)
+        |> Enum.at(0)
+        |> Map.get(:url)
+      else
+        project.base_url
+      end
+    end
   end
 end
