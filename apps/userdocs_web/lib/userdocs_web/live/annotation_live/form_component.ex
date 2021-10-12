@@ -27,62 +27,82 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
   def render_fields(assigns, form, prefix \\ "") do
     ~L"""
     = hidden_input(form, :name, [ value: Ecto.Changeset.get_field(@changeset, :name, "") ])
-    .field.is-grouped
-      = Layout.select_input(form, :page_id, @select_lists.pages_select,
-        [ selected: form.data.page_id || "" ], "control")
-      = Layout.select_input(form, :annotation_type_id, @select_lists.annotation_types,
-        [ placeholder: form.data.annotation_type_id || "None" ], "control")
 
-    .field.is-grouped.is-grouped-multiline
+    .grid.grid-cols-4.gap-2
+
+      = label form, :page_id, class: "label mb-0"
+      .col-span-3
+        = select form, :page_id, @select_lists.pages_select,
+          class: "flex-1 select select-sm select-bordered mb-0",
+          selected: form.data.page_id || ""
+      = error_tag form, :page_id
+
+      = label form, :annotation_type_id, "Ann. Type", class: "label mb-0"
+      .col-span-3
+        = select form, :annotation_type_id, @select_lists.annotation_types,
+          class: "flex-1 select select-sm select-bordered mb-0",
+          selected: form.data.annotation_type_id || "None"
+      = error_tag form, :annotation_type_id
+
       = if @last_step_form.annotation.label_enabled do
-        div.control style="width: 15%;"
-          = label form, :label, class: "label"
-          div.control
-            = text_input form, :label, class: "input", type: "text"
+        .form-control
+          = label form, :label, class: "label mb-0"
+          = text_input form, :label, type: "text", class: "input input-sm input-bordered mb-0"
+          = error_tag form, :label
 
       = if @last_step_form.annotation.size_enabled do
-        div.control style="width: 15%;"
-          = label form, :size, class: "label"
-          div.control
-            = number_input form, :size, class: "input", type: "text"
+        .form-control
+          = label form, :size, class: "label mb-0"
+          = number_input form, :size, type: "text", class: "input input-sm input-bordered mb-0"
+          = error_tag form, :size
 
       = if @last_step_form.annotation.x_offset_enabled do
-        div.control style="width: 15%;"
-          = label form, :x_offset, class: "label"
-          div.control
-            = number_input form, :x_offset, class: "input", type: "text"
+        .form-control
+          = label form, :x_offset, class: "label mb-0"
+          = number_input form, :x_offset, type: "text", class: "input input-sm input-bordered mb-0"
+          = error_tag form, :x_offset
 
       = if @last_step_form.annotation.y_offset_enabled do
-        div.control style="width: 15%;"
-          = label form, :y_offset, class: "label"
-          div.control
-            = number_input form, :y_offset, class: "input", type: "text"
+        .form-control
+          = label form, :y_offset, class: "label mb-0"
+          = number_input form, :y_offset, type: "text", class: "input input-sm input-bordered mb-0"
+          = error_tag form, :y_offset
 
       = if @last_step_form.annotation.font_size_enabled do
-        div.control style="width: 15%;"
-          = label form, :font_size, class: "label"
-            div.control
-              = text_input form, :font_size, class: "input", type: "text"
-
-      = if @last_step_form.annotation.x_orientation_enabled do
-        = Layout.select_input(form, :x_orientation,
-          [{"None", ""}, { "Right", "R" }, {"Middle", "M"}, { "Left", "L" }],
-          [ placeholder: form.data.x_orientation || "" ], "control")
-
-      = if @last_step_form.annotation.y_orientation_enabled do
-        = Layout.select_input(form, :y_orientation,
-          [{"None", ""}, { "Top", "T" }, {"Middle", "M"}, { "Bottom", "B" }],
-          [ placeholder: form.data.y_orientation || "" ], "control")
+        .form-control
+          = label form, :font_size, class: "label mb-0"
+          = text_input form, :font_size, type: "text", class: "input input-sm input-bordered mb-0"
+          = error_tag form, :font_size
 
       = if @last_step_form.annotation.color_enabled do
-        = Layout.text_input(form, :color, [], "control")
+        .form-control
+          = label form, :color, class: "label mb-0"
+          = text_input form, :color, type: "text", class: "input input-sm input-bordered mb-0"
+          = error_tag form, :color
+
+      = if @last_step_form.annotation.x_orientation_enabled do
+        .form-control
+          = label form, :x_orientation, class: "label pr-0 mb-0"
+          = select form, :x_orientation,
+            [{"None", ""}, {"Right", "R"}, {"Middle", "M"}, {"Left", "L"}],
+            class: "flex-1 select select-sm select-bordered mb-0",
+            placeholder: form.data.x_orientation || ""
+          = error_tag form, :x_orientation
+
+      = if @last_step_form.annotation.y_orientation_enabled do
+        .form-control
+          = label form, :y_orientation, class: "label pr-0 mb-0"
+          = select form, :y_orientation,
+            [{"None", ""}, {"Top", "T"}, {"Middle", "M"}, {"Bottom", "B"}],
+            class: "flex-1 select select-sm select-bordered mb-0",
+            placeholder: form.data.y_orientation || ""
+          = error_tag form, :y_orientation
 
       = if @last_step_form.annotation.thickness_enabled do
-        div.control style="width: 15%;"
-          = label form, :thickness, class: "label"
-          div.control
-            = text_input form, :thickness, class: "input", type: "text"
-
+        .form-control
+          = label form, :thickness, class: "label mb-0"
+          = text_input form, :thickness, type: "text", class: "input input-sm input-bordered mb-0"
+          = error_tag form, :thickness
     """
   end
 
