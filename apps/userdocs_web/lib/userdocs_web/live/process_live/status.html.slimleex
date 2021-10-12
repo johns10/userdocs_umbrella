@@ -28,17 +28,20 @@ div id=@id
   .navbar-item
     = process_instances_status_element(@socket, @process.process_instances, @myself.cid)
   = if @display_errors_modal do 
-    .modal.is-active
-      .modal-background phx-click="toggle_errors_modal" phx-target=@myself.cid
-      .section 
-        .card.m-4.errors-modal
-          .card-content.errors-modal-content
-            = for process_instance <- @process.process_instances do 
-              h2.title
-                => process_instance.name
-                => process_instance.id
-              h2.subtitle
-                = process_instance.status
-              p
-                = render_errors(process_instance.errors)
-      button.modal-close.is-large aria-label="close" phx-click="toggle_errors_modal" phx-target=@myself.cid
+    input.modal-toggle type="checkbox" id="modal" checked="true"
+  - else 
+    input.modal-toggle type="checkbox" id="modal"
+  .modal
+    .modal-background phx-click="toggle_errors_modal" phx-target=@myself.cid
+    .section 
+      .card.m-4.errors-modal
+        .card-content.errors-modal-content
+          = for process_instance <- @process.process_instances do 
+            h2.title
+              => process_instance.name
+              => process_instance.id
+            h2.subtitle
+              = process_instance.status
+            p
+              = render_errors(process_instance.errors)
+    button.modal-close.is-large aria-label="close" phx-click="toggle_errors_modal" phx-target=@myself.cid
