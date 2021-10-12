@@ -20,12 +20,23 @@ defmodule UserDocsWeb.RegistrationLive.Index do
 
   @impl true
   def handle_params(params, url, socket) do
-    {:noreply, socket |> apply_action(socket.assigns.live_action, params) |> assign(url: URI.parse(url))}
+    {
+      :noreply,
+      socket
+      |> apply_action(socket.assigns.live_action, params)
+      |> assign(url: URI.parse(url))
+    }
   end
 
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "Sign Up for UserDocs")
+    |> assign(:user, %User{})
+  end
+
+  defp apply_action(socket, :index, _params) do
+    socket
+    |> assign(:page_title, "Set Up UserDocs")
     |> assign(:user, %User{})
   end
 

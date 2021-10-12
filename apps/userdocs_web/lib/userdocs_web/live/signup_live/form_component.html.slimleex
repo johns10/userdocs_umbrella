@@ -7,29 +7,20 @@
 
   h2.is-size-4 
     = @title
-  .field
+  .form-control
     = label f, Pow.Ecto.Schema.user_id_field(@changeset), class: "label"
-      .control.has-icons-left
-        = email_input f, Pow.Ecto.Schema.user_id_field(@changeset), class: "input"
-        = error_tag f, :email
-        span.icon.is-small.is-left
-          i.fa.fa-envelope
-      .field
-        = label f, :password, class: "label"
-        .control.has-icons-left
-          = password_input f, :password, class: "input", value: input_value(f, :password)
-          = error_tag f, :password
-          span.icon.is-small.is-left
-            i.fa.fa-lock
-      .field
-        = label f, :password_confirmation, class: "label"
-        .control.has-icons-left
-          = password_input f, :password_confirmation, class: "input", value: input_value(f, :password_confirmation)
-          = error_tag f, :password_confirmation
-          span.icon.is-small.is-left
-            i.fa.fa-lock
+    = email_input f, Pow.Ecto.Schema.user_id_field(@changeset), class: "input input-bordered"
+    = error_tag f, :email
+  .form-control
+    = label f, :password, class: "label"
+    = password_input f, :password, class: "input input-bordered", value: input_value(f, :password)
+    = error_tag f, :password
+  .form-control
+    = label f, :password_confirmation, class: "label"
+    = password_input f, :password_confirmation, class: "input input-bordered", value: input_value(f, :password_confirmation)
+    = error_tag f, :password_confirmation
 
   .field
-    = submit "Sign up", class: "button is-success"
+    = submit "Sign up", class: "btn btn-primary mt-4"
 
     

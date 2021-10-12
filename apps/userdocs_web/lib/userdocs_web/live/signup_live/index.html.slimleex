@@ -1,16 +1,14 @@
 = if @live_action in [:new] do 
-  section.hero.is-primary.is-fullheight
-    .hero-body
-      .container
-        .columns.is-centered
-          .column.is-10-tablet.is-8-desktop.is-6-widescreen
-            .box
-              = live_component @socket, UserDocsWeb.RegistrationLive.FormComponent,
-                id: @user.id || :new,
-                title: @page_title,
-                action: @live_action,
-                user: @user,
-                trigger_submit: false
+  .hero.min-h-screen.bg-base-200.flex-row.justify-center
+    .text-center.hero-content
+      .card.max-w
+        .card-content
+          = live_component @socket, UserDocsWeb.RegistrationLive.FormComponent,
+            id: @user.id || :new,
+            title: @page_title,
+            action: @live_action,
+            user: @user,
+            trigger_submit: false
 = if @live_action in [:edit] do
   css:
     body { overflow: hidden; }
@@ -23,4 +21,3 @@
             title: @page_title,
             user: @user,
             os: @os
-        
