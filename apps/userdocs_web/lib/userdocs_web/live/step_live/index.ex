@@ -154,6 +154,7 @@ defmodule UserDocsWeb.StepLive.Index do
     do: {:noreply, socket}
   def handle_event("reorder_dragend", _, %{assigns: %{drag: _, items: items}} = socket),
     do: {:noreply, socket |> assign(:drag, nil) |> assign(:steps, items)}
+  def handle_event(n, p, s), do: Root.handle_event(n, p, s)
 
   @impl true
   def handle_info(%{topic: "user:" <> _user_id, event: "event:browser_event", payload: %{"action" => action} = payload}, socket) do
