@@ -90,7 +90,7 @@ defmodule UserDocsWeb.Router do
     pipe_through [:browser, :put_user_agent_data]
 
     live "/setup/:id", RegistrationLive.Index, :edit
-    live "/setup", RegistrationLive.Index, :index
+    live "/download", RegistrationLive.Index, :index
   end
 
   scope "/", UserDocsWeb do
