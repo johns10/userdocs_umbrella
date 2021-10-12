@@ -31,10 +31,6 @@ css:
         = if is_struct(@current_project, UserDocs.Projects.Project) do
           button.btn.btn-ghost.btn-sm 
             = live_patch "Jobs", to: Routes.job_index_path(@socket, :index), class: "hover_text-white"
-          button.btn.btn-ghost.btn-sm 
-            = live_patch "Teams", to: Routes.team_index_path(@socket, :index), class: "hover_text-white"
-          button.btn.btn-ghost.btn-sm 
-            = live_patch "Projects", to: Routes.project_index_path(@socket, :index), class: "hover_text-white"
     .flex-1
       = live_component(@socket, UserDocsWeb.ProjectPicker, 
         [ current_user: @current_user, current_project: @current_project])
@@ -46,6 +42,10 @@ css:
           ul.p-2.shadow.menu.dropdown-content.bg-base-100.rounded-box.w-52 tabindex="0" 
             li.text-black
               a phx-click="local-options" Local Options
+            li.text-black
+              = live_patch "Teams", to: Routes.team_index_path(@socket, :index), class: "hover_text-white"
+            li.text-black
+              = live_patch "Projects", to: Routes.project_index_path(@socket, :index), class: "hover_text-white"
     .flex-none.justify-end.flex-1.px-2
         .dropdown.dropdown-left
           button.m-1.btn.btn-square.btn-ghost tabindex="0"
