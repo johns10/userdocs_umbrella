@@ -125,15 +125,16 @@ defmodule UserDocsWeb.StepLive.FormComponent do
     save_step(socket, socket.assigns.action, step_form_params)
   end
   def handle_event("new-element", _, socket) do
-    changeset = Automation.new_step_element(
-      socket.assigns.step, socket.assigns.changeset)
+    updated_params =
+      socket.assigns.changeset.params
+      |> Map.put("element_id", nil)
+      |> Map.put("element", %{})
 
-    {
-      :noreply,
-      socket
-      |> assign(:changeset, changeset)
-      |> assign(:step, changeset.data)
-   }
+    changeset =
+      StepForm.changeset(%StepForm{}, updated_params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, socket |> assign(:changeset, changeset)}
   end
   def handle_event("new-page", _, socket) do
     updated_params =
