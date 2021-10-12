@@ -7,72 +7,63 @@
 
   h2.is-size-4 Edit Step 
 
-  .field.is-horizontal
-    .field-label.is-normal
-      = label f, :process_id, class: "label"
-    .field-body
-      .control
-        .select
-          = select f, :process_id, @select_lists.processes_select, [ class: "input", selected: @parent_id || "", id: "process-select" ]
-        = error_tag(f, :process_id)
+  .grid.grid-cols-4.gap-2
 
-  .field.is-horizontal
-    .field-label.is-normal
-      = label f, :step_type_id, class: "label"
-    .field-body
-      .control
-        .select
-          = select f,:step_type_id, @select_lists.step_types_select, 
-            [ class: "input", type: "text", id: "step-type-select" ]
-        = error_tag(f, :step_type_id)
+    = label f, :process_id, class: "label mb-0"
+    .col-span-3
+      = select f, :process_id, @select_lists.processes_select, 
+        class: "select select-sm select-bordered w-full mb-0", 
+        selected: @parent_id || "", id: "process-select"
+      = error_tag f, :process_id
 
-  .field.is-horizontal
-    .field-label.is-normal
-      = label f, :page_id, class: "label"
-    .field-body
-      .field.has-addons
-        .control 
-          .select
-            = select(f, :page_id, @select_lists.pages_select, 
-              [ value: @changeset |> Ecto.Changeset.get_change(:page_id, nil) ])
-        = Layout.new_item_button("new-page", 
-          [ button_class: :a, phx_target: @myself.cid ], "control")
-        = error_tag(f, :page_id)
+    = label f, :step_type_id, class: "label mb-0"
+    .col-span-3
+      = select f, :step_type_id, @select_lists.step_types_select,
+        class: "select select-sm select-bordered w-full mb-0"
+      = error_tag f, :step_type_id
 
-  .field.is-horizontal
-    .field-label.is-normal
-      = label f, :order, class: "label"
-    .field-body
-      .control
-        = number_input f, :order, [ class: "input", type: "text" ]
-        = error_tag(f, :order)
+    = label f, :order, class: "label mb-0"
+    .col-span-3
+      = text_input f, :order, type: "text", class: "input input-sm input-bordered mb-0"
+      = error_tag f, :order
 
-  = if @last_step_form.width_enabled do
-    .field.is-horizontal
-      .field-label.is-normal
-        = label f, :width, class: "label"
-      .field-body
-        .control
-          = number_input f, :width, [ class: "input", type: "text", id: "width-input" ]
-          = error_tag(f, :width)
+    = label f, :page_id, class: "label mb-0"
+    .col-span-3
+      .flex.space-x-2
+        = select f, :page_id, @select_lists.pages_select, 
+          class: "flex-1 select select-sm select-bordered mb-0", 
+          value: @changeset |> Ecto.Changeset.get_change(:page_id, nil)  
+        button.btn.btn-primary.btn-sm.flex-0.mb-0
+          = link "New Page", to: "#", phx_click: "new-page", phx_target: @myself.cid
+      = error_tag f, :page_id
 
-  = if @last_step_form.width_enabled do
-    .field.is-horizontal
-      .field-label.is-normal
-        = label f, :height, class: "label"
-      .field-body
-        .control
-          = number_input f, :height, [ class: "input", type: "text", id: "height-input" ]
-          = error_tag(f, :height)
+    = if @last_step_form.width_enabled do
+      = label f, :width, class: "label"
+      .col-span-3
+        = number_input f, :width, type: "text", class: "input input-sm input-bordered"
+        = error_tag(f, :width)
 
-  = if @last_step_form.text_enabled do
-    .field.is-horizontal
-      .field-label.is-normal
-        = label f, :text, class: "label"
-      .field-body
-        .control
-          = text_input f, :text, [ class: "input", type: "text", id: "text-input" ]
-          = error_tag(f, :text)
+    = if @last_step_form.height_enabled do
+      = label f, :height, class: "label"
+      .col-span-3
+        = number_input f, :height, type: "text", class: "input input-sm input-bordered"
+        = error_tag(f, :height)
+
+    = if @last_step_form.text_enabled do
+      = label f, :text, class: "label"
+      .col-span-3
+        = number_input f, :text, type: "text", class: "input input-sm input-bordered", id: "text-input"
+        = error_tag f, :text
+
+    = if @last_step_form.element_id_enabled do
+      = label f, :element_id, class: "label mb-0"
+      .col-span-3
+        .flex.space-x-2
+          = select f, :element_id, @select_lists.elements, 
+            class: "flex-1 select select-sm select-bordered mb-0", 
+            value: @changeset |> Ecto.Changeset.get_change(:element_id, nil) || f.data.element_id || ""
+          button.btn.btn-primary.btn-sm.flex-0.mb-0
+            = link "New Element", to: "#", phx_click: "new-element", phx_target: @myself.cid
 
   = if @last_step_form.page_form_enabled do
     .field id="page-subform"
@@ -82,38 +73,46 @@
           .pl-2
             = PageLive.FormComponent.render_fields(assigns, fp, [ prefix: "page-" ])
 
-  = if @last_step_form.element_id_enabled do
-    .field.is-horizontal
-      .field-label.is-normal
-        = label f, :element_id, class: "label"
-      .field-body
-        .field.has-addons
-          = Layout.select_input(f, :element_id, @select_lists.elements, 
-            [ value: @changeset |> Ecto.Changeset.get_change(:element_id, nil) || f.data.element_id || "", label: false ], "control")
-          = Layout.new_item_button("new-element", [ button_class: :a, phx_target: @myself.cid ], "control")
+  = if @last_step_form.element_form_enabled do
+    .field id="element-subform"
+      h3.is-size-5 Element
+      = inputs_for f, :element, [], fn fe ->
+        .grid.grid-cols-4.gap-2 style="border-left: 5px solid LightGray;"
 
-    = if @last_step_form.element_form_enabled do
-      .field id="element-subform"
-        h3.is-size-5 Element
-        = inputs_for f, :element, [], fn fe ->
-          div style="border-left: 5px solid LightGray;"
-            .pl-2
-              = Layout.select_input(fe, :page_id, @select_lists.pages_select,
-                [ value: @changeset |> Ecto.Changeset.get_change(:page_id, nil),
-                id: "page-select" ], "control")
-              = ElementLive.FormComponent.render_name_field(assigns, fe, "element-")
-              = ElementLive.FormComponent.render_selector_field(assigns, fe, "element-")
+          = label fe, :page_id, class: "label ml-2 mb-0"
+          .col-span-3
+            = select fe, :page_id, @select_lists.pages_select, id: "page-select",
+              class: "flex-1 select select-sm select-bordered mb-0", 
+              value: @changeset |> Ecto.Changeset.get_change(:page_id, nil)  
+            
+          = label fe, :name, class: "label ml-2 my-0"
+          .col-span-3
+            = text_input fe, :name, type: "text", class: "input input-sm input-bordered mb-0"
+            = error_tag fe, :name
 
+          = label fe, :strategy_id, class: "label ml-2 my-0 py-0"
+          .col-span-3
+            = label fe, :selector, class: "label my-0 py-0"
+          
+          .rounded-r-none.rounded-l-lg.ml-2
+            = select fe, :strategy_id, @select_lists.strategies,
+              class: "select select-sm select-bordered"
+            = error_tag fe, :strategy_id
+          .col-span-3
+            = text_input fe, :selector, type: "text", class: "input input-sm input-bordered"
+            = error_tag fe, :selector
+            
   = if @last_step_form.annotation_id_enabled do
-    .field.is-horizontal
-      .field-label.is-normal
-        = label f, :annotation_id, class: "label"
-      .field-body
-        .field.has-addons 
-          = Layout.select_input(f, :annotation_id, @select_lists.annotations, 
-            [ value: @changeset |> Ecto.Changeset.get_change(:annotation_id, nil) || f.data.annotation_id || "",
-            label: false ], "control")
-          = Layout.new_item_button("new-annotation", [ button_class: :a, phx_target: @myself.cid ], "control")
+    .grid.grid-cols-4.gap-2
+      = label f, :annotation_id, class: "label mb-0"
+      .col-span-3
+        .flex.space-x-2
+          = select f, :annotation_id, @select_lists.annotations,
+            class: "flex-1 select select-sm select-bordered mb-0", 
+            value: @changeset |> Ecto.Changeset.get_change(:annotation_id, nil) || f.data.annotation_id || ""
+          button.btn.btn-primary.btn-sm.flex-0
+            = link "New Annotation", to: "#", phx_click: "new-annotation", phx_target: @myself.cid
+          = error_tag f, :annotation_id
           
   = if @last_step_form.annotation_form_enabled && @last_step_form.annotation do
     .field id="annotation-subform"
