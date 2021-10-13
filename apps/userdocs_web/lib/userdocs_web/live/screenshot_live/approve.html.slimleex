@@ -26,33 +26,34 @@ css:
     height: 100%;
     overflow: scroll;
   }
-.modal.is-active
+input.modal-toggle type="checkbox" id="modal" checked="true"
+.modal
   .modal-background 
-    .section
-      .card.review-modal 
-        .card-content.review-modal-content.p-0
-          .card-header.m-0
-            p.card-header-title Approve or Reject Image Update 
-          .columns.my-2.mx-1
-            .column
-              h2 Original Image
-              = if @screenshot.aws_screenshot do 
-                = img_tag @aws_screenshot, class: "image review-image"
-            .column
-              h2 New Image
-              = if @screenshot.aws_provisional_screenshot do 
-                = img_tag @aws_provisional_screenshot, class: "image review-image"
-          .columns.my-2.mx-1
-            .column
-              h2 Image Diff
-              = if @screenshot.aws_diff_screenshot do 
-                = img_tag @aws_diff_screenshot
-              - else 
-                p Screenshot size is different, couldn't diff
-          .card-footer
-            = link "Approve", to: "#", phx_target: @myself.cid, phx_click: "approve-provisional", class: "card-footer-item is-success"
-            = link "Reject", to: "#", phx_target: @myself.cid, phx_click: "reject-provisional", class: "card-footer-item is-danger"
-            = link "Cancel", to: "#", phx_target: @myself.cid, phx_click: "cancel-review", class: "card-footer-item is-danger"
+  .section
+    .card.review-modal 
+      .card-content.review-modal-content.p-0
+        .card-header.m-0
+          p.card-header-title Approve or Reject Image Update 
+        .columns.my-2.mx-1
+          .column
+            h2 Original Image
+            = if @screenshot.aws_screenshot do 
+              = img_tag @aws_screenshot, class: "image review-image"
+          .column
+            h2 New Image
+            = if @screenshot.aws_provisional_screenshot do 
+              = img_tag @aws_provisional_screenshot, class: "image review-image"
+        .columns.my-2.mx-1
+          .column
+            h2 Image Diff
+            = if @screenshot.aws_diff_screenshot do 
+              = img_tag @aws_diff_screenshot
+            - else 
+              p Screenshot size is different, couldn't diff
+        .card-footer
+          = link "Approve", to: "#", phx_target: @myself.cid, phx_click: "approve-provisional", class: "card-footer-item is-success"
+          = link "Reject", to: "#", phx_target: @myself.cid, phx_click: "reject-provisional", class: "card-footer-item is-danger"
+          = link "Cancel", to: "#", phx_target: @myself.cid, phx_click: "cancel-review", class: "card-footer-item is-danger"
 
 
   
