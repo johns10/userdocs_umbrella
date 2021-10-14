@@ -31,4 +31,4 @@
 
 
   = live_patch to: Routes.project_index_path(@socket, :new) do
-    button.button.is-primary New Project
+    button.btn.btn-primary.mt-4 New Project

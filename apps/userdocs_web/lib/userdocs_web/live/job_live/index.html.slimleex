@@ -30,5 +30,5 @@
                 i.fa.fa-trash
 
   = live_patch to: Routes.job_index_path(@socket, :new) do
-    button.button.is-primary New Job
+    button.btn.btn-primary.mt-4 New Job
     
