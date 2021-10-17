@@ -18,11 +18,11 @@ defmodule UserDocsWeb.PageLive.FormComponent do
         phx_submit: "save",
         class: "form-horizontal" %>
 
-        <h4><%= @title %></h4>
+        <h2 class="text-xl font-bold"><%= @title %></h4>
 
         <%= render_fields(assigns, form) %>
 
-        <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
+        <%= submit "Save", phx_disable_with: "Saving...", class: "btn btn-primary mt-4" %>
       </form>
     """
   end
