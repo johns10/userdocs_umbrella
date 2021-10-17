@@ -11,6 +11,7 @@
     "watch": "webpack --mode development --watch"
   },
   "dependencies": {
+    "@tailwindcss/typography": "^0.4.1",
     "bulma": "^0.9.1",
     "bulma-switch": "^2.0.0",
     "daisyui": "^1.14.2",

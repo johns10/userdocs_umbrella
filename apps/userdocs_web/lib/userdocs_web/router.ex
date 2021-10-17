@@ -97,6 +97,14 @@ defmodule UserDocsWeb.Router do
     pipe_through [:browser, :protected, :put_user_agent_data]
 
     live "/", PageLive, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/download", RegistrationLive.Index, :index
+
+    live "/elements", ElementLive.Index, :index
+    live "/elements/new", ElementLive.Index, :new
+    live "/elements/:id/edit", ElementLive.Index, :edit
+
+    live "/elements/:id", ElementLive.Show, :show
+    live "/elements/:id/show/edit", ElementLive.Show, :edit
 
     live "/users/new", UserLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/users", UserLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
@@ -110,6 +118,13 @@ defmodule UserDocsWeb.Router do
     live "/teams", TeamLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/teams/:id", TeamLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/teams/:id/edit", TeamLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
+    live "/pages", PageLive.Index, :index
+    live "/pages/new", PageLive.Index, :new
+    live "/pages/:id/edit", PageLive.Index, :edit
+
+    live "/pages/:id", PageLive.Show, :show
+    live "/pages/:id/show/edit", PageLive.Show, :edit
 
     live "/teams/:team_id/projects", ProjectLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/projects", ProjectLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
@@ -132,7 +147,6 @@ defmodule UserDocsWeb.Router do
     live "/jobs/:id/edit", JobLive.Index, :edit
     live "/jobs/:id", JobLive.Show, :show
     live "/jobs/:id/show/edit", JobLive.Show, :edit
-
 
     post "/registration/send-confirmation-email", RegistrationController, :resend_confirmation_email
   end
