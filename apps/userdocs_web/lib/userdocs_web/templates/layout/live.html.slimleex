@@ -24,13 +24,12 @@ css:
         span.text-lg.font-bold.pl-4.hover_text-white
           | UserDocs
     .flex-none.px-2.mx-2
-      .items-stretch.hidden.lg_flex
-        = if is_struct(@current_project, UserDocs.Projects.Project) do
-          button.btn.btn-ghost.btn-sm 
-            = live_patch "Processes", to: Routes.process_index_path(@socket, :index), class: "hover_text-white"
-        = if is_struct(@current_project, UserDocs.Projects.Project) do
-          button.btn.btn-ghost.btn-sm 
-            = live_patch "Jobs", to: Routes.job_index_path(@socket, :index), class: "hover_text-white"
+      = if is_struct(@current_project, UserDocs.Projects.Project) do
+        button.btn.btn-ghost.btn-sm 
+          = live_patch "Processes", to: Routes.process_index_path(@socket, :index), class: "hover_text-white"
+      = if is_struct(@current_project, UserDocs.Projects.Project) do
+        button.btn.btn-ghost.btn-sm 
+          = live_patch "Jobs", to: Routes.job_index_path(@socket, :index), class: "hover_text-white"
     .flex-1
       = live_component(@socket, UserDocsWeb.ProjectPicker, 
         [ current_user: @current_user, current_project: @current_project])
