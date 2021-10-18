@@ -8,6 +8,7 @@ defmodule UserDocsWeb.StepLive.Index do
 
   require Logger
 
+  alias UserDocs.Annotations
   alias UserDocs.Annotations.Annotation
   alias UserDocs.Annotations.AnnotationForm
   alias UserDocs.Automation
@@ -44,7 +45,7 @@ defmodule UserDocsWeb.StepLive.Index do
     |> assign(:modal_action, :show)
     |> assign(:step_params, nil)
     |> UserDocsWeb.Loaders.screenshots(opts)
-    |> Web.load_annotation_types(opts)
+    |> Annotations.load_annotation_types(opts)
     |> Web.load_strategies(opts)
     |> Automation.load_step_types(opts)
     |> Loaders.step_instances(opts)
@@ -387,7 +388,7 @@ defmodule UserDocsWeb.StepLive.Index do
   def annotation_types_select(%{assigns: %{state_opts: state_opts}} = socket) do
     order = [%{field: :id, order: :asc}]
     opts = Keyword.put(state_opts, :order, order)
-    Web.list_annotation_types(socket, opts)
+    Annotations.list_annotation_types(socket, opts)
     |> Helpers.select_list(:name, :false)
   end
   def annotation_types_select(_), do: []

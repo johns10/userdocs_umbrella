@@ -94,51 +94,51 @@ defmodule UserDocs.WebTest do
       {:ok, annotation_type} =
         attrs
         |> Enum.into(@valid_attrs)
-        |> Web.create_annotation_type()
+        |> Annotations.create_annotation_type()
 
       annotation_type
     end
 
     test "list_annotation_types/0 returns all annotation_types" do
       annotation_type = annotation_type_fixture()
-      assert Web.list_annotation_types() == [annotation_type]
+      assert Annotations.list_annotation_types() == [annotation_type]
     end
 
     test "get_annotation_type!/1 returns the annotation_type with given id" do
       annotation_type = annotation_type_fixture()
-      assert Web.get_annotation_type!(annotation_type.id) == annotation_type
+      assert Annotations.get_annotation_type!(annotation_type.id) == annotation_type
     end
 
     test "create_annotation_type/1 with valid data creates a annotation_type" do
-      assert {:ok, %AnnotationType{} = annotation_type} = Web.create_annotation_type(@valid_attrs)
+      assert {:ok, %AnnotationType{} = annotation_type} = Annotations.create_annotation_type(@valid_attrs)
       assert annotation_type.name == "some name"
     end
 
     test "create_annotation_type/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Web.create_annotation_type(@invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Annotations.create_annotation_type(@invalid_attrs)
     end
 
     test "update_annotation_type/2 with valid data updates the annotation_type" do
       annotation_type = annotation_type_fixture()
-      assert {:ok, %AnnotationType{} = annotation_type} = Web.update_annotation_type(annotation_type, @update_attrs)
+      assert {:ok, %AnnotationType{} = annotation_type} = Annotations.update_annotation_type(annotation_type, @update_attrs)
       assert annotation_type.name == "some updated name"
     end
 
     test "update_annotation_type/2 with invalid data returns error changeset" do
       annotation_type = annotation_type_fixture()
-      assert {:error, %Ecto.Changeset{}} = Web.update_annotation_type(annotation_type, @invalid_attrs)
-      assert annotation_type == Web.get_annotation_type!(annotation_type.id)
+      assert {:error, %Ecto.Changeset{}} = Annotations.update_annotation_type(annotation_type, @invalid_attrs)
+      assert annotation_type == Annotations.get_annotation_type!(annotation_type.id)
     end
 
     test "delete_annotation_type/1 deletes the annotation_type" do
       annotation_type = annotation_type_fixture()
-      assert {:ok, %AnnotationType{}} = Web.delete_annotation_type(annotation_type)
-      assert_raise Ecto.NoResultsError, fn -> Web.get_annotation_type!(annotation_type.id) end
+      assert {:ok, %AnnotationType{}} = Annotations.delete_annotation_type(annotation_type)
+      assert_raise Ecto.NoResultsError, fn -> Annotations.get_annotation_type!(annotation_type.id) end
     end
 
     test "change_annotation_type/1 returns a annotation_type changeset" do
       annotation_type = annotation_type_fixture()
-      assert %Ecto.Changeset{} = Web.change_annotation_type(annotation_type)
+      assert %Ecto.Changeset{} = Annotations.change_annotation_type(annotation_type)
     end
   end
 

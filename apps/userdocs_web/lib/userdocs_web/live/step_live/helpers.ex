@@ -1,4 +1,5 @@
 defmodule UserDocsWeb.StepLive.FormComponent.Helpers do
+  alias UserDocs.Annotations
   alias UserDocs.Automation
   alias UserDocs.Web
   alias UserDocs.Annotations.AnnotationForm
@@ -32,14 +33,14 @@ defmodule UserDocsWeb.StepLive.FormComponent.Helpers do
 
   def enabled_annotation_fields(%Ecto.Changeset{} = changeset, state) do
     annotation_type_id = changeset.changes.annotation.changes.annotation_type_id
-    annotation_type = Web.get_annotation_type!(annotation_type_id, state, state.state_opts)
+    annotation_type = Annotations.get_annotation_type!(annotation_type_id, state, state.state_opts)
     annotation_form = enable_fields(changeset.changes.annotation, AnnotationForm.enabler_fields(), annotation_type.args)
     Ecto.Changeset.put_change(changeset, :annotation, annotation_form)
   end
   def enabled_annotation_fields(%StepForm{annotation: nil} = step_form, _), do: step_form
   def enabled_annotation_fields(%StepForm{annotation: %{annotation_type_id: nil}} = step_form, _), do: step_form
   def enabled_annotation_fields(%StepForm{annotation: %{annotation_type_id: annotation_type_id} = annotation} = step_form, state) do
-    annotation_type = Web.get_annotation_type!(annotation_type_id, state, state.state_opts)
+    annotation_type = Annotations.get_annotation_type!(annotation_type_id, state, state.state_opts)
     annotation_form = enable_fields(annotation, AnnotationForm.enabler_fields(), annotation_type.args)
     Map.put(step_form, :annotation, annotation_form)
   end

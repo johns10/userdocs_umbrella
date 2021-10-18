@@ -2,6 +2,7 @@ defmodule UserDocsWeb.PageLive.Show do
   use UserDocsWeb, :live_view
   use UserdocsWeb.LiveViewPowHelper
 
+  alias UserDocs.Annotations
   alias UserDocs.Helpers
   alias UserDocs.Projects
   alias UserDocs.Web
@@ -34,7 +35,7 @@ defmodule UserDocsWeb.PageLive.Show do
   def initialize(socket) do
     opts = socket.assigns.state_opts
     socket
-    |> Web.load_annotation_types(opts)
+    |> Annotations.load_annotation_types(opts)
     |> Web.load_strategies(opts)
     |> Loaders.pages(opts)
     |> Loaders.annotations(opts)

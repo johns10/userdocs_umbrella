@@ -95,4 +95,45 @@ defmodule UserDocs.Annotations do
   def change_annotation(%Annotation{} = annotation, attrs \\ %{}) do
     Annotation.changeset(annotation, attrs)
   end
+
+  alias UserDocs.Annotations.AnnotationType
+
+  def load_annotation_types(state, opts) do
+    StateHandlers.load(state, list_annotation_types(), AnnotationType, opts)
+  end
+
+  def list_annotation_types(state, opts) when is_list(opts) do
+    StateHandlers.list(state, AnnotationType, opts)
+  end
+  def list_annotation_types do
+    Repo.all(AnnotationType)
+  end
+
+  def get_annotation_type!(id, _params \\ %{}, _filters \\ %{})
+  def get_annotation_type!(id, _params, _filters) do
+    Repo.get!(AnnotationType, id)
+  end
+  def get_annotation_type!(id, _params, _filters, state) do
+    UserDocs.State.get!(state, id, :annotation_types, AnnotationType)
+  end
+
+  def create_annotation_type(attrs \\ %{}) do
+    %AnnotationType{}
+    |> AnnotationType.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_annotation_type(%AnnotationType{} = annotation_type, attrs) do
+    annotation_type
+    |> AnnotationType.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_annotation_type(%AnnotationType{} = annotation_type) do
+    Repo.delete(annotation_type)
+  end
+
+  def change_annotation_type(%AnnotationType{} = annotation_type, attrs \\ %{}) do
+    AnnotationType.changeset(annotation_type, attrs)
+  end
 end

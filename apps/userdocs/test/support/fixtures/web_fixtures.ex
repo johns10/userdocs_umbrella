@@ -58,7 +58,7 @@ defmodule UserDocs.WebFixtures do
   def annotation_type(name \\ :badge) do
     {:ok, annotation } =
       annotation_type_attrs(:valid, name)
-      |> Web.create_annotation_type()
+      |> Annotations.create_annotation_type()
     annotation
   end
 
@@ -66,7 +66,7 @@ defmodule UserDocs.WebFixtures do
     UserDocs.WebFixtures.AnnotationTypes.data()
     |> Enum.map(
       fn(st) ->
-        { :ok, annotation_type } = Web.create_annotation_type(st)
+        { :ok, annotation_type } = Annotations.create_annotation_type(st)
         annotation_type
       end
     )

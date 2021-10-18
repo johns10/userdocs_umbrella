@@ -4,6 +4,7 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
     The module assigns step_params to the socket. step_params is used in `StepLive.FormComponent` to do the things.
   """
   require Logger
+  alias UserDocs.Annotations
   alias UserDocs.Automation
   alias UserDocs.Automation.Step
   alias UserDocs.Automation.StepForm
@@ -137,7 +138,7 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
   end
 
   def annotation_type_id(annotation_type) do
-    Web.list_annotation_types()
+    Annotations.list_annotation_types()
     |> Enum.filter(fn(at) -> at.name == annotation_type end)
     |> Enum.at(0)
     |> Map.get(:id, nil)

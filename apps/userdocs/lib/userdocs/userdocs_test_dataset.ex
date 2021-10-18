@@ -1,5 +1,5 @@
 defmodule UserDocs.TestDataset do
-
+  alias UserDocs.Annotations
   alias UserDocs.Annotations.AnnotationType
   alias UserDocs.Jobs
 
@@ -84,7 +84,7 @@ defmodule UserDocs.TestDataset do
      }
     ]
 
-    Enum.each(annotation_types, fn(annotation_type) -> UserDocs.Web.create_annotation_type(annotation_type) end)
+    Enum.each(annotation_types, fn(annotation_type) -> UserDocs.Annotations.create_annotation_type(annotation_type) end)
 
     step_types = [
       %{
