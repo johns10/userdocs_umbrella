@@ -40,7 +40,6 @@ defmodule UserDocsWeb.PageLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    IO.puts("EDIT")
     socket
     |> assign(:page_title, "Edit Page")
     |> assign(:page, Web.get_page!(id))

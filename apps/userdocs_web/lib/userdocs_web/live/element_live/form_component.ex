@@ -9,69 +9,6 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
   alias UserDocsWeb.ID
 
   @impl true
-  def render(assigns) do
-    ~L"""
-      <%= form = form_for @changeset, "#",
-        id: @id,
-        phx_target: @myself.cid,
-        phx_change: "validate",
-        phx_submit: "save" %>
-        <%= render_fields(assigns, form) %>
-        <%= submit "Save", phx_disable_with: "Saving...", class: "button is-link" %>
-      </form>
-    """
-  end
-
-  def render_fields(assigns, form, prefix \\ "") do
-    ~L"""
-
-      <div class="field is-grouped">
-
-        <%= Layout.select_input(form, :page_id, @select_lists.pages_select, [
-          selected: form.data.page_id || "",
-          id: prefix <> @field_ids.page_id,
-        ], "control") %>
-
-        <%= render_name_field(assigns, form, prefix) %>
-
-        <%= Layout.number_input(form, :order, [
-          id: prefix <> @field_ids.order
-        ]) %>
-
-      </div>
-
-      <%= render_selector_field(assigns, form, prefix) %>
-    """
-  end
-
-  def render_name_field(assigns, form, prefix) do
-    ~L"""
-    <%= Layout.text_input(form, :name, [], "control") %>
-    """
-  end
-
-  def render_selector_field(assigns, form, prefix) do
-    ~L"""
-    <div class="field">
-      <%= label form, :selector, class: "label" %>
-      <p class="control is-expanded">
-        <div class="field has-addons">
-
-          <%= Layout.select_input(form, :strategy_id, @select_lists.strategies, [
-              id: prefix <> "strategy-select", label: false
-            ], "control") %>
-
-          <%= Layout.text_input(form, :selector, [ label: false, id: prefix <> "selector-input"
-            ], "control is-expanded") %>
-
-        </div>
-        <%= error_tag form, :selector %>
-      </p>
-    </div>
-    """
-  end
-
-  @impl true
   def update(%{element: element} = assigns, socket) do
     changeset = Web.change_element(element)
 
@@ -100,9 +37,11 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
   defp save_element(socket, :edit, element_params) do
     case Web.update_element(socket.assigns.element, element_params) do
       {:ok, _element} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Element updated successfully")
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "Element updated successfully")
+          |> push_redirect(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -113,9 +52,11 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
   defp save_element(socket, :new, element_params) do
     case Web.create_element(element_params) do
       {:ok, _element} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Element created successfully")
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "Element created successfully")
+          |> push_redirect(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->

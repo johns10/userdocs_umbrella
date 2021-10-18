@@ -1,4 +1,4 @@
-h1 Show Page
+h1.text-2xl.font-bold.m-4 Show Page
 
 = if @live_action in [:edit] do
   = live_modal @socket, UserDocsWeb.PageLive.FormComponent,
@@ -6,6 +6,17 @@ h1 Show Page
     title: @page_title,
     action: @live_action,
     page: @page,
+    select_lists: @select_lists,
+    current_project: @current_project,
+    return_to: Routes.page_show_path(@socket, :show, @page)
+
+= if @live_action in [:edit_element, :new_element] do
+  = live_modal @socket, UserDocsWeb.ElementLive.FormComponent,
+    id: @element.id || :new_element,
+    title: @page_title,
+    action: parse_element_live_action(@live_action),
+    element: @element,
+    select_lists: @select_lists,
     return_to: Routes.page_show_path(@socket, :show, @page)
 
 ul.py-3.shadow-lg.bg-base-100.rounded-box.m-4
@@ -14,15 +25,29 @@ ul.py-3.shadow-lg.bg-base-100.rounded-box.m-4
   = for element <- @elements do 
     li.flex
       = live_patch element.name, to: "#", class: "text-current px-5 py-2 hover_bg-base-content hover_bg-opacity-10 flex-1"
-      = link to: "#", phx_click: "navigate", phx_value_id: element.id, class: "text-current px-5 py-2 hover_bg-base-content hover_bg-opacity-10 flex-none" do
-        svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-      = live_patch to: Routes.element_index_path(@socket, :edit, element.id), class: "text-current px-5 py-2 hover_bg-base-content hover_bg-opacity-10 flex-none" do
-        svg.inline-block.w-5.h-5.mr-2.stroke-current xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+      .text-current.px-5.py-2.hover_bg-base-content.hover_bg-opacity-10.flex-none
+        = f = form_for :highlight, "#", id: "page-form", phx_change: "validate"
+          = checkbox f, :apply, class: "checkbox"
+      = link to: "#", phx_click: "create_annotation", phx_value_id: element.id, class: "text-current px-5 py-2 hover_bg-base-content hover_bg-opacity-10 flex-none flex" do
+        svg.h-5.w-5 name="plus" fill="currentColor" viewbox=("0 0 20 20") xmlns="http://www.w3.org/2000/svg" 
+          path clip-rule="evenodd" d=("M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z") fill-rule="evenodd"
+        svg.h-5.w-5 name="down_arrow" fill="currentColor" viewbox=("0 0 20 20") xmlns="http://www.w3.org/2000/svg" 
+          path clip-rule="evenodd" d=("M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z") fill-rule="evenodd" /
+      = live_patch to: Routes.page_show_path(@socket, :edit_element, @page.id, element.id), class: "text-current px-5 py-2 hover_bg-base-content hover_bg-opacity-10 flex-none" do
+        svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"
+          path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
+          path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"
       = link to: "#", phx_click: "delete", phx_value_id: element.id, class: "text-current px-5 py-2 hover_bg-base-content hover_bg-opacity-10 flex-none" do
-        svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+        svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"
+          path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"
+    = for annotation <- element.annotations do
+      p = annotation.name
 
-span = live_patch "Edit", to: Routes.page_show_path(@socket, :edit, @page), class: "button"
-span = live_redirect "Back", to: Routes.page_index_path(@socket, :index)
+= live_redirect to: Routes.page_index_path(@socket, :index) do
+  button.btn.btn-primary.m-4 Back
+
+= live_patch to: Routes.page_show_path(@socket, :edit, @page) do 
+  button.btn.btn-primary.m-4 Edit Page
+
+= live_patch to: Routes.page_show_path(@socket, :new_element, @page) do 
+  button.btn.btn-primary.m-4 New Element
