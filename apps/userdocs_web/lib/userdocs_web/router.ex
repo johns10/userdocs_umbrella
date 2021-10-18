@@ -124,6 +124,8 @@ defmodule UserDocsWeb.Router do
     live "/pages/:id/edit", PageLive.Index, :edit
 
     live "/pages/:id", PageLive.Show, :show
+    live "/pages/:page_id/element/:element_id/edit", PageLive.Show, :edit_element
+    live "/pages/:page_id/element/new", PageLive.Show, :new_element
     live "/pages/:id/show/edit", PageLive.Show, :edit
 
     live "/teams/:team_id/projects", ProjectLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
