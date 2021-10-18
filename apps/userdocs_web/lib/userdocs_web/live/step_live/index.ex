@@ -9,6 +9,7 @@ defmodule UserDocsWeb.StepLive.Index do
   require Logger
 
   alias UserDocs.Annotations.Annotation
+  alias UserDocs.Annotations.AnnotationForm
   alias UserDocs.Automation
   alias UserDocs.Automation.Step
   alias UserDocs.Documents
@@ -270,7 +271,7 @@ defmodule UserDocsWeb.StepLive.Index do
       %UserDocs.Automation.StepForm{}
       |> Map.put(:screenshot, %UserDocs.Media.Screenshot{})
       |> Map.put(:element, %UserDocs.Web.Element{})
-      |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{})
+      |> Map.put(:annotation, %AnnotationForm{})
       |> Map.put(:page, nil)
 
     step =
@@ -301,7 +302,7 @@ defmodule UserDocsWeb.StepLive.Index do
       |> Map.put(:page_id, page_id)
       |> Map.put(:page, page)
       |> Map.put(:element, %UserDocs.Web.Element{page_id: page_id})
-      |> Map.put(:annotation, %UserDocs.Web.AnnotationForm{page_id: page_id, label: label})
+      |> Map.put(:annotation, %AnnotationForm{page_id: page_id, label: label})
       |> Map.put(:order, order)
 
     step =
@@ -460,7 +461,7 @@ defmodule UserDocsWeb.StepLive.Index do
     annotation_form =
       if step.annotation do
         a = step.annotation
-        %Web.AnnotationForm{
+        %AnnotationForm{
           name: a.name,
           label: a.label,
           x_orientation: a.x_orientation,
@@ -475,7 +476,7 @@ defmodule UserDocsWeb.StepLive.Index do
           annotation_type_id: a.annotation_type_id
        }
       else
-        %Web.AnnotationForm{}
+        %AnnotationForm{}
       end
 
     step_form = %Automation.StepForm{

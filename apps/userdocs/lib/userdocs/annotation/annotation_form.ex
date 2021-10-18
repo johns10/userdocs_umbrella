@@ -1,4 +1,4 @@
-defmodule UserDocs.Web.AnnotationForm do
+defmodule UserDocs.Annotations.AnnotationForm do
   use Ecto.Schema
   import Ecto.Changeset
 

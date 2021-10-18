@@ -1,7 +1,7 @@
 defmodule UserDocsWeb.StepLive.FormComponent.Helpers do
   alias UserDocs.Automation
   alias UserDocs.Web
-  alias UserDocs.Web.AnnotationForm
+  alias UserDocs.Annotations.AnnotationForm
   alias UserDocs.Automation.StepForm
 
   def handle_enabled_fields(%Ecto.Changeset{} = changeset, state) do

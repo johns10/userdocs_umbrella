@@ -6,7 +6,7 @@ defmodule UserDocs.Automation.StepForm do
 
   alias UserDocs.Media.Screenshot
   alias UserDocs.Projects.Project
-  alias UserDocs.Web.AnnotationForm
+  alias UserDocs.Annotations.AnnotationForm
   alias UserDocs.Web.Element
   alias UserDocs.Web.Page
 
