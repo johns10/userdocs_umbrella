@@ -1,4 +1,4 @@
-defmodule UserDocs.Web.AnnotationType do
+defmodule UserDocs.Annotations.AnnotationType do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -17,7 +17,7 @@ defmodule UserDocs.Web.AnnotationType do
     |> validate_required([:name])
   end
 
-  def safe(annotation_type = %UserDocs.Web.AnnotationType{}, _handlers) do
+  def safe(annotation_type = %UserDocs.Annotations.AnnotationType{}, _handlers) do
     %{
       name: annotation_type.name
     }

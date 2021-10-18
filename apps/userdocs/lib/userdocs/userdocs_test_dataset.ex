@@ -1,5 +1,6 @@
 defmodule UserDocs.TestDataset do
 
+  alias UserDocs.Annotations.AnnotationType
   alias UserDocs.Jobs
 
   alias UserDocs.Users
@@ -12,7 +13,6 @@ defmodule UserDocs.TestDataset do
   alias UserDocs.Documents.LanguageCode
 
   alias UserDocs.Web.Page
-  alias UserDocs.Web.AnnotationType
   alias UserDocs.Annotations.Annotation
   alias UserDocs.Web.Element
   alias UserDocs.Web.Strategy

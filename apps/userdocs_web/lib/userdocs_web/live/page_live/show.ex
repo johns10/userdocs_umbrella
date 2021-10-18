@@ -11,7 +11,7 @@ defmodule UserDocsWeb.PageLive.Show do
 
   def data_types do
     [
-      UserDocs.Web.AnnotationType,
+      UserDocs.Annotations.AnnotationType,
       UserDocs.Web.Strategy,
       UserDocs.Annotations.Annotation,
       UserDocs.Web.Element,

@@ -141,7 +141,7 @@ defmodule UserDocs.Web do
     Page.changeset(page, attrs)
   end
 
-  alias UserDocs.Web.AnnotationType
+  alias UserDocs.Annotations.AnnotationType
 
   def load_annotation_types(state, opts) do
     StateHandlers.load(state, list_annotation_types(), AnnotationType, opts)

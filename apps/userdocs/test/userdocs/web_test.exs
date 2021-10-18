@@ -83,7 +83,7 @@ defmodule UserDocs.WebTest do
   end
 
   describe "annotation_types" do
-    alias UserDocs.Web.AnnotationType
+    alias UserDocs.Annotations.AnnotationType
 
     @valid_attrs %{name: "some name"}
     @update_attrs %{name: "some updated name"}

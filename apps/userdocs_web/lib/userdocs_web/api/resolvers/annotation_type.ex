@@ -1,6 +1,6 @@
 defmodule UserDocsWeb.API.Resolvers.AnnotationType do
 
-  alias UserDocs.Web.AnnotationType
+  alias UserDocs.Annotations.AnnotationType
   alias UserDocs.Annotations.Annotation
 
   def get_annotation_type!(%Annotation{ annotation_type: %AnnotationType{} = annotation_type }, _args, _resolution) do

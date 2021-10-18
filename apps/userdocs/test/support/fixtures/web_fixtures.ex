@@ -9,7 +9,7 @@ defmodule UserDocs.WebFixtures do
   alias UserDocs.Web
   alias UserDocs.Web.Page
   alias UserDocs.Web.Strategy
-  alias UserDocs.Web.AnnotationType
+  alias UserDocs.Annotations.AnnotationType
   alias UserDocs.Annotations.Annotation
   alias UserDocs.Web.Element
   alias UserDocs.Web.Strategy

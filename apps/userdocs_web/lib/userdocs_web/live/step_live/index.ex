@@ -355,7 +355,7 @@ defmodule UserDocsWeb.StepLive.Index do
 
   def data_types do
     [
-      UserDocs.Web.AnnotationType,
+      UserDocs.Annotations.AnnotationType,
       UserDocs.Web.Strategy,
       UserDocs.Automation.StepType,
       UserDocs.Automation.Process,
