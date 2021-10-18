@@ -204,7 +204,7 @@ defmodule UserDocs.WebTest do
   end
 
   describe "annotations" do
-    alias UserDocs.Web.Annotation
+    alias UserDocs.Annotations.Annotation
     alias UserDocs.Web.Page
 
     @valid_attrs %{

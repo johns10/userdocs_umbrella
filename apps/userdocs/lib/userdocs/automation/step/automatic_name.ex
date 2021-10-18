@@ -6,7 +6,7 @@ defmodule UserDocs.Automation.Step.Name do
 
   alias UserDocs.Automation.Step
   alias UserDocs.Automation.StepType
-  alias UserDocs.Web.Annotation
+  alias UserDocs.Annotations.Annotation
   alias UserDocs.Web.Element
   alias UserDocs.Web.Page
 

@@ -7,7 +7,7 @@ defmodule UserDocs.Automation.Step do
   alias UserDocs.Web.Element
   alias UserDocs.Web.Page
   alias UserDocs.Automation.StepType
-  alias UserDocs.Web.Annotation
+  alias UserDocs.Annotations.Annotation
   alias UserDocs.Automation.Process
   alias UserDocs.Media.Screenshot
   alias UserDocs.Automation.Step.Name
@@ -104,7 +104,7 @@ defmodule UserDocs.Automation.Step do
           nil -> changeset
           "" -> changeset
           element ->
-            name = UserDocs.Web.Annotation.Name.execute(annotation, element)
+            name = Annotation.Name.execute(annotation, element)
             Ecto.Changeset.update_change(changeset, :annotation,
               fn(a) -> Ecto.Changeset.put_change(a, :name, name) end)
         end

@@ -4,7 +4,7 @@ defmodule UserDocs.Web.Page do
 
   alias UserDocs.Projects.Project
   alias UserDocs.Web.Element
-  alias UserDocs.Web.Annotation
+  alias UserDocs.Annotations.Annotation
 
   @derive {Jason.Encoder, only: [:id, :order, :name, :url]}
   schema "pages" do

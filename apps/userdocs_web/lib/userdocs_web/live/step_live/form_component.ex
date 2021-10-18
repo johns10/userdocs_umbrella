@@ -9,6 +9,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   alias UserDocsWeb.PageLive
   alias UserDocsWeb.StepLive.FormComponent.Helpers
 
+  alias UserDocs.Annotations.Annotation
   alias UserDocs.Automation
   alias UserDocs.Automation.Step.BrowserEvents
   alias UserDocs.Automation.StepForm
@@ -185,7 +186,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   def maybe_update_annotation_params(%{} = params, _, nil), do: params
   def maybe_update_annotation_params(%{} = params, state, annotation_id) do
     annotation = UserDocs.Web.get_annotation!(annotation_id, state, state.state_opts)
-    annotation_params = replace_params_with_fields(params["annotation"], annotation, UserDocs.Web.Annotation)
+    annotation_params = replace_params_with_fields(params["annotation"], annotation, Annotation)
     Map.put(params, "annotation", annotation_params)
   end
 

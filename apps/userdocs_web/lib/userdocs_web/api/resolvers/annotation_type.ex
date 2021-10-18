@@ -1,7 +1,7 @@
 defmodule UserDocsWeb.API.Resolvers.AnnotationType do
 
   alias UserDocs.Web.AnnotationType
-  alias UserDocs.Web.Annotation
+  alias UserDocs.Annotations.Annotation
 
   def get_annotation_type!(%Annotation{ annotation_type: %AnnotationType{} = annotation_type }, _args, _resolution) do
     IO.puts("Get annotation_type call where the parent is annotation, and it has a preloaded annotation_type")

@@ -7,14 +7,13 @@ defmodule UserDocs.TestDataset do
   alias UserDocs.Users.Team
   alias UserDocs.Users.TeamUser
 
-  alias UserDocs.Projects
   alias UserDocs.Projects.Project
 
   alias UserDocs.Documents.LanguageCode
 
   alias UserDocs.Web.Page
   alias UserDocs.Web.AnnotationType
-  alias UserDocs.Web.Annotation
+  alias UserDocs.Annotations.Annotation
   alias UserDocs.Web.Element
   alias UserDocs.Web.Strategy
 
@@ -261,6 +260,10 @@ defmodule UserDocs.TestDataset do
       args: ["element_id", "element_form"],
       name: "Submit Form"
    },
+   hover = %{
+     args: ["element_id", "element_form"],
+     name: "Hover"
+  },
   ]
 
   {:ok, %StepType{id: navigate_id}} =

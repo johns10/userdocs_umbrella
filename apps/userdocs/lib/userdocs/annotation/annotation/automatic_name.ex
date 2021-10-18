@@ -1,10 +1,10 @@
-defmodule UserDocs.Web.Annotation.Name do
+defmodule UserDocs.Annotations.Annotation.Name do
 
   require Logger
 
   import UserDocs.Name
 
-  alias UserDocs.Web.Annotation
+  alias UserDocs.Annotations.Annotation
   alias UserDocs.Web.Element
 
   def execute(

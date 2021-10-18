@@ -1,4 +1,4 @@
-defmodule UserDocs.Web.Annotation do
+defmodule UserDocs.Annotations.Annotation do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -6,7 +6,8 @@ defmodule UserDocs.Web.Annotation do
 
   alias UserDocs.Web.AnnotationType
   alias UserDocs.Web.Page
-  alias UserDocs.Web.Annotation.Name
+  alias UserDocs.Annotations.Annotation
+  alias UserDocs.Annotations.Annotation.Name
   alias UserDocs.Web.Element
 
   @derive {Jason.Encoder, only: [:id, :name, :label, :x_orientation, :y_orientation,
@@ -56,13 +57,13 @@ defmodule UserDocs.Web.Annotation do
 
 
   def safe(annotation, handlers \\ %{})
-  def safe(annotation = %UserDocs.Web.Annotation{}, handlers) do
+  def safe(annotation = %Annotation{}, handlers) do
     base_safe(annotation)
     |> maybe_safe_annotation_type(handlers[:annotation_type], annotation.annotation_type, handlers)
   end
   def safe(nil, _), do: nil
 
-  def base_safe(annotation = %UserDocs.Web.Annotation{}) do
+  def base_safe(annotation = %Annotation{}) do
     %{
       id: annotation.id,
       label: annotation.label,
@@ -91,7 +92,7 @@ defmodule UserDocs.Web.Annotation do
     end
   end
 
-  def name(annotation = %UserDocs.Web.Annotation{}) do
+  def name(annotation = %Annotation{}) do
     Name.execute(annotation, Map.get(annotation, :element, %Element{}))
   end
 end

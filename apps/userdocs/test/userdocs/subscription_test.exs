@@ -5,6 +5,7 @@ defmodule UserDocs.SubscriptionTest do
 
     alias UserDocs.Subscription
     alias UserDocs.Automation
+    alias UserDocs.Annotations.Annotation
 
     def step_attrs(step_id, annotation_id) do
       %{
@@ -56,7 +57,7 @@ defmodule UserDocs.SubscriptionTest do
       result = Subscription.traverse_changes(updated_step, broadcast_actions)
       {first_action, first_object} = result |> Enum.at(0)
       assert first_action == :update
-      assert first_object.__struct__ == UserDocs.Web.Annotation
+      assert first_object.__struct__ == Annotation
     end
 
     test "broadcast_result" do

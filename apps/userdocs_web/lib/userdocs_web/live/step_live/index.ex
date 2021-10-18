@@ -8,6 +8,7 @@ defmodule UserDocsWeb.StepLive.Index do
 
   require Logger
 
+  alias UserDocs.Annotations.Annotation
   alias UserDocs.Automation
   alias UserDocs.Automation.Step
   alias UserDocs.Documents
@@ -345,7 +346,7 @@ defmodule UserDocsWeb.StepLive.Index do
       {:noreply, socket |> prepare_steps()}
     end
   end
-  def handle_info(%{topic: _, event: _, payload: %UserDocs.Web.Annotation{}} = sub_data, socket) do
+  def handle_info(%{topic: _, event: _, payload: %Annotation{}} = sub_data, socket) do
     Logger.debug("#{__MODULE__} Received an annotation broadcast")
     {:noreply, socket} = Root.handle_info(sub_data, socket)
     {:noreply, prepare_steps(socket)}
@@ -359,7 +360,7 @@ defmodule UserDocsWeb.StepLive.Index do
       UserDocs.Automation.StepType,
       UserDocs.Automation.Process,
       UserDocs.Automation.Step,
-      UserDocs.Web.Annotation,
+      UserDocs.Annotations.Annotation,
       UserDocs.Web.Element,
       UserDocs.Web.Page,
       UserDocs.Media.Screenshot,

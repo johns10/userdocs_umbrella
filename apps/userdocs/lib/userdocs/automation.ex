@@ -7,14 +7,6 @@ defmodule UserDocs.Automation do
 
   import Ecto.Query, warn: false
   alias UserDocs.Repo
-  alias UserDocs.Web.Page
-  alias UserDocs.Web.Annotation
-  alias UserDocs.Web.Element
-
-  alias UserDocs.Users.User
-
-  alias UserDocs.Projects
-
 
   @behaviour Bodyguard.Policy
   def authorize(:get_step!, %{team_users: team_users} = current_user, %{process: %{project: %{team: %{id: team_id}}}} = _step) do

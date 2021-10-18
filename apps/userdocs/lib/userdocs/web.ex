@@ -274,6 +274,14 @@ defmodule UserDocs.Web do
   end
   def list_elements(state, opts) when is_list(opts) do
     StateHandlers.list(state, Element, opts)
+    |> maybe_preload_element(opts[:preloads], state, opts)
+  end
+
+
+  defp maybe_preload_element(element, nil, _, _), do: element
+  defp maybe_preload_element(element, _preloads, state, opts) do
+    opts = Keyword.delete(opts, :filter)
+    StateHandlers.preload(state, element, opts)
   end
 
   defp maybe_preload_strategy(query, nil), do: query
@@ -389,7 +397,7 @@ defmodule UserDocs.Web do
     Element.changeset(element, attrs)
   end
 
-  alias UserDocs.Web.Annotation
+  alias UserDocs.Annotations.Annotation
 
   def load_annotations(state, opts) do
     StateHandlers.load(state, list_annotations(opts[:params], opts[:filters]), Annotation, opts)

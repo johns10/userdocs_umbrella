@@ -1,6 +1,6 @@
 defmodule UserDocsWeb.API.Resolvers.Annotation do
 
-  alias UserDocs.Web.Annotation
+  alias UserDocs.Annotations.Annotation
   alias UserDocs.Automation.Step
 
   def get_annotation!(%Step{ annotation: %Annotation{} = annotation }, _args, _resolution) do

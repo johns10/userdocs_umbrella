@@ -5,7 +5,7 @@ defmodule UserDocs.Automation.Step.Changeset do
 
   alias UserDocs.Documents
   alias UserDocs.Web
-  alias UserDocs.Web.Annotation
+  alias UserDocs.Annotations.Annotation
   alias UserDocs.Web.Element
   alias UserDocs.Web.Page
 
