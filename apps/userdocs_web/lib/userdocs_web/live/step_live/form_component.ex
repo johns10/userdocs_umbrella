@@ -14,6 +14,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   alias UserDocs.Automation
   alias UserDocs.Automation.Step.BrowserEvents
   alias UserDocs.Automation.StepForm
+  alias UserDocs.Elements
   alias UserDocs.Web
   alias UserDocs.Web.Page
   alias UserDocs.Elements.Element
@@ -180,7 +181,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   def maybe_update_element_params(%{} = params, _, nil), do: params
   def maybe_update_element_params(%{} = params, state, element_id) do
-    element = UserDocs.Web.get_element!(element_id, state, state.state_opts)
+    element = UserDocs.Elements.get_element!(element_id, state, state.state_opts)
     element_params = replace_params_with_fields(params["element"], element, Element)
     Map.put(params, "element", element_params)
   end
@@ -306,11 +307,11 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   def elements_select(%{state_opts: state_opts} = socket, page_id) do
     opts = Keyword.put(state_opts, :filter, {:page_id, page_id})
-    Web.list_elements(socket, opts)
+    Elements.list_elements(socket, opts)
     |> UserDocs.Helpers.select_list(:name, true)
   end
   def elements_select(%{state_opts: state_opts} = socket, nil) do
-    Web.list_elements(socket, state_opts)
+    Elements.list_elements(socket, state_opts)
     |> UserDocs.Helpers.select_list(:name, true)
   end
 

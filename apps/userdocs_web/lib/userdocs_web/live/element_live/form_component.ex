@@ -4,6 +4,7 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
   require Logger
 
   alias UserDocs.Web
+  alias UserDocs.Elements
   alias UserDocs.Elements.Element
 
   alias UserDocsWeb.Layout
@@ -11,7 +12,7 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
 
   @impl true
   def update(%{element: element} = assigns, socket) do
-    changeset = Web.change_element(element)
+    changeset = Elements.change_element(element)
 
     {
       :ok,
@@ -25,7 +26,7 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
   def handle_event("validate", %{"element" => element_params}, socket) do
     changeset =
       socket.assigns.element
-      |> Web.change_element(element_params)
+      |> Elements.change_element(element_params)
       |> Map.put(:action, :validate)
 
     { :noreply, assign(socket, :changeset, changeset) }
@@ -36,7 +37,7 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
   end
 
   defp save_element(socket, :edit, element_params) do
-    case Web.update_element(socket.assigns.element, element_params) do
+    case Elements.update_element(socket.assigns.element, element_params) do
       {:ok, _element} ->
         {
           :noreply,
@@ -51,7 +52,7 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
   end
 
   defp save_element(socket, :new, element_params) do
-    case Web.create_element(element_params) do
+    case Elements.create_element(element_params) do
       {:ok, _element} ->
         {
           :noreply,

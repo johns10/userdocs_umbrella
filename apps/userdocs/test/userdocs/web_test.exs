@@ -4,6 +4,7 @@ defmodule UserDocs.WebTest do
   alias UserDocs.Web
   alias UserDocs.Annotations
   alias UserDocs.AutomationFixtures
+  alias UserDocs.Elements
   alias UserDocs.UsersFixtures
   alias UserDocs.ProjectsFixtures
   alias UserDocs.WebFixtures
@@ -157,30 +158,30 @@ defmodule UserDocs.WebTest do
 
     test "list_elements/0 returns all elements", %{page: page, strategy: strategy} do
       element = WebFixtures.element(page.id, strategy.id)
-      assert Web.list_elements() == [element]
+      assert Elements.list_elements() == [element]
     end
 
     test "get_element!/1 returns the element with given id", %{page: page, strategy: strategy} do
       element = WebFixtures.element(page.id, strategy.id)
-      assert Web.get_element!(element.id) == element
+      assert Elements.get_element!(element.id) == element
     end
 
     test "create_element/1 with valid data creates a element", %{page: page, strategy: strategy} do
       attrs = WebFixtures.element_attrs(:valid, page.id, strategy.id)
-      assert {:ok, %Element{} = element} = Web.create_element(attrs)
+      assert {:ok, %Element{} = element} = Elements.create_element(attrs)
       assert element.name == attrs.name
       assert element.selector == attrs.selector
     end
 
     test "create_element/1 with invalid data returns error changeset", %{page: page, strategy: strategy} do
       attrs = WebFixtures.element_attrs(:invalid, page.id, strategy.id)
-      assert {:error, %Ecto.Changeset{}} = Web.create_element(attrs)
+      assert {:error, %Ecto.Changeset{}} = Elements.create_element(attrs)
     end
 
     test "update_element/2 with valid data updates the element", %{page: page, strategy: strategy} do
       element = WebFixtures.element(page.id, strategy.id)
       attrs = WebFixtures.element_attrs(:valid, page.id, strategy.id)
-      assert {:ok, %Element{} = element} = Web.update_element(element, attrs)
+      assert {:ok, %Element{} = element} = Elements.update_element(element, attrs)
       assert element.name == attrs.name
       assert element.selector == attrs.selector
     end
@@ -188,19 +189,19 @@ defmodule UserDocs.WebTest do
     test "update_element/2 with invalid data returns error changeset", %{page: page, strategy: strategy} do
       element = WebFixtures.element(page.id, strategy.id)
       attrs = WebFixtures.element_attrs(:invalid, page.id, strategy.id)
-      assert {:error, %Ecto.Changeset{}} = Web.update_element(element, attrs)
-      assert element == Web.get_element!(element.id)
+      assert {:error, %Ecto.Changeset{}} = Elements.update_element(element, attrs)
+      assert element == Elements.get_element!(element.id)
     end
 
     test "delete_element/1 deletes the element", %{page: page, strategy: strategy} do
       element = WebFixtures.element(page.id, strategy.id)
-      assert {:ok, %Element{}} = Web.delete_element(element)
-      assert_raise Ecto.NoResultsError, fn -> Web.get_element!(element.id) end
+      assert {:ok, %Element{}} = Elements.delete_element(element)
+      assert_raise Ecto.NoResultsError, fn -> Elements.get_element!(element.id) end
     end
 
     test "change_element/1 returns a element changeset", %{page: page, strategy: strategy} do
       element = WebFixtures.element(page.id, strategy.id)
-      assert %Ecto.Changeset{} = Web.change_element(element)
+      assert %Ecto.Changeset{} = Elements.change_element(element)
     end
   end
 

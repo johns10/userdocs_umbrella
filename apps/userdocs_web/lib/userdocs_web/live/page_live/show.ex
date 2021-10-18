@@ -6,6 +6,7 @@ defmodule UserDocsWeb.PageLive.Show do
   alias UserDocs.Helpers
   alias UserDocs.Projects
   alias UserDocs.Web
+  alias UserDocs.Elements
   alias UserDocs.Elements.Element
   alias UserDocsWeb.Root
   alias UserDocsWeb.ProcessLive.Loaders
@@ -70,7 +71,7 @@ defmodule UserDocsWeb.PageLive.Show do
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:page, Web.get_page!(String.to_integer(page_id), socket, opts))
-    |> assign(:element, Web.get_element!(String.to_integer(element_id), socket, opts))
+    |> assign(:element, Elements.get_element!(String.to_integer(element_id), socket, opts))
     |> prepare_elements(String.to_integer(page_id))
     |> assign_select_lists
   end
@@ -100,9 +101,9 @@ defmodule UserDocsWeb.PageLive.Show do
        |> Keyword.put(:order, [%{field: :name, order: :asc}])
        |> Keyword.put(:filter, {:page_id, page_id})
 
-    IO.inspect(Web.list_elements(socket, opts))
+    IO.inspect(Elements.list_elements(socket, opts))
 
-    assign(socket, :elements, Web.list_elements(socket, opts))
+    assign(socket, :elements, Elements.list_elements(socket, opts))
   end
 
   defp page_title(:show), do: "Show Page"

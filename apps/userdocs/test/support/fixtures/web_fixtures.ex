@@ -9,12 +9,10 @@ defmodule UserDocs.WebFixtures do
   alias UserDocs.Annotations
   alias UserDocs.Annotations.AnnotationType
   alias UserDocs.Annotations.Annotation
+  alias UserDocs.Elements.Element
+  alias UserDocs.Elements
   alias UserDocs.Web
   alias UserDocs.Web.Page
-  alias UserDocs.Web.Strategy
-  alias UserDocs.Annotations.AnnotationType
-  alias UserDocs.Annotations.Annotation
-  alias UserDocs.Elements.Element
   alias UserDocs.Web.Strategy
 
 
@@ -28,7 +26,7 @@ defmodule UserDocs.WebFixtures do
   def element(page_id, strategy_id) when is_integer(page_id) and is_integer(strategy_id) do
     {:ok, object } =
       element_attrs(:valid, page_id, strategy_id)
-      |> Web.create_element()
+      |> Elements.create_element()
     object
   end
 

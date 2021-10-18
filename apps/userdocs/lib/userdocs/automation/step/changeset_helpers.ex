@@ -6,6 +6,7 @@ defmodule UserDocs.Automation.Step.Changeset do
   alias UserDocs.Documents
   alias UserDocs.Web
   alias UserDocs.Annotations.Annotation
+  alias UserDocs.Elements
   alias UserDocs.Elements.Element
   alias UserDocs.Web.Page
 
@@ -72,7 +73,7 @@ defmodule UserDocs.Automation.Step.Changeset do
 
   def handle_element_id_change(%{changes: %{element_id: element_id}} = changeset, state) do
     Logger.debug("Element id changed to #{element_id}")
-    element = Web.get_element!(element_id, state, state.assigns.state_opts)
+    element = Elements.get_element!(element_id, state, state.assigns.state_opts)
     Map.put(changeset.data, :element, element)
     |> cast(changeset.params, [])
   end
@@ -91,7 +92,7 @@ defmodule UserDocs.Automation.Step.Changeset do
   end
   def maybe_replace_element_params(changeset, %{changes: %{element_id: element_id}}, state) do
     Logger.debug("Replacing Element params")
-    element = Web.get_element!(element_id, state, state.assigns.state_opts)
+    element = Elements.get_element!(element_id, state, state.assigns.state_opts)
     element_params = replace_params_with_fields(changeset.params["element"], element, Element)
     params =
       changeset.params

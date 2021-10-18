@@ -318,7 +318,7 @@ defmodule UserDocs.Automation do
 
     element = case step do
       %Step{element_id: nil} -> nil
-      %Step{element_id: element_id} -> UserDocs.Web.get_element!(element_id)
+      %Step{element_id: element_id} -> UserDocs.Elements.get_element!(element_id)
     end
 
     annotation = case step do

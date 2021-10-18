@@ -205,7 +205,7 @@ defmodule UserDocs.StepChange do
           |> Map.put(:strategy_id, fx.strategy.id)
       }
       {:ok, final_step} = Automation.update_step_with_nested_data(new_step, attrs, fx.state)
-      updated_element = Web.get_element!(final_step.element.id)
+      updated_element = Elements.get_element!(final_step.element.id)
       assert updated_element.name == attrs.element.name
       assert final_step.element.name == attrs.element.name
     end

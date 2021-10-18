@@ -3,6 +3,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
   alias UserDocs.Documents
   alias UserDocs.Annotations
   alias UserDocs.Automation
+  alias UserDocs.Elements
   alias UserDocs.Web
   alias UserDocs.Screenshots
   alias UserDocs.StepInstances
@@ -40,7 +41,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
       |> Keyword.put(:filters, %{project_id: socket.assigns.current_project.id})
       |> Keyword.put(:params, %{})
 
-    Web.load_elements(socket, opts)
+    Elements.load_elements(socket, opts)
   end
 
   def pages(socket, opts) do
