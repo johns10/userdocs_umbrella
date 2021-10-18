@@ -1,6 +1,6 @@
 defmodule UserDocsWeb.API.Resolvers.Element do
 
-  alias UserDocs.Web.Element
+  alias UserDocs.Elements.Element
   alias UserDocs.Automation.Step
 
   def get_element!(%Step{ element: %Element{} = element }, _args, _resolution) do

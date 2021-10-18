@@ -1,4 +1,4 @@
-defmodule UserDocs.Web.Element do
+defmodule UserDocs.Elements.Element do
   use Ecto.Schema
   import Ecto.Changeset
   alias UserDocs.Web.Page
@@ -42,7 +42,7 @@ defmodule UserDocs.Web.Element do
   end
 
   def safe(element, handlers \\ %{})
-  def safe(element = %UserDocs.Web.Element{}, handlers) do
+  def safe(element = %UserDocs.Elements.Element{}, handlers) do
     base_safe(element)
     |> maybe_safe_strategy(handlers[:strategy], element.strategy, handlers)
     |> maybe_safe_page(handlers[:page], element.page, handlers)

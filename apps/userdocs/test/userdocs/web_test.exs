@@ -143,7 +143,7 @@ defmodule UserDocs.WebTest do
   end
 
   describe "elements" do
-    alias UserDocs.Web.Element
+    alias UserDocs.Elements.Element
 
     setup [
       :create_user,

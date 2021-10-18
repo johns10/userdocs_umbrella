@@ -5,7 +5,7 @@ defmodule UserDocs.Annotations.Annotation.Name do
   import UserDocs.Name
 
   alias UserDocs.Annotations.Annotation
-  alias UserDocs.Web.Element
+  alias UserDocs.Elements.Element
 
   def execute(
     %Annotation{ annotation_type: %{ name: annotation_type_name } } = annotation,

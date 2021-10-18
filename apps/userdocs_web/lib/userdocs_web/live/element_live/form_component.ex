@@ -4,6 +4,7 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
   require Logger
 
   alias UserDocs.Web
+  alias UserDocs.Elements.Element
 
   alias UserDocsWeb.Layout
   alias UserDocsWeb.ID
@@ -64,7 +65,7 @@ defmodule UserDocsWeb.ElementLive.FormComponent do
     end
   end
 
-  def field_ids(element = %Web.Element{}) do
+  def field_ids(element = %Element{}) do
     %{}
     |> Map.put(:page_id, ID.form_field(element, :page_id))
     |> Map.put(:order, ID.form_field(element, :order))

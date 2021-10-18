@@ -8,7 +8,7 @@ defmodule UserDocs.Annotations.Annotation do
   alias UserDocs.Web.Page
   alias UserDocs.Annotations.Annotation
   alias UserDocs.Annotations.Annotation.Name
-  alias UserDocs.Web.Element
+  alias UserDocs.Elements.Element
 
   @derive {Jason.Encoder, only: [:id, :name, :label, :x_orientation, :y_orientation,
     :size, :color, :thickness, :x_offset, :y_offset, :font_size, :font_color]}

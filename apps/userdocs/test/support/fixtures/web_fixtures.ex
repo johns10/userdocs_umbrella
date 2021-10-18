@@ -14,7 +14,7 @@ defmodule UserDocs.WebFixtures do
   alias UserDocs.Web.Strategy
   alias UserDocs.Annotations.AnnotationType
   alias UserDocs.Annotations.Annotation
-  alias UserDocs.Web.Element
+  alias UserDocs.Elements.Element
   alias UserDocs.Web.Strategy
 
 

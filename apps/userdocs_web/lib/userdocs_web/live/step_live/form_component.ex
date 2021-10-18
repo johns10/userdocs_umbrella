@@ -16,6 +16,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   alias UserDocs.Automation.StepForm
   alias UserDocs.Web
   alias UserDocs.Web.Page
+  alias UserDocs.Elements.Element
 
   def update(%{id: id, step_params: step_params} = assigns,
   %{assigns: %{current_project: current_project, last_step_form: last_step_form, data: %{elements: elements}}} = socket)
@@ -180,7 +181,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   def maybe_update_element_params(%{} = params, _, nil), do: params
   def maybe_update_element_params(%{} = params, state, element_id) do
     element = UserDocs.Web.get_element!(element_id, state, state.state_opts)
-    element_params = replace_params_with_fields(params["element"], element, UserDocs.Web.Element)
+    element_params = replace_params_with_fields(params["element"], element, Element)
     Map.put(params, "element", element_params)
   end
 

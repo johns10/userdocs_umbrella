@@ -6,7 +6,7 @@ defmodule UserDocs.Automation.Step.Changeset do
   alias UserDocs.Documents
   alias UserDocs.Web
   alias UserDocs.Annotations.Annotation
-  alias UserDocs.Web.Element
+  alias UserDocs.Elements.Element
   alias UserDocs.Web.Page
 
   def handle_page_id_change(%{changes: %{page_id: page_id}} = changeset, state) do

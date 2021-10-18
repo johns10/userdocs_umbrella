@@ -9,7 +9,7 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
   alias UserDocs.Automation.StepForm
   alias UserDocs.Projects.Project
   alias UserDocs.Web
-  alias UserDocs.Web.Element
+  alias UserDocs.Elements.Element
   alias UserDocs.Web.Page
 
 

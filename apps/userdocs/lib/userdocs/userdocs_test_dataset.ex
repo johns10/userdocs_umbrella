@@ -14,7 +14,7 @@ defmodule UserDocs.TestDataset do
 
   alias UserDocs.Web.Page
   alias UserDocs.Annotations.Annotation
-  alias UserDocs.Web.Element
+  alias UserDocs.Elements.Element
   alias UserDocs.Web.Strategy
 
   alias UserDocs.Automation.Step

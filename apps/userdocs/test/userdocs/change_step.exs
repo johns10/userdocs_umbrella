@@ -4,7 +4,7 @@ defmodule UserDocs.StepChange do
   alias UserDocs.Automation
   alias UserDocs.Automation.Step
   alias UserDocs.Web
-  alias UserDocs.Web.Element
+  alias UserDocs.Elements.Element
 
   alias UserDocs.AutomationFixtures
   alias UserDocs.WebFixtures

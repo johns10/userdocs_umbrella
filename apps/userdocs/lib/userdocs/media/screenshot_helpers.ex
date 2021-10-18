@@ -6,7 +6,7 @@ defmodule UserDocs.Media.ScreenshotHelpers do
   alias UserDocs.Media
   alias UserDocs.Media.Screenshot
   alias UserDocs.Media.FileHelpers
-  alias UserDocs.Web.Element
+  alias UserDocs.Elements.Element
 
   @path "apps/userdocs_web/priv/static/images/"
 

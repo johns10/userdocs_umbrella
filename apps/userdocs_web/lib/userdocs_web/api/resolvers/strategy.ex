@@ -1,7 +1,7 @@
 defmodule UserDocsWeb.API.Resolvers.Strategy do
 
   alias UserDocs.Web.Strategy
-  alias UserDocs.Web.Element
+  alias UserDocs.Elements.Element
 
   def get_strategy!(%Element{ strategy: %Strategy{} = strategy }, _args, _resolution) do
     IO.puts("Get strategy call where the parent is element, and it has a preloaded strategy")

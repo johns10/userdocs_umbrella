@@ -3,7 +3,7 @@ defmodule UserDocs.Web.Page do
   import Ecto.Changeset
 
   alias UserDocs.Projects.Project
-  alias UserDocs.Web.Element
+  alias UserDocs.Elements.Element
   alias UserDocs.Annotations.Annotation
 
   @derive {Jason.Encoder, only: [:id, :order, :name, :url]}

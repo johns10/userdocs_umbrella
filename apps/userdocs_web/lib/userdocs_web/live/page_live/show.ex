@@ -5,7 +5,7 @@ defmodule UserDocsWeb.PageLive.Show do
   alias UserDocs.Helpers
   alias UserDocs.Projects
   alias UserDocs.Web
-  alias UserDocs.Web.Element
+  alias UserDocs.Elements.Element
   alias UserDocsWeb.Root
   alias UserDocsWeb.ProcessLive.Loaders
 
@@ -14,7 +14,7 @@ defmodule UserDocsWeb.PageLive.Show do
       UserDocs.Annotations.AnnotationType,
       UserDocs.Web.Strategy,
       UserDocs.Annotations.Annotation,
-      UserDocs.Web.Element,
+      UserDocs.Elements.Element,
       UserDocs.Web.Page,
       UserDocs.Projects.Project
    ]

@@ -17,6 +17,7 @@ defmodule UserDocsWeb.StepLive.Index do
   alias UserDocs.Media.Screenshot
   alias UserDocs.Projects
   alias UserDocs.Web
+  alias UserDocs.Elements.Element
 
   alias UserDocs.Automation.Step.BrowserEvents
   alias UserDocsWeb.ComposableBreadCrumb
@@ -270,7 +271,7 @@ defmodule UserDocsWeb.StepLive.Index do
     step_form =
       %UserDocs.Automation.StepForm{}
       |> Map.put(:screenshot, %UserDocs.Media.Screenshot{})
-      |> Map.put(:element, %UserDocs.Web.Element{})
+      |> Map.put(:element, %Element{})
       |> Map.put(:annotation, %AnnotationForm{})
       |> Map.put(:page, nil)
 
@@ -301,7 +302,7 @@ defmodule UserDocsWeb.StepLive.Index do
       %UserDocs.Automation.StepForm{}
       |> Map.put(:page_id, page_id)
       |> Map.put(:page, page)
-      |> Map.put(:element, %UserDocs.Web.Element{page_id: page_id})
+      |> Map.put(:element, %Element{page_id: page_id})
       |> Map.put(:annotation, %AnnotationForm{page_id: page_id, label: label})
       |> Map.put(:order, order)
 
@@ -362,7 +363,7 @@ defmodule UserDocsWeb.StepLive.Index do
       UserDocs.Automation.Process,
       UserDocs.Automation.Step,
       UserDocs.Annotations.Annotation,
-      UserDocs.Web.Element,
+      UserDocs.Elements.Element,
       UserDocs.Web.Page,
       UserDocs.Media.Screenshot,
       UserDocs.StepInstances.StepInstance,
