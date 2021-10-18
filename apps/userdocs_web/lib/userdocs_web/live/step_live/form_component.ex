@@ -9,6 +9,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   alias UserDocsWeb.PageLive
   alias UserDocsWeb.StepLive.FormComponent.Helpers
 
+  alias UserDocs.Annotations
   alias UserDocs.Annotations.Annotation
   alias UserDocs.Automation
   alias UserDocs.Automation.Step.BrowserEvents
@@ -185,7 +186,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   def maybe_update_annotation_params(%{} = params, _, nil), do: params
   def maybe_update_annotation_params(%{} = params, state, annotation_id) do
-    annotation = UserDocs.Web.get_annotation!(annotation_id, state, state.state_opts)
+    annotation = UserDocs.Annotations.get_annotation!(annotation_id, state, state.state_opts)
     annotation_params = replace_params_with_fields(params["annotation"], annotation, Annotation)
     Map.put(params, "annotation", annotation_params)
   end
@@ -314,11 +315,11 @@ defmodule UserDocsWeb.StepLive.FormComponent do
 
   def annotations_select(%{state_opts: state_opts} = socket, page_id) do
     opts = Keyword.put(state_opts, :filter, {:page_id, page_id})
-    Web.list_annotations(socket, opts)
+    Annotations.list_annotations(socket, opts)
     |> UserDocs.Helpers.select_list(:name, true)
   end
   def elements_select(%{state_opts: state_opts} = socket, nil) do
-    Web.list_annotations(socket, state_opts)
+    Annotations.list_annotations(socket, state_opts)
     |> UserDocs.Helpers.select_list(:name, true)
   end
 

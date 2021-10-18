@@ -323,7 +323,7 @@ defmodule UserDocs.Automation do
 
     annotation = case step do
       %Step{annotation_id: nil} -> nil
-      %Step{annotation_id: annotation_id} -> UserDocs.Web.get_annotation!(annotation_id)
+      %Step{annotation_id: annotation_id} -> UserDocs.Annotations.get_annotation!(annotation_id)
     end
 
     {

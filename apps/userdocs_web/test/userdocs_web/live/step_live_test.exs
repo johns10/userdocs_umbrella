@@ -3,6 +3,7 @@ defmodule UserDocsWeb.StepLiveTest do
 
   import Phoenix.LiveViewTest
 
+  alias UserDocs.Annotations
   alias UserDocs.Web
   alias UserDocs.AutomationFixtures
   alias UserDocs.UsersFixtures
@@ -51,8 +52,8 @@ defmodule UserDocsWeb.StepLiveTest do
   defp first_element(), do: Web.list_elements() |> Enum.at(0)
   defp second_element(), do: Web.list_elements() |> Enum.at(1)
 
-  defp first_annotation(), do: Web.list_annotations() |> Enum.at(0)
-  defp second_annotation(), do: Web.list_annotations() |> Enum.at(1)
+  defp first_annotation(), do: Annotations.list_annotations() |> Enum.at(0)
+  defp second_annotation(), do: Annotations.list_annotations() |> Enum.at(1)
 
   defp make_selections(%{user: user, team: team, project: project}) do
     {:ok, user} = UserDocs.Users.update_user_selections(user, %{

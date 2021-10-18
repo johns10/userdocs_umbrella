@@ -2,6 +2,7 @@ defmodule UserDocs.WebTest do
   use UserDocs.DataCase
 
   alias UserDocs.Web
+  alias UserDocs.Annotations
   alias UserDocs.AutomationFixtures
   alias UserDocs.UsersFixtures
   alias UserDocs.ProjectsFixtures
@@ -229,37 +230,37 @@ defmodule UserDocs.WebTest do
         attrs
         |> Enum.into(@valid_attrs)
         |> Map.put(:page_id, Integer.to_string(page.id))
-        |> Web.create_annotation()
+        |> Annotations.create_annotation()
 
       annotation
     end
 
     test "list_annotations/0 returns all annotations" do
       annotation = annotation_fixture()
-      assert Web.list_annotations() == [annotation]
+      assert Annotations.list_annotations() == [annotation]
     end
 
     test "get_annotation!/1 returns the annotation with given id" do
       annotation = annotation_fixture()
-      assert Web.get_annotation!(annotation.id) == annotation
+      assert Annotations.get_annotation!(annotation.id) == annotation
     end
 
     test "create_annotation/1 with valid data creates a annotation" do
       {:ok, %Page{} = page} = Web.create_page(@page_attrs)
       attrs = Map.put(@valid_attrs, :page_id, page.id)
-      assert {:ok, %Annotation{} = annotation} = Web.create_annotation(attrs)
+      assert {:ok, %Annotation{} = annotation} = Annotations.create_annotation(attrs)
       assert annotation.label == "some label"
       assert annotation.name == "some name"
     end
 
     test "create_annotation/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Web.create_annotation(@invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Annotations.create_annotation(@invalid_attrs)
     end
 
     test "update_annotation/2 with valid data updates the annotation" do
       annotation = annotation_fixture()
       assert {:ok, %Annotation{} = annotation} =
-        Web.update_annotation(annotation, @update_attrs)
+        Annotations.update_annotation(annotation, @update_attrs)
 
       assert annotation.label == @update_attrs.label
       assert annotation.name == @update_attrs.name
@@ -267,19 +268,19 @@ defmodule UserDocs.WebTest do
 
     test "update_annotation/2 with invalid data returns error changeset" do
       annotation = annotation_fixture()
-      assert {:error, %Ecto.Changeset{}} = Web.update_annotation(annotation, @invalid_attrs)
-      assert annotation == Web.get_annotation!(annotation.id)
+      assert {:error, %Ecto.Changeset{}} = Annotations.update_annotation(annotation, @invalid_attrs)
+      assert annotation == Annotations.get_annotation!(annotation.id)
     end
 
     test "delete_annotation/1 deletes the annotation" do
       annotation = annotation_fixture()
-      assert {:ok, %Annotation{}} = Web.delete_annotation(annotation)
-      assert_raise Ecto.NoResultsError, fn -> Web.get_annotation!(annotation.id) end
+      assert {:ok, %Annotation{}} = Annotations.delete_annotation(annotation)
+      assert_raise Ecto.NoResultsError, fn -> Annotations.get_annotation!(annotation.id) end
     end
 
     test "change_annotation/1 returns a annotation changeset" do
       annotation = annotation_fixture()
-      assert %Ecto.Changeset{} = Web.change_annotation(annotation)
+      assert %Ecto.Changeset{} = Annotations.change_annotation(annotation)
     end
   end
 end

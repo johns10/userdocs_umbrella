@@ -41,7 +41,7 @@ defmodule UserDocs.Automation.Step.Changeset do
   def handle_annotation_id_change(%{changes: %{annotation_id: annotation_id}} = changeset, state) do
     Logger.debug("Annotation id changed to #{annotation_id}")
     opts = Keyword.put(state.assigns.state_opts, :preloads, [:annotation_type ])
-    annotation = Web.get_annotation!(annotation_id, state, opts)
+    annotation = Annotations.get_annotation!(annotation_id, state, opts)
 
     Map.put(changeset.data, :annotation, annotation)
     |> cast(changeset.params, [])
@@ -59,7 +59,7 @@ defmodule UserDocs.Automation.Step.Changeset do
   def maybe_replace_annotation_params(changeset, %{changes: %{annotation_id: annotation_id}}, state) do
     Logger.debug("Replacing Annotation #{annotation_id} Params")
     opts = Keyword.put(state.assigns.state_opts, :preloads, [:annotation_type ])
-    annotation = Web.get_annotation!(annotation_id, state, opts)
+    annotation = Annotations.get_annotation!(annotation_id, state, opts)
     annotation_params = replace_params_with_fields(changeset.params["annotation"], annotation, Annotation)
     params =
       changeset.params

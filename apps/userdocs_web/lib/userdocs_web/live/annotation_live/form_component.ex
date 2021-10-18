@@ -5,6 +5,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
 
   alias UserDocsWeb.Layout
 
+  alias UserDocs.Annotations
   alias UserDocs.Web
 
   @impl true
@@ -108,7 +109,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
 
   @impl true
   def update(%{annotation: annotation} = assigns, socket) do
-    changeset = Web.change_annotation(annotation)
+    changeset = Annotations.change_annotation(annotation)
 
     {
       :ok,
@@ -122,7 +123,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
   def handle_event("validate", %{"annotation" => annotation_params}, socket) do
     changeset =
       socket.assigns.annotation
-      |> Web.change_annotation(annotation_params)
+      |> Annotations.change_annotation(annotation_params)
       |> Map.put(:action, :validate)
 
     {:noreply, assign(socket, :changeset, changeset)}
@@ -133,7 +134,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
   end
 
   defp save_annotation(socket, :edit, annotation_params) do
-    case Web.update_annotation(socket.assigns.annotation, annotation_params) do
+    case Annotations.update_annotation(socket.assigns.annotation, annotation_params) do
       {:ok, _annotation} ->
         {:noreply,
          socket
@@ -147,7 +148,7 @@ defmodule UserDocsWeb.AnnotationLive.FormComponent do
   end
 
   defp save_annotation(socket, :new, annotation_params) do
-    case Web.create_annotation(annotation_params) do
+    case Annotations.create_annotation(annotation_params) do
       {:ok, _annotation} ->
         {:noreply,
          socket

@@ -6,6 +6,9 @@ defmodule UserDocs.WebFixtures do
 
   alias UserDocs.Projects
 
+  alias UserDocs.Annotations
+  alias UserDocs.Annotations.AnnotationType
+  alias UserDocs.Annotations.Annotation
   alias UserDocs.Web
   alias UserDocs.Web.Page
   alias UserDocs.Web.Strategy
@@ -44,7 +47,7 @@ defmodule UserDocs.WebFixtures do
     {:ok, annotation } =
       annotation_attrs(:valid)
       |> Map.put(:page_id, page_id)
-      |> Web.create_annotation()
+      |> Annotations.create_annotation()
     annotation
   end
 

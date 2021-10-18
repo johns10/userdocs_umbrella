@@ -1,6 +1,7 @@
 defmodule UserDocsWeb.ProcessLive.Loaders do
 
   alias UserDocs.Documents
+  alias UserDocs.Annotations
   alias UserDocs.Automation
   alias UserDocs.Web
   alias UserDocs.Screenshots
@@ -30,7 +31,7 @@ defmodule UserDocsWeb.ProcessLive.Loaders do
       |> Keyword.put(:filters, %{project_id: socket.assigns.current_project.id})
       |> Keyword.put(:params, %{})
 
-    Web.load_annotations(socket, opts)
+    Annotations.load_annotations(socket, opts)
   end
 
   def elements(socket, opts) do
