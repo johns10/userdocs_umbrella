@@ -1,9 +1,8 @@
 defmodule UserDocsWeb.API.Resolvers.Element do
 
-  alias UserDocs.Elements.Element
   alias UserDocs.Automation.Step
 
-  def get_element!(%Step{ element: %Element{} = element }, _args, _resolution) do
+  def get_element!(%Step{ element: %UserDocs.Elements.Element{} = element }, _args, _resolution) do
     IO.puts("Get element call where the parent is step, and it has a preloaded page")
     { :ok, element }
   end
