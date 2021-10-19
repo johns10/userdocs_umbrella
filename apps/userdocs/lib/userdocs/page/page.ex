@@ -1,4 +1,4 @@
-defmodule UserDocs.Web.Page do
+defmodule UserDocs.Pages.Page do
   use Ecto.Schema
   import Ecto.Changeset
 

@@ -5,6 +5,7 @@ defmodule UserDocs.Annotations do
   import Ecto.Query, warn: false
   alias UserDocs.Repo
 
+  alias UserDocs.Pages.Page
   alias UserDocs.Annotations.Annotation
 
   def load_annotations(state, opts) do
@@ -38,7 +39,7 @@ defmodule UserDocs.Annotations do
   defp maybe_filter_annotation_by_team_id(query, nil), do: query
   defp maybe_filter_annotation_by_team_id(query, team_id) do
     from(annotation in query,
-      left_join: page in UserDocs.Web.Page, on: page.id == annotation.page_id,
+      left_join: page in Page, on: page.id == annotation.page_id,
       left_join: project in UserDocs.Projects.Project, on: page.project_id == project.id,
       left_join: team in UserDocs.Users.Team, on: project.team_id == team.id,
       where: team.id == ^team_id)
@@ -47,7 +48,7 @@ defmodule UserDocs.Annotations do
   defp maybe_filter_annotation_by_project(query, nil), do: query
   defp maybe_filter_annotation_by_project(query, project_id) do
     from(annotation in query,
-      left_join: page in UserDocs.Web.Page, on: page.id == annotation.page_id,
+      left_join: page in Page, on: page.id == annotation.page_id,
       where: page.project_id == ^project_id)
   end
 

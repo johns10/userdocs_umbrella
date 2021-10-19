@@ -8,7 +8,7 @@ defmodule UserDocs.Repo.Migrations.AlterPage do
     end
     flush()
     pages =
-      Ecto.Query.from(pages in UserDocs.Web.Page)
+      Ecto.Query.from(pages in UserDocs.Pages.Page)
       |> Ecto.Query.preload(:version)
       |> UserDocs.Repo.all()
       |> Enum.map(fn(page) ->

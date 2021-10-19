@@ -87,9 +87,9 @@ defmodule UserDocsWeb.DomainHelpers do
       |> Enum.at(0)
 
     case page do
-      %UserDocs.Web.Page{} -> page
-      None -> %UserDocs.Web.Page{}
-      nil -> %UserDocs.Web.Page{}
+      %Page{} -> page
+      None -> %Page{}
+      nil -> %Page{}
     end
   end
 

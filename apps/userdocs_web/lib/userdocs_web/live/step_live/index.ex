@@ -365,7 +365,7 @@ defmodule UserDocsWeb.StepLive.Index do
       UserDocs.Automation.Step,
       UserDocs.Annotations.Annotation,
       UserDocs.Elements.Element,
-      UserDocs.Web.Page,
+      UserDocs.Pages.Page,
       UserDocs.Media.Screenshot,
       UserDocs.StepInstances.StepInstance,
       UserDocs.Projects.Project

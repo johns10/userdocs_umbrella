@@ -11,7 +11,7 @@ defmodule UserDocs.Automation.Step.BrowserEvents do
   alias UserDocs.Projects.Project
   alias UserDocs.Web
   alias UserDocs.Elements.Element
-  alias UserDocs.Web.Page
+  alias UserDocs.Pages.Page
 
 
   alias UserDocsWeb.StepLive.FormComponent.Helpers

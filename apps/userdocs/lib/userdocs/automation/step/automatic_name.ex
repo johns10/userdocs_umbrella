@@ -8,7 +8,7 @@ defmodule UserDocs.Automation.Step.Name do
   alias UserDocs.Automation.StepType
   alias UserDocs.Annotations.Annotation
   alias UserDocs.Elements.Element
-  alias UserDocs.Web.Page
+  alias UserDocs.Pages.Page
 
   def execute(%Ecto.Changeset{} = step_changeset) do
     step_type =

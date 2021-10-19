@@ -2,6 +2,7 @@ defmodule UserDocsWeb.PageLive.FormComponent do
   use UserDocsWeb, :live_component
 
   alias UserDocs.Web
+  alias UserDocs.Pages.Page
   alias UserDocs.Projects.Project
 
   alias UserDocsWeb.LiveHelpers
@@ -116,7 +117,7 @@ defmodule UserDocsWeb.PageLive.FormComponent do
     end
   end
 
-  def field_ids(page = %Web.Page{}) do
+  def field_ids(page = %Page{}) do
     %{}
     |> Map.put(:order, ID.form_field(page, :order))
     |> Map.put(:name, ID.form_field(page, :name))

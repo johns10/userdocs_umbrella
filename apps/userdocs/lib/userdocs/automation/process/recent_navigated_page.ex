@@ -2,7 +2,7 @@ defmodule UserDocs.Automation.Process.RecentPage do
 
   require Logger
 
-  alias UserDocs.Web.Page
+  alias UserDocs.Pages.Page
   alias UserDocs.Automation.Step
   alias UserDocs.Automation.Process
 
@@ -32,7 +32,7 @@ defmodule UserDocs.Automation.Process.RecentPage do
       case recent_navigation_step(current_step, steps) do
         None ->
           Logger.debug("Failed to fetch most recent navigation step")
-          %UserDocs.Web.Page{}
+          %Page{}
 
         %UserDocs.Automation.Step{} = step ->
           # Logger.debug("Fetched most recent navigation step, page_id: #{step.page_id}")
@@ -42,7 +42,7 @@ defmodule UserDocs.Automation.Process.RecentPage do
             |> Enum.at(0)
       end
   end
-  def get([], _, _), do: %UserDocs.Web.Page{}
+  def get([], _, _), do: %Page{}
 
   # Takes a list of steps, returns the most recent step of type "Navigate"
   defp recent_navigation_step(step, steps) do

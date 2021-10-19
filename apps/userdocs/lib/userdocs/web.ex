@@ -7,7 +7,7 @@ defmodule UserDocs.Web do
 
   alias UserDocs.Repo
   alias UserDocs.Subscription
-  alias UserDocs.Web.Page
+  alias UserDocs.Pages.Page
 
   def load_pages(state, opts) do
     StateHandlers.load(state, list_pages(%{}, opts[:filters]), Page, opts)

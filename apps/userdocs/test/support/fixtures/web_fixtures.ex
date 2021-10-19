@@ -12,7 +12,7 @@ defmodule UserDocs.WebFixtures do
   alias UserDocs.Elements.Element
   alias UserDocs.Elements
   alias UserDocs.Web
-  alias UserDocs.Web.Page
+  alias UserDocs.Pages.Page
   alias UserDocs.Web.Strategy
 
 

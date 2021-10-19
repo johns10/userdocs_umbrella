@@ -5,8 +5,7 @@ defmodule UserDocs.Annotations.Annotation do
   require Logger
 
   alias UserDocs.Annotations.AnnotationType
-  alias UserDocs.Web.Page
-  alias UserDocs.Annotations.Annotation
+  alias UserDocs.Pages.Page
   alias UserDocs.Annotations.Annotation.Name
   alias UserDocs.Elements.Element
 

@@ -1,7 +1,7 @@
 defmodule UserDocs.Elements.Element do
   use Ecto.Schema
   import Ecto.Changeset
-  alias UserDocs.Web.Page
+  alias UserDocs.Pages.Page
   alias UserDocs.Web.Strategy
 
   @derive {Jason.Encoder, only: [:id, :name, :selector]}

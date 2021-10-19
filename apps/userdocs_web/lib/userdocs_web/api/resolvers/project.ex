@@ -1,7 +1,7 @@
 defmodule UserDocsWeb.API.Resolvers.Project do
   @moduledoc false
   alias UserDocs.Projects.Project
-  alias UserDocs.Web.Page
+  alias UserDocs.Pages.Page
   alias UserDocs.Automation.Process
 
   def get_project!(%Page{project: %Project{} = project}, _args, _resolution) do

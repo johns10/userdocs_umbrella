@@ -26,7 +26,7 @@ defmodule UserDocs.WebTest do
   defp create_strategy(_), do: %{strategy: fixture(:strategy)}
 
   describe "pages" do
-    alias UserDocs.Web.Page
+    alias UserDocs.Pages.Page
 
     @valid_attrs %{url: "some url"}
     @update_attrs %{url: "some updated url"}
@@ -207,7 +207,7 @@ defmodule UserDocs.WebTest do
 
   describe "annotations" do
     alias UserDocs.Annotations.Annotation
-    alias UserDocs.Web.Page
+    alias UserDocs.Pages.Page
 
     @valid_attrs %{
       label: "some label",

@@ -5,7 +5,7 @@ defmodule UserDocs.Automation.Step do
   require Logger
 
   alias UserDocs.Elements.Element
-  alias UserDocs.Web.Page
+  alias UserDocs.Pages.Page
   alias UserDocs.Automation.StepType
   alias UserDocs.Annotations.Annotation
   alias UserDocs.Automation.Process

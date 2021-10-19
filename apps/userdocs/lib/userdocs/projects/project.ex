@@ -4,7 +4,7 @@ defmodule UserDocs.Projects.Project do
   import Ecto.Changeset
 
   alias UserDocs.Web.Strategy
-  alias UserDocs.Web.Page
+  alias UserDocs.Pages.Page
   alias UserDocs.Automation.Process
 
   alias UserDocs.Users.Team

@@ -17,7 +17,7 @@ defmodule UserDocsWeb.PageLive.Show do
       UserDocs.Web.Strategy,
       UserDocs.Annotations.Annotation,
       UserDocs.Elements.Element,
-      UserDocs.Web.Page,
+      UserDocs.Pages.Page,
       UserDocs.Projects.Project
    ]
   end

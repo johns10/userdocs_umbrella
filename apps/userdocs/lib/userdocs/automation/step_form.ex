@@ -8,7 +8,7 @@ defmodule UserDocs.Automation.StepForm do
   alias UserDocs.Projects.Project
   alias UserDocs.Annotations.AnnotationForm
   alias UserDocs.Elements.Element
-  alias UserDocs.Web.Page
+  alias UserDocs.Pages.Page
 
   schema "step_form" do
     field :order, :integer

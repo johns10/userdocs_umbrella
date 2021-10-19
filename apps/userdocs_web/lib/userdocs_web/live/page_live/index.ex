@@ -5,13 +5,13 @@ defmodule UserDocsWeb.PageLive.Index do
   alias UserDocs.Helpers
   alias UserDocs.Projects
   alias UserDocs.Web
-  alias UserDocs.Web.Page
+  alias UserDocs.Pages.Page
   alias UserDocsWeb.Root
   alias UserDocsWeb.ProcessLive.Loaders
 
   def data_types do
     [
-      UserDocs.Web.Page,
+      UserDocs.Pages.Page,
       UserDocs.Projects.Project
    ]
   end

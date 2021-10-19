@@ -12,7 +12,7 @@ defmodule UserDocs.TestDataset do
 
   alias UserDocs.Documents.LanguageCode
 
-  alias UserDocs.Web.Page
+  alias UserDocs.Pages.Page
   alias UserDocs.Annotations.Annotation
   alias UserDocs.Elements.Element
   alias UserDocs.Web.Strategy

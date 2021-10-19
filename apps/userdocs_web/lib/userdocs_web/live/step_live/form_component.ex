@@ -16,7 +16,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   alias UserDocs.Automation.StepForm
   alias UserDocs.Elements
   alias UserDocs.Web
-  alias UserDocs.Web.Page
+  alias UserDocs.Pages.Page
   alias UserDocs.Elements.Element
 
   def update(%{id: id, step_params: step_params} = assigns,
@@ -175,7 +175,7 @@ defmodule UserDocsWeb.StepLive.FormComponent do
   def maybe_update_page_params(%{} = params, _, nil), do: params
   def maybe_update_page_params(%{} = params, state, page_id) do
     page = UserDocs.Web.get_page!(page_id, state, state.state_opts)
-    page_params = replace_params_with_fields(params["page"], page, UserDocs.Web.Page)
+    page_params = replace_params_with_fields(params["page"], page, UserDocs.Pages.Page)
     Map.put(params, "page", page_params)
   end
 
