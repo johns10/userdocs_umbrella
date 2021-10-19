@@ -56,13 +56,13 @@ defmodule UserDocs.Annotations.Annotation do
 
 
   def safe(annotation, handlers \\ %{})
-  def safe(annotation = %Annotation{}, handlers) do
+  def safe(annotation = %UserDocs.Annotations.Annotation{}, handlers) do
     base_safe(annotation)
     |> maybe_safe_annotation_type(handlers[:annotation_type], annotation.annotation_type, handlers)
   end
   def safe(nil, _), do: nil
 
-  def base_safe(annotation = %Annotation{}) do
+  def base_safe(annotation = %UserDocs.Annotations.Annotation{}) do
     %{
       id: annotation.id,
       label: annotation.label,
@@ -91,7 +91,7 @@ defmodule UserDocs.Annotations.Annotation do
     end
   end
 
-  def name(annotation = %Annotation{}) do
+  def name(annotation = %UserDocs.Annotations.Annotation{}) do
     Name.execute(annotation, Map.get(annotation, :element, %Element{}))
   end
 end
