@@ -82,8 +82,35 @@ defmodule UserDocs.WebTest do
       page = page_fixture()
       assert %Ecto.Changeset{} = Web.change_page(page)
     end
-  end
 
+    test "effective_url/3 returns an overriden URL when an override matches the project" do
+      url = UserDocs.Web.effective_url(
+        %Page{url: "/test"},
+        %UserDocs.Projects.Project{id: 1, base_url: "https://example.com"},
+        %UserDocs.Users.User{id: 1, overrides: [%UserDocs.Users.Override{project_id: 1, url: "https://test.com"}]})
+
+      assert url == "https://test.com/test"
+    end
+
+    test "effective_url/3 returns an non-overriden URL when no overrides match" do
+      url = UserDocs.Web.effective_url(
+        %Page{url: "/test"},
+        %UserDocs.Projects.Project{id: 2, base_url: "https://example.com"},
+        %UserDocs.Users.User{id: 1, overrides: [%UserDocs.Users.Override{project_id: 1, url: "https://test.com"}]})
+
+      assert url == "https://example.com/test"
+    end
+
+    test "effective_url/3 returns the page URL when it's not relative" do
+      url = UserDocs.Web.effective_url(
+        %Page{url: "https://face.com/test"},
+        %UserDocs.Projects.Project{id: 1, base_url: ""},
+        %UserDocs.Users.User{id: 1, overrides: [%UserDocs.Users.Override{project_id: 1, url: ""}]})
+
+      assert url == "https://face.com/test"
+    end
+  end
+"""
   describe "annotation_types" do
     alias UserDocs.Annotations.AnnotationType
 
@@ -284,4 +311,5 @@ defmodule UserDocs.WebTest do
       assert %Ecto.Changeset{} = Annotations.change_annotation(annotation)
     end
   end
+  """
 end

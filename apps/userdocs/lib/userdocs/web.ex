@@ -8,6 +8,8 @@ defmodule UserDocs.Web do
   alias UserDocs.Repo
   alias UserDocs.Subscription
   alias UserDocs.Pages.Page
+  alias UserDocs.Projects.Project
+  alias UserDocs.Users.User
 
   def load_pages(state, opts) do
     StateHandlers.load(state, list_pages(%{}, opts[:filters]), Page, opts)
@@ -140,6 +142,21 @@ defmodule UserDocs.Web do
   def change_page(%Page{} = page, attrs \\ %{}) do
     Page.changeset(page, attrs)
   end
+
+  def effective_url(
+    %Page{url: "/" <> _ = path} = page,
+    %Project{id: id, base_url: base_url},
+    %User{overrides: overrides}
+  ) do
+    Enum.reduce(overrides, base_url <> path, fn(o, url) ->
+      if o.project_id == id do
+        o.url <> path
+      else
+        url
+      end
+    end)
+  end
+  def effective_url(%Page{url: url}, %Project{}, %User{}), do: url
 
   alias UserDocs.Web.Strategy
 
