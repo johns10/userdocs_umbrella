@@ -58,6 +58,7 @@ defmodule UserDocs.Elements do
   end
   def get_element!(id, state, opts) when is_list(opts) do
     StateHandlers.get(state, id, Element, opts)
+    |> maybe_preload_element(opts[:preloads], state, opts)
   end
 
   defp base_element_query(id) do
@@ -83,5 +84,4 @@ defmodule UserDocs.Elements do
   def change_element(%Element{} = element, attrs \\ %{}) do
     Element.changeset(element, attrs)
   end
-
 end

@@ -26,6 +26,9 @@ css:
     .flex-none.px-2.mx-2
       = if is_struct(@current_project, UserDocs.Projects.Project) do
         button.btn.btn-ghost.btn-sm 
+          = live_patch "Pages", to: Routes.page_index_path(@socket, :index), class: "hover_text-white"
+      = if is_struct(@current_project, UserDocs.Projects.Project) do
+        button.btn.btn-ghost.btn-sm 
           = live_patch "Processes", to: Routes.process_index_path(@socket, :index), class: "hover_text-white"
       = if is_struct(@current_project, UserDocs.Projects.Project) do
         button.btn.btn-ghost.btn-sm 

@@ -54,7 +54,6 @@ defmodule UserDocsWeb.PageLive.Show do
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:page, Web.get_page!(String.to_integer(id), socket, socket.assigns.state_opts))
-    |> prepare_elements(String.to_integer(id))
     |> assign_select_lists
   end
 
@@ -62,7 +61,6 @@ defmodule UserDocsWeb.PageLive.Show do
     socket
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:page, Web.get_page!(String.to_integer(id), socket, socket.assigns.state_opts))
-    |> prepare_elements(String.to_integer(id))
     |> assign_select_lists
   end
 
@@ -72,7 +70,6 @@ defmodule UserDocsWeb.PageLive.Show do
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:page, Web.get_page!(String.to_integer(page_id), socket, opts))
     |> assign(:element, Elements.get_element!(String.to_integer(element_id), socket, opts))
-    |> prepare_elements(String.to_integer(page_id))
     |> assign_select_lists
   end
 
@@ -82,28 +79,8 @@ defmodule UserDocsWeb.PageLive.Show do
     |> assign(:page_title, page_title(socket.assigns.live_action))
     |> assign(:page, Web.get_page!(String.to_integer(page_id), socket, opts))
     |> assign(:element, %Element{})
-    |> prepare_elements(String.to_integer(page_id))
     |> assign_select_lists
 
-  end
-
-  defp prepare_elements(socket, page_id) do
-    preloads =
-      [
-        :strategy,
-        :annotations,
-        [annotation: :annotation_type]
-     ]
-
-     opts =
-       socket.assigns.state_opts
-       |> Keyword.put(:preloads, preloads)
-       |> Keyword.put(:order, [%{field: :name, order: :asc}])
-       |> Keyword.put(:filter, {:page_id, page_id})
-
-    IO.inspect(Elements.list_elements(socket, opts))
-
-    assign(socket, :elements, Elements.list_elements(socket, opts))
   end
 
   defp page_title(:show), do: "Show Page"
@@ -116,24 +93,12 @@ defmodule UserDocsWeb.PageLive.Show do
 
   def assign_select_lists(socket) do
     assign(socket, :select_lists, %{
-      projects: projects_select(socket),
-      pages_select: pages_select(socket),
-      strategies: strategies_select(socket)
+      projects: projects_select(socket)
     })
   end
 
-  def projects_select(%{assigns: %{state_opts: state_opts}} = socket) do
+  defp projects_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Projects.list_projects(socket, state_opts)
-    |> Helpers.select_list(:name, :false)
-  end
-
-  def pages_select(%{assigns: %{state_opts: state_opts}} = socket) do
-    Web.list_pages(socket, state_opts)
-    |> Helpers.select_list(:name, :true)
-  end
-
-  def strategies_select(%{assigns: %{state_opts: state_opts}} = socket) do
-    Web.list_strategies(socket, state_opts)
     |> Helpers.select_list(:name, :false)
   end
 end

@@ -5,6 +5,7 @@ defmodule UserDocsWeb.PageLive.Index do
   alias UserDocs.Helpers
   alias UserDocs.Projects
   alias UserDocs.Web
+  alias UserDocs.Web
   alias UserDocs.Pages.Page
   alias UserDocsWeb.Root
   alias UserDocsWeb.ProcessLive.Loaders
@@ -35,8 +36,14 @@ defmodule UserDocsWeb.PageLive.Index do
   end
 
   @impl true
-  def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  def handle_params(params, url, socket) do
+    {
+      :noreply,
+      socket
+      |> assign(url: URI.parse(url))
+      |> apply_action(socket.assigns.live_action, params)
+
+    }
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
@@ -70,6 +77,19 @@ defmodule UserDocsWeb.PageLive.Index do
 
     {:noreply, prepare_pages(socket, socket.assigns.current_project_id)}
   end
+
+  def handle_event("navigate", %{"id" => id}, %{assigns: %{state_opts: opts, current_project: project, current_user: user}} = socket) do
+    page = Web.get_page!(String.to_integer(id), socket, opts)
+    url = Web.effective_url(page, project, user)
+    IO.puts("Sending a navigate command to the extension to #{url}")
+    UserDocsWeb.Endpoint.broadcast("user:" <> to_string(user.id), "command:navigate", %{url: url})
+    {:noreply, socket}
+  end
+
+  def handle_event(n, p, s), do: Root.handle_event(n, p, s)
+
+  @impl true
+  def handle_info(n, s), do: Root.handle_info(n, s)
 
   defp prepare_pages(socket, project_id) do
      opts =

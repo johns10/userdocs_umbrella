@@ -99,8 +99,9 @@ defmodule UserDocsWeb.Router do
     live "/", PageLive, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/download", RegistrationLive.Index, :index
 
-    live "/elements", ElementLive.Index, :index
+    live "/pages/:page_id/elements", ElementLive.Index, :index
     live "/elements/new", ElementLive.Index, :new
+    live "/pages/:page_id/elements/:element_id/edit", ElementLive.Index, :edit
     live "/elements/:id/edit", ElementLive.Index, :edit
 
     live "/elements/:id", ElementLive.Show, :show
@@ -124,7 +125,6 @@ defmodule UserDocsWeb.Router do
     live "/pages/:id/edit", PageLive.Index, :edit
 
     live "/pages/:id", PageLive.Show, :show
-    live "/pages/:page_id/element/:element_id/edit", PageLive.Show, :edit_element
     live "/pages/:page_id/element/new", PageLive.Show, :new_element
     live "/pages/:id/show/edit", PageLive.Show, :edit
 
