@@ -110,7 +110,7 @@ defmodule UserDocs.WebTest do
       assert url == "https://face.com/test"
     end
   end
-"""
+
   describe "annotation_types" do
     alias UserDocs.Annotations.AnnotationType
 
@@ -311,5 +311,4 @@ defmodule UserDocs.WebTest do
       assert %Ecto.Changeset{} = Annotations.change_annotation(annotation)
     end
   end
-  """
 end
