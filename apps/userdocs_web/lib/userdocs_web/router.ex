@@ -99,6 +99,10 @@ defmodule UserDocsWeb.Router do
     live "/", PageLive, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/download", RegistrationLive.Index, :index
 
+    live "/pages/:page_id/annotations", AnnotationLive.Index, :index
+    live "/pages/:page_id/annotations/new", AnnotationLive.Index, :new
+    live "/pages/:page_id/annotations/:id/edit", AnnotationLive.Index, :edit
+
     live "/jobs", JobLive.Index, :index
     live "/jobs/new", JobLive.Index, :new
     live "/jobs/:id/edit", JobLive.Index, :edit
@@ -106,9 +110,8 @@ defmodule UserDocsWeb.Router do
     live "/jobs/:id/show/edit", JobLive.Show, :edit
 
     live "/pages/:page_id/elements", ElementLive.Index, :index
-    live "/elements/new", ElementLive.Index, :new
+    live "/pages/:page_id/elements/new", ElementLive.Index, :new
     live "/pages/:page_id/elements/:element_id/edit", ElementLive.Index, :edit
-    live "/elements/:id/edit", ElementLive.Index, :edit
 
     live "/pages", PageLive.Index, :index
     live "/pages/new", PageLive.Index, :new

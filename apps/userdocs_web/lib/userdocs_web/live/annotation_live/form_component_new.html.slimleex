@@ -1,0 +1,83 @@
+= form = form_for @changeset, "#",
+  id: @id,
+  phx_target: @myself.cid,
+  phx_change: "validate",
+  phx_submit: "save"
+
+  = hidden_input(form, :name, [ value: Ecto.Changeset.get_field(@changeset, :name, "") ])
+
+  .grid.grid-cols-4.gap-2
+
+    = label form, :page_id, class: "label mb-0"
+    .col-span-3
+      = select form, :page_id, @select_lists.pages,
+        class: "flex-1 select select-sm select-bordered mb-0"
+    = error_tag form, :page_id
+
+    = label form, :annotation_type_id, "Ann. Type", class: "label mb-0"
+    .col-span-3
+      = select form, :annotation_type_id, @select_lists.annotation_types,
+        class: "flex-1 select select-sm select-bordered mb-0"
+    = error_tag form, :annotation_type_id
+
+    = if field_enabled?(form.source, :label, @annotation_types) do
+      .form-control
+        = label form, :label, class: "label mb-0"
+        = text_input form, :label, type: "text", class: "input input-sm input-bordered mb-0"
+        = error_tag form, :label
+
+    = if field_enabled?(form.source, :size, @annotation_types) do
+      .form-control
+        = label form, :size, class: "label mb-0"
+        = number_input form, :size, type: "text", class: "input input-sm input-bordered mb-0"
+        = error_tag form, :size
+
+    = if field_enabled?(form.source, :x_offset, @annotation_types) do
+      .form-control
+        = label form, :x_offset, class: "label mb-0"
+        = number_input form, :x_offset, type: "text", class: "input input-sm input-bordered mb-0"
+        = error_tag form, :x_offset
+
+    = if field_enabled?(form.source, :y_offset, @annotation_types) do
+      .form-control
+        = label form, :y_offset, class: "label mb-0"
+        = number_input form, :y_offset, type: "text", class: "input input-sm input-bordered mb-0"
+        = error_tag form, :y_offset
+
+    = if field_enabled?(form.source, :font_size, @annotation_types) do
+      .form-control
+        = label form, :font_size, class: "label mb-0"
+        = text_input form, :font_size, type: "text", class: "input input-sm input-bordered mb-0"
+        = error_tag form, :font_size
+
+    = if field_enabled?(form.source, :color, @annotation_types) do
+      .form-control
+        = label form, :color, class: "label mb-0"
+        = text_input form, :color, type: "text", class: "input input-sm input-bordered mb-0"
+        = error_tag form, :color
+
+    = if field_enabled?(form.source, :x_orientation, @annotation_types) do
+      .form-control
+        = label form, :x_orientation, "X Orient.", class: "label pr-0 mb-0"
+        = select form, :x_orientation,
+          [{"None", ""}, {"Right", "R"}, {"Middle", "M"}, {"Left", "L"}],
+          class: "flex-1 select select-sm select-bordered mb-0"
+        = error_tag form, :x_orientation
+
+    = if field_enabled?(form.source, :y_orientation, @annotation_types) do
+      .form-control
+        = label form, :y_orientation, "Y Orient.", class: "label pr-0 mb-0"
+        = select form, :y_orientation,
+          [{"None", ""}, {"Top", "T"}, {"Middle", "M"}, {"Bottom", "B"}],
+          class: "flex-1 select select-sm select-bordered mb-0"
+        = error_tag form, :y_orientation
+
+    = if field_enabled?(form.source, :thickness, @annotation_types) do
+      .form-control
+        = label form, :thickness, class: "label mb-0"
+        = text_input form, :thickness, type: "text", class: "input input-sm input-bordered mb-0"
+        = error_tag form, :thickness
+
+  = submit "Save", phx_disable_with: "Saving...", class: "mt-4 btn btn-success"
+
+</form>
