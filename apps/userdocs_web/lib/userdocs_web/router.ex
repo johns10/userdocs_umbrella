@@ -99,26 +99,16 @@ defmodule UserDocsWeb.Router do
     live "/", PageLive, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/download", RegistrationLive.Index, :index
 
+    live "/jobs", JobLive.Index, :index
+    live "/jobs/new", JobLive.Index, :new
+    live "/jobs/:id/edit", JobLive.Index, :edit
+    live "/jobs/:id", JobLive.Show, :show
+    live "/jobs/:id/show/edit", JobLive.Show, :edit
+
     live "/pages/:page_id/elements", ElementLive.Index, :index
     live "/elements/new", ElementLive.Index, :new
     live "/pages/:page_id/elements/:element_id/edit", ElementLive.Index, :edit
     live "/elements/:id/edit", ElementLive.Index, :edit
-
-    live "/elements/:id", ElementLive.Show, :show
-    live "/elements/:id/show/edit", ElementLive.Show, :edit
-
-    live "/users/new", UserLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/users", UserLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/users/:id", UserLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/users/:id/show/edit", UserLive.Show, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/users/:id/show/options", UserLive.Show, :options, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/users/:id/show/local", UserLive.Show, :local_options, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/users/:id/edit", UserLive.Index, :edit
-
-    live "/teams/new", TeamLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/teams", TeamLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/teams/:id", TeamLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/teams/:id/edit", TeamLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
     live "/pages", PageLive.Index, :index
     live "/pages/new", PageLive.Index, :new
@@ -128,27 +118,34 @@ defmodule UserDocsWeb.Router do
     live "/pages/:page_id/element/new", PageLive.Show, :new_element
     live "/pages/:id/show/edit", PageLive.Show, :edit
 
+    live "/processes/:project_id/projects", ProcessLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/processes", ProcessLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/processes/new", ProcessLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/processes/:id/edit", ProcessLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
     live "/teams/:team_id/projects", ProjectLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/projects", ProjectLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/projects/:id/edit", ProjectLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/projects/new", ProjectLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/projects/:id", ProjectLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
-    live "/processes/:project_id/projects", ProcessLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/processes", ProcessLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/processes/new", ProcessLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-    live "/processes/:id/edit", ProcessLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
-
     live "/processes/:process_id/steps", StepLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/processes/:process_id/steps/new", StepLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/steps/:id/edit", StepLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
     live "/steps/:id/screenshot", StepLive.Index, :screenshot_workflow, session: {UserDocsWeb.LiveHelpers, :which_app, []}
 
-    live "/jobs", JobLive.Index, :index
-    live "/jobs/new", JobLive.Index, :new
-    live "/jobs/:id/edit", JobLive.Index, :edit
-    live "/jobs/:id", JobLive.Show, :show
-    live "/jobs/:id/show/edit", JobLive.Show, :edit
+    live "/teams/new", TeamLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams", TeamLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:id", TeamLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/teams/:id/edit", TeamLive.Index, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+
+    live "/users/new", UserLive.Index, :new, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/users", UserLive.Index, :index, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/users/:id", UserLive.Show, :show, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/users/:id/show/edit", UserLive.Show, :edit, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/users/:id/show/options", UserLive.Show, :options, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/users/:id/show/local", UserLive.Show, :local_options, session: {UserDocsWeb.LiveHelpers, :which_app, []}
+    live "/users/:id/edit", UserLive.Index, :edit
 
     post "/registration/send-confirmation-email", RegistrationController, :resend_confirmation_email
   end
