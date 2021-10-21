@@ -2,9 +2,9 @@ defmodule UserDocsWeb.ElementLive.Index do
   use UserDocsWeb, :live_view
   use UserdocsWeb.LiveViewPowHelper
 
-  alias UserDocs.Helpers
   alias UserDocs.Elements
   alias UserDocs.Elements.Element
+  alias UserDocs.Helpers
   alias UserDocs.Pages
   alias UserDocs.Web
   alias UserDocsWeb.Root
@@ -15,7 +15,7 @@ defmodule UserDocsWeb.ElementLive.Index do
       UserDocs.Web.Strategy,
       UserDocs.Elements.Element,
       UserDocs.Pages.Page
-   ]
+    ]
   end
 
   @impl true
@@ -25,7 +25,7 @@ defmodule UserDocsWeb.ElementLive.Index do
       socket
       |> Root.apply(session, data_types())
       |> initialize()
-   }
+    }
   end
 
   def initialize(%{assigns: %{auth_state: :not_logged_in}} = socket), do: socket
@@ -60,10 +60,13 @@ defmodule UserDocsWeb.ElementLive.Index do
     |> prepare_elements()
   end
 
-  defp apply_action(socket, :new, _params) do
+  defp apply_action(socket, :new, %{"page_id" => page_id}) do
     socket
     |> assign(:page_title, "New Element")
+    |> prepare_elements(String.to_integer(page_id))
+    |> assign(:page, Web.get_page!(String.to_integer(page_id), socket, socket.assigns.state_opts))
     |> assign(:element, %Element{})
+    |> assign_select_lists
   end
 
   defp apply_action(socket, :index, %{"page_id" => page_id}) do
