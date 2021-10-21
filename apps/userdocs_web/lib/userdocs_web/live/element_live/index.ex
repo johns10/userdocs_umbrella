@@ -99,11 +99,12 @@ defmodule UserDocsWeb.ElementLive.Index do
     {:noreply, socket}
   end
 
-  def handle_event("delete", %{"id" => id}, socket) do
+  def handle_event("delete", %{"id" => id, "page-id" => page_id}, socket) do
     element = Elements.get_element!(id)
-    {:ok, _} = Elements.delete_element(element)
-
-    {:noreply, assign(socket, :elements, prepare_elements(socket))}
+    {:ok, deleted_element} = Elements.delete_element(element)
+    send(self(), {:broadcast, "delete", deleted_element})
+    elements = Enum.filter(socket.assigns.elements, fn(e) -> e.id != deleted_element.id end)
+    {:noreply, socket |> assign(:elements, elements)}
   end
 
   @impl true
