@@ -1,10 +1,10 @@
+h2 = @title
+
 = form = form_for @changeset, "#",
-  id: @id,
+  id: "annotation-form",
   phx_target: @myself.cid,
   phx_change: "validate",
   phx_submit: "save"
-
-  = hidden_input(form, :name, [ value: Ecto.Changeset.get_field(@changeset, :name, "") ])
 
   .grid.grid-cols-4.gap-2
 
@@ -12,7 +12,7 @@
     .col-span-3
       = select form, :page_id, @select_lists.pages,
         class: "flex-1 select select-sm select-bordered mb-0"
-    = error_tag form, :page_id
+      = error_tag form, :page_id
 
     = label form, :annotation_type_id, "Ann. Type", class: "label mb-0"
     .col-span-3
