@@ -75,10 +75,14 @@ defmodule UserDocsWeb.AnnotationLive.Index do
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     annotation = Annotations.get_annotation!(id)
-    {:ok, _} = Annotations.delete_annotation(annotation)
-
-    {:noreply, socket}
+    {:ok, deleted_annotation} = Annotations.delete_annotation(annotation)
+    send(self(), {:broadcast, "delete", deleted_annotation})
+    annotations = Enum.filter(socket.assigns.annotations, fn(e) -> e.id != deleted_annotation.id end)
+    {:noreply, socket |> assign(:annotations, annotations)}
   end
+
+  @impl true
+  def handle_info(n, s), do: Root.handle_info(n, s)
 
   @preloads [:annotation_type]
   @order [%{field: :name, order: :asc}]
