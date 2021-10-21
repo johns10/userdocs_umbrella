@@ -13,7 +13,7 @@ defmodule UserDocsWeb.PageLive.FormComponent do
   def render(assigns) do
     ~L"""
       <%= form = form_for @changeset, "#",
-        id: @id,
+        id: "page-form",
         phx_target: @myself.cid,
         phx_change: "validate",
         phx_submit: "save",
