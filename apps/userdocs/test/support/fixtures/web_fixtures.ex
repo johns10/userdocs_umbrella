@@ -78,6 +78,14 @@ defmodule UserDocs.WebFixtures do
     }
   end
 
+  def page_attrs(:invalid, project_id) do
+    %{
+      url: "http://www.user-docs.com",
+      name: UUID.uuid4(),
+      project_id: nil
+    }
+  end
+
   def element_attrs(:valid, page_id, strategy_id) do
     %{
       name: UUID.uuid4(),
@@ -89,7 +97,6 @@ defmodule UserDocs.WebFixtures do
 
   def element_attrs(:invalid, page_id, strategy_id) do
     %{
-      name: nil,
       selector: nil,
       page_id: page_id,
       strategy_id: strategy_id
@@ -102,6 +109,12 @@ defmodule UserDocs.WebFixtures do
     }
   end
 
+  def annotation_attrs(:invalid) do
+    %{
+      page_id: nil
+    }
+  end
+
   def annotation_attrs(:valid) do
     %{
       label: UUID.uuid4(),
@@ -109,6 +122,11 @@ defmodule UserDocs.WebFixtures do
     }
   end
 
+  def annotation_attrs(:valid, page_id) do
+    %{
+      page_id: page_id
+    }
+  end
   def annotation_type_attrs(:valid, :outline) do
     %{
       args: ["color", "thickness"],
