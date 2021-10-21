@@ -63,9 +63,12 @@ defmodule UserDocsWeb.AnnotationLive.FormComponentNew do
   end
 
   def field_enabled?(changeset, name, annotation_types) do
-    annotation_type_id = Ecto.Changeset.get_field(changeset, :annotation_type_id)
-    annotation = Enum.filter(annotation_types, fn(at) -> at.id == annotation_type_id end) |> Enum.at(0)
-    enabled_fields = annotation.args |> Enum.map(fn(a) -> String.to_atom(a) end)
-    name in enabled_fields
+    case Ecto.Changeset.get_field(changeset, :annotation_type_id) do
+      nil -> false
+      annotation_type_id ->
+        annotation = Enum.filter(annotation_types, fn(at) -> at.id == annotation_type_id end) |> Enum.at(0)
+        enabled_fields = annotation.args |> Enum.map(fn(a) -> String.to_atom(a) end)
+        name in enabled_fields
+    end
   end
 end
