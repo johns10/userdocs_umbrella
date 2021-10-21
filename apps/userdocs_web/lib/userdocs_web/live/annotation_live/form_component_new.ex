@@ -37,10 +37,11 @@ defmodule UserDocsWeb.AnnotationLive.FormComponentNew do
   defp save_annotation(socket, :edit, annotation_params) do
     case Annotations.update_annotation(socket.assigns.annotation, annotation_params) do
       {:ok, _annotation} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Annotation updated successfully")
-         |> push_patch(to: socket.assigns.return_to)
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "Annotation updated successfully")
+          |> push_redirect(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -51,10 +52,11 @@ defmodule UserDocsWeb.AnnotationLive.FormComponentNew do
   defp save_annotation(socket, :new, annotation_params) do
     case Annotations.create_annotation(annotation_params) do
       {:ok, _annotation} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Annotation created successfully")
-         |> push_patch(to: socket.assigns.return_to)
+        {
+          :noreply,
+          socket
+          |> put_flash(:info, "Annotation created successfully")
+          |> push_redirect(to: socket.assigns.return_to)
         }
 
       {:error, %Ecto.Changeset{} = changeset} ->
