@@ -73,9 +73,10 @@ defmodule UserDocsWeb.PageLive.Index do
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     page = Web.get_page!(id)
-    {:ok, _} = Web.delete_page(page)
-
-    {:noreply, prepare_pages(socket, socket.assigns.current_project_id)}
+    {:ok, deleted_page} = Web.delete_page(page)
+    send(self(), {:broadcast, "delete", deleted_page})
+    pages = Enum.filter(socket.assigns.pages, fn(p) -> p.id != deleted_page.id end)
+    {:noreply, socket |> assign(:pages, pages)}
   end
 
   def handle_event("navigate", %{"id" => id}, %{assigns: %{state_opts: opts, current_project: project, current_user: user}} = socket) do
@@ -108,6 +109,6 @@ defmodule UserDocsWeb.PageLive.Index do
 
   def projects_select(%{assigns: %{state_opts: state_opts}} = socket) do
     Projects.list_projects(socket, state_opts)
-    |> Helpers.select_list(:name, :false)
+    |> Helpers.select_list(:name, :true)
   end
 end
