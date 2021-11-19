@@ -53,6 +53,8 @@ defmodule UserDocs.Screenshots do
     config =
       ExAws.Config.new(:s3)
       |> Map.put(:region, region)
+      |> Map.put(:access_key_id, team.aws_access_key_id)
+      |> Map.put(:scret_access_key, team.aws_secret_access_key)
 
     ExAws.S3.presigned_url(config, :get, bucket, path, virtual_host: true)
   end
@@ -62,7 +64,7 @@ defmodule UserDocs.Screenshots do
   def get_screenshot_status(%Screenshot{}), do: nil
   def get_screenshot_status(nil), do: nil
 
-  def get_url(nil, _team), do: {:nofile, ""}
+  def get_url(nil, team), do: {:nofile, ""}
   def get_url(aws_key, team) do
     region = team.aws_region
     bucket = team.aws_bucket
@@ -70,6 +72,8 @@ defmodule UserDocs.Screenshots do
     config =
       ExAws.Config.new(:s3)
       |> Map.put(:region, region)
+      |> Map.put(:access_key_id, team.aws_access_key_id)
+      |> Map.put(:scret_access_key, team.aws_secret_access_key)
 
     ExAws.S3.presigned_url(config, :get, bucket, aws_key, virtual_host: true)
   end
