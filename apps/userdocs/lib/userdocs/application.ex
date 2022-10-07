@@ -14,7 +14,6 @@ defmodule UserDocs.Application do
       {Phoenix.PubSub, name: UserDocs.PubSub, adapter: Phoenix.PubSub.PG2}
     ]
 
-    :pg2.create(UserDocs.PubSub)
     Supervisor.start_link(children, strategy: :one_for_one, name: UserDocs.Supervisor)
   end
 end
