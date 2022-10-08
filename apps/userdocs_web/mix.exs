@@ -63,6 +63,7 @@ defmodule UserDocsWeb.MixProject do
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:absinthe, "~> 1.5", override: true},
       {:nodejs, "~> 2.0", only: [:dev, :test]},
+      {:neotoma, "~> 1.7.3", manager: :rebar3, override: true}
     ]
   end
 

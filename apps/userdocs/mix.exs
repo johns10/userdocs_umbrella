@@ -46,7 +46,7 @@ defmodule UserDocs.MixProject do
       {:image64, "~> 0.0.1"},
       {:uuid, "~> 1.1"},
       {:mogrify, "~> 0.8.0"},
-      {:cloak_ecto, "~> 1.1.1"},
+      {:cloak_ecto, "~> 1.2"},
       {:waffle, "~> 1.1.4"},
       {:waffle_ecto, "~> 0.0.9"},
       {:ex_aws, "~> 2.2.1"},

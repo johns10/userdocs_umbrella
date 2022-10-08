@@ -32,7 +32,7 @@
     "css-loader": "^5.x",
     "css-minimizer-webpack-plugin": "^1.x",
     "mini-css-extract-plugin": "^1.x",
-    "node-sass": "^4.13",
+    "node-sass": "^6",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "postcss": "^8.3.6",
     "postcss-loader": "^4.2",
